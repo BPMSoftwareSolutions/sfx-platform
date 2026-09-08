@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-counted-monotonic-summary","viewId":"n-4f711af7b0d1d3eff5297a21"};

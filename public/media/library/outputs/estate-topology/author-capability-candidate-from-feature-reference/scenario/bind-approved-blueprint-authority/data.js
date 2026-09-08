@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-approved-blueprint-authority","viewId":"n-64555edd0318f8b7252607fc"};

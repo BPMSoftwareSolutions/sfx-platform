@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"scan-forbidden-terminology","viewId":"n-cfbbcc9b4a05ed50d0a3e1b1"};

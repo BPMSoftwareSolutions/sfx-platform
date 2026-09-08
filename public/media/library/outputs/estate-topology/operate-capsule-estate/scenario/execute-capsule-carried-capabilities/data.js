@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"execute-capsule-carried-capabilities","viewId":"n-eca941787591f5d1c397c51c"};

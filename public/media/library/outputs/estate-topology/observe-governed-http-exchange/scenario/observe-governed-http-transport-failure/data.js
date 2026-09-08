@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-governed-http-transport-failure","viewId":"n-4d6c8848e49630a8cb74cad1"};

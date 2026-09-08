@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-openapi-description","viewId":"n-317cb5cd9815a2a34b8d5512"};

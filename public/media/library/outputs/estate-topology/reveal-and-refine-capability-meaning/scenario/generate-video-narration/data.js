@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"generate-video-narration","viewId":"n-5bb051d812d0a4eb1ca5c024"};

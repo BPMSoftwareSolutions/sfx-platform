@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-premature-or-incomplete-capability-authoring-closure","viewId":"n-5f38954ea97cc61330a35f8d"};

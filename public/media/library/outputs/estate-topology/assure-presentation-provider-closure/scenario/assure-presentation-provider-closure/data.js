@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"assure-presentation-provider-closure","viewId":"n-efa3f266ee41cd88a43b74ca"};

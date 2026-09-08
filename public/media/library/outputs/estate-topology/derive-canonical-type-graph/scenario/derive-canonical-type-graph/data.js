@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-canonical-type-graph","viewId":"n-a5b91616d200f90ec029126d"};

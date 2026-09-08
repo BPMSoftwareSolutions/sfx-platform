@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-carrier-rejection","viewId":"n-152398f3accecfacf141228a"};

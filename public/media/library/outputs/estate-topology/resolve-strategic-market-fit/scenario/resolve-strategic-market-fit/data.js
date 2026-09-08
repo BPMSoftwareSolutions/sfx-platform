@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-strategic-market-fit","viewId":"n-b9db201dcf85a078043d80c8"};

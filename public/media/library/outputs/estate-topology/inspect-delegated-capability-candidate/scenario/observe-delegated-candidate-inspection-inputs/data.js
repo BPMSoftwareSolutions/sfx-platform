@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-delegated-candidate-inspection-inputs","viewId":"n-885a0e2f7b1f58a4f16b2b0f"};

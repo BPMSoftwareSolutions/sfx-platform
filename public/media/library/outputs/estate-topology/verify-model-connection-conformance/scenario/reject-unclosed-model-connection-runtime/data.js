@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-unclosed-model-connection-runtime","viewId":"n-fb5ed6fc2ac89e6b4bec88cc"};

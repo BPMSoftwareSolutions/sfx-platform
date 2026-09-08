@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-product-fit-aggregate","viewId":"n-bb1fee8cedbdeed9fc3644b7"};

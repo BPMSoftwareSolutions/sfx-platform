@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"deliver-capability-change-cli","viewId":"n-37ce228f0622463ee915f8a2"};

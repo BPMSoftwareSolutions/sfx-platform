@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-bounded-return-authority","viewId":"n-e0b13e6811d05985584f9fb8"};

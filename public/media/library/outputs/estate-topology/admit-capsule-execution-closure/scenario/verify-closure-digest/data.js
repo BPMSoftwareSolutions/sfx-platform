@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-closure-digest","viewId":"n-2e8091bfc6145bc9481425cc"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"detect-stale-pins","viewId":"n-026812d5e5ae6c37298bf5ba"};

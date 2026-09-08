@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-closure-receipt","viewId":"n-6ce06ff766ae738d25043a8a"};

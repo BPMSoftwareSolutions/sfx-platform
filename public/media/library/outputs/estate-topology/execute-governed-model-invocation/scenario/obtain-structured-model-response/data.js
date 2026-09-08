@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"obtain-structured-model-response","viewId":"n-901427890a9aea1e3d23f98b"};

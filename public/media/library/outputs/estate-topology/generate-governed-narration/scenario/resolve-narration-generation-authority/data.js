@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-narration-generation-authority","viewId":"n-f2a2f9d34e55d6d6222b0cae"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-blueprint-design-testimony","viewId":"n-1a43f913511ed6e37afc6c41"};

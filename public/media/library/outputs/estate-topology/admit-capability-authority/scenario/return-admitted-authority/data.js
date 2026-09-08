@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-admitted-authority","viewId":"n-fe1a28e994e091d5f7fae100"};

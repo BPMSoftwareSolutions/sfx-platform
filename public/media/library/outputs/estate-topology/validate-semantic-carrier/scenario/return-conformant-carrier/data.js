@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-conformant-carrier","viewId":"n-a8609bf63914083f93b5a0d1"};

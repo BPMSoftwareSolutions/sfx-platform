@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-unsupported-interaction-mode","viewId":"n-1d75b223908eb341ba6f0968"};

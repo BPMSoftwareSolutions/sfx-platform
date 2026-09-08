@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"govern-strategic-decision-v2","viewId":"n-3d54ca269525b517a24bf1ed"};

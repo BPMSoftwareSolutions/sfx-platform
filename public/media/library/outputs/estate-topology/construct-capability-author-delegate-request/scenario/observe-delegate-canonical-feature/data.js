@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-delegate-canonical-feature","viewId":"n-e5b8b99ddfa456211274bc54"};

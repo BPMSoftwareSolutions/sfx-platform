@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"operate-capsule-estate","viewId":"n-670d721d4ce9e6b1507554b9"};

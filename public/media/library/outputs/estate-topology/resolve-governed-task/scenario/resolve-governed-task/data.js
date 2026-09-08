@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-governed-task","viewId":"n-e452868dfe4e1c01df7ee718"};

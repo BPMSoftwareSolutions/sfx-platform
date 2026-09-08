@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-selected-outcome-variant","viewId":"n-df2ebad856fd4f523cfde569"};

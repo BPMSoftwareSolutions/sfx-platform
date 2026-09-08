@@ -4,6 +4,7 @@
   "artifacts": {
     "estate-publication.json": "sha256:1a47fdfbe3c8820e0ac10846306fe101307a6211fb43f600675e625ab268f5c0",
     "circuit-projections.json": "sha256:ecf01e049eedba46cd6f5234487f5b9f9425c9cb03e1902567e54685b545aef2",
-    "visual-publication.json": "sha256:dc6603260ecbbfb21b8cb805b496c89658cecf33dab83d0869d2a3aed2372d9e"
-  }
+    "visual-publication.json": "sha256:7d158e4a4d8695f02a5debcab4fa96b99271ec7a5846e037520924a9cfcdd5c8"
+  },
+  "topology": "sha256:a97566b9feb8e5c5cc1d7c06ebdf1bf257fe31cd0a03fbd454733c41081286e9"
 }

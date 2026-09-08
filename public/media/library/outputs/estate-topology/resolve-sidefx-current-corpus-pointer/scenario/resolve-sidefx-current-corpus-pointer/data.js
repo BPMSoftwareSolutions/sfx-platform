@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-sidefx-current-corpus-pointer","viewId":"n-26bdf0018581d3470c0b12d0"};

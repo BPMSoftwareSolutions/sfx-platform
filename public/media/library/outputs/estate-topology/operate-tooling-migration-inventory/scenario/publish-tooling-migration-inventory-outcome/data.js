@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"publish-tooling-migration-inventory-outcome","viewId":"n-88eb525d4325a44e47263aa4"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"preserve-model-role-context-isolation","viewId":"n-29d8db4c44da9051914ad517"};

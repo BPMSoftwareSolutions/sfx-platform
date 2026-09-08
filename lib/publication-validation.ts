@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { z } from 'zod';
 
@@ -14,7 +14,21 @@ export const PublicationManifest = z.object({
     'circuit-projections.json': Digest,
     'visual-publication.json': Digest,
   }).strict(),
+  /**
+   * ADR 0001 — one digest over every topology bundle, so the graph data the site renders from is
+   * pinned by the release exactly like the other published artifacts.
+   */
+  topology: Digest,
 }).strict();
+
+/** Digest over the topology directory: a stable map of bundle name to its own digest. */
+export function topologyDigest(directory = join(process.cwd(), 'generated')) {
+  const bundles = join(directory, 'topology');
+  if (!existsSync(bundles)) return stableDigest({});
+  return stableDigest(Object.fromEntries(
+    readdirSync(bundles).sort().map(name => [name, digest(readFileSync(join(bundles, name)))]),
+  ));
+}
 
 export function digest(bytes: string | Buffer): string {
   return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
@@ -80,6 +94,11 @@ export function readValidatedPublication(directory = join(process.cwd(), 'genera
       digest(circuitBytes) !== manifest.artifacts['circuit-projections.json'] ||
       digest(visualBytes) !== manifest.artifacts['visual-publication.json']) {
     throw new Error('Selected publication artifact digest mismatch');
+  }
+  // ADR 0001 — the topology bundles are release artifacts too: an altered or missing bundle must
+  // fail the read rather than render an unpinned diagram.
+  if (topologyDigest(directory) !== manifest.topology) {
+    throw new Error('Selected topology bundles differ from the release manifest');
   }
   const validated = validatePublication(publicationBytes, circuitBytes);
   const visuals=VisualPublication.parse(JSON.parse(visualBytes.toString('utf8')));

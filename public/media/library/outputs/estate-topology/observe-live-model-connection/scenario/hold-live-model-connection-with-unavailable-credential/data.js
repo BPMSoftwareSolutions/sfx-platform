@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"hold-live-model-connection-with-unavailable-credential","viewId":"n-b8c26cf8aa9af6bb4856c23d"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"preserve-admitted-projection-on-incomplete-regeneration","viewId":"n-c7c0739182e9c0472ac0dc8e"};

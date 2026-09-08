@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-scaffold-completeness-level","viewId":"n-623bde15e6e33b2cae51605d"};

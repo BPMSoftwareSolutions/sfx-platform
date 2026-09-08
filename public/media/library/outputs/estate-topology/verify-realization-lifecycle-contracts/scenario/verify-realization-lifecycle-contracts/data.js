@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-realization-lifecycle-contracts","viewId":"n-ef992430d8212b9cfaaa1f9e"};

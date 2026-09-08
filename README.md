@@ -21,6 +21,8 @@ Other scripts:
 | Script | What it does |
 | --- | --- |
 | `npm run publish:estate` | Reads one pinned generation of the estate and writes `generated/` |
+| `npm run ingest:topology` | Rebuilds `generated/topology` from the compiler output, discarding rendered SVG (ADR 0001) |
+| `npm run verify:topology` | Compares on-demand rendering against stored diagrams, where those still exist |
 | `npm run select:estate` | Validates and pins both generated artifacts in a digest manifest after a deliberate publication refresh |
 | `npm run validate:estate` | Checks the selected bytes, schema, identities, coverage and circuit integrity |
 | `npm run build` | Requires the selected valid publication, then builds standalone output; never reads the development database |
@@ -42,6 +44,7 @@ C:\lab\sidefx-database\data\website-visuals\inventory-2026-09-08.json   (selecte
         ▼
 generated/estate-publication.json    validated by contracts/estate.ts on every read
 generated/circuit-projections.json   one boundary-lens circuit per scenario face
+generated/topology/<capability>.json validated topology graphs, rendered to SVG on demand
         │
         ▼
 lib/estate.ts  →  pages

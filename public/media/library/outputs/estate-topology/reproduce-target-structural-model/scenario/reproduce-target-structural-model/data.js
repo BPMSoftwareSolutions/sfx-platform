@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reproduce-target-structural-model","viewId":"n-0fae6106a35cc1ce8420d47f"};

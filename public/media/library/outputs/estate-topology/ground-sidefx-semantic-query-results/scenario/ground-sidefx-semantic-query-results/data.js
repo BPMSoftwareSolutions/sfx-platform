@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"ground-sidefx-semantic-query-results","viewId":"n-8537cae8e06e9591735267cd"};

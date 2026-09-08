@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"require-blueprint-geometry-proof","viewId":"n-66c14c32aed039026a9784a9"};

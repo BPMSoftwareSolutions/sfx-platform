@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-canonical-circuit-blueprint-projection-receipt","viewId":"n-eb5be57cd1fff7d879881d3d"};

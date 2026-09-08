@@ -2,6 +2,37 @@
 
 Updated 2026-09-08. The original audit below records the missing connection; implementation has now replaced that baseline. The complete image backfill remains open.
 
+## Topology delivery replaced by on-demand rendering
+
+Updated 2026-09-08 after [ADR 0001](adr/0001-render-topology-on-demand.md). The compiled diagrams
+described below were delivered as prebuilt HTML and JavaScript inside a sandboxed iframe. They are
+now published as validated graph data and rendered by the website on demand.
+
+Measurement that drove it: of the 157 MB of view JavaScript, **47.7% was a pre-rendered SVG string**
+sitting alongside the `nodes` and `edges` it had been drawn from, and **90.9% of that SVG was markup
+the renderer can reproduce**. Only the Graphviz spline geometry was irreplaceable, and it is
+retained in `layout`.
+
+Result: `public/media` fell from **207 MB / 3,591 files to 41 MB / 171 files**. The 1,578 views —
+41,200 components and 40,752 routes across 217 capabilities — now live in `generated/topology`
+under `contracts/topology.ts`, carry a `graphDigest` each, and are pinned as a set by the release
+manifest. Before any artifact was deleted, the on-demand renderer was compared against the stored
+SVG for **all 1,578 views**: identity and geometry parity held for every one.
+
+What changed for a reader: the primary diagram is now server-rendered into the page, so it is
+readable without JavaScript and its components are real elements the parent document names, focuses
+and tests. Additional views render through `/api/topology/[capabilityId]/[viewId]`.
+
+**Feature parity.** The full workbench is ported, including flow playback. The trace planner is a
+direct port of the original and is compared against it on real graphs by
+`tests/trace-parity.test.ts`, which asserts identical wave plans — branch order, convergence
+waiting and provider-binding timing included. Material/base appearance, fit, zoom, SVG export,
+component search, route stepping and the source inspector's facts, SHA-256 and pointer are all
+retained.
+
+An earlier pass of this migration dropped those controls. That was a defect in the implementation,
+not a consequence of the architecture; the constraint is now stated in ADR 0001 §2.0.
+
 ## Implemented connection
 
 ### Complete topology correction

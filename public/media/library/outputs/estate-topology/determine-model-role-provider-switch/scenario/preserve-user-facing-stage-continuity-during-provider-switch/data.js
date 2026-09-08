@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"preserve-user-facing-stage-continuity-during-provider-switch","viewId":"n-da230d5a8f6a0fdb43ad2e5a"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-capsule-round-trip-closure","viewId":"n-074d04677f8da0430b343812"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"require-current-approved-review-receipt","viewId":"n-922d7f58c9e5a289e450bcc3"};

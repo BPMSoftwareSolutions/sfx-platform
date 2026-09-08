@@ -226,3 +226,394 @@ body {
   color: var(--color-ink);
   font-weight: 600;
 }
+
+/* Topology workbench — ADR 0001. Replaces the iframe-delivered viewer. */
+.topology-workbench {
+  border: 1px solid var(--color-grid-line);
+  border-radius: 12px;
+  background: var(--color-ink-2);
+  overflow: hidden;
+}
+.topology-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-grid-line);
+}
+.topology-toolbar-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.topology-toolbar select {
+  background: var(--color-ink);
+  color: var(--color-text);
+  border: 1px solid var(--color-grid-line);
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+  max-width: min(100%, 34rem);
+}
+.topology-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+/* The diagram scrolls inside its own region; the page never scrolls sideways (§6.6). */
+.topology-surface {
+  overflow: auto;
+  max-height: 70vh;
+  background: #071722;
+}
+.topology-surface svg {
+  display: block;
+  min-width: 640px;
+}
+.topology-node,
+.topology-route {
+  cursor: pointer;
+}
+.topology-node:focus-visible,
+.topology-route:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+/* Selection is marked on the rendered group, so it needs no re-render. */
+.topology-node[data-selected='true'] > path,
+.topology-node[data-selected='true'] > rect {
+  stroke: var(--color-signal);
+  stroke-width: 4;
+}
+.topology-route[data-selected='true'] .route-path {
+  stroke: var(--color-signal);
+  stroke-width: 4;
+}
+.topology-material {
+  pointer-events: none;
+}
+.topology-panels {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--color-grid-line);
+}
+@media (min-width: 900px) {
+  .topology-panels {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.topology-inspector h3,
+.topology-outline h3 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 0.5rem;
+}
+.topology-inspector dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+.topology-inspector dt {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+.topology-inspector dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.topology-inspector p {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.topology-mono {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+.topology-outline ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 18rem;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.25rem;
+}
+.topology-outline button {
+  width: 100%;
+  text-align: left;
+  background: var(--color-ink);
+  border: 1px solid var(--color-grid-line);
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.82rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.topology-outline button[aria-pressed='true'] {
+  border-color: var(--color-signal);
+}
+.topology-outline-kind {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.topology-provenance {
+  padding: 0 1rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-muted);
+}
+
+/* Illustrative flow controls — ADR 0001, §12.4. */
+.topology-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--color-grid-line);
+  background: color-mix(in srgb, var(--color-signal) 4%, var(--color-ink-2));
+}
+.topology-flow button {
+  background: var(--color-ink);
+  color: var(--color-text);
+  border: 1px solid var(--color-grid-line);
+  border-radius: 4px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.topology-flow button:hover:not(:disabled) {
+  border-color: var(--color-signal);
+}
+.topology-flow button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.topology-flow .trace-primary {
+  background: var(--color-signal);
+  color: var(--color-ink);
+  font-weight: 600;
+  border-color: var(--color-signal);
+}
+.trace-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.trace-control select {
+  background: var(--color-ink);
+  color: var(--color-text);
+  border: 1px solid var(--color-grid-line);
+  border-radius: 4px;
+  padding: 0.2rem 0.35rem;
+}
+.trace-status {
+  flex: 1 1 100%;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-muted);
+}
+.trace-status[data-state='playing'] {
+  color: var(--color-signal);
+}
+.trace-status[data-state='complete'] {
+  color: var(--color-signal);
+}
+/* A route currently carrying the trace, and one it has already covered. */
+.topology-route.active-route .route-path {
+  stroke: var(--color-text);
+  stroke-width: 3.5;
+}
+.topology-node.traced > path,
+.topology-node.traced > rect {
+  stroke-width: 3.2;
+}
+
+/* Restored workbench controls — ADR 0001 keeps the content lab's full interaction set. */
+.topology-view-controls {
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.topology-button-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.topology-button-group button {
+  background: var(--color-ink);
+  color: var(--color-text);
+  border: 1px solid var(--color-grid-line);
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.topology-button-group button:hover {
+  border-color: var(--color-signal);
+}
+.topology-button-group button[aria-pressed='true'] {
+  border-color: var(--color-signal);
+  color: var(--color-signal);
+}
+.topology-zoom {
+  min-width: 3.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+/* Base SVG hides the generated material plates; the drawing beneath is unchanged. */
+.topology-workbench.base .topology-material {
+  display: none;
+}
+.topology-main {
+  display: grid;
+  gap: 0;
+}
+@media (min-width: 1000px) {
+  .topology-main {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+  }
+  .topology-aside {
+    border-left: 1px solid var(--color-grid-line);
+  }
+}
+.topology-aside {
+  padding: 0.75rem 1rem;
+  min-width: 0;
+}
+.topology-search {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.topology-search input {
+  margin-top: 0.35rem;
+  width: 100%;
+  background: var(--color-ink);
+  color: var(--color-text);
+  border: 1px solid var(--color-grid-line);
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.82rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: var(--font-sans);
+}
+.topology-empty {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  padding: 0.4rem 0;
+}
+.topology-routes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-grid-line);
+}
+.topology-routes-status {
+  flex: 1 1 100%;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.topology-routes button {
+  background: var(--color-ink);
+  color: var(--color-text);
+  border: 1px solid var(--color-authority);
+  border-radius: 4px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.topology-routes button:hover {
+  border-color: var(--color-signal);
+}
+.topology-inspection {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--color-grid-line);
+  background: var(--color-ink);
+}
+@media (min-width: 900px) {
+  .topology-inspection {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.topology-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-signal);
+}
+.topology-inspection h3 {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.topology-detail {
+  margin-top: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--color-muted);
+}
+.topology-inspection details {
+  border: 1px solid var(--color-grid-line);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+}
+.topology-inspection summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.topology-inspection pre {
+  margin-top: 0.6rem;
+  max-height: 14rem;
+  overflow: auto;
+  background: var(--color-ink-2);
+  border-radius: 4px;
+  padding: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.topology-findings {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-telemetry);
+  overflow-wrap: anywhere;
+}
+.topology-evidence {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.topology-loading {
+  padding: 2rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}

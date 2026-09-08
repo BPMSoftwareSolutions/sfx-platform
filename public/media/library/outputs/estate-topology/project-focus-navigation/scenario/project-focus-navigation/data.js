@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-focus-navigation","viewId":"n-c34d8fd088898cea3756f903"};

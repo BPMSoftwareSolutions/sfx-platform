@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-decode-receipt","viewId":"n-954b41e6972e7aa8ebf274c6"};

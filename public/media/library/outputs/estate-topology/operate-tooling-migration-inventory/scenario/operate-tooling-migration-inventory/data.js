@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"operate-tooling-migration-inventory","viewId":"n-2387350adf371375ff7d5401"};

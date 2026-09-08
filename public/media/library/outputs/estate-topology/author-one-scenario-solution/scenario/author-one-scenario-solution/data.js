@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"author-one-scenario-solution","viewId":"n-2f661e0b0401cd0049d79ceb"};

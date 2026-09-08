@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-cognitive-video-projection-context","viewId":"n-ca353486bcfc889004197cff"};

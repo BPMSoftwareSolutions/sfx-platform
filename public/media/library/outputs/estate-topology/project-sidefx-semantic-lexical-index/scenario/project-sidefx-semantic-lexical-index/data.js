@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-sidefx-semantic-lexical-index","viewId":"n-65605736194396555e38bd39"};

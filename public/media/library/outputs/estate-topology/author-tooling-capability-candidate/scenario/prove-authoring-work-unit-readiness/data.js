@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-authoring-work-unit-readiness","viewId":"n-4b147784bbc1c3394534ec81"};

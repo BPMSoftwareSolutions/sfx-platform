@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-portfolio-view-facets","viewId":"n-ffdd38a6437faf1725cd4c3a"};

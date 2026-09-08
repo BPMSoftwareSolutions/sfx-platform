@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"preserve-model-role-semantics-across-provider-switch","viewId":"n-8272aefc1640d6c166c88a14"};

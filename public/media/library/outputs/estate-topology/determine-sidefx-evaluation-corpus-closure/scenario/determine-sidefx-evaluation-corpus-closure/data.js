@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"determine-sidefx-evaluation-corpus-closure","viewId":"n-0a0db858794dd02fe4d4c8fe"};

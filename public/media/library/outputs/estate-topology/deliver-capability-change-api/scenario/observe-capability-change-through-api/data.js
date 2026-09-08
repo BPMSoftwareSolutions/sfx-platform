@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-capability-change-through-api","viewId":"n-adf0eef9404ecf56e5d4f6ac"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-capability-change","viewId":"n-5fcc795b331b11f9f20f56f0"};

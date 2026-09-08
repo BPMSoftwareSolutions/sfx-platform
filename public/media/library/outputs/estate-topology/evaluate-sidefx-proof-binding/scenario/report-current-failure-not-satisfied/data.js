@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"report-current-failure-not-satisfied","viewId":"n-751b20f7766385a0361b5a4a"};

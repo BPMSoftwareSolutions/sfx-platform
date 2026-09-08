@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"materialize-projectable-capability-candidate","viewId":"n-42c609902f95d0404a8fbfec"};

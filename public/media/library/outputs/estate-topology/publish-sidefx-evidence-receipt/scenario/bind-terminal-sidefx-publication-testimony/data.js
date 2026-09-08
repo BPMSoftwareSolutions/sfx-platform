@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-terminal-sidefx-publication-testimony","viewId":"n-36802251eea2d5e79d9d9538"};

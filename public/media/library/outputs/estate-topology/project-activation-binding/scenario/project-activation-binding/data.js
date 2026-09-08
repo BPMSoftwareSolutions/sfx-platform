@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-activation-binding","viewId":"n-40b865a3053a0510c782416c"};

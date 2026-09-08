@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"discover-realization-api-capabilities","viewId":"n-d01c3c587bb72a6103787878"};

@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
-import { digest, validatePublication } from '../lib/publication-validation.ts';
+import { digest, topologyDigest, validatePublication } from '../lib/publication-validation.ts';
 
 // Deliberate selection after publication; builds only verify this selection, never rewrite it.
 const directory = join(process.cwd(), 'generated');
@@ -15,6 +15,7 @@ const manifest = {
     'circuit-projections.json': digest(circuitBytes),
     'visual-publication.json': digest(readFileSync(join(directory, 'visual-publication.json'))),
   },
+  topology: topologyDigest(directory),
 };
 const file = join(directory, 'publication-manifest.json');
 writeFileSync(`${file}.tmp`, `${JSON.stringify(manifest, null, 2)}\n`);

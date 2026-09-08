@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"close-provisioning-coverage","viewId":"n-83bca23fc635e8a6a413eba2"};

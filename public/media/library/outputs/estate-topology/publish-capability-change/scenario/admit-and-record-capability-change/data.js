@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-and-record-capability-change","viewId":"n-a0eaa942b835b39c24692846"};

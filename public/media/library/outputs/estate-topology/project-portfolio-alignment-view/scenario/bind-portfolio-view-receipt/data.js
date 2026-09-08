@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-portfolio-view-receipt","viewId":"n-aba675b7a3d7b3a8282e380b"};

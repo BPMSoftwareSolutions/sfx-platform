@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"inspect-canonical-circuit-blueprint-candidate","viewId":"n-181bc4738b47400b62d1421b"};

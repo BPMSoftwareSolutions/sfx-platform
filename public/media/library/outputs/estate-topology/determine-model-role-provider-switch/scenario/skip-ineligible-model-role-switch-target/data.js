@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"skip-ineligible-model-role-switch-target","viewId":"n-82d77f9b0525f9d2bef812ec"};

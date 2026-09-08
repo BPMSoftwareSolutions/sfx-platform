@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-realization-api-projection","viewId":"n-8ca6c1f44678764ad6512d00"};

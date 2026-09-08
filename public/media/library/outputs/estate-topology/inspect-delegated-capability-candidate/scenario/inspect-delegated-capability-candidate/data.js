@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"inspect-delegated-capability-candidate","viewId":"n-1e0195b4864369da399f503f"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-unsupported-adapter-authority","viewId":"n-5dbc7a2c81ca032d896d76f8"};

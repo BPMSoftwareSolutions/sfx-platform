@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-fit-identity-binding","viewId":"n-428bd15b8392bc59057e9400"};

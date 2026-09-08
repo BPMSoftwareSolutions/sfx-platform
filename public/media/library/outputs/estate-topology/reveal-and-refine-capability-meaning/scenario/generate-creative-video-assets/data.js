@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"generate-creative-video-assets","viewId":"n-062403834749091ca85e1373"};

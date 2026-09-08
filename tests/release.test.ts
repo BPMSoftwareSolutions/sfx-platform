@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import type { EstatePublication } from '../contracts/estate.ts';
-import { digest, readValidatedPublication, stableDigest } from '../lib/publication-validation.ts';
+import { digest, topologyDigest, readValidatedPublication, stableDigest } from '../lib/publication-validation.ts';
 
 const source = join(process.cwd(), 'generated');
 
@@ -28,6 +28,8 @@ function reselect(directory: string) {
       'circuit-projections.json': digest(readFileSync(join(directory, 'circuit-projections.json'))),
       'visual-publication.json': digest(readFileSync(join(directory, 'visual-publication.json'))),
     },
+    // ADR 0001 — the fixture carries no topology bundles, so this is the empty-directory digest.
+    topology: topologyDigest(directory),
   };
   writeFileSync(join(directory, 'publication-manifest.json'), JSON.stringify(manifest));
 }

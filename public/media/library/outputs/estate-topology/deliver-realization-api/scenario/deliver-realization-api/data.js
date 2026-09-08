@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"deliver-realization-api","viewId":"n-03ca61d9350b1dbf41c10eb4"};

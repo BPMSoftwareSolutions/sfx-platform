@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"invoke-capsule-estate-mcp-tool","viewId":"n-4c3fc8bf28aec3d8dece41e9"};

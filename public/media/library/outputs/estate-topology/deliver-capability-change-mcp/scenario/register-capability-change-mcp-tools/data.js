@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"register-capability-change-mcp-tools","viewId":"n-6c85368b1ec11dccbcc7ffeb"};

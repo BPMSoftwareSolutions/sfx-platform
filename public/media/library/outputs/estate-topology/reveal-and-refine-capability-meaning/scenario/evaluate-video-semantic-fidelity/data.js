@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-video-semantic-fidelity","viewId":"n-4c8e923e2e065a2dfd9ad0fe"};

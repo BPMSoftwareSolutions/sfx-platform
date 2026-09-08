@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"compose-canonical-blueprint-review-document","viewId":"n-992e628789db1586d23d59bf"};

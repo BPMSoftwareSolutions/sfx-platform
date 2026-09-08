@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { CapabilityCircuitPanel } from '@/components/estate/capability-circuit-panel';
 import { EntityArt } from '@/components/estate/entity-art';
 import { EditionCircuit, EditionFilm } from '@/components/estate/visual-edition';
-import { StoredCircuitPanel } from '@/components/estate/stored-circuit-panel';
+import { TopologyPanel } from '@/components/topology/topology-panel';
 import { findCapability, getCapabilities, getCircuitsForCapability } from '@/lib/estate';
-import { getEdition, getStoredCircuits } from '@/lib/visuals';
+import { getEdition } from '@/lib/visuals';
+import { getTopologyViews } from '@/lib/topology';
 import { pageMetadata } from '@/lib/seo';
 interface Params { params: Promise<{namespace:string;capabilityId:string}> }
 export async function generateMetadata({params}:Params){
@@ -18,7 +19,7 @@ export function generateStaticParams(){return getCapabilities().map(c=>({namespa
 export default async function CapabilityDetailPage({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
  if(!capability)notFound();
- const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),storedCircuits=getStoredCircuits(capability.semanticObjectDefinitionPk);
+ const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),topologyViews=getTopologyViews(capability.entityId);
  return <>
   <section className="capability-hero page-width">
    <div><Link className="kicker" href="/capabilities">The capability estate / {capability.title}</Link>
@@ -32,9 +33,9 @@ export default async function CapabilityDetailPage({params}:Params){
   {edition?<div className="page-width"><div className="experience-strip">{Object.entries(edition.experience).map(([label,text],i)=><div key={label}><span className="kicker">0{i+1} / {label}</span><p>{text}</p></div>)}</div></div>:null}
   <section className="page-width editorial-section" id="circuit" aria-labelledby="capability-circuit-title">
    <div className="editorial-heading"><div><p className="kicker">01 / Open the capability</p><h2 id="capability-circuit-title">Meaning you can<br/><em>move through.</em></h2></div><p>Inspect the inputs, responsibilities and outcomes. Each view preserves its source and evidence scope.</p></div>
-   {storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:edition?.circuitUrl?<EditionCircuit edition={edition}/>:<CapabilityCircuitPanel circuits={circuits}/>}
-   {storedCircuits.length&&edition?.circuitUrl?<details className="mt-6 border-t border-grid-line pt-5"><summary className="cursor-pointer text-sm">Explore the authored teaching circuit</summary><div className="mt-5"><EditionCircuit edition={edition}/></div></details>:null}
-   {storedCircuits.length?<details className="mt-6 border-t border-grid-line pt-5" id="declared-circuit"><summary className="cursor-pointer text-sm">Inspect the {capability.scenarios.length} scenario boundary contracts</summary><div className="mt-5"><CapabilityCircuitPanel circuits={circuits}/></div></details>:null}
+   {topologyViews.length?<TopologyPanel views={topologyViews} label={capability.title} capabilityId={capability.entityId}/>:edition?.circuitUrl?<EditionCircuit edition={edition}/>:<CapabilityCircuitPanel circuits={circuits}/>}
+   {topologyViews.length&&edition?.circuitUrl?<details className="mt-6 border-t border-grid-line pt-5"><summary className="cursor-pointer text-sm">Explore the authored teaching circuit</summary><div className="mt-5"><EditionCircuit edition={edition}/></div></details>:null}
+   {topologyViews.length?<details className="mt-6 border-t border-grid-line pt-5" id="declared-circuit"><summary className="cursor-pointer text-sm">Inspect the {capability.scenarios.length} scenario boundary contracts</summary><div className="mt-5"><CapabilityCircuitPanel circuits={circuits}/></div></details>:null}
   </section>
   <section className="page-width editorial-section" aria-labelledby="scenario-title">
    <div className="editorial-heading"><div><p className="kicker">02 / The scenarios</p><h2 id="scenario-title">Different situations.<br/><em>One capability.</em></h2></div><p>Each scenario has its own input, event, responsibility, outcome and image requirement.</p></div>

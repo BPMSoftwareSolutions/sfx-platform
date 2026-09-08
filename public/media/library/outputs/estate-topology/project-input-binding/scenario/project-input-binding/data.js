@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-input-binding","viewId":"n-811d627f85c64e83ec6443fe"};

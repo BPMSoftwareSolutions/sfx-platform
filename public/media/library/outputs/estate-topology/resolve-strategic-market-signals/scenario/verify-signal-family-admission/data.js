@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-signal-family-admission","viewId":"n-04354b680b42ddc96f3ab6c5"};

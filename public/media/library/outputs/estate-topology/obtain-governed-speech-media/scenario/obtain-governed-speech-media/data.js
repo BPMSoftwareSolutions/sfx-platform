@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"obtain-governed-speech-media","viewId":"n-cf827848609e901f8e0d9043"};

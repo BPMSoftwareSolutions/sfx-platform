@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-fixed-invocation-terms","viewId":"n-bf125b657188161cd3b10a23"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-governed-placement","viewId":"n-0f106413a3c66e1b8c9171e8"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"publish-projected-capability","viewId":"n-9154ba2dd714033de157f62f"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-portfolio-view-inputs","viewId":"n-5651867a6a3687ed35223595"};

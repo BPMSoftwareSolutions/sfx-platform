@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"stage-projected-candidate","viewId":"n-14ea46f8135fe9b3880c2ab2"};

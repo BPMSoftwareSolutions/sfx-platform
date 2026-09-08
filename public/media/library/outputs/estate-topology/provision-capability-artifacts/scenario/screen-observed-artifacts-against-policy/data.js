@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"screen-observed-artifacts-against-policy","viewId":"n-837560525231c8bd495bdbff"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-invalid-capability-scenario-authoring-source","viewId":"n-a47b04a5dc3aedace1679ff5"};
