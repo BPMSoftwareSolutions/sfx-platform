@@ -25,4 +25,4 @@
  draw();
 })();
 
-addEventListener('load',()=>{const report=()=>parent.postMessage({type:'sidefx-circuit-height',height:document.body.scrollHeight},'*');new ResizeObserver(report).observe(document.body);report();});
+addEventListener('load',()=>{const stage=document.getElementById('stage');const expose=()=>stage.firstElementChild?.setAttribute('role','group');new MutationObserver(expose).observe(stage,{childList:true});expose();const report=()=>parent.postMessage({type:'sidefx-circuit-height',height:document.body.scrollHeight},'*');new ResizeObserver(report).observe(document.body);report();});

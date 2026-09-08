@@ -4,6 +4,6 @@
   "artifacts": {
     "estate-publication.json": "sha256:1a47fdfbe3c8820e0ac10846306fe101307a6211fb43f600675e625ab268f5c0",
     "circuit-projections.json": "sha256:ecf01e049eedba46cd6f5234487f5b9f9425c9cb03e1902567e54685b545aef2",
-    "visual-publication.json": "sha256:9034ff1ad9b5b58d67407d91f5c1ae0407ccf2d21b7dfdbc83ee66216c627a04"
+    "visual-publication.json": "sha256:6da4d6ceb754566d3d5167cddbff215b15246ea55bd8ba0678b71c9e2bb255ec"
   }
 }
