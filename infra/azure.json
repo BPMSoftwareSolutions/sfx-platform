@@ -5,6 +5,7 @@
   "location": "eastus2",
   "planName": "ASP-sidefxgroup-ad2e",
   "containerMode": "classic",
+  "appServiceApiVersion": "2025-05-01",
   "port": 3000,
   "stagingSlot": "staging",
   "registryName": "bpmaiengineacr",

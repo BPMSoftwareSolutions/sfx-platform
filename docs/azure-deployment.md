@@ -45,8 +45,9 @@ query result; upstream source digests remain retained provenance.
 Run `infra/bootstrap-staging.ps1` from PowerShell 7 with Azure and GitHub administrative access.
 It creates a staging slot on the existing plan, assigns the slot an ACR pull identity and creates
 the `sfx-platform-github-staging` user-assigned identity for GitHub OIDC. Its Website Contributor
-scope is the staging slot only. Reader on the parent app allows the Azure CLI to inspect its metadata
-while configuring a slot; it does not grant production writes. AcrPush is scoped to the existing registry under its legacy RBAC
+scope is the staging slot only. Deployment patches that slot's `config/web` resource directly using
+API `2025-05-01`, avoiding the container CLI helper's reads of production app settings and registry
+admin credentials. AcrPush is scoped to the existing registry under its legacy RBAC
 mode; no registry admin password is used. An ABAC registry requires revising the role binding.
 
 The GitHub `staging` environment trusts only `main` and the implementation branch
@@ -118,5 +119,6 @@ the staging workflow or by successful ACR publication.
 - [Next.js standalone output](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)
 - [Azure classic container configuration and managed identity](https://learn.microsoft.com/en-us/azure/app-service/configure-custom-container)
 - [Azure deployment slots](https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots)
+- [Update slot configuration API](https://learn.microsoft.com/en-us/rest/api/appservice/web-apps/update-configuration-slot?view=rest-appservice-2025-05-01)
 - [GitHub OIDC authentication to Azure](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
 - [ACR image locking](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-image-lock)

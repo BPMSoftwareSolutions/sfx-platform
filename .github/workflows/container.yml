@@ -90,6 +90,10 @@ jobs:
           group=$(jq -r .resourceGroup infra/azure.json)
           app=$(jq -r .appName infra/azure.json)
           slot=$(jq -r .stagingSlot infra/azure.json)
+          subscription=$(jq -r .subscriptionId infra/azure.json)
+          api=$(jq -r .appServiceApiVersion infra/azure.json)
+          slot_url="https://management.azure.com/subscriptions/$subscription/resourceGroups/$group/providers/Microsoft.Web/sites/$app/slots/$slot"
+          config_url="$slot_url/config/web?api-version=$api"
           tag="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           gzip -dc artifacts/image.tar.gz | docker load
           test "$(docker image inspect sidefx-tested:ci --format '{{.Id}}')" = "$(cat artifacts/image-id.txt)"
@@ -102,16 +106,19 @@ jobs:
           test "$(docker image inspect "$server/$repository@$digest" --format '{{.Id}}')" = "$(cat artifacts/image-id.txt)"
           az acr repository update -n "$registry" --image "$repository:$tag" --write-enabled false --delete-enabled false -o none
           az acr repository update -n "$registry" --image "$repository@$digest" --write-enabled false --delete-enabled false -o none
-          previous=$(az webapp config show -g "$group" -n "$app" --slot "$slot" --query linuxFxVersion -o tsv)
+          previous=$(az rest --method get --url "$config_url" --query properties.linuxFxVersion -o tsv)
           [[ "$previous" == DOCKER\|* ]]
           image="$server/$repository@$digest"
-          az webapp config container set -g "$group" -n "$app" --slot "$slot" --container-image-name "$image" --container-registry-url "https://$server" -o none
-          az webapp restart -g "$group" -n "$app" --slot "$slot"
-          host=$(az webapp show -g "$group" -n "$app" --slot "$slot" --query defaultHostName -o tsv)
+          host=$(az rest --method get --url "$slot_url?api-version=$api" --query properties.defaultHostName -o tsv)
           jq -n --arg source "$GITHUB_SHA" --arg image "$image" --arg previous "$previous" --arg url "https://$host" --slurpfile publication generated/publication-manifest.json \
-            '{sourceCommit:$source,image:$image,previousImage:$previous,url:$url,publication:$publication[0],scope:"staging; P1 incomplete"}' > artifacts/deployment.json
+            '{sourceCommit:$source,image:$image,previousImage:$previous,url:$url,publication:$publication[0],status:"pending",scope:"staging; P1 incomplete"}' > artifacts/deployment.json
+          jq -n --arg image "DOCKER|$image" '{properties:{linuxFxVersion:$image}}' > artifacts/container-binding.json
+          az rest --method patch --url "$config_url" --body @artifacts/container-binding.json -o none
+          az rest --method post --url "$slot_url/restart?api-version=$api" -o none
           node scripts/smoke-container.mjs "https://$host" --noindex --revision "$GITHUB_SHA" | tee artifacts/azure-smoke.txt
-          test "$(az webapp config show -g "$group" -n "$app" --slot "$slot" --query linuxFxVersion -o tsv)" = "DOCKER|$image"
+          test "$(az rest --method get --url "$config_url" --query properties.linuxFxVersion -o tsv)" = "DOCKER|$image"
+          jq '.status="verified"' artifacts/deployment.json > artifacts/deployment.tmp.json
+          mv artifacts/deployment.tmp.json artifacts/deployment.json
           echo "Staging: https://$host" >> "$GITHUB_STEP_SUMMARY"
           echo "Image: $image" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

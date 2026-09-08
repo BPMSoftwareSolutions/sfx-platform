@@ -34,15 +34,14 @@ $settingsPath = Join-Path $PSScriptRoot 'staging-config.json'
 $null = Invoke-AzureJson @('webapp', 'config', 'set', '-g', $group, '-n', $app, '--slot', $slot, '--generic-configurations', "@$settingsPath")
 $null = Invoke-AzureJson @('webapp', 'update', '-g', $group, '-n', $app, '--slot', $slot, '--https-only', 'true')
 $null = Invoke-AzureJson @('webapp', 'config', 'appsettings', 'set', '-g', $group, '-n', $app, '--slot', $slot, '--settings', 'NODE_ENV=production', 'HOSTNAME=0.0.0.0', 'PORT=3000', 'WEBSITES_PORT=3000', 'WEBSITES_ENABLE_APP_SERVICE_STORAGE=false', 'WEBSITE_WARMUP_PATH=/readyz', 'WEBSITE_WARMUP_STATUSES=200', 'WEBSITE_SWAP_WARMUP_PING_PATH=/readyz', 'WEBSITE_SWAP_WARMUP_PING_STATUSES=200', '--slot-settings', 'SIDEFX_INDEXING=disabled')
+$null = Invoke-AzureJson @('webapp', 'config', 'appsettings', 'set', '-g', $group, '-n', $app, '--slot', $slot, '--settings', "DOCKER_REGISTRY_SERVER_URL=https://$($binding.registryServer)")
+$null = Invoke-AzureJson @('webapp', 'config', 'appsettings', 'delete', '-g', $group, '-n', $app, '--slot', $slot, '--setting-names', 'DOCKER_REGISTRY_SERVER_USERNAME', 'DOCKER_REGISTRY_SERVER_PASSWORD')
 
 $identity = Invoke-AzureJson @('identity', 'create', '-g', $group, '-n', $binding.deploymentIdentityName, '-l', $binding.location)
 $null = Invoke-AzureJson @('identity', 'federated-credential', 'create', '-g', $group, '--identity-name', $binding.deploymentIdentityName, '-n', 'github-staging', '--issuer', 'https://token.actions.githubusercontent.com', '--subject', $binding.githubOidcSubject, '--audiences', 'api://AzureADTokenExchange')
 $null = Invoke-AzureJson @('role', 'assignment', 'create', '--assignee-object-id', $identity.principalId, '--assignee-principal-type', 'ServicePrincipal', '--role', 'AcrPush', '--scope', $registry.id)
 # Deployment identity can change this staging slot, not production or subscription resources.
 $null = Invoke-AzureJson @('role', 'assignment', 'create', '--assignee-object-id', $identity.principalId, '--assignee-principal-type', 'ServicePrincipal', '--role', 'Website Contributor', '--scope', $slotResource.id)
-# Azure's container command reads the parent app's kind/configuration when updating a slot.
-$appResourceId = $slotResource.id -replace '/slots/[^/]+$', ''
-$null = Invoke-AzureJson @('role', 'assignment', 'create', '--assignee-object-id', $identity.principalId, '--assignee-principal-type', 'ServicePrincipal', '--role', 'Reader', '--scope', $appResourceId)
 
 $environmentFile = Join-Path ([IO.Path]::GetTempPath()) "sidefx-github-environment-$([Guid]::NewGuid()).json"
 try {
