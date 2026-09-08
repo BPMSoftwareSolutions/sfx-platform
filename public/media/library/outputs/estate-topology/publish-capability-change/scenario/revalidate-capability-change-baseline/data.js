@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"revalidate-capability-change-baseline","viewId":"n-1ff57f017ad40b5785983305"};

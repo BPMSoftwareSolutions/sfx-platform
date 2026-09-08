@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-schema-family","viewId":"n-009c0af2e5ffdf013b45ea08"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-observable-condition-obligations","viewId":"n-0b5cbc25fb738fbd9a6738ef"};

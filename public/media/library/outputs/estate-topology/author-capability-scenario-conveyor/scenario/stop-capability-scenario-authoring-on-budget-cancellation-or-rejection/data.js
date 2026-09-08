@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"stop-capability-scenario-authoring-on-budget-cancellation-or-rejection","viewId":"n-581669976e134d5911443a88"};

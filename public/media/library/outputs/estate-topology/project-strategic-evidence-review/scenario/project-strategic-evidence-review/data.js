@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-strategic-evidence-review","viewId":"n-ada08cc8d2b4f860d24a4377"};

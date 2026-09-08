@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"plan-stable-model-role-conveyor-presentation","viewId":"n-626eb9aef25a8165e41d1842"};

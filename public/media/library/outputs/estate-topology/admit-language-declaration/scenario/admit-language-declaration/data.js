@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-language-declaration","viewId":"n-71503f0918323b35e454aa1e"};

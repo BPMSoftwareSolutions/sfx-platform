@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-structured-data-presentation","viewId":"n-0b08601197f9286680771473"};

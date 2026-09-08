@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"represent-capability-change-mcp-failure","viewId":"n-33cf607073376b2dc5301b29"};

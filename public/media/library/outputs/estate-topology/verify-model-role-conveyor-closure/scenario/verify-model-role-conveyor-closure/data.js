@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-model-role-conveyor-closure","viewId":"n-843bb762fc4b3b12491c1591"};

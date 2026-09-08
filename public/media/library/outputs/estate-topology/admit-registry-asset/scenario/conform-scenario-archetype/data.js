@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"conform-scenario-archetype","viewId":"n-972d7914d46cb44a35fa5d54"};

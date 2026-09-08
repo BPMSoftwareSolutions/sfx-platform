@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"invoke-capability-change-mcp-tool","viewId":"n-f0efa02b5f020a90046f4b38"};

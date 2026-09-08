@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"materialize-narration-artifact","viewId":"n-da4b3c16bb669f953b00aa50"};

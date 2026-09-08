@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"inspect-altitude-appropriate-cell-geometry","viewId":"n-999c4c8882d2ba92fc493408"};

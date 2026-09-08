@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-market-signal-receipt","viewId":"n-a9c9298716892849509ca973"};

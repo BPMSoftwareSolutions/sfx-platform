@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"apply-unique-mechanical-repair","viewId":"n-fd7acd50661585011d8bbdb3"};

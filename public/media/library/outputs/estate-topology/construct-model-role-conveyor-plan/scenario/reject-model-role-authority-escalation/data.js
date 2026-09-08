@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-model-role-authority-escalation","viewId":"n-a63b3d9e2a2c31616703706d"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"initialize-artifact-authoring-ledger","viewId":"n-9f66ff1cadd43bfae8b2ce93"};

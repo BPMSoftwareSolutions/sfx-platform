@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"hold-capability-scenario-selection-with-no-eligible-unit","viewId":"n-ea67dab711c03990c2ee32ee"};

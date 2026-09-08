@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-model-testimony-evidence","viewId":"n-622507335fae26558b9acf32"};

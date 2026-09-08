@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-capsule-execution-closure","viewId":"n-2b399f24cf619ee798cb6f44"};

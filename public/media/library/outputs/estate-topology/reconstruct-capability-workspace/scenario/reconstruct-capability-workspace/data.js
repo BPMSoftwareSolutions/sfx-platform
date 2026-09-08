@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reconstruct-capability-workspace","viewId":"n-9803c046ebe5fe410e4c2d3c"};

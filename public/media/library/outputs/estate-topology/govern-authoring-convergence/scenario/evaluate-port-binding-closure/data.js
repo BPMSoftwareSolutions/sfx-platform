@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-port-binding-closure","viewId":"n-c5d625fb4f0b243e583aa1f7"};

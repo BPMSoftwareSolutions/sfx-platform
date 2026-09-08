@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"preserve-semantic-transformation-as-unresolved","viewId":"n-4c9922a836b9ffe13421feab"};

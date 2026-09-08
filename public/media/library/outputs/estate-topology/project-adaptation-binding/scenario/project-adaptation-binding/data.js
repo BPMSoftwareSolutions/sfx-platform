@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-adaptation-binding","viewId":"n-3b9c3bb53c9e8e7a26035253"};

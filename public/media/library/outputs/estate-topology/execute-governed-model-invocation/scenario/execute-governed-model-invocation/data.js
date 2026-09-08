@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"execute-governed-model-invocation","viewId":"n-94f817507c8f560baa084bbb"};

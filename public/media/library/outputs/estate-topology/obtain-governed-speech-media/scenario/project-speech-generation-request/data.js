@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-speech-generation-request","viewId":"n-7e85c471cc6a14a63d9d16b3"};

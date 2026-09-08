@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"determine-platform-mechanic-conformance","viewId":"n-6e2af2a9f15cc14627be7a3a"};

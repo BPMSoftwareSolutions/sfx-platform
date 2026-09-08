@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"report-semantic-monotonicity-not-declared","viewId":"n-9a94bf0671eb0958caf79fae"};

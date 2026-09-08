@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"obtain-one-scenario-authority-fragment-testimony","viewId":"n-5807787a024d46376aeb7201"};

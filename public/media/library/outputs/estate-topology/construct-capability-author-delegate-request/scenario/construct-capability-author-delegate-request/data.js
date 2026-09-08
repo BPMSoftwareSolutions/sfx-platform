@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"construct-capability-author-delegate-request","viewId":"n-e960124bf600a78f0f0e5594"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-extracted-graph","viewId":"n-1073f2ab6df4b565702a4ea1"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-declared-store-law-document","viewId":"n-5b61c37a159bafc9aa451a07"};

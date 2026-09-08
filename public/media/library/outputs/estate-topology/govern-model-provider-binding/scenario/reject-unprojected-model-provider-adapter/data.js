@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-unprojected-model-provider-adapter","viewId":"n-25dcba22d06a9eeec037ddf5"};

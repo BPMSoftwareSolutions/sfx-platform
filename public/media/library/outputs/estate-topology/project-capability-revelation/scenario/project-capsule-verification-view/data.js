@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-capsule-verification-view","viewId":"n-1fb6f51ee5865c78b1675c38"};

@@ -8,9 +8,10 @@
   },
   "scripts": {
     "publish:estate": "node scripts/publish-estate.mjs",
+    "restore:media": "node scripts/restore-media.mjs",
     "dev": "next dev",
-    "build": "npm run validate:estate && npm run validate:media && next build",
     "validate:media": "tsx scripts/validate-media.ts",
+    "build": "npm run validate:estate && npm run validate:media && next build",
     "build:preview": "npm run publish:estate -- --allow-missing && next build",
     "select:estate": "tsx scripts/select-publication.ts",
     "validate:estate": "tsx scripts/validate-publication.ts",

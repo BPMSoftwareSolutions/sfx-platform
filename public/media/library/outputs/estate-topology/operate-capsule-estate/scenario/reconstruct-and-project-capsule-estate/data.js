@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reconstruct-and-project-capsule-estate","viewId":"n-2cc5e3f41234563024a41ef2"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-language-behavior","viewId":"n-4197064585e2b6d5d3648a3e"};

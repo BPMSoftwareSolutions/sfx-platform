@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-frozen-tooling-migration-operational-oracle","viewId":"n-f4502c99b190613de93d6695"};

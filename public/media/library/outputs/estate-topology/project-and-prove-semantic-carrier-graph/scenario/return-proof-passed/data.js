@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-proof-passed","viewId":"n-5cafcd29aff515199976916d"};

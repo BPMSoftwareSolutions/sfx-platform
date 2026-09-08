@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"hold-unobservable-capability-change","viewId":"n-419c930daa7c1c6faa8ee6be"};

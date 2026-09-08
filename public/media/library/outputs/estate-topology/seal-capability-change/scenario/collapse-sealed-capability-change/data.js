@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"collapse-sealed-capability-change","viewId":"n-e388b78090bbb6d9b1565667"};

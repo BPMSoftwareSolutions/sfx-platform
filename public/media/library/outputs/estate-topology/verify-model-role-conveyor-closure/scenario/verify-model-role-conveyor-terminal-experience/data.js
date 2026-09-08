@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-model-role-conveyor-terminal-experience","viewId":"n-626e94d1bbb1c62e5820ef52"};

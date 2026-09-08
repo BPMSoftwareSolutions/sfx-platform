@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-validation-presentation","viewId":"n-6cfb14e570044206e1df469a"};

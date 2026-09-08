@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-domain-fit-statement","viewId":"n-2ec0b3affcc735994e8da404"};

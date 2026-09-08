@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"close-provider-candidate-coverage","viewId":"n-779ad3776fbab74c57959951"};

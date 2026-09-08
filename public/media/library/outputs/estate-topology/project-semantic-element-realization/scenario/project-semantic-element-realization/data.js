@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-semantic-element-realization","viewId":"n-89de0e54565070e1345fa41a"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"author-tooling-capability-candidate","viewId":"n-69b6853533ab1d663473efb6"};

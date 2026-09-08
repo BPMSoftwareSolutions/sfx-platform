@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"adapt-job-market-intelligence-evidence","viewId":"n-f0424897c63813deb919933f"};

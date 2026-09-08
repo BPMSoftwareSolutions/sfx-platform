@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"assemble-closed-capability-source-bundle-from-scenario-fragments","viewId":"n-e1850f8e6492029ba4f95126"};

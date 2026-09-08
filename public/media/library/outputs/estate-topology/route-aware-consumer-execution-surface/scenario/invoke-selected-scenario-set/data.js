@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"invoke-selected-scenario-set","viewId":"n-d326acc134fbe6029ed6730d"};

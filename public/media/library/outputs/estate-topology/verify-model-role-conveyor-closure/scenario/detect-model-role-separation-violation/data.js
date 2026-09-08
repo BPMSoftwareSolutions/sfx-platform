@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"detect-model-role-separation-violation","viewId":"n-a56a841abc234ee8eaf95933"};

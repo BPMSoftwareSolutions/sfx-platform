@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"realize-admitted-capability","viewId":"n-d2741cecb24f5616610c0d32"};

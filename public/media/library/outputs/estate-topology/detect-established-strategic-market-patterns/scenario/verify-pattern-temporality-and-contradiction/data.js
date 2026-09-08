@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-pattern-temporality-and-contradiction","viewId":"n-0e2adac2f7d1ba2774d186af"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-decision-authorization","viewId":"n-4bdcd672e8d3eca1efa1b8bf"};

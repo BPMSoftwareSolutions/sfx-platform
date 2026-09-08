@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"construct-sidefx-evaluation-corpus-snapshot","viewId":"n-8d54447ef6b927cc196ab335"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"validate-provider-candidate-generation","viewId":"n-672b17b5317ce2e147e76d74"};

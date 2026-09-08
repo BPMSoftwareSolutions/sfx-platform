@@ -17,11 +17,29 @@ jobs:
   container:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    # The media publication is restored from SQL rather than committed, so this job needs the
+    # environment that holds the connection string.
+    environment: staging
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24.20.0'
+      # The database repository owns the media schema and the only SQL client.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: BPMSoftwareSolutions/sidefx-database
+          path: .sidefx-database
+      - name: Install the database client
+        run: npm ci --omit=dev
+        working-directory: .sidefx-database
+      - name: Restore the media publication from SQL
+        env:
+          SIDEFX_CONNECTION_STRING: ${{ secrets.SIDEFX_CONNECTION_STRING }}
+        run: npm run restore:media
+      # A restore that silently produced nothing would build an image with no diagrams.
+      - name: Confirm the restored publication matches its manifest
+        run: npm run validate:media
       - name: Build and check the final Linux image
         run: docker build --platform linux/amd64 --build-arg SOURCE_COMMIT="$GITHUB_SHA" -t sidefx-tested:ci .
       - name: Exercise the runtime, staging indexing, readiness failures and restart

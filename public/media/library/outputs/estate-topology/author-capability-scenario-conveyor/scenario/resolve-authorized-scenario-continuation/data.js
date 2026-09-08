@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-authorized-scenario-continuation","viewId":"n-b0b2e9a663b7483406479555"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-malformed-structured-model-response","viewId":"n-a5c07f6abeab6fc156a3a716"};

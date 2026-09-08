@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reveal-capability-representation","viewId":"n-42fb265aaab173534ea3b4de"};

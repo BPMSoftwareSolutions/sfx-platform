@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"represent-capability-change-api-failure","viewId":"n-c0299ab2d760047e5c9b4cf4"};

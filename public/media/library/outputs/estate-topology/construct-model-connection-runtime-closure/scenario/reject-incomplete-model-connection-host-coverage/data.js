@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-incomplete-model-connection-host-coverage","viewId":"n-c2c557ad148def706f1eab5f"};

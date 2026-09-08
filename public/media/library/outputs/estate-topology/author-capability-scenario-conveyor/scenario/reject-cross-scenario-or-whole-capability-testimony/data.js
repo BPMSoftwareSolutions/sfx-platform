@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-cross-scenario-or-whole-capability-testimony","viewId":"n-8fce5297c40549bcf90bc627"};

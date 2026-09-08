@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-target-projection-graph","viewId":"n-bbb84759c65d9880c2f71080"};

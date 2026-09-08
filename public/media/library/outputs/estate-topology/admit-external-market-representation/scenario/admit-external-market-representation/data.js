@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-external-market-representation","viewId":"n-8c11fd825880684ff33167a2"};

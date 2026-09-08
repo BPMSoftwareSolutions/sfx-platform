@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-live-model-connection","viewId":"n-42f4d592a06ca897b8af05f2"};

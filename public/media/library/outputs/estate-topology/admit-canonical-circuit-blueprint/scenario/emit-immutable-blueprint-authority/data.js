@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"emit-immutable-blueprint-authority","viewId":"n-1bf16d968239a28bf522be63"};

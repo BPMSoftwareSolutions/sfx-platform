@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"normalize-provider-transport-testimony","viewId":"n-78b329fcb70abc4834f33d0d"};

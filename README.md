@@ -12,15 +12,34 @@ boundaries, pipelines, contracts and honesty invariants — that the codebase is
 
 ```bash
 npm ci
+npm run restore:media      # fetch public/media from SQL (see below)
 npm run validate:estate    # validate the committed, selected publication
 npm run dev                # http://localhost:3000
 ```
+
+### `public/media` is not in the repository
+
+The media publication — capability artwork, materials, editions and the 168 MB of compiled
+topology diagrams — is generated content that SQL retains in full and can rebuild byte for byte.
+It is therefore not committed. `npm run restore:media` writes it into `public/media` from the
+selected publication, and `npm run validate:media` checks every file against its SQL hash.
+
+It needs a database connection string in the environment (`SIDEFX_CONNECTION_STRING`, or
+`sidefx-connection-string`) and a checkout of
+[`sidefx-database`](https://github.com/BPMSoftwareSolutions/sidefx-database), which owns the media
+schema and the only SQL client. Point `SIDEFX_DATABASE_ROOT` at it if it is not a sibling
+directory. CI restores the same way before building the image.
+
+**If you already had this repository checked out**, pulling the commit that untracked these files
+will delete them from your working copy. Run `npm run restore:media` and the build works again.
 
 Other scripts:
 
 | Script | What it does |
 | --- | --- |
 | `npm run publish:estate` | Reads one pinned generation of the estate and writes `generated/` |
+| `npm run restore:media` | Restores `public/media` from the selected SQL publication |
+| `npm run validate:media` | Verifies every restored media file against its SQL publication hash |
 | `npm run select:estate` | Validates and pins both generated artifacts in a digest manifest after a deliberate publication refresh |
 | `npm run validate:estate` | Checks the selected bytes, schema, identities, coverage and circuit integrity |
 | `npm run build` | Requires the selected valid publication, then builds standalone output; never reads the development database |

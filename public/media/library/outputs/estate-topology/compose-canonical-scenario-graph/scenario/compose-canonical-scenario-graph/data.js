@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"compose-canonical-scenario-graph","viewId":"n-dbfdaeb5a273feb84176e4ed"};

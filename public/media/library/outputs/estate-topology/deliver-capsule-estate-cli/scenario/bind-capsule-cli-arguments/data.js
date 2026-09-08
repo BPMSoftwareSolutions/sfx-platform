@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-capsule-cli-arguments","viewId":"n-dc7c9d40e5992e1efe722c85"};

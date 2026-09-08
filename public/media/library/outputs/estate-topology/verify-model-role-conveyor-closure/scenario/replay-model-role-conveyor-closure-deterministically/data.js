@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"replay-model-role-conveyor-closure-deterministically","viewId":"n-508abc99c0d740b6496bd45d"};

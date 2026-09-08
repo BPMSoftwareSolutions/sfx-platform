@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-outcome-receipt","viewId":"n-b65f94e69694d551fa826d29"};

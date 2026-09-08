@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"read-authorized-file","viewId":"n-57cad6e9dfffadad69dec42f"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-admitted-capability-lifecycle","viewId":"n-97801fa0740535a8adb44a92"};

@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-mechanical-sterility","viewId":"n-37d77de2fec798b1d0813c47"};

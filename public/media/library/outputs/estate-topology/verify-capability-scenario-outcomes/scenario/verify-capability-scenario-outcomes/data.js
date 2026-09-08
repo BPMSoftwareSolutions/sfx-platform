@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-capability-scenario-outcomes","viewId":"n-6da234e798689bfc87209580"};

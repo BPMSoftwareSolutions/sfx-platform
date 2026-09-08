@@ -1,1 +1,0 @@
-window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"represent-capability-change-evidence","viewId":"n-3dc73bc94296230cefa65b50"};
