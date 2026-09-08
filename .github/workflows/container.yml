@@ -37,9 +37,6 @@ jobs:
         env:
           SIDEFX_CONNECTION_STRING: ${{ secrets.SIDEFX_CONNECTION_STRING }}
         run: npm run restore:media
-      # A restore that silently produced nothing would build an image with no diagrams.
-      - name: Confirm the restored publication matches its manifest
-        run: npm run validate:media
       - name: Build and check the final Linux image
         run: docker build --platform linux/amd64 --build-arg SOURCE_COMMIT="$GITHUB_SHA" -t sidefx-tested:ci .
       - name: Exercise the runtime, staging indexing, readiness failures and restart

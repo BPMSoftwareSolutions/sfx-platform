@@ -15,7 +15,8 @@
  * and the path CI checks it out to.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -61,4 +62,34 @@ const result = spawnSync(process.execPath, args, {
 });
 
 if (result.error) throw result.error;
-process.exit(result.status ?? 1);
+if (result.status !== 0) process.exit(result.status ?? 1);
+if (verifyOnly) process.exit(0);
+
+/**
+ * Confirm the restore actually delivered the selected publication.
+ *
+ * A restore that silently produced the wrong generation — or nothing — would otherwise only
+ * surface inside the Docker build. This check needs no dependencies, so it runs on a bare runner:
+ * the publication manifest pins the visual publication's digest, and the restore just wrote it.
+ */
+const manifestPath = join(ROOT, 'generated', 'publication-manifest.json');
+const visualPath = join(ROOT, 'generated', 'visual-publication.json');
+
+if (!existsSync(visualPath)) {
+  console.error('The restore did not write generated/visual-publication.json.');
+  process.exit(1);
+}
+
+const pinned = JSON.parse(readFileSync(manifestPath, 'utf8')).artifacts['visual-publication.json'];
+const actual = `sha256:${createHash('sha256').update(readFileSync(visualPath)).digest('hex')}`;
+
+if (pinned !== actual) {
+  console.error('The restored media publication is not the one this release selected.');
+  console.error(`  selected: ${pinned}`);
+  console.error(`  restored: ${actual}`);
+  console.error('SQL is serving a different generation than generated/publication-manifest.json pins.');
+  process.exit(1);
+}
+
+const files = Object.keys(JSON.parse(readFileSync(visualPath, 'utf8')).artifacts).length;
+console.log(`Restored publication matches the selected release: ${files} files, ${actual.slice(0, 19)}…`);
