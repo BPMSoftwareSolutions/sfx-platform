@@ -2,36 +2,50 @@
 // A finite inspection of every declared route, including all branch alternatives.
 // Each edge is visited once; cycles are illustrated once, never executed.
 function planTrace(graph, preferred) {
-  const visited = new Set(), reached = new Set(), steps = [], queue = [];
+  const visited = new Set(), reached = new Set(), waves = [];
   const flow = graph.edges.filter(e => e.kind !== 'provider-binding');
-  const outgoing = id => flow.filter(e => e.source === id && !visited.has(e.id));
-  const enqueue = id => {
-    const node = graph.nodes.find(n => n.id === id);
-    const requirements = flow.filter(e => e.target === id && e.kind === 'CONVERGENCE_REQUIREMENT');
-    if (node?.kind === 'convergence' && requirements.some(e => !visited.has(e.id))) return;
-    queue.unshift(...outgoing(id));
-  };
-  const roots = graph.nodes.filter(n => !flow.some(e => e.target === n.id));
-  const start = preferred || roots.find(n => outgoing(n.id).length)?.id || graph.nodes[0]?.id;
-  if (start) enqueue(start);
-  while (visited.size < flow.length) {
-    if (!queue.length) {
-      const next = flow.find(e => !visited.has(e.id) && reached.has(e.source)) || flow.find(e => !visited.has(e.id));
-      if (!next) break;
-      queue.push(next);
+  const nodes=new Map(graph.nodes.map(n=>[n.id,n])),out=new Map(),required=new Map(),targets=new Set();
+  for(const edge of flow){
+    if(!out.has(edge.source))out.set(edge.source,[]);out.get(edge.source).push(edge);targets.add(edge.target);
+    if(edge.kind==='CONVERGENCE_REQUIREMENT'||graph.kind==='expression'&&['argument-dependency','conditional-argument'].includes(edge.kind)){
+      if(!required.has(edge.target))required.set(edge.target,[]);required.get(edge.target).push(edge);
     }
-    const edge = queue.shift();
-    if (visited.has(edge.id)) continue;
-    visited.add(edge.id); reached.add(edge.source); reached.add(edge.target);
-    steps.push({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind});
-    enqueue(edge.target);
   }
+  const outgoing = id => (out.get(id)||[]).filter(e => !visited.has(e.id));
+  const eligible = id => {
+    const node = nodes.get(id),requirements=required.get(id)||[];
+    return node?.kind !== 'convergence'&&graph.kind!=='expression' || requirements.every(e => visited.has(e.id));
+  };
+  const activate = (id, next) => {
+    if(!eligible(id))return;
+    for(const edge of outgoing(id))if(!next.some(e=>e.id===edge.id))next.push(edge);
+  };
+  const roots = graph.nodes.filter(n => !targets.has(n.id));
+  const start = preferred || roots.find(n => outgoing(n.id).length)?.id || graph.nodes[0]?.id;
+  let frontier=[];
+  if(preferred&&start)activate(start,frontier);
+  else for(const root of roots)activate(root.id,frontier);
+  while (visited.size < flow.length) {
+    if (!frontier.length) {
+      const next=flow.find(e=>!visited.has(e.id)&&eligible(e.source)&&reached.has(e.source)) || flow.find(e=>!visited.has(e.id)&&eligible(e.source)) || flow.find(e=>!visited.has(e.id));
+      if (!next) break;
+      activate(next.source,frontier);
+      if(!frontier.length)frontier.push(next);
+    }
+    const batch=frontier.filter(e=>!visited.has(e.id));frontier=[];
+    if(!batch.length)continue;
+    for(const edge of batch){visited.add(edge.id);reached.add(edge.source);reached.add(edge.target);}
+    waves.push(batch.map(edge=>({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind})));
+    for(const edge of batch)activate(edge.target,frontier);
+  }
+  const references=[];
   for (const edge of graph.edges.filter(e => e.kind === 'provider-binding')) {
     visited.add(edge.id); reached.add(edge.source); reached.add(edge.target);
-    steps.push({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind});
+    references.push({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind});
   }
-  for (const node of graph.nodes) if (!reached.has(node.id)) steps.push({nodeId:node.id});
-  return steps;
+  if(references.length)waves.push(references);
+  for (const node of graph.nodes) if (!reached.has(node.id)) waves.push([{nodeId:node.id}]);
+  return waves;
 }
 if (typeof module === 'object' && module.exports) module.exports = {planTrace};
 else
@@ -49,7 +63,8 @@ else
     visitedNodes = new Set(),
     trace = [],
     cursor = 0,
-    playToken = 0;
+    playToken = 0,
+    parallelCamera = false;
   const speed = document.createElement('select');
   speed.id = 'trace-speed'; speed.setAttribute('aria-label', 'Trace speed');
   for (const value of [1,4,16,64]) { const o=document.createElement('option');o.value=value;o.textContent=value+'×';speed.append(o); }
@@ -58,6 +73,7 @@ else
   const followLabel=document.createElement('label');followLabel.className='trace-control';followLabel.append(follow,' Follow flow');
   $('play').parentElement.insertBefore(speedLabel,$('flow-status'));
   $('play').parentElement.insertBefore(followLabel,$('flow-status'));
+  $('next').textContent='Next step';
   const report = () =>
     parent.postMessage(
       { type: 'sidefx-circuit-height', height: document.body.scrollHeight },
@@ -89,6 +105,7 @@ else
   function stop() {
     if(running)$('flow-status').textContent=`Trace paused · ${visited.size} / ${view.edges.length} routes`;
     running = false;
+    parallelCamera=false;
     token++;
     playToken++;
     $('play').textContent = trace.length && cursor < trace.length ? 'Resume trace' : 'Trace flow';
@@ -199,17 +216,18 @@ else
     $('source').textContent=n.source.label+' · SHA-256 '+n.source.sha256+' · '+n.source.pointer;
   }
   function followPoint(p) {
-    if (!follow.checked || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    if (parallelCamera || !follow.checked || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
     const viewport=$('viewport');
     if (view.layout.width*scale > viewport.clientWidth) viewport.scrollLeft=Math.max(0,p.x*scale-viewport.clientWidth/2);
     if (view.layout.height*scale > viewport.clientHeight) viewport.scrollTop=Math.max(0,p.y*scale-viewport.clientHeight/2);
   }
   async function travel(edge) {
-    const mine = ++token;
+    const mine = token;
     const path = $(edge.id)?.querySelector('.route-path');
     if (!path) throw new Error('Trace route geometry missing: '+edge.id);
     visitedNodes.add(edge.source);
     $(edge.id).classList.add('active-route');
+    $(edge.id).dataset.traceToken=String(mine);
     const ball = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'circle',
@@ -235,7 +253,7 @@ else
       requestAnimationFrame(frame);
     });
     ball.remove();
-    if (mine !== token) {if(!visited.has(edge.id))$(edge.id)?.classList.remove('active-route');return false;}
+    if (mine !== token) {if(!visited.has(edge.id)&&$(edge.id)?.dataset.traceToken===String(mine))$(edge.id)?.classList.remove('active-route');return false;}
     visited.add(edge.id);
     showNode(edge.target);
     if(!running)choices();
@@ -247,20 +265,29 @@ else
       trace=planTrace(view,trace.length?undefined:selected);cursor=0;visited.clear();visitedNodes.clear();
       for(const el of $('stage').querySelectorAll('.active-route'))el.classList.remove('active-route');
     }
-    const mine=++playToken;running=play;$('play').textContent=play?'Pause trace':'Trace flow';
+    const mine=++playToken;token++;running=play;$('play').textContent=play?'Pause trace':'Trace flow';
     delete $('flow-status').dataset.state;
     $('routes').replaceChildren();
     do {
-      const item=trace[cursor];if(!item)break;
-      if(item.edgeId){
-        const edge=view.edges.find(e=>e.id===item.edgeId);
-        $('flow-status').textContent=`Tracing ${visited.size+1} / ${view.edges.length} · ${edge.kind} · ${edge.label}`;
-        if(!await travel(edge))return;
-      }else{
-        showNode(item.nodeId);const [x,y,w,h]=view.layout.boxes[item.nodeId];followPoint({x:x+w/2,y:y+h/2});
-        await new Promise(resolve=>requestAnimationFrame(resolve));
+      const batch=trace[cursor]?.filter(item=>item.edgeId?!visited.has(item.edgeId):!visitedNodes.has(item.nodeId));if(!batch)break;
+      parallelCamera=batch.length>1;
+      if(parallelCamera&&follow.checked){
+        const boxes=batch.flatMap(item=>[view.layout.boxes[item.source],view.layout.boxes[item.target]]);
+        const left=Math.min(...boxes.map(b=>b[0])),top=Math.min(...boxes.map(b=>b[1])),right=Math.max(...boxes.map(b=>b[0]+b[2])),bottom=Math.max(...boxes.map(b=>b[1]+b[3]));
+        const viewport=$('viewport');scale=Math.min(1,(viewport.clientWidth-60)/(right-left),(viewport.clientHeight-60)/(bottom-top));sizing();
+        viewport.scrollLeft=Math.max(0,(left+right)*scale/2-viewport.clientWidth/2);viewport.scrollTop=Math.max(0,(top+bottom)*scale/2-viewport.clientHeight/2);
       }
+      const edges=batch.filter(item=>item.edgeId);
+      $('flow-status').textContent=batch.length>1?`Tracing ${visited.size+1}–${visited.size+edges.length} / ${view.edges.length} · ${batch.length} parallel branches`:`Tracing ${Math.min(visited.size+1,view.edges.length)} / ${view.edges.length} · ${batch[0]?.kind??'isolated component'}`;
+      const completed=await Promise.all(batch.map(async item=>{
+        if(item.edgeId)return travel(view.edges.find(e=>e.id===item.edgeId));
+        showNode(item.nodeId);const [x,y,w,h]=view.layout.boxes[item.nodeId];followPoint({x:x+w/2,y:y+h/2});
+        await new Promise(resolve=>requestAnimationFrame(resolve));return true;
+      }));
       if(mine!==playToken)return;
+      parallelCamera=false;
+      if(completed.some(ok=>!ok))return;
+      for(const item of batch)$(item.target||item.nodeId)?.classList.add('selected');
       cursor++;
     }while(play && running && cursor<trace.length);
     if(mine!==playToken)return;
@@ -293,7 +320,8 @@ else
       visited.clear();
       visitedNodes.clear();trace=[];cursor=0;delete $('flow-status').dataset.state;
       $('play').textContent='Trace flow';
-      speed.value=view.edges.length>500?'64':view.edges.length>80?'16':'1';
+      const waveCount=planTrace(view).length;
+      speed.value=waveCount>500?'16':waveCount>80?'4':'1';
       $('stage').innerHTML = view.svg;
       for (const el of $('stage').querySelectorAll(
         '[data-entity],[data-route]',
