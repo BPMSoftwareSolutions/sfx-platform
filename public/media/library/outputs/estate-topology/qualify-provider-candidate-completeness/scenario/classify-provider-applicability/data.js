@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"classify-provider-applicability","viewId":"n-f6d3b8cbd39b1d6da4dbccab"};

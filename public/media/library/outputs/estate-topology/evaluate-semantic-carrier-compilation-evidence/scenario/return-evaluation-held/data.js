@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-evaluation-held","viewId":"n-43d05acb5097837ad01d2198"};

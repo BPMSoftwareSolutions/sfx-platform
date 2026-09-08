@@ -32,14 +32,15 @@ export default async function CapabilityDetailPage({params}:Params){
   {edition?<div className="page-width"><div className="experience-strip">{Object.entries(edition.experience).map(([label,text],i)=><div key={label}><span className="kicker">0{i+1} / {label}</span><p>{text}</p></div>)}</div></div>:null}
   <section className="page-width editorial-section" id="circuit" aria-labelledby="capability-circuit-title">
    <div className="editorial-heading"><div><p className="kicker">01 / Open the capability</p><h2 id="capability-circuit-title">Meaning you can<br/><em>move through.</em></h2></div><p>Inspect the inputs, responsibilities and outcomes. Each view preserves its source and evidence scope.</p></div>
-   {edition?.circuitUrl?<EditionCircuit edition={edition}/>:storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:<CapabilityCircuitPanel circuits={circuits}/>}
-   {edition?.circuitUrl||storedCircuits.length?<details className="mt-6 border-t border-grid-line pt-5" id="declared-circuit"><summary className="cursor-pointer text-sm">Inspect all {capability.scenarios.length} selected estate scenario boundaries</summary><div className="mt-5">{edition?.circuitUrl&&storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:null}<CapabilityCircuitPanel circuits={circuits}/></div></details>:null}
+   {storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:edition?.circuitUrl?<EditionCircuit edition={edition}/>:<CapabilityCircuitPanel circuits={circuits}/>}
+   {storedCircuits.length&&edition?.circuitUrl?<details className="mt-6 border-t border-grid-line pt-5"><summary className="cursor-pointer text-sm">Explore the authored teaching circuit</summary><div className="mt-5"><EditionCircuit edition={edition}/></div></details>:null}
+   {storedCircuits.length?<details className="mt-6 border-t border-grid-line pt-5" id="declared-circuit"><summary className="cursor-pointer text-sm">Inspect the {capability.scenarios.length} scenario boundary contracts</summary><div className="mt-5"><CapabilityCircuitPanel circuits={circuits}/></div></details>:null}
   </section>
   <section className="page-width editorial-section" aria-labelledby="scenario-title">
    <div className="editorial-heading"><div><p className="kicker">02 / The scenarios</p><h2 id="scenario-title">Different situations.<br/><em>One capability.</em></h2></div><p>Each scenario has its own input, event, responsibility, outcome and image requirement.</p></div>
    <div className="scenario-grid">{capability.scenarios.map(s=><article className="scenario-card" key={s.scenarioVersionPk}>
     <EntityArt visuals={s.visuals} title={s.scenarioId.replaceAll('-',' ')} kind="SCENARIO"/>
-    <div><h3>{s.scenarioId.replaceAll('-',' ')}</h3><p>{s.responsibility}</p><a className="text-link" href={'?scenario='+encodeURIComponent(s.scenarioId)+'#'+(edition?.circuitUrl?'declared-circuit':'circuit')}>Inspect this scenario ↗</a></div>
+    <div><h3>{s.scenarioId.replaceAll('-',' ')}</h3><p>{s.responsibility}</p><a className="text-link" href={'?scenario='+encodeURIComponent(s.scenarioId)+'#circuit'}>Inspect this scenario ↗</a></div>
    </article>)}</div>
   </section>
   <section className="page-width editorial-section">
@@ -48,7 +49,7 @@ export default async function CapabilityDetailPage({params}:Params){
     <div><dt className="kicker">Namespace</dt><dd className="mt-2">{capability.namespaceId??'Not declared'}</dd></div>
     <div><dt className="kicker">Semantic object / definition</dt><dd className="mt-2">{capability.semanticObjectPk} / {capability.semanticObjectDefinitionPk}</dd></div>
     <div><dt className="kicker">Downloads</dt><dd className="mt-2">{capability.downloadEligibility.reason}</dd></div>
-   </dl><p className="mt-6 max-w-3xl text-sm text-muted">Estate boundary views show declared input, event, responsibility and outcome. This publication has no normalized blueprint edges; deeper topology is not inferred. Reviewed content editions retain their own source-bound declared, target and evidence labels.</p></details>
+   </dl><p className="mt-6 max-w-3xl text-sm text-muted">Blueprints retain their authority records and typed routes. Execution views expose native cells or declared operations; mechanic views expose expression dependencies. Each graph keeps exact source identities, contracts and evidence scope.</p></details>
   </section>
  </>;
 }

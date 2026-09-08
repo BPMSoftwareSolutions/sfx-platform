@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"accept-explicit-or-deterministic-current-binding","viewId":"n-ad0e62072d7b4dd6ef4e9a1c"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-positive-obligation","viewId":"n-8aafa2236c8c7cc870d4036b"};

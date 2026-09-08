@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-no-http-effect-in-protocol-projection","viewId":"n-a231dd278f702a878fdcf04a"};

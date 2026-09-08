@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-strategic-review-receipt","viewId":"n-6e950bd9e9b908bbc471e4e2"};

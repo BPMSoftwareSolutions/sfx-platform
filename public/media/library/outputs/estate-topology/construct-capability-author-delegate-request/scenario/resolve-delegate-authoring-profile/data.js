@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-delegate-authoring-profile","viewId":"n-3ffa4c2768f8eb5471516138"};

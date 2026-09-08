@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-consumer-execution-embodiment-fixtures","viewId":"n-808f549c4343b071f0423601"};

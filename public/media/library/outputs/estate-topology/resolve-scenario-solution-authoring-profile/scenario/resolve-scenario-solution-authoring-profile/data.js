@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-scenario-solution-authoring-profile","viewId":"n-d93872693055767fe59d7a64"};

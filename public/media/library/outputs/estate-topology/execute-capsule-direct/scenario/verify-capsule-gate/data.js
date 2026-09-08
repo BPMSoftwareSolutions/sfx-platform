@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-capsule-gate","viewId":"n-d4777e91e2cf7e4e94b25074"};

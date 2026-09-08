@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-strategic-market-fit-receipt","viewId":"n-1381bd06ded6686619284007"};

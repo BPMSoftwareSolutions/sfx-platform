@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"discover-and-inspect-capsules","viewId":"n-0a8cb1fd20ce50c58cd8fb54"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"retain-unsuccessful-scenario-authoring-attempt","viewId":"n-2342db1dc33ba2c3e50da03c"};

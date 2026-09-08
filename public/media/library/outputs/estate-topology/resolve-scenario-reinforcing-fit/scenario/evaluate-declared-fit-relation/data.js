@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-declared-fit-relation","viewId":"n-e593558dde1938bbe41f9ba5"};

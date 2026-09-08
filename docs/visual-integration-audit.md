@@ -4,6 +4,24 @@ Updated 2026-09-08. The original audit below records the missing connection; imp
 
 ## Implemented connection
 
+### Complete topology correction
+
+The initial integration connected media storage and the player but lowered scenario graphs to their input/event/outcome boundary. That was inadequate: the frozen records already contained operations, mechanic bindings, native cells and routes, and selected SQL blueprint definitions contained edges absent from the normalized website edge query. The primary website circuit now consumes these complete sources.
+
+The new Python compiler produces 1,602 diagrams: all 35 selected SQL blueprints, 694 expanded operation views, 117 native execution views and 756 mechanic expression dependency views. Together they render 41,803 component occurrences and 41,331 relation occurrences, with zero source components/routes omitted within their declared profiles. These are view occurrences, not unique estate entities. The speech provider view alone preserves 609 native cells and 690 routes. The largest mechanic dependency graph contains 1,493 components.
+
+The compiler preserves explicit branch, fan-out, convergence, terminal, return, recurrence and cancellation semantics. Expression edges describe named dependencies, not inferred runtime control. Three source blueprint endpoint references lack node declarations; their unresolved shapes and findings remain visible. The existing 14 unmatched scenario entries and changed capsule lineage are not silently rebound.
+
+All graph data, source SVGs, material masks, catalog entries, coverage receipts and versioned runtime files are retained in SQL bundles. The full blueprint/operation workbench is primary on capability pages and the homepage. Reviewed films/editions and compact boundary contracts have separate surfaces. Browser validation checks complete material and base rendering, readable large-graph zoom, component search/inspection and complete flow through all fan-out members and terminal branches. Publication validation independently compares delivered SVG node/route identities to the graph and rejects missing endpoints, missing materials or incomplete catalogs.
+
+The current delivery contains 1,578 diagrams through 810 scenario entries across 217 capabilities, including all 35 SQL blueprints. The remaining 24 compiled mechanic dependency diagrams belong to the capability whose frozen scenario identities cannot bind to current definitions; their original bundles remain in SQL. An independent union check verifies all 4,992 native source cells and 5,498 source routes, including the additional `write-binary-artifact` cells outside scenario assignments. Every one of the 30,164 compiled mechanic expression occurrences resolves to its exact mechanic definition and responsibility.
+
+Trace Flow now traverses every declared route and component to a visible completion state, including alternative branches, convergence, return/recurrence, provider references and disconnected components. Each cyclic route is visited once. Pause/resume, replay, speed and camera-follow controls are implemented. Browser checks completed 10/10 blueprint routes and 690/690 speech-provider routes, covering 9/9 and 609/609 components respectively. These are diagram walkthroughs, not provider execution receipts.
+
+The production build passes for 516 pages. Six Python tests cover source preservation and native cells without scenario assignments; three player tests include finite, complete tracing over all 1,602 compiled diagrams. SQL-only reconstruction verifies all 3,591 delivered artifacts (209,823,157 bytes), including the selected runtime overlay, against media manifest SHA-256 `551b62aaa16fbc0f9a2f415790dc1bf88ee7b4bdb5ad36286d76c0d52bbde3ed`.
+
+### Earlier media connection
+
 - SQL migrations `005-media-registry` and `006-media-integrity` are installed. Original bytes, derivatives, generation requests, exact semantic foreign keys, reviews, selections and circuit bundles are persisted. Direct cross-entity writes and edits to immutable records are rejected by SQL.
 - All 1,393 current capability/scenario/mechanic/provider definitions have image requirements, including definitions without a public page. Ten distinct subjects have reviewed images: two imported capability illustrations, four new Nano Banana mechanic images and four new Nano Banana scenario images. Their 20 card/detail selections are published. Another 1,383 generation jobs remain queued; the full paid backfill has not run.
 - The lab's 15 reviewed component materials, original generation receipts and two complete visual editions are stored. SCL compilation produced 810 current, identity-matched scenario views across 217 capabilities. Their 5,568 input/output files are stored in SQL. Twelve frozen scenario-line identities could not bind to the current model; `resolve-platform-responsibilities` has changed capsule lineage. Those gaps are retained.
@@ -13,7 +31,7 @@ Updated 2026-09-08. The original audit below records the missing connection; imp
 
 See [media operations](media-operations.md) for the running pipeline and recovery commands. A successful staging build does not close complete-artwork, authoring, download or other P1 gates.
 
-### Verification
+### Earlier verification (before the topology correction)
 
 The production build passes for 516 pages. The 41-test suite includes media tampering, exact entity/definition ownership and circuit-owner regression tests. Ten SQL rejection/readback checks plus all ten selected original-image round trips pass. SQL-only reconstruction verifies all 2,336 publication artifacts, totaling 96,297,260 bytes, against media manifest SHA-256 `9034ff1ad9b5b58d67407d91f5c1ae0407ccf2d21b7dfdbc83ee66216c627a04`. Desktop and 375-pixel layout checks show no page overflow; the existing silver-ball player reaches its authored endpoint while retaining the GAP evidence label.
 

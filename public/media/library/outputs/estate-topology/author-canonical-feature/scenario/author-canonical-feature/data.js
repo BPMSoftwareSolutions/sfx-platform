@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"author-canonical-feature","viewId":"n-d7c7c51b4183845d998608c1"};

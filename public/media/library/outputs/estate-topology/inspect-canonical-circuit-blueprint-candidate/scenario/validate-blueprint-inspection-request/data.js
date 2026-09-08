@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"validate-blueprint-inspection-request","viewId":"n-2dfad7333f02f30fcb882543"};

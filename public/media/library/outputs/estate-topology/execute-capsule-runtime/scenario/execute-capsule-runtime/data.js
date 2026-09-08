@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"execute-capsule-runtime","viewId":"n-2c609f5a6a31fba19498964c"};

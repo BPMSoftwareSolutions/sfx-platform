@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-sidefx-semantic-pattern-candidates","viewId":"n-ffeb9c7f9d6f2fdc1bef0102"};

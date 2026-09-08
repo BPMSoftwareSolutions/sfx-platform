@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"preserve-carrier-provider-blackout","viewId":"n-eb6102af65efe33a6b18afbd"};

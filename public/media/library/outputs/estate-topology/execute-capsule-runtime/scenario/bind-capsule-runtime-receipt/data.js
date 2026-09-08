@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-capsule-runtime-receipt","viewId":"n-0b27cf4780f42e7864e8b8c3"};

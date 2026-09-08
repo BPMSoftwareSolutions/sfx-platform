@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-capability-fit-aggregate","viewId":"n-af61b843f21955261a2ada2a"};

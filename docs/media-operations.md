@@ -21,20 +21,31 @@ From the content lab, compile the frozen SCL with its existing renderer. Four in
 .venv/Scripts/python.exe scripts/compile_estate_media.py --inventory C:/lab/sidefx-database/data/media/inventory.json --shards 4 --part 0
 # Repeat for --part 1, 2 and 3, then:
 .venv/Scripts/python.exe scripts/merge_estate_media.py
+.venv/Scripts/python.exe scripts/compile_estate_topology.py --inventory C:/lab/sidefx-database/data/media/inventory.json --shards 4 --part 0
+# Repeat topology compilation for --part 1, 2 and 3, wait for all four, then:
+.venv/Scripts/python.exe scripts/merge_estate_topology.py --inventory C:/lab/sidefx-database/data/media/inventory.json
+.venv/Scripts/python.exe -m unittest discover -s scripts -p test_estate_topology.py -v
 ```
 
 Back in the database repository:
 
 ```powershell
-node src/media/import-circuits.mjs
-node src/media/select-circuits.mjs
+$env:SIDEFX_CIRCUIT_INDEX='outputs/estate-topology/index.json'
+try { node src/media/import-circuits.mjs } finally { Remove-Item Env:SIDEFX_CIRCUIT_INDEX }
 node src/media/archive-catalogs.mjs
+node src/media/publish-topology-runtime.mjs
 node src/media/export-website.mjs
 node src/media/verify.mjs
 node src/media/restore-website.mjs --verify-only
 ```
 
-Originals are hash-checked before import. The SQL byte table checks every digest and length; immutable revisions and exact foreign keys protect the mapping. Circuit imports reject stale capsule lineage and unresolved scenario ownership. Selection retains the reviewed authored edition when it exists. Source-only views never acquire an invented playback trace.
+Originals are hash-checked before import. The SQL byte table checks every digest and length; immutable revisions and exact foreign keys protect the mapping. Circuit imports reject stale capsule lineage and unresolved scenario ownership. Complete topology bundles select the capability/scenario/blueprint CIRCUIT requirements; reviewed authored editions remain separate teaching products. Declared route tracing never becomes an execution receipt. Do not run the older boundary-only `select-circuits.mjs` for this topology publication.
+
+`outputs/estate-topology/coverage.json` records NetworkX analysis and the complete source/geometry checks. Its counts are diagram occurrences: multiple scenario views can include the same source component. The original SVGs, source definitions, compiler/runtime files, graph datasets and materials are all bundle members in SQL. Delivery loads one selected graph at a time; it does not ship the full estate into the page's React payload.
+
+For a bounded source repair, compile with `--capabilities <id> --index-name <repair>.json`, point `SIDEFX_CIRCUIT_INDEX` at that index and import with `--merge-current`. This replaces only those exact capability entries in the current SQL catalog; every other bundle retains its original revision. Shared player updates use `publish-topology-runtime.mjs`: JS/CSS bytes and original-runtime ancestry are stored in SQL, and a compatible runtime catalog pins the delivery overlay. Export rejects an unknown original runtime. SQL-only recovery includes the selected overlay, so runtime fixes do not require re-generating unchanged graphs.
+
+Run `node --test scripts/topology-trace.test.cjs` in the content lab after compilation. It verifies full route/component coverage across the compiled estate, finite recurrence, all branch alternatives, isolated components and convergence ordering. Trace Flow runs to completion with pause/resume, replay, speed and camera-follow controls. Tracing every alternative illustrates declared topology; it does not claim they all execute in one invocation.
 
 The import catalogs and website media publication are themselves stored in SQL. `export-website.mjs` reads these SQL catalogs, then retrieves selected bytes from SQL. The content lab is not required for export or recovery. The website artifact manifest records the precise bytes of delivery adaptations such as iframe sizing; their original revisions remain stored separately.
 
@@ -43,6 +54,7 @@ From the website repository, with the development server stopped during publicat
 ```powershell
 npm run publish:estate
 npm run select:estate
+npx tsx scripts/prune-media.ts --apply
 npm run build
 npm run check
 ```

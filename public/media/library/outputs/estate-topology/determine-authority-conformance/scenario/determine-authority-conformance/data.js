@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"determine-authority-conformance","viewId":"n-ef8ef2c2b16aa3d5d6d26326"};

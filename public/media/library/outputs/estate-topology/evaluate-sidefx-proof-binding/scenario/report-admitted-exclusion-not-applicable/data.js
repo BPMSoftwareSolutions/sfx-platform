@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"report-admitted-exclusion-not-applicable","viewId":"n-457bf972d51917eb1dcf9268"};

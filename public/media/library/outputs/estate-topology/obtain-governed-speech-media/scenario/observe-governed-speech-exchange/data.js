@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-governed-speech-exchange","viewId":"n-ee85050768bd6b043feea264"};

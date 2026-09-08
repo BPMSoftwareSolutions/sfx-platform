@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-openai-text-request","viewId":"n-fb4222177c44cc5b7fd88ada"};

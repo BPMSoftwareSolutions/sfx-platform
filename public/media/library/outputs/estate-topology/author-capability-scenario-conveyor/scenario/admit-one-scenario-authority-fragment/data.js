@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-one-scenario-authority-fragment","viewId":"n-de5b27451060d60642f1feb4"};

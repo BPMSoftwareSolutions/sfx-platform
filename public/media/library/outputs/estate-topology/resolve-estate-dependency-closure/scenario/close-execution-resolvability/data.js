@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"close-execution-resolvability","viewId":"n-f2d62238bed794c69a61f2a6"};

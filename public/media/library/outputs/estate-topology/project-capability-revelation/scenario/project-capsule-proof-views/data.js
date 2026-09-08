@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-capsule-proof-views","viewId":"n-efbd7ab157d49bb95e73b302"};

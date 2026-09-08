@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"provision-capability-artifacts","viewId":"n-4a29e275d12445baa06b094f"};

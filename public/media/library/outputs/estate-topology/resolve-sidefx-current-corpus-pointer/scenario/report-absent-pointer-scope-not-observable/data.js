@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"report-absent-pointer-scope-not-observable","viewId":"n-0ad7a6638a6edbfa50e8d63f"};

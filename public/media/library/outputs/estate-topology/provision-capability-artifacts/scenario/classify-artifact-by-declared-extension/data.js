@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"classify-artifact-by-declared-extension","viewId":"n-9d96d391eb7caafdc3ff01e2"};

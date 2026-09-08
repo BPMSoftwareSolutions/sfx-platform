@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-strategic-decision-authorization","viewId":"n-a053dcda0c01851d8bf8ac6a"};

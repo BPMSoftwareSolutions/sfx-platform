@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"observe-binary-artifact-write-result","viewId":"n-6c932bba23bdcfcb39da5037"};

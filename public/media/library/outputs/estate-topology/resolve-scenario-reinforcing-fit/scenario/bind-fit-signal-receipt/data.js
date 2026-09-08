@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-fit-signal-receipt","viewId":"n-463253a2f1d2f58d67680c32"};

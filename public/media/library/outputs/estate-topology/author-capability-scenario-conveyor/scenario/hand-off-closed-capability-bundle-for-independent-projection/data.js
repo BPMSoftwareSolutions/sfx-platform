@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"hand-off-closed-capability-bundle-for-independent-projection","viewId":"n-f3afaaa2c257b04f2b334373"};

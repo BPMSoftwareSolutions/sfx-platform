@@ -8,4 +8,4 @@ export function getVisualPublication(){
  return cached;
 }
 export function getEdition(definitionPk:string){return getVisualPublication().editions.find(e=>e.definitionPk===definitionPk);}
-export function getStoredCircuits(definitionPk:string){return getVisualPublication().circuits.filter(c=>c.capabilityDefinitionPk===definitionPk);}
+export function getStoredCircuits(definitionPk:string){return getVisualPublication().circuits.filter(c=>c.capabilityDefinitionPk===definitionPk).map(({scenarioId,url,label,topologyViews})=>({scenarioId,url,label,topologyViews}));}

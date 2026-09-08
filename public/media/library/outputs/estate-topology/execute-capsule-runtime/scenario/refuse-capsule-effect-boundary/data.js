@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"refuse-capsule-effect-boundary","viewId":"n-366f63df199881e27f92e5a0"};

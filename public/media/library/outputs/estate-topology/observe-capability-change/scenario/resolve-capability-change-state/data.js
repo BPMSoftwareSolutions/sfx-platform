@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-capability-change-state","viewId":"n-26a40533a9aed82359bce2f7"};

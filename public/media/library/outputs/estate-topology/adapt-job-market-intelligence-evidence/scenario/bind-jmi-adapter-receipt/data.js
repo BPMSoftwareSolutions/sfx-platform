@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-jmi-adapter-receipt","viewId":"n-c2d43245fba712d81f06c37e"};

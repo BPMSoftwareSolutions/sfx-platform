@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-capsule-exposure-views","viewId":"n-a4990a24fed19183ee9e81c7"};

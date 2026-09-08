@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"hold-unsupported-model-interaction-mode","viewId":"n-9375aaf6180fd537fc06bcaf"};

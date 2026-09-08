@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-presentation-token-binding","viewId":"n-fd5bcf7170901da041edbbcc"};

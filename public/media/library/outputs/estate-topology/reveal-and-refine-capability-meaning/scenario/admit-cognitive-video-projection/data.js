@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-cognitive-video-projection","viewId":"n-c3395bf6ebbdf3c559aa0ef4"};

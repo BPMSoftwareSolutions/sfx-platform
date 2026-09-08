@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"select-one-eligible-blueprint-cell","viewId":"n-35530a8213e1040a34a13077"};

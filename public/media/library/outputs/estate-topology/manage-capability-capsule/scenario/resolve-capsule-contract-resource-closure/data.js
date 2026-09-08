@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-capsule-contract-resource-closure","viewId":"n-3406001440a38c630742bb40"};

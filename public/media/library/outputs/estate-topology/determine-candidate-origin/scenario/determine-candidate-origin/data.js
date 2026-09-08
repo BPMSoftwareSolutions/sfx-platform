@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"determine-candidate-origin","viewId":"n-0ca84df66bbd664b67b6323c"};

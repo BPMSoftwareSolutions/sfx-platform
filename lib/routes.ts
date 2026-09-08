@@ -178,7 +178,7 @@ export const HOME_COPY = {
  footnote:'Semantic authority. Inspectable circuits. Reusable mechanics.',
  explore:'Explore the estate', start:'Start with your intent', inside:'Inside a capability',
  stories:{eyebrow:'The work, made visible',title:['A capability has','a story to tell.'],description:'Start with the human experience. Then open the circuit and inspect what each part is responsible for.',open:'Open the capability'},
- circuit:{eyebrow:'The SideFX visual language',title:['Every connection','means something.'],description:'Inputs, responsibilities, providers and outcomes keep their own identities. Play the authored flow. Inspect a node. Switch between the clean geometry and its material treatment.'},
+ circuit:{eyebrow:'The SideFX visual language',title:['Every connection','means something.'],description:'Open the blueprint. Follow the declared routes through its responsibilities, decisions and mechanics. Inspect the exact contracts and sources behind every component.'},
  mechanics:{eyebrow:'Below the surface',title:['Precise responsibilities.','Reusable parts.'],explore:'Explore all mechanics',empty:'A mechanic carries one declared responsibility. Providers supply implementations. The capability keeps its meaning.',open:'Open the mechanic library'},
  closing:{eyebrow:'From intent to capability',title:['What should your','system be able to do?'],start:'Describe your intent',docs:'Understand the system'},
 } as const;

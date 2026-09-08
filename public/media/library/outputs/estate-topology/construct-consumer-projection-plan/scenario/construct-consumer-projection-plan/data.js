@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"construct-consumer-projection-plan","viewId":"n-1c6c48f09a95f8aab0d62966"};

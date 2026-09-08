@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"collapse-admitted-capability","viewId":"n-d430c8d5458424ddcda3d439"};

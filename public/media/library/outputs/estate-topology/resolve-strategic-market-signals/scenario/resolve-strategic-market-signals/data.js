@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-strategic-market-signals","viewId":"n-4dae18725a1ea5ce0d5c5324"};

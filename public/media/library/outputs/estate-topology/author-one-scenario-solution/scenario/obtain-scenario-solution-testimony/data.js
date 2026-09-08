@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"obtain-scenario-solution-testimony","viewId":"n-b04d9bf900c6ec10a500d968"};

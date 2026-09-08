@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-capability-proof-obligations","viewId":"n-44059450f46248e0ee07aa84"};

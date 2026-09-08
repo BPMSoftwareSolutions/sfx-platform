@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"determine-shape-conformance","viewId":"n-42ba5a9c3eea9080424922b2"};

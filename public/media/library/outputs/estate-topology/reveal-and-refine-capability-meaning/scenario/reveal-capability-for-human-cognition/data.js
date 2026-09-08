@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reveal-capability-for-human-cognition","viewId":"n-13e2d8cec36d17e1da9d2fd9"};

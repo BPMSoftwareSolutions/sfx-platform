@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-http-endpoint-outside-authority","viewId":"n-e5cb393f32d048f96b3f4658"};

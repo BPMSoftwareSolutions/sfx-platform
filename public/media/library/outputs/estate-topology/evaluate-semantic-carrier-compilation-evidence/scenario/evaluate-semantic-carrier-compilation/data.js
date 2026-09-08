@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-semantic-carrier-compilation","viewId":"n-a716ee296da05593f1104e88"};

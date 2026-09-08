@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"invoke-governed-narration-provider","viewId":"n-a805b0dab35be351dff40925"};

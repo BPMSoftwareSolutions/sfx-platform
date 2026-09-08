@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-blueprint-review-digest-closure","viewId":"n-3aa43e2a038c131d0e1789ae"};

@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { getCapabilities, getMechanics, getPublication, getProviders } from '@/lib/estate';
-import { getVisualPublication } from '@/lib/visuals';
+import { getVisualPublication, getStoredCircuits } from '@/lib/visuals';
 import { EntityArt } from '@/components/estate/entity-art';
 import { EditionCircuit } from '@/components/estate/visual-edition';
+import { StoredCircuitPanel } from '@/components/estate/stored-circuit-panel';
 import { pageMetadata, HOME_META } from '@/lib/seo';
 import { HOME_COPY as copy } from '@/lib/routes';
 import { selectHomeRecords } from '@/lib/content-selection';
@@ -12,6 +13,7 @@ export default function HomePage(){
  const publication=getPublication(),capabilities=getCapabilities(),visual=getVisualPublication();
  const selected=publication?selectHomeRecords(publication,visual):{editions:[],lead:undefined,mechanics:[]};
  const {editions,mechanics}=selected,lead=selected.lead?.capability,leadEdition=selected.lead?.edition;
+ const leadCircuits=lead?getStoredCircuits(lead.semanticObjectDefinitionPk):[];
  return <>
   <section className="landing-hero page-width">
    <div className="landing-intro"><p className="kicker">{copy.eyebrow}</p>
@@ -35,9 +37,9 @@ export default function HomePage(){
     <div className="story-copy"><span className="kicker">0{i+1} / {capability.title}</span><h3><Link href={'/capabilities/'+capability.urlKey}>{edition.storyTitle}</Link></h3><p>{edition.humanProblem}</p><Link className="text-link" href={'/capabilities/'+capability.urlKey}>{copy.stories.open} ↗</Link></div>
    </article>:null)}</div>
   </section>
-  {leadEdition?.circuitUrl?<section className="page-width editorial-section" aria-labelledby="circuit-title">
+  {leadCircuits.length||leadEdition?.circuitUrl?<section className="page-width editorial-section" aria-labelledby="circuit-title">
    <div className="editorial-heading"><div><p className="kicker">{copy.circuit.eyebrow}</p><h2 id="circuit-title">{copy.circuit.title[0]}<br/><em>{copy.circuit.title[1]}</em></h2></div><p>{copy.circuit.description}</p></div>
-   <EditionCircuit edition={leadEdition}/>
+   {leadCircuits.length?<StoredCircuitPanel circuits={leadCircuits}/>:leadEdition?<EditionCircuit edition={leadEdition}/>:null}
   </section>:null}
   <section className="page-width editorial-section" aria-labelledby="mechanics-title">
    <div className="editorial-heading"><div><p className="kicker">{copy.mechanics.eyebrow}</p><h2 id="mechanics-title">{copy.mechanics.title[0]}<br/><em>{copy.mechanics.title[1]}</em></h2></div><Link className="text-link" href="/mechanics">{copy.mechanics.explore} ↗</Link></div>

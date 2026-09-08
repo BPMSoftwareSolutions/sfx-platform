@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-capability-change-impact","viewId":"n-d22f7948775f6f388ccacfe0"};

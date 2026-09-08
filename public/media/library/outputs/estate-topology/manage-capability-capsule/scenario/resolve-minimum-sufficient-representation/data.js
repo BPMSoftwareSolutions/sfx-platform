@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-minimum-sufficient-representation","viewId":"n-9d2a78ea1e14e5eba01fd9a1"};

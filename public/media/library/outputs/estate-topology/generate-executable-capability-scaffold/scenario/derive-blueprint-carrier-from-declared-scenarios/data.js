@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-blueprint-carrier-from-declared-scenarios","viewId":"n-74b6e35aff92be25706a4634"};

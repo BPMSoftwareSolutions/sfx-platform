@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-market-fact-receipt","viewId":"n-1c6e0ea27bb5a230703b2ff9"};

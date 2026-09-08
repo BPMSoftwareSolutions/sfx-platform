@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-collection-presentation","viewId":"n-78ea6363cacc7bab06575675"};

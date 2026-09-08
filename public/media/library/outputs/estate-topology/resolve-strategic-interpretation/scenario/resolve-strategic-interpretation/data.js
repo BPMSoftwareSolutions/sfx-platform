@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-strategic-interpretation","viewId":"n-b3fe26390d65c30db3da650f"};

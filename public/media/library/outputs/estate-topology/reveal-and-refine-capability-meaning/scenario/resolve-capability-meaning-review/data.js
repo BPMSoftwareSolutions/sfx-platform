@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-capability-meaning-review","viewId":"n-8e62b1be5ceebb7760c0b061"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"initialize-capability-scenario-authoring-ledger","viewId":"n-4117dff3c782107c4fd0211a"};

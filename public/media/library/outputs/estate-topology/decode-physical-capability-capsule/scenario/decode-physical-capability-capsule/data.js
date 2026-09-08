@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"decode-physical-capability-capsule","viewId":"n-5d75cd33a61c321ee5e2ca82"};

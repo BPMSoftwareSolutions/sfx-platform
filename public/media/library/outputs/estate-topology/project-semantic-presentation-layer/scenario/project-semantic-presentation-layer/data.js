@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-semantic-presentation-layer","viewId":"n-f64bc94b0b59b21b33273d7c"};

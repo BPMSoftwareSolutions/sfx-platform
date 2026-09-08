@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-jmi-type-admission","viewId":"n-4bf7bc75ddecfe352530a879"};

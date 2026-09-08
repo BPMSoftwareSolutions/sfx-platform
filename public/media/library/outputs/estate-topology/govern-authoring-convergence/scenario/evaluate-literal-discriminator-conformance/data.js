@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-literal-discriminator-conformance","viewId":"n-ee96ce9cd476472b422b889f"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-blueprint-embodiment","viewId":"n-a32eb362fd8356d0b81c15bb"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-credential-bearing-model-provider-authority","viewId":"n-0db83d7022d905a0d3521641"};

@@ -322,6 +322,7 @@ Python outputs obey the same architecture laws as every other artifact:
 ### 7.4 Current state and adoption order
 
 - **Already in the lab:** the SCL compiler (networkx, pydantic), the infographic pipeline (Pillow, CairoSVG, numpy), whisper transcription, Gemini generation and MCP boundaries all exist as reviewed Python. The content lab is the proving ground.
+- **Connected to the website:** the topology compiler uses NetworkX multigraphs, containment validation, connected components and cycle analysis, then Graphviz geometry and the lab's canonical material masks. Its source coverage receipts, complete SVGs, graph data and player are persisted in SQL and exported into the pinned website publication. This is a running media/graph projection, distinct from the broader estate analytics service.
 - **Not yet wired to the platform:** the estate analytics service, semantic retrieval, imagehash review and ops consoles do not exist as platform services; the database repo carries no Python reader (the restricted reader remains the boundary).
 - **Adoption order:** (1) estate analytics projection into the publication pipeline — it makes every catalog, estate page and inspector richer without touching the web contract; (2) semantic retrieval into the conveyor context builder — intent matching is the single highest-leverage data science surface for the core journey; (3) imagehash media QA into §5.2 — saves billable generation; (4) ragas evals when `/platform/knowledge` ships in P2.
 
@@ -360,7 +361,9 @@ Two coordinated products per capability, one semantic source (§12):
 1. **Interactive circuit** — SCL → typed graph → deterministic SVG + accessible inspector. Server-rendered SVG *and* text outline, so the circuit is readable without JavaScript.
 2. **Entity image** — dedicated Nano Banana artwork per capability/scenario/mechanic/provider, bound to exact subject/definition revisions.
 
-The website now integrates the content lab's pinned grammar (15 canonical primitives, 7 typed route families), reviewed materials, films and existing silver-ball player through a SQL media publication. Exact source matching produced 810 scenario views across 217 capabilities. Only authored traces are playable. The independent boundary renderer remains the readable fallback for unresolved scope. The full dedicated-image backfill remains open; see `visual-integration-audit.md` and `media-operations.md`.
+The primary workbench renders complete selected SQL blueprints, declared scenario operation/call flow, native execution cells/routes and mechanic expression dependencies. Python compilation produces 1,602 source diagrams: 35 blueprints, 694 operation views, 117 native views and 756 mechanic dependency views. All 35 selected blueprint definitions are represented. The 810 identity-matched scenario entry points across 217 capabilities select from these views; the source compilation also retains one capability whose frozen scenario identities cannot bind to current definitions.
+
+Source nodes and routes retain their identities, contracts, pointers and digest provenance. Coverage and geometry checks reject omitted source components or rendered edges. Branch, fan-out, convergence, return, recurrence, cancellation and dependency relations retain their native vocabulary. Search, zoom, component inspection and silver-ball route tracing operate on this complete graph. Tracing is an illustration of declared relationships, with automatic continuation across branches and joins, one visit per cyclic route, and a visible completion count; it never invokes providers or establishes execution testimony. Reviewed authored films and circuit editions remain separate teaching surfaces. The boundary renderer remains the readable fallback and contract summary; it cannot stand in for an available complete blueprint. The full dedicated-image backfill remains open; see `visual-integration-audit.md` and `media-operations.md`.
 
 ## 11. What makes this cutting edge
 
@@ -384,7 +387,7 @@ The architecture is established; portions remain unimplemented. Per §10 and the
 | Gemini Pro authoring conveyor + auth + durable jobs | 5.3 | Not connected; `/build` retains intent only, and says so |
 | Capability export adapter, verified SDA release | 5.3, 9 | Not connected; no downloads offered anywhere |
 | SQL media schema + Nano Banana production + ingest | 5.2 | Schema installed; originals, derivatives and exact bindings persisted. 10 reviewed subject images / 20 selections; 1,383 further jobs queued |
-| Content-lab grammar/material/player integration | 10 | Connected: reviewed editions/player, 15 materials and 810 source-bound SCL views. Unmatched source remains in the boundary fallback |
+| Content-lab grammar/material/player integration | 10 | Connected: 15 materials, complete source topology, 35 SQL blueprints, mechanic dependency graphs, 810 scenario workbench entries and reviewed teaching editions. Unmatched definitions retain explicit gaps |
 | Durable inquiry store + mail worker | 4, spec §8.7 | Hosted builds reject submissions with values preserved |
 | Legal entity, analytics config, workspace routes | 4, 5.4 | Registered unavailable; unlinked, noindex |
 | Estate analytics, semantic retrieval, media QA services | 7 | Lab assets exist; platform services not wired (§7.4) |
