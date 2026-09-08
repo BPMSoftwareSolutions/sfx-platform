@@ -1,0 +1,31 @@
+{
+  "name": "sfx-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SideFX website — capability management and engineering platform (www.sidefx.io)",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "publish:estate": "node scripts/publish-estate.mjs",
+    "dev": "next dev",
+    "build": "npm run publish:estate -- --allow-missing && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/",
+    "check": "npm run typecheck && npm run test"
+  },
+  "dependencies": {
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.5.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}
