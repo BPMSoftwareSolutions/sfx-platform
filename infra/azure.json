@@ -12,5 +12,6 @@
   "registryServer": "bpmaiengineacr.azurecr.io",
   "imageRepository": "sidefx/sfx-platform",
   "deploymentIdentityName": "sfx-platform-github-staging",
-  "githubRepository": "BPMSoftwareSolutions/sfx-platform"
+  "githubRepository": "BPMSoftwareSolutions/sfx-platform",
+  "githubOidcSubject": "repo:BPMSoftwareSolutions@43733196/sfx-platform@1361441581:environment:staging"
 }

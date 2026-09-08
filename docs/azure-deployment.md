@@ -52,6 +52,9 @@ The GitHub `staging` environment trusts only `main` and the implementation branc
 `codex/azure-container-deployment`. Client, tenant and subscription IDs are nonsecret environment
 variables. Set repository variable `AZURE_STAGING_ENABLED=true` to enable staging delivery.
 Future branches require a deliberate environment-policy change. Bootstrap does not enable this flag.
+The actual OIDC subject includes numeric owner/repository IDs; its exact observed value is recorded
+in `infra/azure.json`. A name-only subject failed authentication in the first run. Preserve the
+ID-qualified trust boundary; inspect the actual claim again if repository ownership changes.
 
 `.github/workflows/container.yml` builds and tests on pull requests and the two selected branches.
 Only a non-PR run with the flag enabled can enter the OIDC staging job. Build actions are pinned
