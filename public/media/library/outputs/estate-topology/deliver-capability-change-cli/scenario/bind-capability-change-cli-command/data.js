@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-capability-change-cli-command","viewId":"n-5df117ffb0abac27d19390b3"};

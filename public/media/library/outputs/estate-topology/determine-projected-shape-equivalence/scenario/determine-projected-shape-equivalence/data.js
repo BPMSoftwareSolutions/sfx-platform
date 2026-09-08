@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"determine-projected-shape-equivalence","viewId":"n-5a571082c81e385fde512c90"};

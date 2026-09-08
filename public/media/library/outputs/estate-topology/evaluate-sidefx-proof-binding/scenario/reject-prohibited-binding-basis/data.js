@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-prohibited-binding-basis","viewId":"n-85b206d7a22c19a1ddf752ef"};

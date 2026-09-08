@@ -1,0 +1,58 @@
+{
+  "demoId": "narration-continuity-film.v1",
+  "kind": "LOCAL_EDITORIAL_COMPOSITION",
+  "notManagedCapsuleExecution": true,
+  "requestDigestBefore": "3f296f2e2c64dc9cd8010d68375198265b9162098b9de48b80bf390da10dbe6d",
+  "requestDigestAfter": "3f296f2e2c64dc9cd8010d68375198265b9162098b9de48b80bf390da10dbe6d",
+  "providers": [
+    {
+      "step": "A",
+      "status": "UNAVAILABLE",
+      "mode": "SIMULATED_FAILURE",
+      "declaredModalities": [
+        "audio"
+      ]
+    },
+    {
+      "step": "B",
+      "status": "INELIGIBLE",
+      "mode": "LOCAL_DECLARED_CANDIDATE",
+      "declaredModalities": [
+        "text"
+      ]
+    },
+    {
+      "step": "C",
+      "status": "SELECTED",
+      "mode": "LIVE_GEMINI",
+      "declaredModalities": [
+        "audio"
+      ]
+    },
+    {
+      "step": "D",
+      "status": "NOT_INVOKED",
+      "mode": "STANDBY",
+      "declaredModalities": [
+        "audio"
+      ]
+    }
+  ],
+  "asset": {
+    "provider": "Gemini",
+    "model": "gemini-2.5-flash-preview-tts",
+    "voice": "Kore",
+    "script": "Your story is ready to be heard. Every detail has a purpose. Every voice carries the story forward.",
+    "requestDigest": "f83623ac172a0702453b60ced43131e893984489c0db0c183f11a7d91b9f5710",
+    "audioDigest": "b98b6be36f3efec2ad5f4f2e3b90aba47c4bd3917378069a93a211d6514fd25a",
+    "audioFile": "finished-narration.wav",
+    "durationSeconds": 8.210958333333334,
+    "elapsedSeconds": 5.578,
+    "status": "MATERIALIZED",
+    "execution": "LIVE_PROVIDER_IN_LOCAL_LAB"
+  },
+  "queueBefore": 7,
+  "queueAfter": 6,
+  "queueMeaning": "Seven local illustrative jobs; this run completes one narration asset, not seven jobs.",
+  "outcome": "NARRATION_MATERIALIZED_AND_HASH_VERIFIED"
+}

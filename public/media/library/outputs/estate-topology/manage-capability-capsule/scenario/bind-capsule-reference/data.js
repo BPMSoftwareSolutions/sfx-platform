@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-capsule-reference","viewId":"n-55c3709535bec2f92b7d0da3"};

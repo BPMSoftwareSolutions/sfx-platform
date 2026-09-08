@@ -1,0 +1,157 @@
+{
+  "capabilityId": "generate-governed-narration",
+  "capsuleDigest": "sha256:09a39695433e4f902efc7b5b0442905b8025695fed69022eb3ad2556ef059fe0",
+  "estateManifestDigest": "0b02db7ee691898d499cb9046737dce3f7c34aa8e1e3d6ca4908afeb823fb802",
+  "dependencies": [
+    {
+      "bindingRef": "../../obtain-governed-speech-media/projected/application-binding.node.json",
+      "bindingDigest": "sha256:5c4cbf93b318731d684955489139e66fc9fe0f505f4c450463c3c1c60f575613",
+      "capabilityAuthorityDigest": "sha256:fab9f90abbcfc3c83b9da840f313080eb8bbb87a18da526a227fb7af2f8c0272"
+    },
+    {
+      "bindingRef": "../../write-binary-artifact/projected/application-binding.node.json",
+      "bindingDigest": "sha256:5b7e28b9b4a9c1010aae99f63b19e61f56aee325cc352c6850de4d7621427728",
+      "capabilityAuthorityDigest": "sha256:916b7911144f2dd8fd60cd289f8cb0978ef758b723cd9ef94e43678b3f070511"
+    }
+  ],
+  "runtimeBindings": [
+    {
+      "runtimeBindingType": "capsule-runtime-binding.v1",
+      "target": "node",
+      "bindingEntryRef": "capsule-runtime/generate-governed-narration/application-binding.node.json",
+      "planEntryRef": "capsule-runtime/generate-governed-narration/execution-plan.node.json",
+      "fixturesEntryRef": "capsule-runtime/generate-governed-narration/fixtures.json",
+      "sterilityEntryRef": "capsule-runtime/generate-governed-narration/projection-conformance.json",
+      "directExecutionEligibility": "fixture-proven"
+    }
+  ],
+  "externalToolRoots": [],
+  "entries": [
+    {
+      "entryId": "capability.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/capability.authority.json",
+      "entryDigest": "sha256:fb8ff858c8c7a693892f66e13685fa714403fde6914a2acb3421d80521c82964",
+      "snapshot": "data/capsule-evidence/entries/fb8ff858c8c7a693892f66e13685fa714403fde6914a2acb3421d80521c82964-c1e8f11071e2dfde.json"
+    },
+    {
+      "entryId": "blueprint.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/blueprint.authority.json",
+      "entryDigest": "sha256:47b59da3016f716ad22d0d863907d501f1a73f99a2d9a1c71c63cf63b8c6405f",
+      "snapshot": "data/capsule-evidence/entries/47b59da3016f716ad22d0d863907d501f1a73f99a2d9a1c71c63cf63b8c6405f-d0cba5f39ee9508e.json"
+    },
+    {
+      "entryId": "blueprint-cell-authoring.receipt.json",
+      "entryRef": "capabilities/generate-governed-narration/blueprint-cell-authoring.receipt.json",
+      "entryDigest": "sha256:a2d3c842bac380cfa6e050df8966ad53fb06dd7d0f6d6fe098ff0b74573b40ea",
+      "snapshot": "data/capsule-evidence/entries/a2d3c842bac380cfa6e050df8966ad53fb06dd7d0f6d6fe098ff0b74573b40ea-bf52dfe178714f7e.json"
+    },
+    {
+      "entryId": "semantic-transformation.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/semantic-transformation.authority.json",
+      "entryDigest": "sha256:656b8cb7b10f55f93522c9ba11c5b9ae0216f047e08e1a313c6519443bad0d25",
+      "snapshot": "data/capsule-evidence/entries/656b8cb7b10f55f93522c9ba11c5b9ae0216f047e08e1a313c6519443bad0d25-d5a4f11e8c16e1e8.json"
+    },
+    {
+      "entryId": "execution-authorities.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/execution-authorities.authority.json",
+      "entryDigest": "sha256:7e5ea2165d5cc995846b45097f31856c56ebe6b5ec4ab4535facb04fcc873b29",
+      "snapshot": "data/capsule-evidence/entries/7e5ea2165d5cc995846b45097f31856c56ebe6b5ec4ab4535facb04fcc873b29-fc8dcf850cace713.json"
+    },
+    {
+      "entryId": "interfaces.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/interfaces.authority.json",
+      "entryDigest": "sha256:bc8a845a999e1b7d578f93693207c00325ffc8895acdc55311c68b099a6a745d",
+      "snapshot": "data/capsule-evidence/entries/bc8a845a999e1b7d578f93693207c00325ffc8895acdc55311c68b099a6a745d-f2b5f278b76321a1.json"
+    },
+    {
+      "entryId": "semantic-graph.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/semantic-graph.authority.json",
+      "entryDigest": "sha256:d77c8ab7092aad58e0c3c42b4ff5b8bb3597cd8bf613620ae94f01bca9cb2bce",
+      "snapshot": "data/capsule-evidence/entries/d77c8ab7092aad58e0c3c42b4ff5b8bb3597cd8bf613620ae94f01bca9cb2bce-c7b66eca4541a5a8.json"
+    },
+    {
+      "entryId": "fixtures.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/fixtures.authority.json",
+      "entryDigest": "sha256:8266cbf8aff8d2d78864bde892fa8b8797bedf836b7fac7b1a58509504a76983",
+      "snapshot": "data/capsule-evidence/entries/8266cbf8aff8d2d78864bde892fa8b8797bedf836b7fac7b1a58509504a76983-558fea5ef19eb8ee.json"
+    },
+    {
+      "entryId": "consumer-workspace.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/consumer-workspace.authority.json",
+      "entryDigest": "sha256:2d152aa338bdf86c36db5657d36c67a53da669dbb926c2acda373fcfaf34c2d3",
+      "snapshot": "data/capsule-evidence/entries/2d152aa338bdf86c36db5657d36c67a53da669dbb926c2acda373fcfaf34c2d3-cffe02bb626271e3.json"
+    },
+    {
+      "entryId": "projection-authorities.authority.json",
+      "entryRef": "capabilities/generate-governed-narration/projection-authorities.authority.json",
+      "entryDigest": "sha256:b75f76d2be1d22e1c28a5f347290d8b344121a1984955aba84dd58040cb6bf24",
+      "snapshot": "data/capsule-evidence/entries/b75f76d2be1d22e1c28a5f347290d8b344121a1984955aba84dd58040cb6bf24-be5464f81e640b06.json"
+    },
+    {
+      "entryId": "contracts/contract-catalog.json",
+      "entryRef": "capabilities/generate-governed-narration/contracts/contract-catalog.json",
+      "entryDigest": "sha256:9d5655f39dae2b777cd3919e8290fd06f140c7067aa5455c5a77fadc794d237e",
+      "snapshot": "data/capsule-evidence/entries/9d5655f39dae2b777cd3919e8290fd06f140c7067aa5455c5a77fadc794d237e-c5d4f17bbac191e7.json"
+    },
+    {
+      "entryId": "features/{id}.feature",
+      "entryRef": "features/generate-governed-narration.feature",
+      "entryDigest": "sha256:0fa81ca50529ce7bab6644810317b412b789d7c24bcf54431a8b3cbc9d8fe28c",
+      "snapshot": "data/capsule-evidence/entries/0fa81ca50529ce7bab6644810317b412b789d7c24bcf54431a8b3cbc9d8fe28c-8b0f95a11d0fc867.json"
+    },
+    {
+      "entryId": "runtime.application-binding.node.json",
+      "entryRef": "capsule-runtime/generate-governed-narration/application-binding.node.json",
+      "entryDigest": "sha256:20b074ef63adbd63acf988a389b6e44dea84acd0ea34b49122974bd59ac860fb",
+      "snapshot": "data/capsule-evidence/entries/20b074ef63adbd63acf988a389b6e44dea84acd0ea34b49122974bd59ac860fb-a7c8395c41d82392.json"
+    },
+    {
+      "entryId": "runtime.execution-plan.node.v3.json",
+      "entryRef": "capsule-runtime/generate-governed-narration/execution-plan.node.json",
+      "entryDigest": "sha256:a00c0347d9851eddcd32a0c99395d0574b053f9cc7f598b449b6a3109fa12d1c",
+      "snapshot": "data/capsule-evidence/entries/a00c0347d9851eddcd32a0c99395d0574b053f9cc7f598b449b6a3109fa12d1c-0dd925b560c1c24f.json"
+    },
+    {
+      "entryId": "runtime.fixtures.json",
+      "entryRef": "capsule-runtime/generate-governed-narration/fixtures.json",
+      "entryDigest": "sha256:8266cbf8aff8d2d78864bde892fa8b8797bedf836b7fac7b1a58509504a76983",
+      "snapshot": "data/capsule-evidence/entries/8266cbf8aff8d2d78864bde892fa8b8797bedf836b7fac7b1a58509504a76983-3a669bf1a5834197.json"
+    },
+    {
+      "entryId": "runtime.projection-conformance.json",
+      "entryRef": "capsule-runtime/generate-governed-narration/projection-conformance.json",
+      "entryDigest": "sha256:eff29d9d763919b405a021fc126f66b5b0c552c3cbe74d8ddb85f9781e4b2eed",
+      "snapshot": "data/capsule-evidence/entries/eff29d9d763919b405a021fc126f66b5b0c552c3cbe74d8ddb85f9781e4b2eed-2425df3bdace0780.json"
+    },
+    {
+      "entryId": "contracts/intermediate.attributable-narration-artifact.schema.json",
+      "entryRef": "capabilities/generate-governed-narration/contracts/intermediate.attributable-narration-artifact.schema.json",
+      "entryDigest": "sha256:47fe105a347b6ca4586d440756c14a8ea741ad429f8ef66832fc2d10d5671818",
+      "snapshot": "data/capsule-evidence/entries/47fe105a347b6ca4586d440756c14a8ea741ad429f8ef66832fc2d10d5671818-66f757a5a2f2ab0d.json"
+    },
+    {
+      "entryId": "contracts/intermediate.authorized-narration-generation-request.schema.json",
+      "entryRef": "capabilities/generate-governed-narration/contracts/intermediate.authorized-narration-generation-request.schema.json",
+      "entryDigest": "sha256:174f4040d4e63780f16964d6f298e3a58becc9acf232782517e4a39d7a08e857",
+      "snapshot": "data/capsule-evidence/entries/174f4040d4e63780f16964d6f298e3a58becc9acf232782517e4a39d7a08e857-ae266f3b5a4566f4.json"
+    },
+    {
+      "entryId": "contracts/intermediate.narration-media-testimony.schema.json",
+      "entryRef": "capabilities/generate-governed-narration/contracts/intermediate.narration-media-testimony.schema.json",
+      "entryDigest": "sha256:fdb85f0923f228cb6f2eae6776ea4f1dd6d3bbba84d2ba102239f1f3f05c6fb2",
+      "snapshot": "data/capsule-evidence/entries/fdb85f0923f228cb6f2eae6776ea4f1dd6d3bbba84d2ba102239f1f3f05c6fb2-c1c1b5eb63271538.json"
+    },
+    {
+      "entryId": "contracts/input.schema.json",
+      "entryRef": "capabilities/generate-governed-narration/contracts/input.schema.json",
+      "entryDigest": "sha256:a2d3576415e0dd76bd8fa995097c8ee9aabe82e6e2940fcc8b869d4232977ca5",
+      "snapshot": "data/capsule-evidence/entries/a2d3576415e0dd76bd8fa995097c8ee9aabe82e6e2940fcc8b869d4232977ca5-9282be1b5d0af61c.json"
+    },
+    {
+      "entryId": "contracts/outcome.schema.json",
+      "entryRef": "capabilities/generate-governed-narration/contracts/outcome.schema.json",
+      "entryDigest": "sha256:6988f5b80c3fb48a405f03469e50eeef9532e667f328cb968e37a809a39279a6",
+      "snapshot": "data/capsule-evidence/entries/6988f5b80c3fb48a405f03469e50eeef9532e667f328cb968e37a809a39279a6-186e37e1d224959d.json"
+    }
+  ]
+}

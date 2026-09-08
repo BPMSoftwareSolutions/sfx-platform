@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-video-technical-quality","viewId":"n-7ca75fc4cfe17f3478237f62"};

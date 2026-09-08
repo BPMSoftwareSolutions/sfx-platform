@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"establish-capsule-first-repository-closure","viewId":"n-18a408b2df7445adfa44a26a"};

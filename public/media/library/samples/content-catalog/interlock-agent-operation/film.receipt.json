@@ -1,0 +1,37 @@
+{
+  "kind": "TARGET_EXPERIENCE_TRAINING_FILM",
+  "durationSeconds": 211.67,
+  "format": "1920x1080 H264 AAC",
+  "fps": 24,
+  "filmDigest": "f5f2aa58fad762eb39b741e4d3d16d736dbd7676f714aed77db587320ceb889f",
+  "timelineDigest": "c70aca01e23e3f7bc00c1a07fc1253d16f26da1098bb9cbb47739a2747afcf9e",
+  "shots": [
+    {
+      "jobId": "c29a186c24b82a83bae977c6",
+      "path": "outputs/generated/b3b0ce166fe14edd41c98030c2d126e800ce1e7909c248c64be0314c80d9decf-0.jpg",
+      "sha256": "681dc591c0fa467f4408d27e7f1abdf2cf7581e534b91454bda3f86abfe3a51f"
+    },
+    {
+      "jobId": "7e8a4da8bef4aec89d27decc",
+      "path": "outputs/generated/5ab3234d39c4973c4feadd52b571b4270f8081190e5924c33cb4c92682e243a8-0.jpg",
+      "sha256": "0b49e154d31629bf369b71b3330330d9af67aad2186bdb272f7c4ea160e55f28"
+    },
+    {
+      "jobId": "df72c336301b3d45344ee321",
+      "path": "outputs/generated/76f2c7bce6a839a9bd75feefb0f53fda50f47b2a6714f75124cf81d31fc4f573-0.jpg",
+      "sha256": "b2e46cf2ff773cc4a06ee7afb2d7eba50931b574500edf8a533b8f7cfb40f9e3"
+    },
+    {
+      "jobId": "4eded5cc820a55071483b5ca",
+      "path": "outputs/generated/98daa207c73c363b21246283ea1909e243d0214ea0ac609a71e702b479ed6806-0.jpg",
+      "sha256": "e9bdc8594401d42f1d67f314737c950b6d73ebf7bcb5b0f0a9c350bce27b229c"
+    }
+  ],
+  "motion": "Generated human stills and chapter cuts, with native 1080p source-bound circuit cutaways in Open the Event and Evidence. Shared silver-ball flow, branch choice and arrival-aware ALL join. Human movement is implied.",
+  "infographicEdit": {
+    "path": "samples/content-catalog/interlock-agent-operation/infographic-edit.receipt.json",
+    "sha256": "ce11504ad36af1c0f48b24f5c48c5c4068fdfbd026ec3746594266e9ff3fb7e8"
+  },
+  "humanChapterRaster": "1280x720 upscaled to 1920x1080",
+  "liveEnforcementClaimed": false
+}

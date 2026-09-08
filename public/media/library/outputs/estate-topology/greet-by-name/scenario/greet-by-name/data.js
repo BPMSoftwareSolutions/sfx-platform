@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"greet-by-name","viewId":"n-7612aa6582bc98b641cca829"};

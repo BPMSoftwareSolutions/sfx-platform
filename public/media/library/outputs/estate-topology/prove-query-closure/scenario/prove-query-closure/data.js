@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-query-closure","viewId":"n-2aaaccc1e26da7708eac5752"};

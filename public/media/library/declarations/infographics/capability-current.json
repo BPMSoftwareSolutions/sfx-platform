@@ -1,0 +1,975 @@
+{
+  "contractVersion": "infographic-projection.v1",
+  "grammarVersion": "sidefx-infographic-grammar.v1",
+  "id": "capability-current",
+  "title": "One capability. Seven scenario boundaries.",
+  "subtitle": "Complete scenario inventory · stored mechanics and shared declared providers",
+  "altitude": "capability",
+  "scope": "Stored capsule semantics, source references and authored visual direction. No observed live interception.",
+  "sources": [
+    {
+      "id": "runtime",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Exact runtime execution plan",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "capsule",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Verified capsule evidence package",
+      "encoding": "json"
+    },
+    {
+      "id": "story",
+      "path": "declarations/episode-01-direction.json",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d",
+      "pointer": "",
+      "kind": "STAGING",
+      "label": "Fictional human experience",
+      "encoding": "json"
+    },
+    {
+      "id": "target",
+      "path": "declarations/infographic-design-intent.v1.json",
+      "sha256": "ef389df72699c9be8028ac9daeddb7a3251e34f34594805ccb256c2973dfdae9",
+      "pointer": "",
+      "kind": "TARGET",
+      "label": "Intended visual circuit",
+      "encoding": "json"
+    },
+    {
+      "id": "gap",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649",
+      "pointer": "",
+      "kind": "GAP",
+      "label": "Missing live enforcement and testimony",
+      "encoding": "json"
+    },
+    {
+      "id": "scenario-0",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/0",
+      "kind": "DECLARED",
+      "label": "Govern one requested agent operation without widening its authority",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-1",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/1",
+      "kind": "DECLARED",
+      "label": "Admit only a complete request at the caller's authority altitude",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-2",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/2",
+      "kind": "DECLARED",
+      "label": "Establish one identity-bound fail-closed hook boundary",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-3",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/3",
+      "kind": "DECLARED",
+      "label": "Certify only a two-sided probe from the same live activation",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-4",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/4",
+      "kind": "DECLARED",
+      "label": "Return the next legal operation for one covered tool call",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-5",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/5",
+      "kind": "DECLARED",
+      "label": "Separate operator policy authority from the governed agent channel",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-6",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/6",
+      "kind": "DECLARED",
+      "label": "Fail closed without overstating the hook boundary",
+      "encoding": "capsule-entry"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "domain": "Governed agent work",
+      "scenarioIds": [
+        "interlock-agent-operation",
+        "admit-agent-interlock-request",
+        "activate-agent-interlock",
+        "certify-live-agent-interlock",
+        "adjudicate-covered-agent-tool-call",
+        "protect-agent-interlock-control-plane",
+        "hold-untrusted-or-uncovered-agent-operation"
+      ],
+      "coverage": "All 7 of 7 source scenarios",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "interlock-agent-operation",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Root operation",
+      "nodeIds": [
+        "s0-input",
+        "s0-event",
+        "s0-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "admit-agent-interlock-request",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Request admission",
+      "nodeIds": [
+        "s1-input",
+        "s1-event",
+        "s1-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "activate-agent-interlock",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Activation",
+      "nodeIds": [
+        "s2-input",
+        "s2-event",
+        "s2-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "certify-live-agent-interlock",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Certification",
+      "nodeIds": [
+        "s3-input",
+        "s3-event",
+        "s3-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "adjudicate-covered-agent-tool-call",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Adjudication",
+      "nodeIds": [
+        "s4-input",
+        "s4-event",
+        "s4-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "protect-agent-interlock-control-plane",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Operator control",
+      "nodeIds": [
+        "s5-input",
+        "s5-event",
+        "s5-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "hold-untrusted-or-uncovered-agent-operation",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Hold",
+      "nodeIds": [
+        "s6-input",
+        "s6-event",
+        "s6-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "s0-input",
+      "type": "input",
+      "label": "Root operation request",
+      "detail": "agent-interlock-operation-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "interlock-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-0"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-operation-request.v1"
+    },
+    {
+      "id": "s0-event",
+      "type": "event",
+      "label": "Select final disposition",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "interlock-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s0-outcome",
+      "type": "outcome",
+      "label": "Ready / established / adjudicated / applied / held",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "interlock-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-operation-outcome.v1"
+    },
+    {
+      "id": "s1-input",
+      "type": "input",
+      "label": "Request admission request",
+      "detail": "agent-interlock-operation-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "admit-agent-interlock-request",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-1"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-operation-request.v1"
+    },
+    {
+      "id": "s1-event",
+      "type": "event",
+      "label": "Check operation variant",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "admit-agent-interlock-request",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s1-outcome",
+      "type": "outcome",
+      "label": "ADMITTED / HELD",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "admit-agent-interlock-request",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "admitted-agent-interlock-request.v1"
+    },
+    {
+      "id": "s2-input",
+      "type": "input",
+      "label": "Activation request",
+      "detail": "admitted-agent-interlock-activation-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "activate-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-2"
+      ],
+      "layer": "mechanic",
+      "productContract": "admitted-agent-interlock-activation-request.v1"
+    },
+    {
+      "id": "s2-event",
+      "type": "event",
+      "label": "Write activation status",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "activate-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s2-outcome",
+      "type": "outcome",
+      "label": "ATTACHED_IN_SESSION",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "activate-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-activation-outcome.v1"
+    },
+    {
+      "id": "s3-input",
+      "type": "input",
+      "label": "Certification request",
+      "detail": "agent-interlock-certification-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certify-live-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-3"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-certification-request.v1"
+    },
+    {
+      "id": "s3-event",
+      "type": "event",
+      "label": "Write certification status",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certify-live-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s3-outcome",
+      "type": "outcome",
+      "label": "GOVERNANCE_PROVEN",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certify-live-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-certification-outcome.v1"
+    },
+    {
+      "id": "s4-input",
+      "type": "input",
+      "label": "Adjudication request",
+      "detail": "covered-agent-tool-call.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudicate-covered-agent-tool-call",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-4"
+      ],
+      "layer": "mechanic",
+      "productContract": "covered-agent-tool-call.v1"
+    },
+    {
+      "id": "s4-event",
+      "type": "event",
+      "label": "Compare tool name",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudicate-covered-agent-tool-call",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s4-outcome",
+      "type": "outcome",
+      "label": "ALLOW / OPERATOR_REQUIRED",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudicate-covered-agent-tool-call",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-tool-call-disposition.v1"
+    },
+    {
+      "id": "s5-input",
+      "type": "input",
+      "label": "Operator control request",
+      "detail": "agent-interlock-control-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "protect-agent-interlock-control-plane",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-5"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-control-request.v1"
+    },
+    {
+      "id": "s5-event",
+      "type": "event",
+      "label": "Write control status",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "protect-agent-interlock-control-plane",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s5-outcome",
+      "type": "outcome",
+      "label": "OPERATOR_ACTION_APPLIED",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "protect-agent-interlock-control-plane",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-interlock-control-outcome.v1"
+    },
+    {
+      "id": "s6-input",
+      "type": "input",
+      "label": "Hold request",
+      "detail": "untrusted-agent-operation.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-6"
+      ],
+      "layer": "mechanic",
+      "productContract": "untrusted-agent-operation.v1"
+    },
+    {
+      "id": "s6-event",
+      "type": "event",
+      "label": "Check admissionStatus",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "s6-outcome",
+      "type": "outcome",
+      "label": "MALFORMED_HOOK_INPUT",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "governance-hold.v1"
+    },
+    {
+      "id": "p0",
+      "type": "provider",
+      "label": "Authority transformation",
+      "detail": "Declared binding / live state unknown",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "port0",
+      "type": "provider-port",
+      "label": "7 event responsibilities",
+      "detail": "Shared responsibility boundary",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "p1",
+      "type": "provider",
+      "label": "Schema admission",
+      "detail": "Declared binding / live state unknown",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "port1",
+      "type": "provider-port",
+      "label": "Contract shape boundary",
+      "detail": "Shared responsibility boundary",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "evidence",
+      "type": "evidence",
+      "label": "Exact capsule evidence",
+      "detail": "Expressions, fixtures, conformance scope",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "capsule"
+      ],
+      "layer": "support"
+    }
+  ],
+  "junctions": [],
+  "edges": [
+    {
+      "id": "e00",
+      "source": "s0-input",
+      "target": "s0-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e01",
+      "source": "s0-event",
+      "target": "s0-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e02",
+      "source": "s1-input",
+      "target": "s1-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e03",
+      "source": "s1-event",
+      "target": "s1-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e04",
+      "source": "s2-input",
+      "target": "s2-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e05",
+      "source": "s2-event",
+      "target": "s2-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e06",
+      "source": "s3-input",
+      "target": "s3-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e07",
+      "source": "s3-event",
+      "target": "s3-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e08",
+      "source": "s4-input",
+      "target": "s4-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e09",
+      "source": "s4-event",
+      "target": "s4-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e10",
+      "source": "s5-input",
+      "target": "s5-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e11",
+      "source": "s5-event",
+      "target": "s5-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e12",
+      "source": "s6-input",
+      "target": "s6-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e13",
+      "source": "s6-event",
+      "target": "s6-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e14",
+      "source": "p0",
+      "target": "port0",
+      "type": "provider-binding",
+      "label": "declared binding",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e15",
+      "source": "p1",
+      "target": "port1",
+      "type": "provider-binding",
+      "label": "declared binding",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e16",
+      "source": "evidence",
+      "target": "s0-event",
+      "type": "evidence-attachment",
+      "label": "source package",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "providers": [
+    {
+      "nodeId": "p0",
+      "portIds": [
+        "port0"
+      ],
+      "binding": "bound",
+      "state": "unknown"
+    },
+    {
+      "nodeId": "p1",
+      "portIds": [
+        "port1"
+      ],
+      "binding": "bound",
+      "state": "unknown"
+    }
+  ],
+  "humanAnchors": [
+    {
+      "person": "Platform engineer",
+      "input": "An engineer needs the whole capability to be legible.",
+      "event": "Seven boundaries can be inspected without merging their proof.",
+      "outcome": "Status labels stay distinct from the stronger intended experience.",
+      "basis": "STAGING",
+      "sourceRefs": [
+        "story"
+      ]
+    }
+  ],
+  "visualLayers": [
+    "human",
+    "mechanic",
+    "support"
+  ],
+  "animationBeats": [
+    {
+      "phase": "Establish",
+      "caption": "Enumerate every source scenario.",
+      "entityIds": [
+        "s0-input",
+        "s1-input",
+        "s2-input",
+        "s3-input",
+        "s4-input",
+        "s5-input",
+        "s6-input"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Activate",
+      "caption": "Each scenario retains input, event and outcome identities.",
+      "entityIds": [
+        "s0-event",
+        "s1-event",
+        "s2-event",
+        "s3-event",
+        "s4-event",
+        "s5-event",
+        "s6-event"
+      ],
+      "edgeIds": [
+        "e00",
+        "e02",
+        "e04",
+        "e06",
+        "e08",
+        "e10",
+        "e12"
+      ]
+    },
+    {
+      "phase": "Execute",
+      "caption": "Shared providers are bindings; their operating state is unknown.",
+      "entityIds": [
+        "p0",
+        "port0",
+        "p1",
+        "port1"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Resolve",
+      "caption": "Stored status results do not upgrade into live-effect claims.",
+      "entityIds": [
+        "s0-outcome",
+        "s1-outcome",
+        "s2-outcome",
+        "s3-outcome",
+        "s4-outcome",
+        "s5-outcome",
+        "s6-outcome"
+      ],
+      "edgeIds": [
+        "e01",
+        "e03",
+        "e05",
+        "e07",
+        "e09",
+        "e11",
+        "e13"
+      ]
+    },
+    {
+      "phase": "Prove",
+      "caption": "Inspect all six root invocations and the exact source evidence.",
+      "entityIds": [
+        "evidence"
+      ],
+      "edgeIds": []
+    }
+  ],
+  "zoomAggregations": [
+    {
+      "id": "aggregate:interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "altitude": "capability",
+      "memberIds": [
+        "s0-input",
+        "s0-event",
+        "s0-outcome",
+        "s1-input",
+        "s1-event",
+        "s1-outcome",
+        "s2-input",
+        "s2-event",
+        "s2-outcome",
+        "s3-input",
+        "s3-event",
+        "s3-outcome",
+        "s4-input",
+        "s4-event",
+        "s4-outcome",
+        "s5-input",
+        "s5-event",
+        "s5-outcome",
+        "s6-input",
+        "s6-event",
+        "s6-outcome",
+        "p0",
+        "port0",
+        "p1",
+        "port1",
+        "evidence"
+      ]
+    }
+  ],
+  "scenarioRelationships": [
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "admit-agent-interlock-request",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "activate-agent-interlock",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "certify-live-agent-interlock",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "adjudicate-covered-agent-tool-call",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "protect-agent-interlock-control-plane",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "hold-untrusted-or-uncovered-agent-operation",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ]
+}

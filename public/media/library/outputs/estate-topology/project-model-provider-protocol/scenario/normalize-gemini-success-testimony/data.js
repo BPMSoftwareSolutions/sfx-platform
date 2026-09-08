@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"normalize-gemini-success-testimony","viewId":"n-6563cd8d053bb106547af9e2"};

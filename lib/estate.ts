@@ -1,8 +1,5 @@
 import 'server-only';
 
-import { readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-
 import {
   CapabilityPage,
   CircuitProjection,
@@ -10,6 +7,7 @@ import {
   MechanicPage,
   ProviderPage,
 } from '@/contracts/estate';
+import { readValidatedPublication } from './publication-validation';
 
 /**
  * Estate reader — §11.1, §11.4.
@@ -18,8 +16,6 @@ import {
  * It never opens a database connection. When no valid publication exists the site renders an
  * unavailable state and disables dependent actions rather than showing an empty catalog.
  */
-
-const GENERATED = join(process.cwd(), 'generated');
 
 /** Maximum acceptable age of a published generation before the site says so (§11.4). */
 const MAX_PUBLICATION_AGE_DAYS = Number(process.env.SIDEFX_MAX_PUBLICATION_AGE_DAYS ?? 30);
@@ -33,28 +29,23 @@ let cached: EstateStatus | undefined;
 let cachedCircuits: Map<string, CircuitProjection[]> | undefined;
 
 function loadStatus(): EstateStatus {
-  const file = join(GENERATED, 'estate-publication.json');
-  let raw: unknown;
+  let publication: EstatePublication;
   try {
-    statSync(file);
-    raw = JSON.parse(readFileSync(file, 'utf8'));
+    const validated = readValidatedPublication();
+    publication = validated.publication;
+    cachedCircuits = new Map();
+    for (const circuit of validated.circuits) {
+      const list = cachedCircuits.get(circuit.capabilityId) ?? [];
+      list.push(circuit);
+      cachedCircuits.set(circuit.capabilityId, list);
+    }
   } catch {
     return {
       state: 'UNAVAILABLE',
-      reason: 'No estate publication has been built. Run `npm run publish:estate`.',
+      reason: 'The estate publication is temporarily unavailable. Please try again later.',
     };
   }
 
-  // §11.4 — refuse an artifact that does not satisfy the contract rather than rendering it.
-  const parsed = EstatePublication.safeParse(raw);
-  if (!parsed.success) {
-    return {
-      state: 'UNAVAILABLE',
-      reason: `The estate publication does not satisfy the publication contract: ${parsed.error.issues[0]?.message ?? 'unknown validation failure'}.`,
-    };
-  }
-
-  const publication = parsed.data;
   const observed = Date.parse(publication.source.observedAt);
   const ageDays = Math.max(0, Math.floor((Date.now() - observed) / 86_400_000));
 
@@ -99,30 +90,13 @@ export function findProvider(namespace: string, id: string): ProviderPage | unde
   return getProviders().find((p) => p.urlNamespace === namespace && p.entityId === decoded);
 }
 
-function loadCircuits(): Map<string, CircuitProjection[]> {
-  const byCapability = new Map<string, CircuitProjection[]>();
-  try {
-    const raw: unknown = JSON.parse(readFileSync(join(GENERATED, 'circuit-projections.json'), 'utf8'));
-    const parsed = CircuitProjection.array().safeParse(raw);
-    if (!parsed.success) return byCapability;
-    for (const circuit of parsed.data) {
-      const list = byCapability.get(circuit.capabilityId) ?? [];
-      list.push(circuit);
-      byCapability.set(circuit.capabilityId, list);
-    }
-  } catch {
-    // No circuit artifact: capability pages report the missing projection rather than guessing.
-  }
-  return byCapability;
-}
-
 /**
  * Circuits for one capability only. Pages load at capability/scenario scope so the whole
  * estate graph never reaches a page bundle (§12.4).
  */
 export function getCircuitsForCapability(capabilityId: string): CircuitProjection[] {
-  cachedCircuits ??= loadCircuits();
-  return cachedCircuits.get(capabilityId) ?? [];
+  getEstateStatus();
+  return cachedCircuits?.get(capabilityId) ?? [];
 }
 
 export function getCircuit(capabilityId: string, scenarioId: string): CircuitProjection | undefined {

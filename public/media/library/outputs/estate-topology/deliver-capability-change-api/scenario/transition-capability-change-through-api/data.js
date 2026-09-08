@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"transition-capability-change-through-api","viewId":"n-afb9126b6e81580799af8495"};

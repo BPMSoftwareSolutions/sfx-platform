@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-portfolio-alignment-view","viewId":"n-bb6470daf751c69d4e433e2c"};

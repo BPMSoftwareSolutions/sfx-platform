@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"seal-capability-change","viewId":"n-b425f4514688c7ec09e33dc8"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"emit-next-bounded-authoring-obligation","viewId":"n-8d8dd38ee73fbaaeabfa152c"};

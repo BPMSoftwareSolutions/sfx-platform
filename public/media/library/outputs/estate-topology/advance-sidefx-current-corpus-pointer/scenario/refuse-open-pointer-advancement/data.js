@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"refuse-open-pointer-advancement","viewId":"n-f0724eb51dad2afc9d03134c"};

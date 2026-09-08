@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-capsule-round-trip","viewId":"n-39cb588f22652c6e304cd80c"};

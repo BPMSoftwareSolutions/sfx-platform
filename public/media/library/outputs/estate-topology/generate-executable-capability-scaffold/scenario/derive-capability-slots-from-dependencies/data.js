@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-capability-slots-from-dependencies","viewId":"n-808d5ba874d57365efbd7f7f"};

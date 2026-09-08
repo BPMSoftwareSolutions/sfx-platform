@@ -1,0 +1,23 @@
+{
+  "kind":"TARGET_DESIGN",
+  "scope":"Authored visual reference designs. These proposed product ports and compositions do not claim current managed execution or existing admitted interfaces.",
+  "certification": {
+    "human":"An operator needs evidence that the exact live boundary both stops an unmanaged effect and permits declared read-only work.",
+    "input":"One exact activation, session, workspace and policy identity.",
+    "fanout":"Send the same identity-bound activation to both required probes.",
+    "join":"Wait for both probe results, then validate matching identities and ordered time.",
+    "outcome":"Only matching, successful two-sided evidence would establish the scoped boundary.",
+    "gap":"Actual same-session probe execution, effect observations and durable testimony remain required."
+  },
+  "integratedCircuit": {
+    "coverage":"A three-capability intended review circuit, not a complete estate wiring diagram.",
+    "domain":"Human-governed capability review (editorial domain).",
+    "capabilities":["interlock-agent-operation","inspect-canonical-circuit-blueprint-candidate","reveal-and-refine-capability-meaning"],
+    "products":[
+      {"id":"target.permitted-inspection-request.v1","meaning":"Exact inspection request plus bound authority and pre-effect permit; publication remains pending."},
+      {"id":"target.reviewable-inspection-report.v1","meaning":"Inspection findings, source identities and output testimony packaged for human review."}
+    ],
+    "composition":"An interlock resolves an inspection-only request. Its permitted inspection envelope enters candidate inspection. The resulting report enters a review projection that the human can challenge.",
+    "missing":"Admitted interface mappings, live dispatch, exact provider fulfillment, human review evidence and decision-to-effect lineage must close before this becomes an implementation claim."
+  }
+}

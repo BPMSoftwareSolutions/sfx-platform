@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-gemini-text-request","viewId":"n-2a44605abab8cf9c3be7b7a0"};

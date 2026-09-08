@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-independence-and-window","viewId":"n-ea17c646354c17f915495c40"};

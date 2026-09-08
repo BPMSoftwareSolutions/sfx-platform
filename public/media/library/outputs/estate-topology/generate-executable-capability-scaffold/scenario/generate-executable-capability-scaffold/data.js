@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"generate-executable-capability-scaffold","viewId":"n-01e8967f331dd0777b24fbf8"};

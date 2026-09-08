@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-scenario-solution-candidate","viewId":"n-8eef399c8994d29e59cb9a20"};

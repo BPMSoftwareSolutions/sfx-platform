@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-product-fit-snapshot","viewId":"n-eea0fe4f58e9f1886a50341c"};

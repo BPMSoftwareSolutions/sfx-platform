@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"recompute-asset-identity","viewId":"n-60ffebf1349e0c734efdc2ac"};

@@ -1,0 +1,74 @@
+{
+  "id": "scenario-current",
+  "baseSvgSha256": "d286f1beaef9ba469471534d6b89179a035bd1e71a808240d30c5cb0d8625d03",
+  "enhancedSvgSha256": "ecdbd865867db1b6604ad118336cf76db9880287cfac89d67ad4ef7bc277c98d",
+  "contractSha256": "46f10b066d037d503da41b5bf700a8cadb9fbc219e17a7a0acf021aef5430b30",
+  "baseRecoveredExactly": true,
+  "maskProofs": [
+    {
+      "entityId": "request",
+      "assetId": "input",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "act",
+      "assetId": "event",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 62010
+    },
+    {
+      "entityId": "operator",
+      "assetId": "outcome",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 69808
+    },
+    {
+      "entityId": "allow",
+      "assetId": "outcome",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 69833
+    },
+    {
+      "entityId": "provider",
+      "assetId": "provider",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 59186
+    },
+    {
+      "entityId": "port",
+      "assetId": "provider-port",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 63394
+    },
+    {
+      "entityId": "receipt",
+      "assetId": "evidence",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 73521
+    },
+    {
+      "entityId": "select",
+      "assetId": "decision",
+      "guardCount": 3,
+      "guardLeakPixels": 0,
+      "materialPixels": 77993
+    }
+  ],
+  "junctionGeometryProof": {
+    "checkedContacts": 0,
+    "maxContactErrorSvgUnits": 0,
+    "maxTangentErrorDegrees": 0,
+    "measurements": [],
+    "findings": []
+  },
+  "manifestSha256": "6f35095fbfd1249c9912cb440986b2c80f3e0fb72337c0ed7440c01671cf4fa0",
+  "reviewSha256": "8f699c6661f3c75be38a69c2902f02fddb0a6442cc8ef62d32e9bc015cbe29c0"
+}

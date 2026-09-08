@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-jmi-record-binding","viewId":"n-0565510007bec926efeab92c"};

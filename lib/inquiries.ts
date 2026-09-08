@@ -7,8 +7,8 @@ import type { InquiryInput } from './inquiry-schema';
 /**
  * Inquiry recording and rate limiting — §5.15.
  *
- * Acceptance means the inquiry was received and a durable delivery job was recorded. It never
- * claims email delivery before the mail provider confirms it.
+ * Development-only receipt and rate-limit primitives. This Map is not durable. Production
+ * submitInquiry rejects input until a real store and delivery worker replace these primitives.
  */
 
 interface StoredInquiry {
@@ -43,11 +43,12 @@ export function rateLimit(clientKey: string): boolean {
 }
 
 export function deliveryConfigured(): boolean {
-  return Boolean(process.env.SIDEFX_INQUIRY_RECIPIENT && process.env.SIDEFX_MAIL_API_KEY);
+  // Configuration values alone do not implement a durable store or mail worker.
+  return false;
 }
 
 /**
- * Persists the inquiry and its delivery job, then returns its identity. An idempotent retry
+ * Stores a development inquiry in memory and returns its identity. An idempotent retry
  * returns the existing record rather than creating a duplicate.
  */
 export function recordInquiry(input: InquiryInput): StoredInquiry {

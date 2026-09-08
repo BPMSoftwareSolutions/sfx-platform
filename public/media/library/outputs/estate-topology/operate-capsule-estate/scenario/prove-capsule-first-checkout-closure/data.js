@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-capsule-first-checkout-closure","viewId":"n-13c9b366709fd2dd82ae385d"};

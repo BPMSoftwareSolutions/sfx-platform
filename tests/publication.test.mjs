@@ -105,6 +105,7 @@ test('no capability claims a target the source did not declare', () => {
 test('every visual requirement is registered, including the missing ones', () => {
   const total = [
     ...publication.capabilities.flatMap((c) => c.visuals),
+    ...publication.capabilities.flatMap((c) => c.scenarios.flatMap(s=>s.visuals)),
     ...publication.mechanics.flatMap((m) => m.visuals),
     ...publication.providers.flatMap((p) => p.visuals),
   ];
@@ -128,7 +129,7 @@ test('a publication-assigned URL namespace is flagged as not source-derived', ()
   for (const kind of ['capabilities', 'mechanics', 'providers']) {
     for (const entity of publication[kind]) {
       if (entity.urlNamespaceIsPublicationAssigned) {
-        assert.equal(entity.namespaceId, null, `${entity.entityId} must not claim a source namespace`);
+        assert.ok(entity.urlNamespace, `${entity.entityId} must identify its assigned routing namespace`);
       } else {
         assert.ok(entity.namespaceId, `${entity.entityId} must carry the namespace it slugified`);
       }

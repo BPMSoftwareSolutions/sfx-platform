@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"select-next-eligible-capability-scenario","viewId":"n-b7f207a9183fed07fa500710"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"decide-implementation-admission","viewId":"n-9044255c4420ba45946d9ef8"};

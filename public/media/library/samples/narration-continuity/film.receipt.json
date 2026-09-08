@@ -1,0 +1,139 @@
+{
+  "format": "1280x720 H264 AAC",
+  "durationSeconds": 64,
+  "fps": 24,
+  "shots": [
+    {
+      "shot": "01",
+      "jobId": "c9247be7d3768bcf1818aa03",
+      "imageDigest": "77ea67f1b2fc12069e15502fce09954ce8dd5336bc550d0d4f77e0d534f32f15",
+      "receipt": {
+        "status": "GENERATED",
+        "jobId": "c9247be7d3768bcf1818aa03",
+        "requestDigest": "cbaa64dd3106f0e78e11aebdebca115b097f7cb96f606bbd6a4fb1027de0805d",
+        "model": "gemini-3-pro-image",
+        "images": [
+          {
+            "path": "cbaa64dd3106f0e78e11aebdebca115b097f7cb96f606bbd6a4fb1027de0805d-0.jpg",
+            "sha256": "77ea67f1b2fc12069e15502fce09954ce8dd5336bc550d0d4f77e0d534f32f15"
+          }
+        ],
+        "semanticReview": "REQUIRED",
+        "finishReasons": [
+          "STOP"
+        ]
+      }
+    },
+    {
+      "shot": "02",
+      "jobId": "318ec4cbe40ea39ef3836479",
+      "imageDigest": "4f173346614b128c75caeb6b2376ecda1f441e3f2dcbf35aed1de99a81a3c605",
+      "receipt": {
+        "status": "GENERATED",
+        "jobId": "318ec4cbe40ea39ef3836479",
+        "requestDigest": "62728cbfe1c406e4677e24a269a3ea94af90de47344768aecec65420db51118e",
+        "model": "gemini-3-pro-image",
+        "images": [
+          {
+            "path": "62728cbfe1c406e4677e24a269a3ea94af90de47344768aecec65420db51118e-0.jpg",
+            "sha256": "4f173346614b128c75caeb6b2376ecda1f441e3f2dcbf35aed1de99a81a3c605"
+          }
+        ],
+        "semanticReview": "REQUIRED",
+        "finishReasons": [
+          "STOP"
+        ]
+      }
+    },
+    {
+      "shot": "03",
+      "jobId": "02ae557d6406d3c413d08def",
+      "imageDigest": "d0d6e564cfa79c3207d66fe39027d29e8ba294e5c27b876e4c4b7852006d3bf8",
+      "receipt": {
+        "status": "GENERATED",
+        "jobId": "02ae557d6406d3c413d08def",
+        "requestDigest": "15cd6ba5c26f17e83a5dddb42de4e57ba819c3d19e4362af6b4b00d711df1d3b",
+        "model": "gemini-3-pro-image",
+        "images": [
+          {
+            "path": "15cd6ba5c26f17e83a5dddb42de4e57ba819c3d19e4362af6b4b00d711df1d3b-0.jpg",
+            "sha256": "d0d6e564cfa79c3207d66fe39027d29e8ba294e5c27b876e4c4b7852006d3bf8"
+          }
+        ],
+        "semanticReview": "REQUIRED",
+        "finishReasons": [
+          "STOP"
+        ]
+      }
+    },
+    {
+      "shot": "04",
+      "jobId": "65ebf582ee08332a97573f9f",
+      "imageDigest": "9bf1ea3178e3df8ab90b2d5a2763d2cd2b14460b182ace644d5910c31eda5713",
+      "receipt": {
+        "status": "GENERATED",
+        "jobId": "65ebf582ee08332a97573f9f",
+        "requestDigest": "3447270ddae37185e70c48a4cef68d026d65a962b2652ac90eb5e53c90783b8c",
+        "model": "gemini-3-pro-image",
+        "images": [
+          {
+            "path": "3447270ddae37185e70c48a4cef68d026d65a962b2652ac90eb5e53c90783b8c-0.jpg",
+            "sha256": "9bf1ea3178e3df8ab90b2d5a2763d2cd2b14460b182ace644d5910c31eda5713"
+          }
+        ],
+        "semanticReview": "REQUIRED",
+        "finishReasons": [
+          "STOP"
+        ]
+      }
+    },
+    {
+      "shot": "05",
+      "jobId": "d1d428bbfcffb64baf799006",
+      "imageDigest": "bb23ba81c488fb50cc62fdbfa7abe43efda9ad4507aabfcc52191b170886429f",
+      "receipt": {
+        "status": "GENERATED",
+        "jobId": "d1d428bbfcffb64baf799006",
+        "requestDigest": "a64213b9446ca02ba6f151a54e9ea76e4d8e391fd066512ab5e1dc4dadaffb2b",
+        "model": "gemini-3-pro-image",
+        "images": [
+          {
+            "path": "a64213b9446ca02ba6f151a54e9ea76e4d8e391fd066512ab5e1dc4dadaffb2b-0.jpg",
+            "sha256": "bb23ba81c488fb50cc62fdbfa7abe43efda9ad4507aabfcc52191b170886429f"
+          }
+        ],
+        "semanticReview": "REQUIRED",
+        "finishReasons": [
+          "STOP"
+        ]
+      }
+    },
+    {
+      "shot": "06",
+      "jobId": "a6fbef4d034aa1c2d6032e4a",
+      "imageDigest": "f27935c3c7bd665c4a29177984255308850649c599158b07d2af7c2639fd1b2b",
+      "receipt": {
+        "status": "GENERATED",
+        "jobId": "a6fbef4d034aa1c2d6032e4a",
+        "requestDigest": "db77e656e3d62de38b6d7f7a3cb9f37eb4a0a8f151909a9bb454c5bda7f7e9a9",
+        "model": "gemini-3-pro-image",
+        "images": [
+          {
+            "path": "db77e656e3d62de38b6d7f7a3cb9f37eb4a0a8f151909a9bb454c5bda7f7e9a9-0.jpg",
+            "sha256": "f27935c3c7bd665c4a29177984255308850649c599158b07d2af7c2639fd1b2b"
+          }
+        ],
+        "semanticReview": "REQUIRED",
+        "finishReasons": [
+          "STOP"
+        ]
+      }
+    }
+  ],
+  "animation": "AI-generated still keyframes with procedural routing, request flow, waveform, artifact assembly, camera motion and editorial cuts. No generated human motion.",
+  "audio": "Actual Gemini demo output at 54s; separate Gemini synthetic documentary narration; original synthesized bed",
+  "demoReceipt": "demo.receipt.json",
+  "failure": "Explicitly simulated A outage; C speech call was live",
+  "audiencePerformance": "UNMEASURED",
+  "filmDigest": "432b9c9d033f83473d7615049fc935a209d2e5b6227e011cc81813791d16b55e"
+}

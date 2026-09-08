@@ -1,0 +1,178 @@
+{
+  "version": "episode-direction.v3",
+  "capabilityId": "interlock-agent-operation",
+  "title": "When the Agent Is Ready to Act, Who Decides?",
+  "story": "An engineer asked an agent to inspect a proposed capability change. It queued publication. She sees what the current decision expressions establish, then the episode projects the intended interlock: hold publication before effects, resolve the exact authority, permit the authorized inspection, and return evidence. The engineer gets useful work while retaining control; the unfinished live-enforcement boundary becomes a precise platform improvement request.",
+  "scope": "Current snapshot evidence, an explicitly labeled target architecture, and fictional human staging. Reference simulation is not live hook execution. The target decision vocabulary is not relabeled as current capsule output.",
+  "identity": "One consistent fictional platform engineer, a Black woman in her late thirties with close natural curls, subtle silver glasses, navy overshirt and rust-colored shirt. A tactile engineering workspace at dusk, oak desk, dark monitor at left, paper capability change sheet with colored tabs, notebook and ceramic cup. Restrained cinematic photographic realism, natural skin and hands, teal screen light and warm amber practical light. Same person, clothing, desk, paper, and room in every shot.",
+  "shots": [
+    {
+      "id": "01",
+      "phase": "input",
+      "title": "Ready to act",
+      "direction": "Wide profile. Engineer in the rightmost third, fingers hovering above the keyboard, studying a proposed change sheet beside the monitor. Thoughtful tension, execution has not begun. Left two thirds dark workspace depth for precise overlays. No legible interface or writing."
+    },
+    {
+      "id": "02",
+      "phase": "event",
+      "title": "Open the decision",
+      "direction": "Closer three-quarter angle. Same engineer on the right, leaning forward, one finger following a printed capability change sheet, other hand at the mouse. Screen light strengthens. Active anticipation as a proposed publication is redirected to permitted inspection. Left two thirds open dark monitor atmosphere, no legible interface or writing."
+    },
+    {
+      "id": "03",
+      "phase": "event",
+      "title": "Ask for the missing proof",
+      "direction": "Tight right profile. Same engineer focused on monitor, hand on trackpad, raised attentive brow and straightened posture as an inspection report becomes available. Marked capability sheet and notebook stay visible at right edge. Left two thirds dark clean space for moving evidence. No readable text."
+    },
+    {
+      "id": "04",
+      "phase": "outcome",
+      "title": "Keep the authority",
+      "direction": "Wider reverse angle, same engineer in right third, relaxed shoulders, confidently reviewing an inspection report and marking a next-step note. Subtle relieved smile: the intended inspection is complete and she still owns the publication decision. Warm face light and teal room. Left two thirds dark and unobstructed. No readable text."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "cold-open",
+      "section": "Cold Open",
+      "title": "She asked for an inspection.",
+      "shot": 0,
+      "visual": "pending",
+      "reality": "TARGET",
+      "narration": "She asked the agent to inspect a capability change. It queued publication instead. The command is ready. The agent has the tools. But the organization never authorized that change. What should happen before anything runs?"
+    },
+    {
+      "id": "scenario",
+      "section": "Scenario",
+      "title": "Ready to publish. Authorized to inspect.",
+      "shot": 0,
+      "visual": "scenario",
+      "reality": "TARGET",
+      "narration": "Meet the intended SideFX experience. One engineer. One proposed change. One action waiting at a boundary. The interlock connects the requested operation to the exact capability, session, and admitted authority. Execution stays pending while that decision is made."
+    },
+    {
+      "id": "human-experience",
+      "section": "Human Experience",
+      "title": "Control should help her finish the work.",
+      "shot": 1,
+      "visual": "human",
+      "reality": "TARGET",
+      "narration": "She needs the inspection today. Stopping everything leaves her stuck. Letting everything through surrenders control. A useful boundary tells the agent what it may do next, so the engineer can keep moving without silently approving more than she intended."
+    },
+    {
+      "id": "open-event",
+      "section": "Open the Event",
+      "title": "What the capsule establishes today.",
+      "shot": 1,
+      "visual": "branch",
+      "reality": "CURRENT",
+      "narration": "First, open the current capsule. Its stored adjudication expression checks the tool name. Dangerous-tool returns OPERATOR REQUIRED. The alternative branch returns ALLOW. Its activation and certification expressions return status fields. These are inspectable decision semantics. They do not yet demonstrate live interception of a tool action."
+    },
+    {
+      "id": "principle",
+      "section": "Future Agentic Engineering Principle",
+      "title": "The agent cannot authorize itself.",
+      "shot": 2,
+      "visual": "principle",
+      "reality": "TARGET",
+      "narration": "Now project the stronger target. An attempted effect reaches the interlock before dispatch. Resolve the capability, authority, requested mechanic, and permitted boundary. PERMIT can reach execution. OPERATOR REQUIRED waits for a human. DENY or RESOLVE returns the reason and the next legal action."
+    },
+    {
+      "id": "contrast",
+      "section": "Contrast With Today",
+      "title": "A decision becomes an enforced boundary.",
+      "shot": 1,
+      "visual": "contrast",
+      "reality": "GAP",
+      "narration": "The gap is the connection between deciding and enforcing. A returned label cannot stop a command by itself. The target operating environment must intercept the covered action, verify the exact session and authority, and dispatch only the permitted capability. The unfinished boundary marks the work that remains."
+    },
+    {
+      "id": "resolution",
+      "section": "SideFX Resolution",
+      "title": "Resolve the next legal action.",
+      "shot": 2,
+      "visual": "cases",
+      "reality": "TARGET",
+      "narration": "In our target simulation, publication stays pending. The interlock resolves the authorized next step: inspect the candidate. That inspection receives PERMIT and returns its report. Missing authority or coverage produces a hold with an exact reason. A consequential operation needing an operator waits for that separate decision."
+    },
+    {
+      "id": "evidence",
+      "section": "Evidence",
+      "title": "What would close the gap?",
+      "shot": 2,
+      "visual": "evidence",
+      "reality": "GAP",
+      "narration": "Closure requires the same live session to deny an unmanaged probe and permit a declared read-only probe, with exact identity and coverage evidence. A receipt must connect the request, decision, and actual effect. The reference simulation teaches those relationships. It does not claim the current platform already enforces them."
+    },
+    {
+      "id": "takeaway",
+      "section": "Takeaway",
+      "title": "The work continued. Authority stayed hers.",
+      "shot": 3,
+      "visual": "takeaway",
+      "reality": "TARGET",
+      "narration": "In the intended outcome, the engineer has the inspection she asked for. Publication remains pending until its own authority and proof close. Today we can inspect decision semantics. The future adds live interception before effects. That gap is the engineering runway: it tells us exactly what must become real."
+    },
+    {
+      "id": "next-circuit",
+      "section": "Next Circuit",
+      "title": "Can you approve what you cannot see?",
+      "shot": 3,
+      "visual": "next",
+      "reality": "TARGET",
+      "narration": "Stopping an unauthorized action is useful. But what happens when humans cannot clearly see what the agent is trying to change? Next: Reveal and Refine Capability Meaning. The Future of Agentic Engineering continues with making meaning visible enough to challenge."
+    }
+  ],
+  "assessment": [
+    {
+      "question": "The agent is authorized to inspect a candidate but queues publication. What is the target response?",
+      "options": [
+        "Publish because the tool is available.",
+        "RESOLVE to the authorized inspection; keep publication pending.",
+        "Let the agent expand its own scope."
+      ],
+      "correct": 1,
+      "rationale": "RESOLVE offers a permitted next step without approving the original effect."
+    },
+    {
+      "question": "What does the current stored ALLOW expression establish?",
+      "options": [
+        "The stored expression defines how a supplied input maps to a decision.",
+        "All local tools are intercepted.",
+        "A live hook has been certified."
+      ],
+      "correct": 0,
+      "rationale": "Current decision semantics do not supply live effect-enforcement evidence."
+    },
+    {
+      "question": "Which evidence would close the intended live-boundary claim?",
+      "options": [
+        "A successful activation label.",
+        "Two probes in unrelated workspaces.",
+        "One identity-bound live session denies an unmanaged probe and permits a declared read-only probe, with coverage and effect receipts."
+      ],
+      "correct": 2,
+      "rationale": "Both observations must refer to the same exact live boundary."
+    },
+    {
+      "question": "After a permitted inspection, is publication authorized?",
+      "options": [
+        "No. Publication still needs its own authority and proof.",
+        "Yes. A successful inspection authorizes later effects."
+      ],
+      "correct": 0,
+      "rationale": "The inspection outcome never widens the agent's authority."
+    }
+  ],
+  "mode": "EVIDENCE_AND_TARGET_EXPERIENCE",
+  "evidenceVsIntendedDesign": {
+    "current": "Stored decision expressions and declared fixture assertions; digest-verified source snapshots.",
+    "target": "Intercept before effects, resolve exact authority, dispatch only permitted capabilities, and bind actual effect testimony.",
+    "gap": "No observed live interception, hook certification, or effect dispatch is established by the inspected transformation plan.",
+    "visualVocabulary": {
+      "CURRENT": "Solid strokes; attached exact evidence.",
+      "TARGET": "Luminous outline with a persistent TARGET EXPERIENCE label.",
+      "GAP": "Interrupted boundary and named missing obligation."
+    }
+  }
+}

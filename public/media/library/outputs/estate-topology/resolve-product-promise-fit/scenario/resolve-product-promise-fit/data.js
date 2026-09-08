@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-product-promise-fit","viewId":"n-ce3f2c8ba9e1c9d5fdbd15f4"};

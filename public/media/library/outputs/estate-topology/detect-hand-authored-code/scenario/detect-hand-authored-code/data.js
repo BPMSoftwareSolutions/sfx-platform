@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"detect-hand-authored-code","viewId":"n-a9ecb582a6a899b010d41eab"};

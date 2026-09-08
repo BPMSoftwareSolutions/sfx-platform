@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-effect-failure-obligations","viewId":"n-5ab8549dc570bde76ed5ea5b"};

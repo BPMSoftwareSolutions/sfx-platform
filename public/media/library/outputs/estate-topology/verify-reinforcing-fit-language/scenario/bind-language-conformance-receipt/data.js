@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-language-conformance-receipt","viewId":"n-ba5cef40066c8e5bb99e11ec"};

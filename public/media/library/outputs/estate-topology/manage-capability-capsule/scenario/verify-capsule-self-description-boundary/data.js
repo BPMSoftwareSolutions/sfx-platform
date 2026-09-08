@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-capsule-self-description-boundary","viewId":"n-f1c2d13ad6a33b7801e4fba4"};

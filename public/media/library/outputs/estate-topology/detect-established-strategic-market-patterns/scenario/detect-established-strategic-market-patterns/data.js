@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"detect-established-strategic-market-patterns","viewId":"n-2174be927fa4d1748e2c0d7c"};

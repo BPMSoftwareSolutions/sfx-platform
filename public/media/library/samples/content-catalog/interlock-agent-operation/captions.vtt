@@ -1,0 +1,151 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.292
+She asked the agent to inspect a capability change.
+
+00:00:03.292 --> 00:00:05.201
+It queued publication instead.
+
+00:00:05.201 --> 00:00:06.518
+The command is ready.
+
+00:00:06.518 --> 00:00:08.032
+The agent has the tools.
+
+00:00:08.032 --> 00:00:11.258
+But the organization never authorized that change.
+
+00:00:11.258 --> 00:00:13.891
+What should happen before anything runs?.
+
+00:00:14.891 --> 00:00:17.582
+Meet the intended SideFX experience.
+
+00:00:17.582 --> 00:00:18.504
+One engineer.
+
+00:00:18.504 --> 00:00:19.965
+One proposed change.
+
+00:00:19.965 --> 00:00:22.425
+One action waiting at a boundary.
+
+00:00:22.425 --> 00:00:30.344
+The interlock connects the requested operation to the exact capability, session, and admitted authority.
+
+00:00:30.344 --> 00:00:34.342
+Execution stays pending while that decision is made.
+
+00:00:35.342 --> 00:00:37.550
+She needs the inspection today.
+
+00:00:37.550 --> 00:00:40.199
+Stopping everything leaves her stuck.
+
+00:00:40.199 --> 00:00:43.511
+Letting everything through surrenders control.
+
+00:00:43.511 --> 00:00:53.593
+A useful boundary tells the agent what it may do next, so the engineer can keep moving without silently approving more than she intended.
+
+00:00:54.593 --> 00:00:56.751
+First, open the current capsule.
+
+00:00:56.751 --> 00:01:00.579
+Its stored adjudication expression checks the tool name.
+
+00:01:00.579 --> 00:01:03.364
+Dangerous-tool returns OPERATOR REQUIRED.
+
+00:01:03.364 --> 00:01:05.870
+The alternative branch returns ALLOW.
+
+00:01:05.870 --> 00:01:10.394
+Its activation and certification expressions return status fields.
+
+00:01:10.394 --> 00:01:13.179
+These are inspectable decision semantics.
+
+00:01:13.179 --> 00:01:17.564
+They do not yet demonstrate live interception of a tool action.
+
+00:01:18.564 --> 00:01:20.950
+Now project the stronger target.
+
+00:01:20.950 --> 00:01:25.338
+An attempted effect reaches the interlock before dispatch.
+
+00:01:25.338 --> 00:01:31.264
+Resolve the capability, authority, requested mechanic, and permitted boundary.
+
+00:01:31.264 --> 00:01:33.266
+PERMIT can reach execution.
+
+00:01:33.266 --> 00:01:35.960
+OPERATOR REQUIRED waits for a human.
+
+00:01:35.960 --> 00:01:40.655
+DENY or RESOLVE returns the reason and the next legal action.
+
+00:01:41.655 --> 00:01:45.551
+The gap is the connection between deciding and enforcing.
+
+00:01:45.551 --> 00:01:48.891
+A returned label cannot stop a command by itself.
+
+00:01:48.891 --> 00:01:59.328
+The target operating environment must intercept the covered action, verify the exact session and authority, and dispatch only the permitted capability.
+
+00:01:59.328 --> 00:02:02.946
+The unfinished boundary marks the work that remains.
+
+00:02:03.946 --> 00:02:07.429
+In our target simulation, publication stays pending.
+
+00:02:07.429 --> 00:02:12.208
+The interlock resolves the authorized next step: inspect the candidate.
+
+00:02:12.208 --> 00:02:15.896
+That inspection receives PERMIT and returns its report.
+
+00:02:15.896 --> 00:02:20.403
+Missing authority or coverage produces a hold with an exact reason.
+
+00:02:20.403 --> 00:02:25.797
+A consequential operation needing an operator waits for that separate decision.
+
+00:02:26.797 --> 00:02:36.396
+Closure requires the same live session to deny an unmanaged probe and permit a declared read-only probe, with exact identity and coverage evidence.
+
+00:02:36.396 --> 00:02:40.538
+A receipt must connect the request, decision, and actual effect.
+
+00:02:40.538 --> 00:02:43.957
+The reference simulation teaches those relationships.
+
+00:02:43.957 --> 00:02:47.968
+It does not claim the current platform already enforces them.
+
+00:02:48.968 --> 00:02:53.894
+In the intended outcome, the engineer has the inspection she asked for.
+
+00:02:53.894 --> 00:02:58.608
+Publication remains pending until its own authority and proof close.
+
+00:02:58.608 --> 00:03:01.353
+Today we can inspect decision semantics.
+
+00:03:01.353 --> 00:03:04.730
+The future adds live interception before effects.
+
+00:03:04.730 --> 00:03:10.219
+That gap is the engineering runway: it tells us exactly what must become real.
+
+00:03:11.219 --> 00:03:14.298
+Stopping an unauthorized action is useful.
+
+00:03:14.298 --> 00:03:23.761
+But what happens when humans cannot clearly see what the agent is trying to change? Next: Reveal and Refine Capability Meaning.
+
+00:03:23.761 --> 00:03:30.670
+The Future of Agentic Engineering continues with making meaning visible enough to challenge.

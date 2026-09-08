@@ -42,14 +42,14 @@ export const PRIMITIVE_STYLES: Record<CircuitNode['primitive'], PrimitiveStyle> 
   OUTCOME: {
     label: 'Outcome',
     shape: 'terminal-out',
-    stroke: 'var(--color-projection)',
-    fill: 'color-mix(in srgb, var(--color-projection) 12%, var(--color-ink-2))',
+    stroke: '#72e1ad',
+    fill: 'color-mix(in srgb, #72e1ad 12%, var(--color-ink-2))',
     text: 'var(--color-text)',
   },
   PROVIDER_SLOT: {
     label: 'Provider slot',
     shape: 'slot',
-    stroke: 'var(--color-telemetry)',
+    stroke: '#82a8f9',
     fill: 'color-mix(in srgb, var(--color-telemetry) 10%, var(--color-ink-2))',
     text: 'var(--color-text)',
   },

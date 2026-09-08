@@ -4,7 +4,7 @@
 **Domain:** https://www.sidefx.io
 **Owner:** BPM Intelligence (formerly BPM Software Solutions LLC), founded by Sidney Jones
 **Planned stack:** Next.js (App Router) · TypeScript · Tailwind CSS · MDX content layer
-**Status:** Draft v5 — existing Azure app and East US 2 deployment target recorded 2026-09-08; implementation and evidence gates remain to be satisfied
+**Status:** Draft v6 — mandatory scenario artwork, database reconstruction of visual products, and Content Creation Mission CSS/design acceptance clarified 2026-09-08; implementation and evidence gates remain to be satisfied
 **Deployment:** Next.js standalone → tested Linux container → Azure Container Registry → Azure App Service
 **Azure target:** Existing `sidefx` app in `sidefx_group`, East US 2, on Linux plan `ASP-sidefxgroup-ad2e` (P0v3; one instance), as reported in the supplied portal summary
 **Content source:** Selected capability estate in `C:\lab\sidefx-database`, including mechanics, providers, scenarios and blueprints, projected through a publication service
@@ -12,6 +12,8 @@
 **Primary experience:** Speak or type intent → inspect a candidate capability circuit → refine and verify → download semantic authority and available embodiments
 
 This specification defines required website behavior. Source documentation establishes the reusable baseline; it does not establish that the website integration already exists. §11 defines the data contract, §12 the SCL and visual system, and §13 the IDE workflow.
+
+The [visual integration audit](visual-integration-audit.md) records the implemented SQL media registry, Nano Banana ingestion, image delivery and content-lab circuit integration. Ten subjects now have reviewed images with 20 card/detail selections; the remaining estate image backfill is open. Container/build success does not satisfy the complete visual release gates below.
 
 ---
 
@@ -358,7 +360,7 @@ Hero: `What capability do you need?` Offer a multiline intent field, **Speak you
 
 Both libraries are generated from exact selected estate definitions and share catalog search, filtering, responsive entity cards and database-backed imagery. A mechanic page explains its declared responsibility, inputs/results where specified, dedicated illustration, provider implementations and source-backed usage. A provider page shows its dedicated portrait, declared mechanics/ports/capabilities, target/profile metadata and qualification/execution evidence where present.
 
-Every capability, mechanic and provider has its own image requirement. Images follow the entity's identity across catalog cards, circuit inspectors, docs, IDE suggestions and YouTube teaching material. A mechanic/provider click in a circuit opens its entity inspector or detail page with the same selected revision. Repeated appearances reuse that entity's art; they do not trigger generation for every node occurrence.
+Every capability, scenario, mechanic and provider has its own image requirement. Images follow the entity's identity across catalog cards, circuit inspectors, docs, IDE suggestions and YouTube teaching material. A mechanic/provider click in a circuit opens its entity inspector or detail page with the same selected revision. Repeated appearances reuse that entity's art; they do not trigger generation for every node occurrence.
 
 The live inspection found 137 platform-provided mechanics without display names. Provide readable editorial names/descriptions through reviewed presentation metadata with source references; preserve exact IDs and do not fill semantic authority fields with generated claims. A name-only declaration supports an identity card until richer meaning has been sourced. Show an explicit absence when a required relationship has not been declared.
 
@@ -368,16 +370,20 @@ The live inspection found 137 platform-provided mechanics without display names.
 
 ### 6.1 Direction
 
-Dark, technical, and legible. Reuse the SideFX glass/material circuit references: restrained grid, luminous semantic edges, dark quiet label surfaces, and visible input/event/outcome structure. Capability pages and the IDE use the same SCL renderer and symbol vocabulary as content production.
+Use the finished Content Creation Mission pages as the visual reference: generous editorial spacing, disciplined typography, strong image composition, fine rules and clear reading order. The capability editions and Agentic Engineering page pair warm paper reading surfaces with dark technical media/workbench surfaces. Carry that deliberate contrast into the website. Circuit surfaces reuse the SideFX glass/material references: restrained grid, luminous semantic edges, dark quiet label surfaces, and visible input/event/outcome structure. Capability pages and the IDE use the same SCL renderer and symbol vocabulary as content production. A full-page blueprint background alone does not establish this design system.
 
-Nano Banana creates a distinct image for every capability, mechanic and provider, and enhances canonical component materials. Scenarios, blueprints and other entities extend the same registry under §12.7. Generated environments or human scenes may illustrate a capability's intended experience when their content contract supports it. Circuit topology, labels, status, and evidence always come from the deterministic projection. Founder photography remains an approved real portrait. §12 resolves differences among the supplied visual references.
+Nano Banana creates a distinct image for every capability, scenario, mechanic and provider, and enhances canonical component materials. Every scenario requires its own artwork whether or not it is featured in a lesson. Blueprints and other entities extend the same registry under §12.7. Generated environments or human scenes may illustrate a capability's intended experience when their content contract supports it. Circuit topology, labels, status, and evidence always come from the deterministic projection. Founder photography remains an approved real portrait. §12 resolves differences among the supplied visual references.
 
 ### 6.2 Palette
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `ink` | `#0A0E14` | Page background |
-| `ink-2` | `#101724` | Card background |
+| `paper` | `#F1F0E9` | Editorial page and reading surfaces, from the capability edition |
+| `editorial-ink` | `#192E34` | Primary text and controls on paper |
+| `editorial-muted` | `#566C71` | Secondary text on paper |
+| `editorial-line` | `#CBD3CC` | Editorial dividers |
+| `ink` | `#0A0E14` | Dark circuit and workbench background |
+| `ink-2` | `#101724` | Raised dark technical surface |
 | `grid-line` | `#1C2735` | Blueprint grid, borders |
 | `signal` | `#33E0C8` | Primary accent, CTAs, active traces |
 | `authority` | `#7AA2FF` | Semantic authority nodes, links |
@@ -388,6 +394,8 @@ Nano Banana creates a distinct image for every capability, mechanic and provider
 | `muted` | `#8B98A9` | Secondary text, captions |
 
 These are website shell tokens. SCL semantic colors come from the versioned circuit grammar and are mapped explicitly; the website palette cannot silently recolor semantic types. CTA buttons use signal fill with ink text. Verify all actual text/background, focus, state and control pairs; decorative grid lines cannot serve as the sole control boundary.
+
+Use surface-scoped foreground, background, muted, border and control tokens. Editorial controls use editorial ink on paper; dark workbench controls use the dark-surface pairs above. Never inherit a dark-surface text color onto paper. Resolve semantic primitive and route colors from the pinned content-lab grammar, independently of shell theme.
 
 ### 6.3 Typography
 
@@ -413,6 +421,19 @@ Shared shell: responsive nav, hero, eyebrow, section header, capability card, pe
 - Circuit nodes have names and roles, keyboard selection, a navigable text outline, and inspector focus behavior. Status uses words and shapes as well as color. Decorative material/flow layers are hidden from assistive technology and ignore pointer events.
 - Label forms, microphone state, target controls and downloads; announce meaningful progress and errors without reading every animation frame. Support denied microphone permission and typed input with equal functionality.
 - Target WCAG 2.2 AA, with manual keyboard, screen-reader, reflow and contrast checks alongside automated tooling. See [W3C evaluation guidance](https://www.w3.org/WAI/test-evaluate/). A Lighthouse score is one check, not the accessibility acceptance decision.
+
+### 6.7 CSS, entity imagery and visual acceptance
+
+The website must read as a professionally authored SideFX product whose visual behavior comes from its underlying system. The reference implementations are the Content Creation Mission `samples/capability-pages/interlock-agent-operation/index.html`, `samples/capability-pages/generate-governed-narration/index.html`, `samples/agentic-engineering/index.html` and `samples/infographic-grammar/index.html`. Compare actual rendered pages against these references during implementation; filenames or copied color values alone are insufficient.
+
+- **One versioned visual contract:** reusable components consume typed entity kind, exact subject/definition, selected media revision, semantic primitive, route family and independent evidence/media states. Map these through shared tokens and component variants. Do not infer entity type from a title, array position or random ID color. Presentation metadata selects constrained layout and crop profiles; arbitrary CSS from database records is not the rendering contract.
+- **Recognizable semantics:** input, event, outcome, provider port, provider, junction, validation, evidence and terminal forms retain the pinned grammar's geometry and material identity. Canonical terminals retain their distinct fulfillment/failure meaning. CSS must not silently map an outcome to a provider color or make an unresolved binding appear qualified. Connections attach to actual geometry anchors, including at zoom and responsive sizes.
+- **Purposeful image composition:** capability, scenario, mechanic and provider art has a defined role in the hero, catalog and inspector. Bind each displayed image to its approved subject revision, derivative, dimensions, aspect ratio, focal/crop direction and alt text. Reserve its layout space before loading; use responsive derivatives. A shared symbol atlas or a repeated hero image cannot satisfy distinct entity artwork.
+- **Editorial craft:** use an intentional type scale, controlled line lengths, aligned baselines, a consistent spacing scale and selective contrast. Compose sections around the capability's story, images, I/E/O, circuit and related mechanics. Avoid a page assembled entirely from interchangeable rounded cards, indiscriminate glow, generic gradients or repeated decorative grids. Technical IDs and provenance belong in the inspector or supporting details, not in place of readable primary content.
+- **Complete states:** design selected, hover, focus, disabled, loading, generation pending, failed, stale, empty and ready states together. Preserve readable content and stable layout throughout. Motion follows real interactions or validated circuit paths, remains opt-in for playback and respects reduced motion.
+- **Visual evidence:** retain comparison captures for Home, a populated catalog, capability detail, scenario selection, mechanic/provider detail and the circuit workbench at the §6.6 widths. Include long titles, heterogeneous artwork, missing/pending artwork, dense graphs, keyboard focus and zoom/reflow. Verify readable labels, intended crops, connection contacts, image integrity, spacing and surface contrast. A successful build or a page with no broken links does not establish this acceptance.
+
+The first integrated reference must demonstrate the complete path from a stored entity image and stored circuit bundle to a composed capability page, a scenario's own image, the catalog and the inspector. Apply that same contract across the selected estate; isolated screenshot-only mockups do not close the integration requirement.
 
 ---
 
@@ -478,7 +499,7 @@ sfx-platform/
 - CI: TypeScript, lint, route/phase checks, publication schema and source-digest validation, deterministic circuit checks, and critical workflow tests. Add tests for behavior and integrity boundaries rather than restating static copy.
 - Integration: capability click opens the correct graph; voice and typed intent produce an inspectable candidate; invalid output preserves the draft and exposes diagnostics; cancellation/resume cannot duplicate jobs; exports match the selected revision and target.
 - Ownership: execute the launch example from the downloaded bundle in the documented SDA environment and in a documented own-architecture adapter environment. Record actual scope and dependencies; do not turn an example into a universal target claim.
-- Data/visuals: enforce one coherent estate generation per publication; protect private data; refuse stale artifacts; show unresolved graph/target state honestly; verify every published capability has its own reviewed Nano Banana image and a source-faithful circuit view. Every published mechanic/provider also requires its own reviewed image. Coverage includes missing requirements, and database byte round trips preserve image digests and exact subject bindings (§11.5).
+- Data/visuals: enforce one coherent estate generation per publication; protect private data; refuse stale artifacts; show unresolved graph/target state honestly; verify every published capability and scenario has its own reviewed Nano Banana image and a source-faithful circuit view. Every published mechanic/provider also requires its own reviewed image. Coverage includes every selected subject, including entities without a routable page or usable face. Database round trips preserve image digests, exact subject bindings and complete infographic/playback bundles (§11.5). Apply the CSS and reference-page acceptance in §6.7. A staging preview may expose incomplete work, but it cannot be reported as visually complete or promoted as the finished public experience while these gates fail.
 - Delivery: staging inquiry reaches the configured recipient; simulate retryable failure and duplicate submission. Verify microphone denial, keyboard-only use, reduced motion, narrow layout, and screen-reader progress/error feedback.
 - Container: test the final runtime image locally and in Azure staging, including static assets, MDX, circuit artifacts, media retrieval, server actions, sign-in return, job reconnect, health checks and graceful restart. Release evidence records the image digest, source commit, dependency lock, website contract and estate publication identity. Validate promotion and rollback using the same stored image (§8.6).
 
@@ -696,9 +717,11 @@ Independent-use downloads resolve a pinned export manifest and immutable artifac
 
 Bind images through the existing `model.semantic_object` and exact `model.semantic_object_definition` keys. Capabilities, mechanics, providers, scenarios, blueprints and other modeled subjects already share these identities. Enforce definition-to-object ownership with real foreign keys; do not use an unchecked entity-type/text-ID pair. Private draft bindings belong to the implemented workspace revision store until an exact semantic binding exists.
 
-The [storage design](C:/lab/sidefx-database/docs/website-visual-assets.md) specifies proposed blob, generation request, asset/revision, typed source/derivation, entity binding, review, visual requirement and approved-selection relations. A versioned `varbinary(max)` blob retains the bytes; append-only review and transactional current selection retain publication history. Store prompt/model/reference provenance without secrets. The media schema is proposed implementation work, not an existing image store verified by this review.
+The [storage design](C:/lab/sidefx-database/docs/website-visual-assets.md) is implemented by migrations `005-media-registry` and `006-media-integrity`: blob, generation request, asset/revision, typed source/derivation, entity binding, review, visual requirement and approved-selection relations. A versioned `varbinary(max)` blob retains bytes; append-only review and transactional selection retain publication history. Prompt/model/reference provenance is stored without credentials. [Media operations](media-operations.md) describes the executed import and SQL-only recovery path; complete image production remains open.
 
-Track a visual requirement before an image exists, so every capability/mechanic/provider appears in coverage totals. Original, composite, catalog crop and sharing image are related revisions with exact parent/source bindings. Shared component material can be reused while each core entity retains its own illustration. Meaning changes mark affected bindings stale; historical posts/videos retain their pinned image revisions.
+Track a visual requirement before an image exists, so every capability/scenario/mechanic/provider appears in coverage totals, including selected capabilities that currently lack a website page or usable face. Original, composite, catalog crop and sharing image are related revisions with exact parent/source bindings. Shared component material can be reused while each core entity retains its own illustration. Meaning changes mark affected bindings stale; historical posts/videos retain their pinned image revisions.
+
+**Store complete infographic and playable circuit products as well as raster images.** A versioned bundle manifest binds the exact subject/revision to authored SCL, canonical graph JSON, base SVG, enhanced SVG, layout/anchor data, animation plan, selected component-material revisions, and grammar/renderer/player versions. Retain the corresponding artifact bytes, including versioned player assets needed for reconstruction; retain posters, captions and rendered film bytes where those are part of the published product. The database must reconstruct the selected visual product after local folders or delivery caches are lost. A screenshot, SVG with broken local image links, or a playback URL does not satisfy this requirement. Imported global grammar/material assets keep their own versioned identities; an occurrence references the shared asset without claiming it is dedicated entity art.
 
 Catalog endpoints return metadata and approved media identity; binary streaming is separate and authorized. Publish hash-addressed CDN copies from SQL as needed, with correct type, caching and revocation. The database remains sufficient to reconstruct published images. Atomic ingestion/selection, idempotent requests, scoped access and existing-image fallback prevent broken or cross-workspace media on failure.
 
@@ -715,7 +738,7 @@ Every capability has two linked visual deliverables:
 1. **Interactive circuit:** SCL projected into deterministic SVG and an accessible inspector, displayed whenever an existing capability is opened or a new valid candidate is created.
 2. **Capability-specific image:** generated through Gemini Nano Banana from the capability's reviewed visual direction, used in the catalog, detail hero, sharing, and related content. It is distinct artwork for that capability, even when canonical component materials are reused.
 
-Every mechanic and provider also has a dedicated generated image, stored through the same database media registry. Mechanic images express a declared responsibility; provider images identify the declared implementer and role. Their inspectors retain typed SCL symbols when embedded in circuits. Additional subject types and reuse rules are defined in §12.7.
+Every scenario, mechanic and provider also has a dedicated Nano Banana image, stored through the same database media registry. Scenario artwork expresses that scenario's own I/E/O and experience, bound to its exact revision and capability owner. Mechanic images express a declared responsibility; provider images identify the declared implementer and role. Their inspectors retain typed SCL symbols when embedded in circuits. Additional subject types and reuse rules are defined in §12.7.
 
 The production sequence is:
 
@@ -747,6 +770,8 @@ Existing capsule/blueprint/runtime testimony remains source authority. An SCL re
 
 **Every open capability gets a circuit view.** If full topology cannot be qualified, render its source-backed I/E/O boundary lens, retaining unresolved references and a clear **Boundary view — detailed topology incomplete** explanation. Draw known members and valid declared edges only. If even a boundary member is missing, show a partial boundary with an unresolved slot, not an invented mechanic. Do not substitute another capability's picture or a generic graph.
 
+An available complete source must take precedence over that boundary summary. Consume the selected blueprint definition's nodes and edges, the source plan's declared operations and scenario calls, native execution cells/routes, and mechanic expressions through their respective adapters. Preserve every source identity and typed relation; do not truncate by a presentation limit. A mechanic expression diagram describes dependencies and must not impersonate an execution trace. NetworkX analysis, Graphviz layout and SVG coverage receipts are part of the implemented publication pipeline. The workbench must support readable zoom, search, exact source inspection and route tracing through every declared alternative, join and cyclic route, with pause/resume and a visible completion count. The database retains the complete graph, source SVG, materials and runtime needed to reproduce it.
+
 For a newly submitted intent with no valid candidate yet, keep the circuit pane visible with the retained intent and **Designing circuit** state. A parser failure shows diagnostics and retry/edit controls. Render the actual candidate as soon as validation produces a supported graph; do not animate speculative streaming fragments as valid topology.
 
 ### 12.3 Semantic and geometric laws
@@ -776,16 +801,16 @@ Public reading and the text explanation remain available without JavaScript. The
 
 Use the existing `content-creation-mission` preparation, generation, review, compositing and receipt pattern. The local component generator currently selects `gemini-3-pro-image`; record the actual configured model and verify account availability when implementing production. Nano Banana remains the requested image provider; a model change is an explicit production configuration change, not an invisible fallback.
 
-Maintain a dedicated visual requirement and asset binding for every capability, mechanic and provider in the selected estate, plus every created capability draft, including nonpublic subjects. Publication eligibility controls visibility, not whether the entity needs its own image. External image requests use only fields authorized for that generation job. The same registry supports scenarios, blueprints, contracts and ports when their presentation requires distinct art.
+Maintain a dedicated visual requirement and asset binding for every capability, scenario, mechanic and provider in the selected estate, plus every created capability draft, including nonpublic subjects. Publication eligibility controls visibility, not whether the entity needs its own image. External image requests use only fields authorized for that generation job. The same registry supports blueprints, contracts and ports when their presentation requires distinct art.
 
 For every capability in that inventory:
 
-1. Bind the exact semantic subject and definition (or private draft revision), audience, visual role, permitted claims and source content contract. For capabilities, include the promise and selected scenario; for mechanics, the declared responsibility; for providers, their declared implementations. Author distinct visual direction for each core entity; a shared atlas alone does not satisfy its image requirement.
+1. Bind the exact semantic subject and definition (or private draft revision), audience, visual role, permitted claims and source content contract. For capabilities, include the promise and selected scenario; for scenarios, their own I/E/O, experience and owner; for mechanics, the declared responsibility; for providers, their declared implementations. Author distinct visual direction for each core entity; a shared atlas alone does not satisfy its image requirement.
 2. Prepare a request with the visual purpose, reference image hashes, semantic exclusions, composition and aspect ratio. Generate capability art separately from reusable component material plates. Do not ask the image model to invent executable wiring, provider state, proof badges, metrics or lettering.
 3. Run durable, bounded Nano Banana jobs. Persist request identity, actual model, source/direction hashes, original image bytes and digest through the database media service (§11.5). A provider response or temporary file is not completion until storage commits. Reuse an identical completed request only after verifying the stored bytes. Handle quota/429 and retryable server failures within a bounded policy; reconcile uncertain outcomes before reissuing a billable request.
 4. Inspect source fidelity and visual quality; retain rejection reasons and approved image hashes. Composite materials through canonical masks and keep deterministic labels, symbols and evidence markings on top. Keep decorative overlays outside text exclusions and remove them to recover the base SVG.
 5. Produce the subject's required formats: 1:1 entity card, detail portrait/explainer, and 16:9 or 1200×630 teaching/sharing derivative where used. Store derivative bytes and parent revision links in the database, plus responsive dimensions and alt text. Crops preserve the intended meaning and never sever semantic graph relationships; use a different composition where needed.
-6. Publish `EntityVisual` with the matching capability, mechanic or provider record. Track coverage by subject kind, definition, purpose and format across required, queued, generating, review required, ready, failed and stale states. All published core entities require their own reviewed image. Created private capabilities enqueue their own image after the first valid candidate; later meaning changes invalidate affected bindings.
+6. Publish `EntityVisual` with the matching capability, scenario, mechanic or provider record. Track coverage by subject kind, definition, purpose and format across required, queued, generating, review required, ready, failed and stale states. All published core entities require their own reviewed image. Created private capabilities enqueue their own image after the first valid candidate; later meaning changes invalidate affected bindings.
 
 Image generation must not delay circuit inspection or semantic editing. Show the deterministic circuit and **Artwork preparing** while generation is pending; on failure retain the circuit, status and retry action. A placeholder is a transient state, not fulfillment of the dedicated image requirement. Private candidate art remains private until its publication is authorized and reviewed. Changing a private draft must not update a public page's image.
 
@@ -816,11 +841,11 @@ Release the grammar/renderer integration with explicit versions, visual referenc
 | Capability | Dedicated Nano Banana image plus deterministic SCL circuit | Exact authority/draft revision; retain source-backed boundary view when topology is unresolved |
 | Mechanic | Dedicated responsibility/transformation image and readable detail | One reusable image per approved subject/definition binding; show concrete I/O only when its contract supports it |
 | Provider | Dedicated provider portrait/tile and declared implementation detail | Reuse across every bound/declared occurrence while keeping status independent of the art |
-| Scenario | I/E/O circuit and an image when featured in teaching/detail | Exact capability owner and scenario revision; share the capability image only as an explicitly related image |
+| Scenario | Dedicated Nano Banana image for every scenario plus its I/E/O circuit | Exact capability owner and scenario revision; a capability image may appear as related art but never fills the scenario's own image requirement |
 | Blueprint | Source-derived graph, optionally with generated material | Geometry is deterministic; zero normalized edges is not a blank check for image-generated wiring |
 | Port, contract, input/event/outcome, authority, evidence, profile | Typed symbol plus an entity-specific image where a page or lesson requires one | Extend through the shared semantic identity registry; repeated primitive occurrences do not each require an AI job |
 
-The requirement registry is the coverage denominator, including missing images. Capability/mechanic/provider images are mandatory; further kinds have explicit art requirements when surfaced. Derivative counts and repeated circuit occurrences are reported separately from unique subjects. This keeps the estate's reusable parts visible without multiplying identical generation requests.
+The requirement registry is the coverage denominator, including missing images. Capability/scenario/mechanic/provider images are mandatory across the selected estate; further kinds have explicit art requirements when surfaced. Report the managed-capability scope and additional platform capability identities separately; neither disappears because a page has not yet been built. Derivative counts and repeated circuit occurrences are reported separately from unique subjects. At the 2026-09-08 inventory, the mandatory identity scope is 1,308 subjects for 219 managed capabilities, 824 scenarios, 191 mechanics and 74 providers, or 1,378 when all 289 selected capability identities are included. Selected definition revisions require their own valid bindings; these subject counts are not a generation-call estimate. This keeps the estate's reusable parts visible without multiplying identical generation requests.
 
 ---
 

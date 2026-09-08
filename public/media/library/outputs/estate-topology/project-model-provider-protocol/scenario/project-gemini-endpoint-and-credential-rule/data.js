@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-gemini-endpoint-and-credential-rule","viewId":"n-3b1dbaad10caf05bde9ef1c1"};

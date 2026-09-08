@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-capsule-estate-dependencies","viewId":"n-c56732c52d28e85602ef4285"};

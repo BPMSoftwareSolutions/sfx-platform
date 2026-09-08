@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-reconstruction-receipt","viewId":"n-641792a70c3bfc1c2f2c2a33"};

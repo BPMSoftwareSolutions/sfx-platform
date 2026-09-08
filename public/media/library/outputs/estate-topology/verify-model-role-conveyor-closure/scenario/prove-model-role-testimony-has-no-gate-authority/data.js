@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-model-role-testimony-has-no-gate-authority","viewId":"n-c50b046edc653313c38e5b3d"};

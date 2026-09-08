@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"generate-governed-narration","viewId":"n-031552b6496734a72aafa58d"};

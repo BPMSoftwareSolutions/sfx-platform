@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"invoke-projectable-capability-candidate-author","viewId":"n-41cdbbe5927ce906d73ee1bd"};

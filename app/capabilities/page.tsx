@@ -16,12 +16,14 @@ export default function CapabilitiesPage() {
   const capabilities = getCapabilities();
 
   const items: CatalogItem[] = capabilities.map((capability) => ({
+    kind: capability.kind,
+    visuals: capability.visuals,
     id: capability.entityId,
     href: `/capabilities/${capability.urlKey}`,
     title: capability.title,
     identity: capability.entityId,
     // The capability's own summary is undeclared; its scenario responsibilities are source text.
-    summary: capability.scenarios[0]?.responsibility ?? null,
+    summary: capability.summary ?? capability.scenarios[0]?.responsibility ?? null,
     facets: [{ label: 'Graph fidelity', value: capability.graphFidelity }],
     badges: [
       { label: `${capability.scenarios.length} scenarios` },

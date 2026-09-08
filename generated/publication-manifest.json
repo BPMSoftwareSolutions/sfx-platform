@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "publicationId": "sha256:6ba4855f516432201753aac7f7794d4eef1c7839491cfdf041194e22a8e3907f",
+  "artifacts": {
+    "estate-publication.json": "sha256:1a47fdfbe3c8820e0ac10846306fe101307a6211fb43f600675e625ab268f5c0",
+    "circuit-projections.json": "sha256:ecf01e049eedba46cd6f5234487f5b9f9425c9cb03e1902567e54685b545aef2",
+    "visual-publication.json": "sha256:dc6603260ecbbfb21b8cb805b496c89658cecf33dab83d0869d2a3aed2372d9e"
+  }
+}

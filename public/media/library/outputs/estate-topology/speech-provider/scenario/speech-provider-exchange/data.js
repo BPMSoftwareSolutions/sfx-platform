@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"speech-provider-exchange","viewId":"n-49b18ba8791bf84013c8b1bc"};

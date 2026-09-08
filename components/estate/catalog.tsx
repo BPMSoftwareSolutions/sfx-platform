@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { EntityArt } from './entity-art';
+import type { EntityVisual } from '@/contracts/estate';
 
 /**
  * Catalog search and filtering — §5.17, §5.20.
@@ -11,6 +13,8 @@ import { useMemo, useState } from 'react';
  */
 
 export interface CatalogItem {
+  kind: string;
+  visuals: EntityVisual[];
   id: string;
   href: string;
   title: string;
@@ -120,8 +124,10 @@ export function Catalog({ items, facetName, facetValues, noun, emptyMessage }: P
               <li key={item.id}>
                 <Link
                   href={item.href}
-                  className="flex h-full flex-col rounded-lg border border-grid-line bg-ink-2 p-5 hover:border-signal"
+                  className="catalog-card"
                 >
+                  <EntityArt visuals={item.visuals} title={item.title} kind={item.kind}/>
+                  <div className="catalog-card-copy">
                   <h3 className="font-display text-base font-semibold break-words">{item.title}</h3>
                   <p className="mt-1 break-all font-mono text-xs text-muted">{item.identity}</p>
                   {item.summary ? (
@@ -148,6 +154,7 @@ export function Catalog({ items, facetName, facetValues, noun, emptyMessage }: P
                     ))}
                   </div>
                   <span className="mt-4 text-sm text-signal">Open →</span>
+                  </div>
                 </Link>
               </li>
             ))}

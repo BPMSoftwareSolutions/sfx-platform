@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"discover-language-bindings","viewId":"n-ede5c8c95a1d084b375578f0"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"project-declared-blueprint-lenses","viewId":"n-882565bc6dbf6e8c655f9077"};

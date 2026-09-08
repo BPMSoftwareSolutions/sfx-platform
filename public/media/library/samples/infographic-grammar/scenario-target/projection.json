@@ -1,0 +1,1323 @@
+{
+  "contractVersion": "infographic-projection.v1",
+  "grammarVersion": "sidefx-infographic-grammar.v1",
+  "id": "scenario-target",
+  "title": "Prove both sides of the boundary.",
+  "subtitle": "One intended certification scenario · fan-out → join → validation",
+  "altitude": "scenario",
+  "scope": "Explicit target design. Animated outcomes do not establish current implementation or completed proof.",
+  "sources": [
+    {
+      "id": "runtime",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Exact runtime execution plan",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "capsule",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Verified capsule evidence package",
+      "encoding": "json"
+    },
+    {
+      "id": "story",
+      "path": "declarations/episode-01-direction.json",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d",
+      "pointer": "",
+      "kind": "STAGING",
+      "label": "Fictional human experience",
+      "encoding": "json"
+    },
+    {
+      "id": "target",
+      "path": "declarations/infographic-design-intent.v1.json",
+      "sha256": "ef389df72699c9be8028ac9daeddb7a3251e34f34594805ccb256c2973dfdae9",
+      "pointer": "",
+      "kind": "TARGET",
+      "label": "Intended visual circuit",
+      "encoding": "json"
+    },
+    {
+      "id": "gap",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649",
+      "pointer": "",
+      "kind": "GAP",
+      "label": "Missing live enforcement and testimony",
+      "encoding": "json"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "domain": "Governed agent work",
+      "scenarioIds": [
+        "certification"
+      ],
+      "coverage": "One intended scenario",
+      "sourceRefs": [
+        "target"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "certification",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Two-sided live certification",
+      "nodeIds": [
+        "activation",
+        "deny-probe",
+        "permit-probe",
+        "check",
+        "certified",
+        "split",
+        "join"
+      ],
+      "sourceRefs": [
+        "target"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "activation",
+      "label": "Exact activation",
+      "detail": "One session / workspace / policy",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "deny-probe",
+      "label": "Deny unmanaged probe",
+      "detail": "Observe no effect",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "permit-probe",
+      "label": "Permit read-only probe",
+      "detail": "Observe the declared effect",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "check",
+      "label": "Match identities",
+      "detail": "Session, coverage, time, authority",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "validation",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "certified",
+      "label": "Scoped boundary",
+      "detail": "Only if every obligation closes",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "port",
+      "label": "Live probe port",
+      "detail": "Responsibility remains to be supplied",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "support",
+      "type": "provider-port",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "provider",
+      "label": "Hook runtime candidate",
+      "detail": "Candidate / not observed",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "support",
+      "type": "provider",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "proof",
+      "label": "Required probe testimony",
+      "detail": "Not an observed receipt",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "GAP",
+      "sourceRefs": [
+        "gap"
+      ],
+      "layer": "support",
+      "type": "evidence",
+      "productContract": null,
+      "closure": "Execute both probes in the same exact live session; bind actual effects and ordered identities."
+    }
+  ],
+  "junctions": [
+    {
+      "id": "split",
+      "label": "Both probes",
+      "detail": "Same identity envelope",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "fan-out",
+      "rule": null,
+      "join": null,
+      "quorum": null
+    },
+    {
+      "id": "join",
+      "label": "Both results",
+      "detail": "ALL / 2 of 2",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "type": "convergence",
+      "rule": null,
+      "join": "all",
+      "quorum": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e00",
+      "source": "activation",
+      "target": "split",
+      "type": "transition",
+      "label": "",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e01",
+      "source": "split",
+      "target": "deny-probe",
+      "type": "transition",
+      "label": "dependent 1",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e02",
+      "source": "split",
+      "target": "permit-probe",
+      "type": "transition",
+      "label": "dependent 2",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e03",
+      "source": "deny-probe",
+      "target": "join",
+      "type": "transition",
+      "label": "",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e04",
+      "source": "permit-probe",
+      "target": "join",
+      "type": "transition",
+      "label": "",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e05",
+      "source": "join",
+      "target": "check",
+      "type": "transition",
+      "label": "both arrived",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e06",
+      "source": "check",
+      "target": "certified",
+      "type": "transition",
+      "label": "matching proof",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e07",
+      "source": "provider",
+      "target": "port",
+      "type": "provider-binding",
+      "label": "candidate",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e08",
+      "source": "port",
+      "target": "deny-probe",
+      "type": "dependency",
+      "label": "probe responsibility",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e09",
+      "source": "port",
+      "target": "permit-probe",
+      "type": "dependency",
+      "label": "probe responsibility",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e10",
+      "source": "proof",
+      "target": "certified",
+      "type": "evidence-attachment",
+      "label": "required to establish",
+      "basis": "GAP",
+      "sourceRefs": [
+        "gap"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    }
+  ],
+  "providers": [
+    {
+      "nodeId": "provider",
+      "portIds": [
+        "port"
+      ],
+      "binding": "candidate",
+      "state": "candidate"
+    }
+  ],
+  "humanAnchors": [
+    {
+      "person": "Operator",
+      "input": "An operator needs to trust the exact boundary.",
+      "event": "Both denial and permitted work must be observed.",
+      "outcome": "Confidence comes from scoped evidence, not an activation label.",
+      "basis": "STAGING",
+      "sourceRefs": [
+        "story"
+      ]
+    }
+  ],
+  "visualLayers": [
+    "human",
+    "mechanic",
+    "support"
+  ],
+  "animationBeats": [
+    {
+      "phase": "Establish",
+      "caption": "Start with one exact activation identity.",
+      "entityIds": [
+        "activation"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Activate",
+      "caption": "Fan-out supplies both required dependents. It does not choose one.",
+      "entityIds": [
+        "split",
+        "provider",
+        "port"
+      ],
+      "edgeIds": [
+        "e00",
+        "e07"
+      ]
+    },
+    {
+      "phase": "Execute",
+      "caption": "Join waits for both arrivals, then identity validation applies.",
+      "entityIds": [
+        "deny-probe",
+        "permit-probe",
+        "join",
+        "check"
+      ],
+      "edgeIds": [
+        "e01",
+        "e02",
+        "e03",
+        "e04",
+        "e05",
+        "e08",
+        "e09"
+      ]
+    },
+    {
+      "phase": "Resolve",
+      "caption": "The target outcome remains conditional on complete matching proof.",
+      "entityIds": [
+        "certified"
+      ],
+      "edgeIds": [
+        "e06"
+      ]
+    },
+    {
+      "phase": "Prove",
+      "caption": "Required testimony stays GAP / REQUIRED throughout the animation.",
+      "entityIds": [
+        "proof"
+      ],
+      "edgeIds": [
+        "e10"
+      ]
+    }
+  ],
+  "zoomAggregations": [
+    {
+      "id": "aggregate:interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "altitude": "capability",
+      "memberIds": [
+        "activation",
+        "deny-probe",
+        "permit-probe",
+        "check",
+        "certified",
+        "port",
+        "provider",
+        "proof",
+        "split",
+        "join"
+      ]
+    }
+  ],
+  "scenarioRelationships": [],
+  "layout": {
+    "width": 2219.2,
+    "height": 1242.0,
+    "boxes": {
+      "activation": [
+        60.0,
+        430.0,
+        300,
+        170
+      ],
+      "deny-probe": [
+        719.75,
+        318.0,
+        300,
+        170
+      ],
+      "permit-probe": [
+        719.75,
+        542.0,
+        300,
+        170
+      ],
+      "check": [
+        1375.0,
+        431.0,
+        300,
+        170
+      ],
+      "certified": [
+        1839.2,
+        431.0,
+        320,
+        170
+      ],
+      "split": [
+        415.0,
+        428.0,
+        160,
+        174
+      ],
+      "join": [
+        1074.8,
+        429.0,
+        160,
+        174
+      ],
+      "port": [
+        259.8666666666666,
+        832.0,
+        300,
+        170
+      ],
+      "provider": [
+        959.5999999999999,
+        832.0,
+        300,
+        170
+      ],
+      "proof": [
+        1659.333333333333,
+        832.0,
+        300,
+        170
+      ]
+    },
+    "paths": {
+      "e00": {
+        "kind": "bezier",
+        "points": [
+          [
+            360.0,
+            515.0
+          ],
+          [
+            387.0,
+            515.0
+          ],
+          [
+            414.0,
+            515.0
+          ],
+          [
+            441.0,
+            515.0
+          ]
+        ]
+      },
+      "e01": {
+        "kind": "bezier",
+        "points": [
+          [
+            547.0,
+            484.0
+          ],
+          [
+            607.9116761458682,
+            447.68726998996317
+          ],
+          [
+            663.8308380729341,
+            403.0
+          ],
+          [
+            719.75,
+            403.0
+          ]
+        ]
+      },
+      "e02": {
+        "kind": "bezier",
+        "points": [
+          [
+            547.0,
+            546.0
+          ],
+          [
+            607.9116761458682,
+            582.3127300100368
+          ],
+          [
+            663.8308380729341,
+            627.0
+          ],
+          [
+            719.75,
+            627.0
+          ]
+        ]
+      },
+      "e03": {
+        "kind": "bezier",
+        "points": [
+          [
+            1019.75,
+            403.0
+          ],
+          [
+            1034.4384615384615,
+            403.0
+          ],
+          [
+            1049.126923076923,
+            469.7307692307692
+          ],
+          [
+            1084.8,
+            484.0
+          ]
+        ]
+      },
+      "e04": {
+        "kind": "bezier",
+        "points": [
+          [
+            1019.75,
+            627.0
+          ],
+          [
+            1034.6582417582417,
+            627.0
+          ],
+          [
+            1049.5664835164835,
+            562.0934065934066
+          ],
+          [
+            1084.8,
+            548.0
+          ]
+        ]
+      },
+      "e05": {
+        "kind": "bezier",
+        "points": [
+          [
+            1224.8,
+            516.0
+          ],
+          [
+            1274.8666666666666,
+            516.0
+          ],
+          [
+            1324.9333333333334,
+            516.0
+          ],
+          [
+            1375.0,
+            516.0
+          ]
+        ]
+      },
+      "e06": {
+        "kind": "bezier",
+        "points": [
+          [
+            1675.4,
+            516.0
+          ],
+          [
+            1723.8,
+            516.0
+          ],
+          [
+            1777.8,
+            516.0
+          ],
+          [
+            1838.8,
+            516.0
+          ]
+        ]
+      },
+      "e07": {
+        "kind": "line",
+        "points": [
+          [
+            959.5999999999999,
+            917.0
+          ],
+          [
+            559.8666666666666,
+            917.0
+          ]
+        ]
+      },
+      "e08": {
+        "kind": "line",
+        "points": [
+          [
+            559.8666666666666,
+            883.0
+          ],
+          [
+            579.8666666666666,
+            883.0
+          ],
+          [
+            579.8666666666666,
+            644.0
+          ],
+          [
+            595.0,
+            644.0
+          ],
+          [
+            595.0,
+            532.0
+          ],
+          [
+            699.75,
+            532.0
+          ],
+          [
+            699.75,
+            369.0
+          ],
+          [
+            719.75,
+            369.0
+          ]
+        ]
+      },
+      "e09": {
+        "kind": "line",
+        "points": [
+          [
+            559.8666666666666,
+            883.0
+          ],
+          [
+            595.0,
+            883.0
+          ],
+          [
+            595.0,
+            647.0
+          ],
+          [
+            699.75,
+            647.0
+          ],
+          [
+            699.75,
+            593.0
+          ],
+          [
+            719.75,
+            593.0
+          ]
+        ]
+      },
+      "e10": {
+        "kind": "line",
+        "points": [
+          [
+            1959.333333333333,
+            883.0
+          ],
+          [
+            1979.333333333333,
+            883.0
+          ],
+          [
+            1979.333333333333,
+            645.0
+          ],
+          [
+            1819.2,
+            645.0
+          ],
+          [
+            1819.2,
+            482.0
+          ],
+          [
+            1839.2,
+            482.0
+          ]
+        ]
+      }
+    },
+    "edgeLabels": {
+      "e01": [
+        635.2471928320508,
+        413.8827262462362
+      ],
+      "e02": [
+        635.2471928320508,
+        584.1172737537638
+      ],
+      "e05": [
+        1299.9,
+        500.0
+      ],
+      "e06": [
+        1757.1,
+        504.75
+      ],
+      "e07": [
+        759.7333333333332,
+        895.0
+      ]
+    },
+    "junctionGlyphs": {
+      "split": {
+        "hub": [
+          495.0,
+          515.0
+        ],
+        "circleRadius": 20,
+        "segments": [
+          [
+            [
+              441.0,
+              515.0
+            ],
+            [
+              495.0,
+              515.0
+            ]
+          ],
+          [
+            [
+              495.0,
+              515.0
+            ],
+            [
+              547.0,
+              484.0
+            ]
+          ],
+          [
+            [
+              495.0,
+              515.0
+            ],
+            [
+              547.0,
+              546.0
+            ]
+          ]
+        ],
+        "inputs": [
+          {
+            "point": [
+              441.0,
+              515.0
+            ],
+            "tangent": [
+              1.0,
+              0.0
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "point": [
+              547.0,
+              484.0
+            ],
+            "tangent": [
+              0.8589469742085634,
+              -0.5120645423166436
+            ]
+          },
+          {
+            "point": [
+              547.0,
+              546.0
+            ],
+            "tangent": [
+              0.8589469742085634,
+              0.5120645423166436
+            ]
+          }
+        ],
+        "labelBaselines": [
+          574.0,
+          599.0
+        ]
+      },
+      "join": {
+        "hub": [
+          1164.8,
+          516.0
+        ],
+        "circleRadius": null,
+        "segments": [
+          [
+            [
+              1084.8,
+              484.0
+            ],
+            [
+              1164.8,
+              516.0
+            ]
+          ],
+          [
+            [
+              1084.8,
+              548.0
+            ],
+            [
+              1164.8,
+              516.0
+            ]
+          ],
+          [
+            [
+              1164.8,
+              516.0
+            ],
+            [
+              1224.8,
+              516.0
+            ]
+          ]
+        ],
+        "inputs": [
+          {
+            "point": [
+              1084.8,
+              484.0
+            ],
+            "tangent": [
+              0.9284766908852594,
+              0.3713906763541037
+            ]
+          },
+          {
+            "point": [
+              1084.8,
+              548.0
+            ],
+            "tangent": [
+              0.9284766908852594,
+              -0.3713906763541037
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "point": [
+              1224.8,
+              516.0
+            ],
+            "tangent": [
+              1.0,
+              0.0
+            ]
+          }
+        ],
+        "labelBaselines": [
+          575.0,
+          600.0
+        ]
+      }
+    },
+    "edgeAnchors": {
+      "e00": {
+        "source": {
+          "point": [
+            360.0,
+            515.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        },
+        "target": {
+          "point": [
+            441.0,
+            515.0
+          ],
+          "tangent": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      "e01": {
+        "source": {
+          "point": [
+            547.0,
+            484.0
+          ],
+          "tangent": [
+            0.8589469742085634,
+            -0.5120645423166436
+          ]
+        },
+        "target": {
+          "point": [
+            719.75,
+            403.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        }
+      },
+      "e02": {
+        "source": {
+          "point": [
+            547.0,
+            546.0
+          ],
+          "tangent": [
+            0.8589469742085634,
+            0.5120645423166436
+          ]
+        },
+        "target": {
+          "point": [
+            719.75,
+            627.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        }
+      },
+      "e03": {
+        "source": {
+          "point": [
+            1019.75,
+            403.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        },
+        "target": {
+          "point": [
+            1084.8,
+            484.0
+          ],
+          "tangent": [
+            0.9284766908852594,
+            0.3713906763541037
+          ]
+        }
+      },
+      "e04": {
+        "source": {
+          "point": [
+            1019.75,
+            627.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        },
+        "target": {
+          "point": [
+            1084.8,
+            548.0
+          ],
+          "tangent": [
+            0.9284766908852594,
+            -0.3713906763541037
+          ]
+        }
+      },
+      "e05": {
+        "source": {
+          "point": [
+            1224.8,
+            516.0
+          ],
+          "tangent": [
+            1.0,
+            0.0
+          ]
+        },
+        "target": {
+          "point": [
+            1375.0,
+            516.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        }
+      }
+    },
+    "boundaries": [],
+    "supportY": 832.0,
+    "legendY": 1102.0,
+    "engine": "Graphviz dot 14.1.2 + primitive connection anchors + semantic I/E/O aggregate interiors"
+  },
+  "topology": {
+    "activation": {
+      "ancestors": [],
+      "descendants": [
+        "certified",
+        "check",
+        "deny-probe",
+        "join",
+        "permit-probe",
+        "split"
+      ]
+    },
+    "deny-probe": {
+      "ancestors": [
+        "activation",
+        "split"
+      ],
+      "descendants": [
+        "certified",
+        "check",
+        "join"
+      ]
+    },
+    "permit-probe": {
+      "ancestors": [
+        "activation",
+        "split"
+      ],
+      "descendants": [
+        "certified",
+        "check",
+        "join"
+      ]
+    },
+    "check": {
+      "ancestors": [
+        "activation",
+        "deny-probe",
+        "join",
+        "permit-probe",
+        "split"
+      ],
+      "descendants": [
+        "certified"
+      ]
+    },
+    "certified": {
+      "ancestors": [
+        "activation",
+        "check",
+        "deny-probe",
+        "join",
+        "permit-probe",
+        "split"
+      ],
+      "descendants": []
+    },
+    "port": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "provider": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "proof": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "split": {
+      "ancestors": [
+        "activation"
+      ],
+      "descendants": [
+        "certified",
+        "check",
+        "deny-probe",
+        "join",
+        "permit-probe"
+      ]
+    },
+    "join": {
+      "ancestors": [
+        "activation",
+        "deny-probe",
+        "permit-probe",
+        "split"
+      ],
+      "descendants": [
+        "certified",
+        "check"
+      ]
+    }
+  },
+  "aggregationEvidence": {
+    "aggregate:interlock-agent-operation": {
+      "TARGET": 9,
+      "GAP": 1
+    }
+  },
+  "contractSha256": "69ed238814e10aa35fa9bbbf052a74097fd0b4639d7cb2637135d5e5a3bebd65",
+  "geometryFindings": [],
+  "junctionGeometryProof": {
+    "checkedContacts": 6,
+    "maxContactErrorSvgUnits": 0.0,
+    "maxTangentErrorDegrees": 1.574107032982335e-14,
+    "measurements": [
+      {
+        "junctionId": "split",
+        "edgeId": "e00",
+        "side": "target",
+        "contactErrorSvgUnits": 0.0,
+        "tangentErrorDegrees": 0.0
+      },
+      {
+        "junctionId": "split",
+        "edgeId": "e01",
+        "side": "source",
+        "contactErrorSvgUnits": 0.0,
+        "tangentErrorDegrees": 0.0
+      },
+      {
+        "junctionId": "split",
+        "edgeId": "e02",
+        "side": "source",
+        "contactErrorSvgUnits": 0.0,
+        "tangentErrorDegrees": 0.0
+      },
+      {
+        "junctionId": "join",
+        "edgeId": "e03",
+        "side": "target",
+        "contactErrorSvgUnits": 0.0,
+        "tangentErrorDegrees": 1.574107032982335e-14
+      },
+      {
+        "junctionId": "join",
+        "edgeId": "e04",
+        "side": "target",
+        "contactErrorSvgUnits": 0.0,
+        "tangentErrorDegrees": 0.0
+      },
+      {
+        "junctionId": "join",
+        "edgeId": "e05",
+        "side": "source",
+        "contactErrorSvgUnits": 0.0,
+        "tangentErrorDegrees": 0.0
+      }
+    ],
+    "findings": []
+  }
+}

@@ -18,6 +18,8 @@ export default function MechanicsPage() {
   const kinds = [...new Set(mechanics.map((m) => m.mechanicKind).filter((k): k is string => Boolean(k)))].sort();
 
   const items: CatalogItem[] = mechanics.map((mechanic) => ({
+    kind: mechanic.kind,
+    visuals: mechanic.visuals,
     id: mechanic.entityId,
     href: `/mechanics/${mechanic.urlKey}`,
     title: mechanic.title,

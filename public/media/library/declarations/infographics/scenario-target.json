@@ -1,0 +1,457 @@
+{
+  "contractVersion": "infographic-projection.v1",
+  "grammarVersion": "sidefx-infographic-grammar.v1",
+  "id": "scenario-target",
+  "title": "Prove both sides of the boundary.",
+  "subtitle": "One intended certification scenario · fan-out → join → validation",
+  "altitude": "scenario",
+  "scope": "Explicit target design. Animated outcomes do not establish current implementation or completed proof.",
+  "sources": [
+    {
+      "id": "runtime",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Exact runtime execution plan",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "capsule",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Verified capsule evidence package",
+      "encoding": "json"
+    },
+    {
+      "id": "story",
+      "path": "declarations/episode-01-direction.json",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d",
+      "pointer": "",
+      "kind": "STAGING",
+      "label": "Fictional human experience",
+      "encoding": "json"
+    },
+    {
+      "id": "target",
+      "path": "declarations/infographic-design-intent.v1.json",
+      "sha256": "ef389df72699c9be8028ac9daeddb7a3251e34f34594805ccb256c2973dfdae9",
+      "pointer": "",
+      "kind": "TARGET",
+      "label": "Intended visual circuit",
+      "encoding": "json"
+    },
+    {
+      "id": "gap",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649",
+      "pointer": "",
+      "kind": "GAP",
+      "label": "Missing live enforcement and testimony",
+      "encoding": "json"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "domain": "Governed agent work",
+      "scenarioIds": [
+        "certification"
+      ],
+      "coverage": "One intended scenario",
+      "sourceRefs": [
+        "target"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "certification",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Two-sided live certification",
+      "nodeIds": [
+        "activation",
+        "deny-probe",
+        "permit-probe",
+        "check",
+        "certified",
+        "split",
+        "join"
+      ],
+      "sourceRefs": [
+        "target"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "activation",
+      "type": "input",
+      "label": "Exact activation",
+      "detail": "One session / workspace / policy",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "deny-probe",
+      "type": "event",
+      "label": "Deny unmanaged probe",
+      "detail": "Observe no effect",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "permit-probe",
+      "type": "event",
+      "label": "Permit read-only probe",
+      "detail": "Observe the declared effect",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "check",
+      "type": "validation",
+      "label": "Match identities",
+      "detail": "Session, coverage, time, authority",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "certified",
+      "type": "outcome",
+      "label": "Scoped boundary",
+      "detail": "Only if every obligation closes",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "port",
+      "type": "provider-port",
+      "label": "Live probe port",
+      "detail": "Responsibility remains to be supplied",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "provider",
+      "type": "provider",
+      "label": "Hook runtime candidate",
+      "detail": "Candidate / not observed",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "proof",
+      "type": "evidence",
+      "label": "Required probe testimony",
+      "detail": "Not an observed receipt",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "GAP",
+      "sourceRefs": [
+        "gap"
+      ],
+      "layer": "support",
+      "closure": "Execute both probes in the same exact live session; bind actual effects and ordered identities."
+    }
+  ],
+  "junctions": [
+    {
+      "id": "split",
+      "type": "fan-out",
+      "label": "Both probes",
+      "detail": "Same identity envelope",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "join",
+      "type": "convergence",
+      "label": "Both results",
+      "detail": "ALL / 2 of 2",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certification",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ],
+      "layer": "mechanic",
+      "join": "all"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e00",
+      "source": "activation",
+      "target": "split",
+      "type": "transition",
+      "label": "",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e01",
+      "source": "split",
+      "target": "deny-probe",
+      "type": "transition",
+      "label": "dependent 1",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e02",
+      "source": "split",
+      "target": "permit-probe",
+      "type": "transition",
+      "label": "dependent 2",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e03",
+      "source": "deny-probe",
+      "target": "join",
+      "type": "transition",
+      "label": "",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e04",
+      "source": "permit-probe",
+      "target": "join",
+      "type": "transition",
+      "label": "",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e05",
+      "source": "join",
+      "target": "check",
+      "type": "transition",
+      "label": "both arrived",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e06",
+      "source": "check",
+      "target": "certified",
+      "type": "transition",
+      "label": "matching proof",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e07",
+      "source": "provider",
+      "target": "port",
+      "type": "provider-binding",
+      "label": "candidate",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e08",
+      "source": "port",
+      "target": "deny-probe",
+      "type": "dependency",
+      "label": "probe responsibility",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e09",
+      "source": "port",
+      "target": "permit-probe",
+      "type": "dependency",
+      "label": "probe responsibility",
+      "basis": "TARGET",
+      "sourceRefs": [
+        "target"
+      ]
+    },
+    {
+      "id": "e10",
+      "source": "proof",
+      "target": "certified",
+      "type": "evidence-attachment",
+      "label": "required to establish",
+      "basis": "GAP",
+      "sourceRefs": [
+        "gap"
+      ]
+    }
+  ],
+  "providers": [
+    {
+      "nodeId": "provider",
+      "portIds": [
+        "port"
+      ],
+      "binding": "candidate",
+      "state": "candidate"
+    }
+  ],
+  "humanAnchors": [
+    {
+      "person": "Operator",
+      "input": "An operator needs to trust the exact boundary.",
+      "event": "Both denial and permitted work must be observed.",
+      "outcome": "Confidence comes from scoped evidence, not an activation label.",
+      "basis": "STAGING",
+      "sourceRefs": [
+        "story"
+      ]
+    }
+  ],
+  "visualLayers": [
+    "human",
+    "mechanic",
+    "support"
+  ],
+  "animationBeats": [
+    {
+      "phase": "Establish",
+      "caption": "Start with one exact activation identity.",
+      "entityIds": [
+        "activation"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Activate",
+      "caption": "Fan-out supplies both required dependents. It does not choose one.",
+      "entityIds": [
+        "split",
+        "provider",
+        "port"
+      ],
+      "edgeIds": [
+        "e00",
+        "e07"
+      ]
+    },
+    {
+      "phase": "Execute",
+      "caption": "Join waits for both arrivals, then identity validation applies.",
+      "entityIds": [
+        "deny-probe",
+        "permit-probe",
+        "join",
+        "check"
+      ],
+      "edgeIds": [
+        "e01",
+        "e02",
+        "e03",
+        "e04",
+        "e05",
+        "e08",
+        "e09"
+      ]
+    },
+    {
+      "phase": "Resolve",
+      "caption": "The target outcome remains conditional on complete matching proof.",
+      "entityIds": [
+        "certified"
+      ],
+      "edgeIds": [
+        "e06"
+      ]
+    },
+    {
+      "phase": "Prove",
+      "caption": "Required testimony stays GAP / REQUIRED throughout the animation.",
+      "entityIds": [
+        "proof"
+      ],
+      "edgeIds": [
+        "e10"
+      ]
+    }
+  ],
+  "zoomAggregations": [
+    {
+      "id": "aggregate:interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "altitude": "capability",
+      "memberIds": [
+        "activation",
+        "deny-probe",
+        "permit-probe",
+        "check",
+        "certified",
+        "port",
+        "provider",
+        "proof",
+        "split",
+        "join"
+      ]
+    }
+  ],
+  "scenarioRelationships": []
+}

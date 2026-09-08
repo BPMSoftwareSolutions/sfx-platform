@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"compare-governed-invocation-terms","viewId":"n-06f493b197be8b27d9934775"};

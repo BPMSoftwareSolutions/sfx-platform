@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"curate-bounded-scenario-authority-fragment-defect","viewId":"n-efe75904b7d1bde7dba8193c"};

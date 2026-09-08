@@ -22,13 +22,14 @@ const ROOT = resolve(HERE, '..');
 const OUT_DIR = join(ROOT, 'generated');
 const OUT_FILE = join(OUT_DIR, 'estate-publication.json');
 
-const ADAPTER_VERSION = 'estate-publication-adapter/1.0.0';
+const ADAPTER_VERSION = 'estate-publication-adapter/1.1.0';
 const CONTRACT_VERSION = '1.0.0';
 const SCL_VERSION = '0.2';
 const RENDERER_VERSION = 'boundary-projection/1.0.0';
 
 /** Default source: the executed read-only inventory query recorded by the database repo (§14.1). */
-const DEFAULT_SOURCE = 'C:/lab/sidefx-database/data/website-visuals/inventory-2026-09-08.json';
+const DEFAULT_SOURCE = 'C:/lab/sidefx-database/data/media/website-inventory.json';
+let selectedVisuals = [];
 
 /**
  * §11.4 step 2 — the explicit public allow-list. Only these source fields may leave the
@@ -140,22 +141,23 @@ function intOf(value) {
 
 /** §12.7 — every core entity carries a visual requirement, whether or not an image exists. */
 function visualRequirements(subjectKind, semanticObjectPk, semanticObjectDefinitionPk, purposes) {
-  return purposes.map((purpose) => ({
+  return purposes.map((purpose) => {
+    const selected = selectedVisuals.find(v => v.kind === subjectKind && v.objectPk === semanticObjectPk && v.definitionPk === semanticObjectDefinitionPk && v.purpose === purpose);
+    return ({
     subjectKind,
     semanticObjectPk,
     semanticObjectDefinitionPk,
     purpose,
-    // No media service is connected in this build, so every requirement is open (§11.5).
-    state: 'REQUIRED',
-    assetRevisionId: null,
-    originalDigest: null,
-    mediaType: null,
-    width: null,
-    height: null,
-    altText: null,
-    generatorModel: null,
-    publishedUrl: null,
-  }));
+    state: selected ? 'READY' : 'REQUIRED',
+    assetRevisionId: selected?.revision ?? null,
+    originalDigest: selected ? `sha256:${selected.originalDigest}` : null,
+    mediaType: selected?.mediaType ?? null,
+    width: selected?.width ?? null,
+    height: selected?.height ?? null,
+    altText: selected?.altText ?? null,
+    generatorModel: selected?.model ?? null,
+    publishedUrl: selected?.url ?? null,
+  }); });
 }
 
 /**
@@ -255,11 +257,15 @@ function build(sourcePath) {
   if (raw.disposition !== 'READ_QUERY_COMPLETE') {
     throw new Error(`Source disposition is ${raw.disposition}; refusing to publish.`);
   }
-  if (!Array.isArray(rs) || rs.length < 9) {
+  if (!Array.isArray(rs) || rs.length !== 10) {
     throw new Error('Source does not carry the expected recordset shape.');
   }
 
   const [meta] = rs[0];
+  const media = JSON.parse(readFileSync(join(OUT_DIR, 'visual-publication.json'), 'utf8'));
+  if (`sha256:${media.source.snapshotDigest}` !== raw.snapshotId || `sha256:${media.source.mappingDigest}` !== raw.projectionDigest) throw new Error('Media and estate source generations differ.');
+  selectedVisuals = media.visuals;
+  const capabilityRows = rs[9];
   const kindCounts = Object.fromEntries(
     rs[1].map((r) => [r.object_kind, { definitions: intOf(r.selected_definitions), identities: intOf(r.selected_identities) }]),
   );
@@ -275,7 +281,7 @@ function build(sourcePath) {
   const actual = [
     rs[0].length, rs[1].length, rs[2].length, mechanicRows.length,
     relationshipRows.length, providerRows.length, scenarioRows.length,
-    blueprintRows.length, rs[8].length,
+    blueprintRows.length, rs[8].length, capabilityRows.length,
   ];
   declared.forEach((n, i) => {
     if (n !== actual[i]) {
@@ -380,14 +386,19 @@ function build(sourcePath) {
   }
 
   const circuits = [];
-  const capabilities = [...facesByCapability.keys()].sort().map((capabilityId) => {
-    const faces = facesByCapability.get(capabilityId).sort((a, b) => a.scenario_id.localeCompare(b.scenario_id));
+  const capabilities = capabilityRows.map((sourceCapability) => {
+    const capabilityId = sourceCapability.capability_id;
+    const faces = (facesByCapability.get(capabilityId) ?? []).sort((a, b) => a.scenario_id.localeCompare(b.scenario_id));
     const bps = blueprintsByCapability.get(capabilityId) ?? [];
 
     for (const face of faces) circuits.push(compileScenarioCircuit(face, bps));
+    if (!faces.length) {
+      const graph = { nodes: [{id:'scenario-unresolved',primitive:'UNRESOLVED',label:'No scenario is declared in this selection',sourceId:null,state:sourceState(null)}], edges: [] };
+      circuits.push({capabilityId,scenarioId:null,sourceProfile:'estate-capability-boundary.v1',sourceDigest:stableDigest(sourceCapability),graphDigest:stableDigest(graph),sclVersion:SCL_VERSION,rendererVersion:RENDERER_VERSION,lens:'CAPABILITY_OVERVIEW',fidelity:'PARTIAL_BOUNDARY',...graph,diagnostics:[{code:'SCENARIO_NOT_DECLARED',message:'The selected capability has no scenario face. Its identity and unresolved scenario slot remain visible.'}]});
+    }
 
     const capabilityCircuits = circuits.filter((c) => c.capabilityId === capabilityId);
-    const graphFidelity = capabilityCircuits.some((c) => c.fidelity === 'PARTIAL_BOUNDARY')
+    const graphFidelity = !faces.length || capabilityCircuits.some((c) => c.fidelity === 'PARTIAL_BOUNDARY')
       ? 'PARTIAL_BOUNDARY'
       : 'BOUNDARY';
 
@@ -401,13 +412,12 @@ function build(sourcePath) {
       }
     }
 
-    const semanticObjectPk = String(faces[0].semantic_object_pk);
-    const semanticObjectDefinitionPk = String(faces[0].semantic_object_definition_pk);
+    const semanticObjectPk = String(sourceCapability.semantic_object_pk);
+    const semanticObjectDefinitionPk = String(sourceCapability.semantic_object_definition_pk);
 
     return {
       kind: 'CAPABILITY',
-      // This generation does not carry a capability namespace; §11.2 keeps that gap visible.
-      namespaceId: null,
+      namespaceId: sourceCapability.namespace_id,
       urlNamespace: 'estate',
       urlNamespaceIsPublicationAssigned: true,
       entityId: capabilityId,
@@ -416,7 +426,7 @@ function build(sourcePath) {
       semanticObjectDefinitionPk,
       title: readableFromIdentity(capabilityId),
       titleIsIdentityFallback: true,
-      summary: null,
+      summary: sourceCapability.intent ?? null,
       definitionProfile: null,
       scope: 'MANAGED',
       scenarios: faces.map((f) => ({
@@ -431,6 +441,7 @@ function build(sourcePath) {
         responsibility: f.responsibility,
         inputContractState: sourceState(f.input_contract_state),
         eventAuthorityState: sourceState(f.event_authority_state),
+        visuals: visualRequirements('SCENARIO', String(f.semantic_object_pk), String(f.semantic_object_definition_pk), ['CARD', 'DETAIL']),
       })),
       blueprints: bps.map((b) => ({
         blueprintId: b.blueprint_id,
@@ -450,16 +461,16 @@ function build(sourcePath) {
           'No export manifest resolves in this publication: the capability export adapter is not connected in this build.',
       },
       relatedCapabilityIds: [...related].sort().slice(0, 8),
-      visuals: visualRequirements('CAPABILITY', semanticObjectPk, semanticObjectDefinitionPk, ['CARD', 'DETAIL', 'SHARING']),
+      visuals: visualRequirements('CAPABILITY', semanticObjectPk, semanticObjectDefinitionPk, ['CARD', 'DETAIL']),
     };
   });
 
   // §11.2 — do not reconcile a count difference silently; publish it as a finding.
-  if (capabilities.length !== managedCapabilities) {
+  if (facesByCapability.size !== managedCapabilities) {
     findings.push({
       code: 'MANAGED_CAPABILITY_WITHOUT_SCENARIO_FACE',
-      message: `The selected model records ${managedCapabilities} managed capabilities; ${capabilities.length} carry at least one scenario face in this generation.`,
-      count: Math.abs(managedCapabilities - capabilities.length),
+      message: `The selected model records ${managedCapabilities} managed capabilities; ${facesByCapability.size} carry at least one scenario face in this generation.`,
+      count: Math.abs(managedCapabilities - facesByCapability.size),
     });
   }
 
@@ -475,6 +486,7 @@ function build(sourcePath) {
 
   const allVisuals = [
     ...capabilities.flatMap((c) => c.visuals),
+    ...capabilities.flatMap((c) => c.scenarios.flatMap(s => s.visuals)),
     ...mechanics.flatMap((m) => m.visuals),
     ...providers.flatMap((p) => p.visuals),
   ];
@@ -483,7 +495,7 @@ function build(sourcePath) {
     findings.push({
       code: 'ENTITY_VISUALS_OUTSTANDING',
       message:
-        'No reviewed entity artwork is stored in this publication. Every capability, mechanic and provider carries an open visual requirement (§12.7).',
+        'Some entity artwork is still in production. Every capability, scenario, mechanic and provider remains included in visual coverage.',
       count: allVisuals.length - visualsReady,
     });
   }

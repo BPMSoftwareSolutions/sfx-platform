@@ -31,7 +31,7 @@ export default function ContactPage({ searchParams }: { searchParams: Promise<{ 
       />
 
       <Section labelledBy="form">
-        <SectionHeader id="form" eyebrow="Send an inquiry" title="We reply to the address you give us." />
+        <SectionHeader id="form" eyebrow="Contact form" title="Inquiry delivery is coming soon." />
         <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div>
             <Suspense
@@ -48,8 +48,8 @@ export default function ContactPage({ searchParams }: { searchParams: Promise<{ 
           <aside className="space-y-4">
             <Callout tone="note" title="What happens to what you send">
               <p>
-                Your message is validated, rate-limited and recorded with an inquiry reference before
-                we acknowledge it. Contact details are never sent to analytics.
+                Contact delivery is not available yet. Keep a copy of your message; this deployment
+                cannot accept or deliver an inquiry. Contact details are never sent to analytics.
               </p>
               <p className="mt-2">
                 <Link href={ROUTES.privacy.href} className="text-signal underline">
@@ -59,9 +59,8 @@ export default function ContactPage({ searchParams }: { searchParams: Promise<{ 
             </Callout>
             <Callout tone="limitation" title="Delivery configuration">
               <p>
-                Mail delivery depends on a configured recipient and provider, which are release
-                dependencies. Where they are not configured, the acknowledgement says the inquiry was
-                recorded rather than claiming it was emailed.
+                A durable inquiry store and delivery worker must be connected before this form can
+                accept submissions. A failed submission keeps your values available to copy.
               </p>
             </Callout>
           </aside>

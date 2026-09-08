@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"represent-capsule-estate-mcp-failure","viewId":"n-bda171b31822a8f37cc35e03"};

@@ -48,7 +48,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
   }
 
   return (
-    <div>
+    <div className="circuit-surface">
       {circuits.length > 1 ? (
         <div className="mb-4">
           <label
@@ -59,7 +59,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
           </label>
           <select
             id="scenario-select"
-            value={circuit.scenarioId}
+            value={circuit.scenarioId??''}
             onChange={(event) => {
               // A scenario change clears a node selection belonging to the previous scenario.
               setScenarioId(event.target.value);
@@ -69,7 +69,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
             className="mt-2 w-full max-w-xl rounded border border-grid-line bg-ink px-3 py-2 text-sm"
           >
             {circuits.map((c) => (
-              <option key={c.scenarioId} value={c.scenarioId}>
+              <option key={c.scenarioId??'overview'} value={c.scenarioId??''}>
                 {c.scenarioId}
               </option>
             ))}
@@ -82,7 +82,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
         selectedNodeId={nodeId}
         onSelectNode={(next) => {
           setNodeId(next);
-          syncUrl(circuit.scenarioId, next);
+          syncUrl(circuit.scenarioId??'', next);
         }}
       />
 
@@ -94,7 +94,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
             <ul className="mt-2 space-y-1">
               {circuits.map((c) => (
                 <li key={c.scenarioId}>
-                  <a href={`?scenario=${encodeURIComponent(c.scenarioId)}`} className="text-sm text-signal underline">
+                  <a href={`?scenario=${encodeURIComponent(c.scenarioId??'')}`} className="text-sm text-signal underline">
                     {c.scenarioId}
                   </a>
                 </li>

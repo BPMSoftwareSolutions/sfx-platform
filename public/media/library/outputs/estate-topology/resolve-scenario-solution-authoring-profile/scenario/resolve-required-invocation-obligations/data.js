@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-required-invocation-obligations","viewId":"n-b1b54c278396a8f19f0ee1ee"};

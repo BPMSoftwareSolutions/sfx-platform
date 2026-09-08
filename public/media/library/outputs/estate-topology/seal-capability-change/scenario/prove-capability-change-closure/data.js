@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"prove-capability-change-closure","viewId":"n-c99d32d7bed2fc441b0d810a"};

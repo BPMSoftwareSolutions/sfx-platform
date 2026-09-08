@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"establish-human-capability-ownership-review-receipt","viewId":"n-519dc31cb5522da6d393bfec"};

@@ -1,0 +1,41 @@
+{
+  "assetId": "rejection",
+  "provider": "Gemini",
+  "model": "gemini-3-pro-image",
+  "requestSha256": "44bbdbf78b84f362eb2fc56ef95aba912a3af7a6f273061b45b4a7f0f66d7fce",
+  "grammarSha256": "41a585107d0b9a02e13490493fc781b95171fb58fccab748fbbdbe59401e3bf1",
+  "guideSha256": "2104a5e895a23018b0000ae69f1a78f61e1b12ef72afdbc953f4c9f374312ad3",
+  "styleReferenceSha256": "a142be600981ba0c0454fe9b27ede09cec00fff6ac4ae7ab8d6f609c6b878b77",
+  "semanticReview": "REQUIRED",
+  "status": "GENERATED",
+  "image": "outputs/component-enhancements/rejection/44bbdbf78b84f362eb2fc56ef95aba912a3af7a6f273061b45b4a7f0f66d7fce.jpg",
+  "imageSha256": "3fa86cdc89a0d9a752b20e08dcc7509a51e8065d5816f236ca764e8f875b4169",
+  "width": 1024,
+  "height": 1024,
+  "usage": {
+    "promptTokenCount": 951,
+    "candidatesTokenCount": 1334,
+    "totalTokenCount": 2531,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 435
+      },
+      {
+        "modality": "IMAGE",
+        "tokenCount": 516
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 1120
+      }
+    ],
+    "thoughtsTokenCount": 246,
+    "serviceTier": "standard"
+  },
+  "finishReasons": [
+    "STOP"
+  ]
+}

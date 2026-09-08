@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { EntityArt } from '@/components/estate/entity-art';
 
 import { Callout, FactList, Hero, NotDeclared, Section, SectionHeader, StatusBadge } from '@/components/ui';
 import { findProvider, getMechanics, getProviders } from '@/lib/estate';
@@ -37,7 +38,7 @@ export default async function ProviderDetailPage({ params }: Params) {
 
   return (
     <>
-      <Hero eyebrow="Provider" eyebrowHref={ROUTES.providers.href} title={provider.title}>
+      <Hero eyebrow="Provider" eyebrowHref={ROUTES.providers.href} title={provider.title} media={<EntityArt visuals={provider.visuals} title={provider.title} kind="PROVIDER" priority/>}>
         <div className="flex flex-wrap gap-2">
           <StatusBadge tone="authority">{provider.entityId}</StatusBadge>
           <StatusBadge tone={provider.mechanicIds.length > 0 ? 'signal' : 'neutral'}>

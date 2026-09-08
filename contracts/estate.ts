@@ -82,6 +82,7 @@ export const ScenarioFace = z.object({
   responsibility: unknownable(z.string()),
   inputContractState: SourceState,
   eventAuthorityState: SourceState,
+  visuals: z.array(EntityVisual),
 });
 export type ScenarioFace = z.infer<typeof ScenarioFace>;
 
@@ -108,7 +109,7 @@ export type CircuitEdge = z.infer<typeof CircuitEdge>;
 /** §11.3 — CircuitProjection. Topology is deterministic; nothing here is generated art. */
 export const CircuitProjection = z.object({
   capabilityId: z.string(),
-  scenarioId: z.string(),
+  scenarioId: z.string().nullable(),
   /** The exact source profile this graph was compiled from. */
   sourceProfile: z.string(),
   sourceDigest: Digest,

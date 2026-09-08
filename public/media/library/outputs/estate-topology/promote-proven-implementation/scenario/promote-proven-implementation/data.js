@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"promote-proven-implementation","viewId":"n-034c66e671266a0cfb054fa3"};

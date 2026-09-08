@@ -1,0 +1,173 @@
+{
+  "kind": "TARGET_REFERENCE_SIMULATION",
+  "liveEffects": false,
+  "ruleSource": {
+    "id": "target",
+    "path": "declarations/episode-01-target-interlock.json",
+    "kind": "TARGET_DESIGN",
+    "sha256": "5e44ae86376dfce0db5b706c5a2a7cd29a135039b525b36ca698773c32391f4e"
+  },
+  "cases": [
+    {
+      "id": "publication",
+      "title": "Publish when authorized to inspect",
+      "request": "Publish candidate capsule",
+      "facts": {
+        "identityBound": true,
+        "coveredPath": true,
+        "liveBoundaryProven": true,
+        "operatorRequired": false,
+        "legalAlternativeAvailable": true,
+        "withinAuthority": false
+      },
+      "expected": "RESOLVE",
+      "decision": "RESOLVE",
+      "reason": "REQUEST_OUTSIDE_ADMITTED_SCOPE",
+      "next": "Inspect the candidate under the existing authority; keep publication pending.",
+      "simulatedEffect": {
+        "dispatched": false,
+        "artifact": null,
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    },
+    {
+      "id": "inspection",
+      "title": "Inspect the candidate",
+      "request": "Inspect candidate capsule",
+      "facts": {
+        "identityBound": true,
+        "coveredPath": true,
+        "liveBoundaryProven": true,
+        "operatorRequired": false,
+        "legalAlternativeAvailable": false,
+        "withinAuthority": true
+      },
+      "expected": "PERMIT",
+      "decision": "PERMIT",
+      "reason": "EXACT_REQUEST_WITHIN_PROVEN_BOUNDARY",
+      "next": "Dispatch only this admitted inspection and bind its result to the decision.",
+      "simulatedEffect": {
+        "dispatched": true,
+        "artifact": "Candidate inspection report",
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    },
+    {
+      "id": "operator",
+      "title": "Operation requires an operator",
+      "request": "Apply operator-controlled policy change",
+      "facts": {
+        "identityBound": true,
+        "coveredPath": true,
+        "liveBoundaryProven": true,
+        "operatorRequired": true,
+        "legalAlternativeAvailable": false,
+        "withinAuthority": true
+      },
+      "expected": "OPERATOR_REQUIRED",
+      "decision": "OPERATOR_REQUIRED",
+      "reason": "SEPARATE_OPERATOR_AUTHORITY_REQUIRED",
+      "next": "Wait for an authenticated operator decision; the agent cannot approve itself.",
+      "simulatedEffect": {
+        "dispatched": false,
+        "artifact": null,
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    },
+    {
+      "id": "uncovered",
+      "title": "An uncovered tool path",
+      "request": "Invoke a tool outside the certified hook path",
+      "facts": {
+        "identityBound": true,
+        "coveredPath": false,
+        "liveBoundaryProven": true,
+        "operatorRequired": false,
+        "legalAlternativeAvailable": false,
+        "withinAuthority": true
+      },
+      "expected": "HOLD",
+      "decision": "HOLD",
+      "reason": "TOOL_PATH_UNCOVERED",
+      "next": "Establish coverage for this exact path; keep the effect pending.",
+      "simulatedEffect": {
+        "dispatched": false,
+        "artifact": null,
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    },
+    {
+      "id": "unproven",
+      "title": "The live probe evidence is absent",
+      "request": "Inspect candidate capsule",
+      "facts": {
+        "identityBound": true,
+        "coveredPath": true,
+        "liveBoundaryProven": false,
+        "operatorRequired": false,
+        "legalAlternativeAvailable": false,
+        "withinAuthority": true
+      },
+      "expected": "HOLD",
+      "decision": "HOLD",
+      "reason": "LIVE_BOUNDARY_UNPROVEN",
+      "next": "Obtain same-session deny and permit probe evidence.",
+      "simulatedEffect": {
+        "dispatched": false,
+        "artifact": null,
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    },
+    {
+      "id": "identity-drift",
+      "title": "Session identity changed",
+      "request": "Inspect candidate capsule",
+      "facts": {
+        "identityBound": false,
+        "coveredPath": true,
+        "liveBoundaryProven": true,
+        "operatorRequired": false,
+        "legalAlternativeAvailable": false,
+        "withinAuthority": true
+      },
+      "expected": "HOLD",
+      "decision": "HOLD",
+      "reason": "SESSION_IDENTITY_UNBOUND",
+      "next": "Bind the exact capability, workspace, session, and policy identities.",
+      "simulatedEffect": {
+        "dispatched": false,
+        "artifact": null,
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    },
+    {
+      "id": "denied",
+      "title": "No legal alternative is available",
+      "request": "Execute outside admitted authority",
+      "facts": {
+        "identityBound": true,
+        "coveredPath": true,
+        "liveBoundaryProven": true,
+        "operatorRequired": false,
+        "legalAlternativeAvailable": false,
+        "withinAuthority": false
+      },
+      "expected": "DENY",
+      "decision": "DENY",
+      "reason": "REQUEST_OUTSIDE_ADMITTED_SCOPE",
+      "next": "Request appropriate authority through its declared boundary; do not dispatch.",
+      "simulatedEffect": {
+        "dispatched": false,
+        "artifact": null,
+        "publicationExecuted": false
+      },
+      "kind": "TARGET_REFERENCE_SIMULATION"
+    }
+  ]
+}

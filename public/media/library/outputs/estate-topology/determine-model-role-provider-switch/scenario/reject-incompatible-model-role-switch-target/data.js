@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"reject-incompatible-model-role-switch-target","viewId":"n-ceb1accb06e860a357207ab2"};

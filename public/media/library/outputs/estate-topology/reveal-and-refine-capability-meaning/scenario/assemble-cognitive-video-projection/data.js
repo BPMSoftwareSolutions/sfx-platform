@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"assemble-cognitive-video-projection","viewId":"n-8141818af2aeba2f36eb8fe0"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"resolve-admitted-market-facts","viewId":"n-67000464358a8b4c57bf90d9"};

@@ -1,0 +1,200 @@
+{
+  "id": "capability-current",
+  "baseSvgSha256": "15294944fbafbd81568d8abceddb05424da3386586fca4789ab7f1d89699df1c",
+  "enhancedSvgSha256": "15e73753a25cfbe06302591144ea881aa22de34cf34b633400125a21aac2f32b",
+  "contractSha256": "4dbb9fd66196fec218aed8f623b961968e254ee8ff103333d280b35896d43e40",
+  "baseRecoveredExactly": true,
+  "maskProofs": [
+    {
+      "entityId": "s0-input",
+      "assetId": "input",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "s0-event",
+      "assetId": "event",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62010
+    },
+    {
+      "entityId": "s0-outcome",
+      "assetId": "outcome",
+      "guardCount": 7,
+      "guardLeakPixels": 0,
+      "materialPixels": 81678
+    },
+    {
+      "entityId": "s1-input",
+      "assetId": "input",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 64392
+    },
+    {
+      "entityId": "s1-event",
+      "assetId": "event",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 64728
+    },
+    {
+      "entityId": "s1-outcome",
+      "assetId": "outcome",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 69700
+    },
+    {
+      "entityId": "s2-input",
+      "assetId": "input",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "s2-event",
+      "assetId": "event",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62010
+    },
+    {
+      "entityId": "s2-outcome",
+      "assetId": "outcome",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 74383
+    },
+    {
+      "entityId": "s3-input",
+      "assetId": "input",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "s3-event",
+      "assetId": "event",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 64728
+    },
+    {
+      "entityId": "s3-outcome",
+      "assetId": "outcome",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 74383
+    },
+    {
+      "entityId": "s4-input",
+      "assetId": "input",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "s4-event",
+      "assetId": "event",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62010
+    },
+    {
+      "entityId": "s4-outcome",
+      "assetId": "outcome",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 74383
+    },
+    {
+      "entityId": "s5-input",
+      "assetId": "input",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "s5-event",
+      "assetId": "event",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62010
+    },
+    {
+      "entityId": "s5-outcome",
+      "assetId": "outcome",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 74383
+    },
+    {
+      "entityId": "s6-input",
+      "assetId": "input",
+      "guardCount": 4,
+      "guardLeakPixels": 0,
+      "materialPixels": 61658
+    },
+    {
+      "entityId": "s6-event",
+      "assetId": "event",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62010
+    },
+    {
+      "entityId": "s6-outcome",
+      "assetId": "outcome",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 74382
+    },
+    {
+      "entityId": "p0",
+      "assetId": "provider",
+      "guardCount": 6,
+      "guardLeakPixels": 0,
+      "materialPixels": 60444
+    },
+    {
+      "entityId": "port0",
+      "assetId": "provider-port",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62328
+    },
+    {
+      "entityId": "p1",
+      "assetId": "provider",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 59186
+    },
+    {
+      "entityId": "port1",
+      "assetId": "provider-port",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 62328
+    },
+    {
+      "entityId": "evidence",
+      "assetId": "evidence",
+      "guardCount": 5,
+      "guardLeakPixels": 0,
+      "materialPixels": 73521
+    }
+  ],
+  "junctionGeometryProof": {
+    "checkedContacts": 0,
+    "maxContactErrorSvgUnits": 0,
+    "maxTangentErrorDegrees": 0,
+    "measurements": [],
+    "findings": []
+  },
+  "manifestSha256": "6f35095fbfd1249c9912cb440986b2c80f3e0fb72337c0ed7440c01671cf4fa0",
+  "reviewSha256": "8f699c6661f3c75be38a69c2902f02fddb0a6442cc8ef62d32e9bc015cbe29c0"
+}

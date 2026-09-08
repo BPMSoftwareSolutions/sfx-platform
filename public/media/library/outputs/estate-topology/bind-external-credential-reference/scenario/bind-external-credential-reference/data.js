@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-external-credential-reference","viewId":"n-bb057f1beb0a6de23e8f5d46"};

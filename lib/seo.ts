@@ -18,6 +18,7 @@ interface PageMetaInput {
   image?: string;
   noindex?: boolean;
 }
+export const HOME_META:PageMetaInput={title:'SideFX — Own the meaning. Build what follows.',description:'Explore a living capability estate. See the scenarios, inspect the circuit, and understand the mechanics behind the work.',path:'/'};
 
 export function pageMetadata({ title, description, path, image, noindex }: PageMetaInput): Metadata {
   const url = new URL(path, SITE.origin).toString();

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"evaluate-capability-authority-admission","viewId":"n-16292d394365cfc88e53ca8d"};

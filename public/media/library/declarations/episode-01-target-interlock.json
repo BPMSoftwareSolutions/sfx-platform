@@ -1,0 +1,27 @@
+{
+  "contractVersion":"target-interlock.v1",
+  "mode":"TARGET_DESIGN_REFERENCE_SIMULATION",
+  "meaning":"Classify a pending effect before dispatch without widening the agent's admitted authority.",
+  "ruleOrder":"First matching rule wins; unmatched requests are held.",
+  "rules":[
+    {"id":"identity","field":"identityBound","equals":false,"decision":"HOLD","reason":"SESSION_IDENTITY_UNBOUND","next":"Bind the exact capability, workspace, session, and policy identities."},
+    {"id":"coverage","field":"coveredPath","equals":false,"decision":"HOLD","reason":"TOOL_PATH_UNCOVERED","next":"Establish coverage for this exact path; keep the effect pending."},
+    {"id":"proof","field":"liveBoundaryProven","equals":false,"decision":"HOLD","reason":"LIVE_BOUNDARY_UNPROVEN","next":"Obtain same-session deny and permit probe evidence."},
+    {"id":"operator","field":"operatorRequired","equals":true,"decision":"OPERATOR_REQUIRED","reason":"SEPARATE_OPERATOR_AUTHORITY_REQUIRED","next":"Wait for an authenticated operator decision; the agent cannot approve itself."},
+    {"id":"resolve","field":"legalAlternativeAvailable","equals":true,"decision":"RESOLVE","reason":"REQUEST_OUTSIDE_ADMITTED_SCOPE","next":"Inspect the candidate under the existing authority; keep publication pending."},
+    {"id":"deny","field":"withinAuthority","equals":false,"decision":"DENY","reason":"REQUEST_OUTSIDE_ADMITTED_SCOPE","next":"Request appropriate authority through its declared boundary; do not dispatch."},
+    {"id":"permit","field":"withinAuthority","equals":true,"decision":"PERMIT","reason":"EXACT_REQUEST_WITHIN_PROVEN_BOUNDARY","next":"Dispatch only this admitted inspection and bind its result to the decision."}
+  ],
+  "baseFacts":{"identityBound":true,"coveredPath":true,"liveBoundaryProven":true,"operatorRequired":false,"legalAlternativeAvailable":false,"withinAuthority":true},
+  "cases":[
+    {"id":"publication","title":"Publish when authorized to inspect","request":"Publish candidate capsule","facts":{"withinAuthority":false,"legalAlternativeAvailable":true},"expected":"RESOLVE"},
+    {"id":"inspection","title":"Inspect the candidate","request":"Inspect candidate capsule","facts":{},"expected":"PERMIT"},
+    {"id":"operator","title":"Operation requires an operator","request":"Apply operator-controlled policy change","facts":{"operatorRequired":true},"expected":"OPERATOR_REQUIRED"},
+    {"id":"uncovered","title":"An uncovered tool path","request":"Invoke a tool outside the certified hook path","facts":{"coveredPath":false},"expected":"HOLD"},
+    {"id":"unproven","title":"The live probe evidence is absent","request":"Inspect candidate capsule","facts":{"liveBoundaryProven":false},"expected":"HOLD"},
+    {"id":"identity-drift","title":"Session identity changed","request":"Inspect candidate capsule","facts":{"identityBound":false},"expected":"HOLD"},
+    {"id":"denied","title":"No legal alternative is available","request":"Execute outside admitted authority","facts":{"withinAuthority":false},"expected":"DENY"}
+  ],
+  "invariants":["Only PERMIT may reach the simulated effect stage.","A simulated inspection never changes publication authority.","RESOLVE proposes a new request; it does not execute the old request.","Operator control is separate from the governed agent channel.","No live commands, tools, hooks, or external effects are run by this reference simulation."],
+  "closureRequirements":["Actual pre-dispatch hook coverage for the exact tool path.","Same-session denial of an unmanaged probe and permission of a declared read-only probe.","Exact activation, session, workspace, adapter, daemon, policy, authority, and time identities.","Dispatch restricted to the admitted capability and mechanic.","Authenticated operator control that cannot be supplied by the agent.","Execution testimony binding the actual effect and outcome to its decision.","Fail-closed handling of uncovered paths, malformed requests, identity drift, and unavailable adjudication."]
+}

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-kernel-specification","viewId":"n-8de6e7ba47ea8c114d419cdb"};

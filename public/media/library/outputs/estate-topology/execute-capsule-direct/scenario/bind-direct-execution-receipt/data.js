@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-direct-execution-receipt","viewId":"n-d61ee5e441f478166f82326f"};

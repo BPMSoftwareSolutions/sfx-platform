@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"deliver-capability-change-api","viewId":"n-67a399baae5115dd4d81d7d3"};

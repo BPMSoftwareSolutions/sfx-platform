@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"open-capability-change","viewId":"n-95ea25cb89a4933fcd18ff2a"};

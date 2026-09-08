@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"admit-governed-narration-asset","viewId":"n-6d70cfc5af78f80a635d6fb8"};

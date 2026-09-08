@@ -1,0 +1,1783 @@
+{
+  "contractVersion": "infographic-projection.v1",
+  "grammarVersion": "sidefx-infographic-grammar.v1",
+  "id": "capability-current",
+  "title": "One capability. Seven scenario boundaries.",
+  "subtitle": "Complete scenario inventory · stored mechanics and shared declared providers",
+  "altitude": "capability",
+  "scope": "Stored capsule semantics, source references and authored visual direction. No observed live interception.",
+  "sources": [
+    {
+      "id": "runtime",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Exact runtime execution plan",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "capsule",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Verified capsule evidence package",
+      "encoding": "json"
+    },
+    {
+      "id": "story",
+      "path": "declarations/episode-01-direction.json",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d",
+      "pointer": "",
+      "kind": "STAGING",
+      "label": "Fictional human experience",
+      "encoding": "json"
+    },
+    {
+      "id": "target",
+      "path": "declarations/infographic-design-intent.v1.json",
+      "sha256": "ef389df72699c9be8028ac9daeddb7a3251e34f34594805ccb256c2973dfdae9",
+      "pointer": "",
+      "kind": "TARGET",
+      "label": "Intended visual circuit",
+      "encoding": "json"
+    },
+    {
+      "id": "gap",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649",
+      "pointer": "",
+      "kind": "GAP",
+      "label": "Missing live enforcement and testimony",
+      "encoding": "json"
+    },
+    {
+      "id": "scenario-0",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/0",
+      "kind": "DECLARED",
+      "label": "Govern one requested agent operation without widening its authority",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-1",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/1",
+      "kind": "DECLARED",
+      "label": "Admit only a complete request at the caller's authority altitude",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-2",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/2",
+      "kind": "DECLARED",
+      "label": "Establish one identity-bound fail-closed hook boundary",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-3",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/3",
+      "kind": "DECLARED",
+      "label": "Certify only a two-sided probe from the same live activation",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-4",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/4",
+      "kind": "DECLARED",
+      "label": "Return the next legal operation for one covered tool call",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-5",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/5",
+      "kind": "DECLARED",
+      "label": "Separate operator policy authority from the governed agent channel",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "scenario-6",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/nodes/6",
+      "kind": "DECLARED",
+      "label": "Fail closed without overstating the hook boundary",
+      "encoding": "capsule-entry"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "domain": "Governed agent work",
+      "scenarioIds": [
+        "interlock-agent-operation",
+        "admit-agent-interlock-request",
+        "activate-agent-interlock",
+        "certify-live-agent-interlock",
+        "adjudicate-covered-agent-tool-call",
+        "protect-agent-interlock-control-plane",
+        "hold-untrusted-or-uncovered-agent-operation"
+      ],
+      "coverage": "All 7 of 7 source scenarios",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "interlock-agent-operation",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Root operation",
+      "nodeIds": [
+        "s0-input",
+        "s0-event",
+        "s0-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "admit-agent-interlock-request",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Request admission",
+      "nodeIds": [
+        "s1-input",
+        "s1-event",
+        "s1-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "activate-agent-interlock",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Activation",
+      "nodeIds": [
+        "s2-input",
+        "s2-event",
+        "s2-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "certify-live-agent-interlock",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Certification",
+      "nodeIds": [
+        "s3-input",
+        "s3-event",
+        "s3-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "adjudicate-covered-agent-tool-call",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Adjudication",
+      "nodeIds": [
+        "s4-input",
+        "s4-event",
+        "s4-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "protect-agent-interlock-control-plane",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Operator control",
+      "nodeIds": [
+        "s5-input",
+        "s5-event",
+        "s5-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "hold-untrusted-or-uncovered-agent-operation",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Hold",
+      "nodeIds": [
+        "s6-input",
+        "s6-event",
+        "s6-outcome"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "s0-input",
+      "label": "Root operation request",
+      "detail": "agent-interlock-operation-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "interlock-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-0"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "agent-interlock-operation-request.v1",
+      "closure": null
+    },
+    {
+      "id": "s0-event",
+      "label": "Select final disposition",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "interlock-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s0-outcome",
+      "label": "Ready / established / adjudicated / applied / held",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "interlock-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-interlock-operation-outcome.v1",
+      "closure": null
+    },
+    {
+      "id": "s1-input",
+      "label": "Request admission request",
+      "detail": "agent-interlock-operation-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "admit-agent-interlock-request",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-1"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "agent-interlock-operation-request.v1",
+      "closure": null
+    },
+    {
+      "id": "s1-event",
+      "label": "Check operation variant",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "admit-agent-interlock-request",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s1-outcome",
+      "label": "ADMITTED / HELD",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "admit-agent-interlock-request",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "admitted-agent-interlock-request.v1",
+      "closure": null
+    },
+    {
+      "id": "s2-input",
+      "label": "Activation request",
+      "detail": "admitted-agent-interlock-activation-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "activate-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-2"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "admitted-agent-interlock-activation-request.v1",
+      "closure": null
+    },
+    {
+      "id": "s2-event",
+      "label": "Write activation status",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "activate-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s2-outcome",
+      "label": "ATTACHED_IN_SESSION",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "activate-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-interlock-activation-outcome.v1",
+      "closure": null
+    },
+    {
+      "id": "s3-input",
+      "label": "Certification request",
+      "detail": "agent-interlock-certification-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certify-live-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-3"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "agent-interlock-certification-request.v1",
+      "closure": null
+    },
+    {
+      "id": "s3-event",
+      "label": "Write certification status",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certify-live-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s3-outcome",
+      "label": "GOVERNANCE_PROVEN",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "certify-live-agent-interlock",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-interlock-certification-outcome.v1",
+      "closure": null
+    },
+    {
+      "id": "s4-input",
+      "label": "Adjudication request",
+      "detail": "covered-agent-tool-call.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudicate-covered-agent-tool-call",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-4"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "covered-agent-tool-call.v1",
+      "closure": null
+    },
+    {
+      "id": "s4-event",
+      "label": "Compare tool name",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudicate-covered-agent-tool-call",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s4-outcome",
+      "label": "ALLOW / OPERATOR_REQUIRED",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudicate-covered-agent-tool-call",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-tool-call-disposition.v1",
+      "closure": null
+    },
+    {
+      "id": "s5-input",
+      "label": "Operator control request",
+      "detail": "agent-interlock-control-request.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "protect-agent-interlock-control-plane",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-5"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "agent-interlock-control-request.v1",
+      "closure": null
+    },
+    {
+      "id": "s5-event",
+      "label": "Write control status",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "protect-agent-interlock-control-plane",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s5-outcome",
+      "label": "OPERATOR_ACTION_APPLIED",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "protect-agent-interlock-control-plane",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-interlock-control-outcome.v1",
+      "closure": null
+    },
+    {
+      "id": "s6-input",
+      "label": "Hold request",
+      "detail": "untrusted-agent-operation.v1",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "scenario-6"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "untrusted-agent-operation.v1",
+      "closure": null
+    },
+    {
+      "id": "s6-event",
+      "label": "Check admissionStatus",
+      "detail": "Stored expression / not live-effect proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "s6-outcome",
+      "label": "MALFORMED_HOOK_INPUT",
+      "detail": "Status meaning requires its own evidence",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "governance-hold.v1",
+      "closure": null
+    },
+    {
+      "id": "p0",
+      "label": "Authority transformation",
+      "detail": "Declared binding / live state unknown",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support",
+      "type": "provider",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "port0",
+      "label": "7 event responsibilities",
+      "detail": "Shared responsibility boundary",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support",
+      "type": "provider-port",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "p1",
+      "label": "Schema admission",
+      "detail": "Declared binding / live state unknown",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support",
+      "type": "provider",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "port1",
+      "label": "Contract shape boundary",
+      "detail": "Shared responsibility boundary",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support",
+      "type": "provider-port",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "evidence",
+      "label": "Exact capsule evidence",
+      "detail": "Expressions, fixtures, conformance scope",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "capsule"
+      ],
+      "layer": "support",
+      "type": "evidence",
+      "productContract": null,
+      "closure": null
+    }
+  ],
+  "junctions": [],
+  "edges": [
+    {
+      "id": "e00",
+      "source": "s0-input",
+      "target": "s0-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e01",
+      "source": "s0-event",
+      "target": "s0-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e02",
+      "source": "s1-input",
+      "target": "s1-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e03",
+      "source": "s1-event",
+      "target": "s1-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e04",
+      "source": "s2-input",
+      "target": "s2-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e05",
+      "source": "s2-event",
+      "target": "s2-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e06",
+      "source": "s3-input",
+      "target": "s3-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e07",
+      "source": "s3-event",
+      "target": "s3-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e08",
+      "source": "s4-input",
+      "target": "s4-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e09",
+      "source": "s4-event",
+      "target": "s4-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e10",
+      "source": "s5-input",
+      "target": "s5-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e11",
+      "source": "s5-event",
+      "target": "s5-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e12",
+      "source": "s6-input",
+      "target": "s6-event",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e13",
+      "source": "s6-event",
+      "target": "s6-outcome",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e14",
+      "source": "p0",
+      "target": "port0",
+      "type": "provider-binding",
+      "label": "declared binding",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e15",
+      "source": "p1",
+      "target": "port1",
+      "type": "provider-binding",
+      "label": "declared binding",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e16",
+      "source": "evidence",
+      "target": "s0-event",
+      "type": "evidence-attachment",
+      "label": "source package",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    }
+  ],
+  "providers": [
+    {
+      "nodeId": "p0",
+      "portIds": [
+        "port0"
+      ],
+      "binding": "bound",
+      "state": "unknown"
+    },
+    {
+      "nodeId": "p1",
+      "portIds": [
+        "port1"
+      ],
+      "binding": "bound",
+      "state": "unknown"
+    }
+  ],
+  "humanAnchors": [
+    {
+      "person": "Platform engineer",
+      "input": "An engineer needs the whole capability to be legible.",
+      "event": "Seven boundaries can be inspected without merging their proof.",
+      "outcome": "Status labels stay distinct from the stronger intended experience.",
+      "basis": "STAGING",
+      "sourceRefs": [
+        "story"
+      ]
+    }
+  ],
+  "visualLayers": [
+    "human",
+    "mechanic",
+    "support"
+  ],
+  "animationBeats": [
+    {
+      "phase": "Establish",
+      "caption": "Enumerate every source scenario.",
+      "entityIds": [
+        "s0-input",
+        "s1-input",
+        "s2-input",
+        "s3-input",
+        "s4-input",
+        "s5-input",
+        "s6-input"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Activate",
+      "caption": "Each scenario retains input, event and outcome identities.",
+      "entityIds": [
+        "s0-event",
+        "s1-event",
+        "s2-event",
+        "s3-event",
+        "s4-event",
+        "s5-event",
+        "s6-event"
+      ],
+      "edgeIds": [
+        "e00",
+        "e02",
+        "e04",
+        "e06",
+        "e08",
+        "e10",
+        "e12"
+      ]
+    },
+    {
+      "phase": "Execute",
+      "caption": "Shared providers are bindings; their operating state is unknown.",
+      "entityIds": [
+        "p0",
+        "port0",
+        "p1",
+        "port1"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Resolve",
+      "caption": "Stored status results do not upgrade into live-effect claims.",
+      "entityIds": [
+        "s0-outcome",
+        "s1-outcome",
+        "s2-outcome",
+        "s3-outcome",
+        "s4-outcome",
+        "s5-outcome",
+        "s6-outcome"
+      ],
+      "edgeIds": [
+        "e01",
+        "e03",
+        "e05",
+        "e07",
+        "e09",
+        "e11",
+        "e13"
+      ]
+    },
+    {
+      "phase": "Prove",
+      "caption": "Inspect all six root invocations and the exact source evidence.",
+      "entityIds": [
+        "evidence"
+      ],
+      "edgeIds": []
+    }
+  ],
+  "zoomAggregations": [
+    {
+      "id": "aggregate:interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "altitude": "capability",
+      "memberIds": [
+        "s0-input",
+        "s0-event",
+        "s0-outcome",
+        "s1-input",
+        "s1-event",
+        "s1-outcome",
+        "s2-input",
+        "s2-event",
+        "s2-outcome",
+        "s3-input",
+        "s3-event",
+        "s3-outcome",
+        "s4-input",
+        "s4-event",
+        "s4-outcome",
+        "s5-input",
+        "s5-event",
+        "s5-outcome",
+        "s6-input",
+        "s6-event",
+        "s6-outcome",
+        "p0",
+        "port0",
+        "p1",
+        "port1",
+        "evidence"
+      ]
+    }
+  ],
+  "scenarioRelationships": [
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "admit-agent-interlock-request",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "activate-agent-interlock",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "certify-live-agent-interlock",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "adjudicate-covered-agent-tool-call",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "protect-agent-interlock-control-plane",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "sourceScenario": "interlock-agent-operation",
+      "targetScenario": "hold-untrusted-or-uncovered-agent-operation",
+      "kind": "invokes",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "layout": {
+    "width": 1420,
+    "height": 3475.0,
+    "boxes": {
+      "s0-input": [
+        156,
+        378.0016,
+        300,
+        170
+      ],
+      "s0-event": [
+        531,
+        378.0016,
+        300,
+        170
+      ],
+      "s0-outcome": [
+        906,
+        378.0016,
+        320,
+        219
+      ],
+      "s1-input": [
+        156,
+        753.9992,
+        300,
+        189
+      ],
+      "s1-event": [
+        531,
+        753.9992,
+        300,
+        189
+      ],
+      "s1-outcome": [
+        906,
+        753.9992,
+        320,
+        170
+      ],
+      "s2-input": [
+        156,
+        1099.9992,
+        300,
+        170
+      ],
+      "s2-event": [
+        531,
+        1099.9992,
+        300,
+        170
+      ],
+      "s2-outcome": [
+        906,
+        1099.9992,
+        320,
+        189
+      ],
+      "s3-input": [
+        156,
+        1445.9992,
+        300,
+        170
+      ],
+      "s3-event": [
+        531,
+        1445.9992,
+        300,
+        189
+      ],
+      "s3-outcome": [
+        906,
+        1445.9992,
+        320,
+        189
+      ],
+      "s4-input": [
+        156,
+        1791.9992,
+        300,
+        170
+      ],
+      "s4-event": [
+        531,
+        1791.9992,
+        300,
+        170
+      ],
+      "s4-outcome": [
+        906,
+        1791.9992,
+        320,
+        189
+      ],
+      "s5-input": [
+        156,
+        2137.9992,
+        300,
+        170
+      ],
+      "s5-event": [
+        531,
+        2137.9992,
+        300,
+        170
+      ],
+      "s5-outcome": [
+        906,
+        2137.9992,
+        320,
+        189
+      ],
+      "s6-input": [
+        156,
+        2483.9992,
+        300,
+        170
+      ],
+      "s6-event": [
+        531,
+        2483.9992,
+        300,
+        170
+      ],
+      "s6-outcome": [
+        906,
+        2483.9992,
+        320,
+        189
+      ],
+      "p0": [
+        72.5,
+        2825.0,
+        300,
+        189
+      ],
+      "port0": [
+        397.5,
+        2825.0,
+        300,
+        170
+      ],
+      "p1": [
+        722.5,
+        2825.0,
+        300,
+        170
+      ],
+      "port1": [
+        1047.5,
+        2825.0,
+        300,
+        170
+      ],
+      "evidence": [
+        72.5,
+        3065.0,
+        300,
+        170
+      ]
+    },
+    "paths": {
+      "e00": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            463.0016
+          ],
+          [
+            531,
+            463.0016
+          ]
+        ]
+      },
+      "e01": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            463.0016
+          ],
+          [
+            906,
+            487.5016
+          ]
+        ]
+      },
+      "e02": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            848.4992
+          ],
+          [
+            531,
+            848.4992
+          ]
+        ]
+      },
+      "e03": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            848.4992
+          ],
+          [
+            906,
+            838.9992
+          ]
+        ]
+      },
+      "e04": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            1184.9992
+          ],
+          [
+            531,
+            1184.9992
+          ]
+        ]
+      },
+      "e05": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            1184.9992
+          ],
+          [
+            906,
+            1194.4992
+          ]
+        ]
+      },
+      "e06": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            1530.9992
+          ],
+          [
+            531,
+            1540.4992
+          ]
+        ]
+      },
+      "e07": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            1540.4992
+          ],
+          [
+            906,
+            1540.4992
+          ]
+        ]
+      },
+      "e08": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            1876.9992
+          ],
+          [
+            531,
+            1876.9992
+          ]
+        ]
+      },
+      "e09": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            1876.9992
+          ],
+          [
+            906,
+            1886.4992
+          ]
+        ]
+      },
+      "e10": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            2222.9992
+          ],
+          [
+            531,
+            2222.9992
+          ]
+        ]
+      },
+      "e11": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            2222.9992
+          ],
+          [
+            906,
+            2232.4992
+          ]
+        ]
+      },
+      "e12": {
+        "kind": "line",
+        "points": [
+          [
+            456,
+            2568.9992
+          ],
+          [
+            531,
+            2568.9992
+          ]
+        ]
+      },
+      "e13": {
+        "kind": "line",
+        "points": [
+          [
+            831,
+            2568.9992
+          ],
+          [
+            906,
+            2578.4992
+          ]
+        ]
+      },
+      "e14": {
+        "kind": "line",
+        "points": [
+          [
+            372.5,
+            2919.5
+          ],
+          [
+            397.5,
+            2910.0
+          ]
+        ]
+      },
+      "e15": {
+        "kind": "line",
+        "points": [
+          [
+            1022.5,
+            2910.0
+          ],
+          [
+            1047.5,
+            2910.0
+          ]
+        ]
+      },
+      "e16": {
+        "kind": "line",
+        "points": [
+          [
+            72.5,
+            3116.0
+          ],
+          [
+            52.5,
+            3116.0
+          ],
+          [
+            52.5,
+            1332.9992
+          ],
+          [
+            377.5,
+            1332.9992
+          ],
+          [
+            377.5,
+            1313.9992
+          ],
+          [
+            476,
+            1313.9992
+          ],
+          [
+            476,
+            986.9992
+          ],
+          [
+            511,
+            986.9992
+          ],
+          [
+            511,
+            429.0016
+          ],
+          [
+            531,
+            429.0016
+          ]
+        ]
+      }
+    },
+    "edgeLabels": {},
+    "junctionGlyphs": {},
+    "edgeAnchors": {},
+    "boundaries": [
+      {
+        "id": "interlock-agent-operation",
+        "label": "Root operation",
+        "box": [
+          130,
+          318.0016,
+          1158,
+          310.9968
+        ]
+      },
+      {
+        "id": "admit-agent-interlock-request",
+        "label": "Request admission",
+        "box": [
+          130,
+          693.9992,
+          1158,
+          281.0016
+        ]
+      },
+      {
+        "id": "activate-agent-interlock",
+        "label": "Activation",
+        "box": [
+          130,
+          1039.9992,
+          1158,
+          281.0016
+        ]
+      },
+      {
+        "id": "certify-live-agent-interlock",
+        "label": "Certification",
+        "box": [
+          130,
+          1385.9992,
+          1158,
+          281.0016
+        ]
+      },
+      {
+        "id": "adjudicate-covered-agent-tool-call",
+        "label": "Adjudication",
+        "box": [
+          130,
+          1731.9992,
+          1158,
+          281.0016
+        ]
+      },
+      {
+        "id": "protect-agent-interlock-control-plane",
+        "label": "Operator control",
+        "box": [
+          130,
+          2077.9992,
+          1158,
+          281.0016
+        ]
+      },
+      {
+        "id": "hold-untrusted-or-uncovered-agent-operation",
+        "label": "Hold",
+        "box": [
+          130,
+          2423.9992,
+          1158,
+          281.0016
+        ]
+      }
+    ],
+    "supportY": 2825.0,
+    "legendY": 3335.0,
+    "engine": "Graphviz dot 14.1.2 + primitive connection anchors + semantic I/E/O aggregate interiors"
+  },
+  "topology": {
+    "s0-input": {
+      "ancestors": [],
+      "descendants": [
+        "s0-event",
+        "s0-outcome"
+      ]
+    },
+    "s0-event": {
+      "ancestors": [
+        "s0-input"
+      ],
+      "descendants": [
+        "s0-outcome"
+      ]
+    },
+    "s0-outcome": {
+      "ancestors": [
+        "s0-event",
+        "s0-input"
+      ],
+      "descendants": []
+    },
+    "s1-input": {
+      "ancestors": [],
+      "descendants": [
+        "s1-event",
+        "s1-outcome"
+      ]
+    },
+    "s1-event": {
+      "ancestors": [
+        "s1-input"
+      ],
+      "descendants": [
+        "s1-outcome"
+      ]
+    },
+    "s1-outcome": {
+      "ancestors": [
+        "s1-event",
+        "s1-input"
+      ],
+      "descendants": []
+    },
+    "s2-input": {
+      "ancestors": [],
+      "descendants": [
+        "s2-event",
+        "s2-outcome"
+      ]
+    },
+    "s2-event": {
+      "ancestors": [
+        "s2-input"
+      ],
+      "descendants": [
+        "s2-outcome"
+      ]
+    },
+    "s2-outcome": {
+      "ancestors": [
+        "s2-event",
+        "s2-input"
+      ],
+      "descendants": []
+    },
+    "s3-input": {
+      "ancestors": [],
+      "descendants": [
+        "s3-event",
+        "s3-outcome"
+      ]
+    },
+    "s3-event": {
+      "ancestors": [
+        "s3-input"
+      ],
+      "descendants": [
+        "s3-outcome"
+      ]
+    },
+    "s3-outcome": {
+      "ancestors": [
+        "s3-event",
+        "s3-input"
+      ],
+      "descendants": []
+    },
+    "s4-input": {
+      "ancestors": [],
+      "descendants": [
+        "s4-event",
+        "s4-outcome"
+      ]
+    },
+    "s4-event": {
+      "ancestors": [
+        "s4-input"
+      ],
+      "descendants": [
+        "s4-outcome"
+      ]
+    },
+    "s4-outcome": {
+      "ancestors": [
+        "s4-event",
+        "s4-input"
+      ],
+      "descendants": []
+    },
+    "s5-input": {
+      "ancestors": [],
+      "descendants": [
+        "s5-event",
+        "s5-outcome"
+      ]
+    },
+    "s5-event": {
+      "ancestors": [
+        "s5-input"
+      ],
+      "descendants": [
+        "s5-outcome"
+      ]
+    },
+    "s5-outcome": {
+      "ancestors": [
+        "s5-event",
+        "s5-input"
+      ],
+      "descendants": []
+    },
+    "s6-input": {
+      "ancestors": [],
+      "descendants": [
+        "s6-event",
+        "s6-outcome"
+      ]
+    },
+    "s6-event": {
+      "ancestors": [
+        "s6-input"
+      ],
+      "descendants": [
+        "s6-outcome"
+      ]
+    },
+    "s6-outcome": {
+      "ancestors": [
+        "s6-event",
+        "s6-input"
+      ],
+      "descendants": []
+    },
+    "p0": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "port0": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "p1": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "port1": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "evidence": {
+      "ancestors": [],
+      "descendants": []
+    }
+  },
+  "aggregationEvidence": {
+    "aggregate:interlock-agent-operation": {
+      "DECLARED": 26
+    }
+  },
+  "contractSha256": "4dbb9fd66196fec218aed8f623b961968e254ee8ff103333d280b35896d43e40",
+  "geometryFindings": [],
+  "junctionGeometryProof": {
+    "checkedContacts": 0,
+    "maxContactErrorSvgUnits": 0,
+    "maxTangentErrorDegrees": 0,
+    "measurements": [],
+    "findings": []
+  }
+}

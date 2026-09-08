@@ -1,0 +1,4 @@
+* text=auto eol=lf
+# Published media and manifests are verified byte-for-byte after checkout.
+public/media/** -text -diff -whitespace
+generated/*.json -text

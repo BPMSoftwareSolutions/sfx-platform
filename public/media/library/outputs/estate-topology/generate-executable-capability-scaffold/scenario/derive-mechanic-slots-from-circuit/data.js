@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"derive-mechanic-slots-from-circuit","viewId":"n-03a2804f2948c4bb568dc0b4"};

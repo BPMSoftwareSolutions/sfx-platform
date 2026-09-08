@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Capability Content Contract v1",
+  "type": "object",
+  "required": ["contractVersion", "capabilityId", "title", "status", "source", "scenarioKeys", "audience", "humanProblem", "experience", "entities", "mechanics", "claims", "evidence", "emotionalArc", "permittedSurfaces", "surfaceContracts", "scope"],
+  "properties": {
+    "contractVersion": {"const": "capability-content.v1"},
+    "capabilityId": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "status": {"enum": ["NEEDS_DIRECTION", "EDITORIALLY_REVIEWED"]},
+    "source": {"type": "object", "required": ["capsuleDigest", "estateManifestDigest"], "properties": {"capsuleDigest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}, "estateManifestDigest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "scenarioKeys": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "audience": {"type": ["string", "null"]},
+    "humanProblem": {"type": ["string", "null"]},
+    "experience": {"type": ["object", "null"], "required": ["input", "event", "outcome"]},
+    "entities": {"type": "array"},
+    "mechanics": {"type": "array", "items": {"type": "object", "required": ["id", "meaning", "evidenceIds"]}},
+    "claims": {"type": "array", "items": {"type": "object", "required": ["id", "text", "kind", "evidenceIds"], "properties": {"kind": {"enum": ["CAPSULE_DECLARATION", "OBSERVED_LOCAL_DEMO", "EDITORIAL_STAGING", "TARGET_DESIGN"]}, "evidenceIds": {"type": "array", "minItems": 1, "items": {"type": "string"}}}}},
+    "evidence": {"type": "array", "items": {"type": "object", "required": ["id", "path", "sha256", "kind"], "properties": {"sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}}},
+    "emotionalArc": {"type": "array"},
+    "permittedSurfaces": {"type": "array", "uniqueItems": true, "items": {"enum": ["video", "short", "thumbnail", "article", "infographic", "training", "demo", "landing-page", "evidence-story"]}},
+    "surfaceContracts": {"type": "object", "additionalProperties": {"type": "object", "required": ["purpose", "structure", "claimIds", "evidenceIds"], "properties": {"purpose": {"type": "string"}, "structure": {"type": "array", "minItems": 1}, "claimIds": {"type": "array", "items": {"type": "string"}}, "evidenceIds": {"type": "array", "items": {"type": "string"}}}}},
+    "scope": {"type": "string", "minLength": 1}
+  },
+  "allOf": [{"if": {"properties": {"status": {"const": "EDITORIALLY_REVIEWED"}}}, "then": {"properties": {"audience": {"type": "string", "minLength": 1}, "humanProblem": {"type": "string", "minLength": 1}, "experience": {"type": "object"}, "entities": {"minItems": 1}, "mechanics": {"minItems": 1}, "claims": {"minItems": 1}, "evidence": {"minItems": 1}, "emotionalArc": {"minItems": 3}, "permittedSurfaces": {"minItems": 1}}}}]
+}

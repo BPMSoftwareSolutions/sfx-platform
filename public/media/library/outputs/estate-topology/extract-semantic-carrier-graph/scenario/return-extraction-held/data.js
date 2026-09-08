@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"return-extraction-held","viewId":"n-b8a6ca440065598c3da71b21"};

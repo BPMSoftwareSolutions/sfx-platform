@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"deliver-capsule-estate-cli","viewId":"n-5f262d7485b8ba8514269ef0"};

@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"bind-sidefx-semantic-query-receipt","viewId":"n-f3a0edc2d9cefe372aeaeb8b"};

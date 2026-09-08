@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"verify-pattern-coverage","viewId":"n-95cf3a79cba261301f8b132b"};

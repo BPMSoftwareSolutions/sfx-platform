@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title · SideFX</title><meta name="description" content="$problem">
+<link rel="stylesheet" href="page.css"><script defer src="page-data.js"></script><script defer src="circuit-flow.js"></script><script defer src="page.js"></script></head>
+<body>
+<a class="skip" href="#story">Skip to the story</a>
+<header class="top"><a class="wordmark" href="../index.html">SideFX <span>Capability editions / 01</span></a><nav aria-label="On this page"><a href="#circuit">Circuit</a><a href="#evidence">Evidence</a><a href="#learn">Learn</a><a href="$catalog">Catalog ↗</a></nav></header>
+<main>
+<section class="hero" id="story">
+ <div class="hero-copy"><p class="eyebrow">The future of agentic engineering</p><h1>$title</h1><p class="lead">$problem</p><a class="button primary" href="#circuit">Open the mechanics <span aria-hidden="true">↓</span></a><p class="capability-name">$capability</p></div>
+ <figure class="film"><video controls playsinline preload="metadata" poster="$poster" aria-label="$title"><source src="$film" type="video/mp4">$captions<a href="$film">Download the film</a></video><figcaption><span class="eyebrow">The human story</span><a href="$film_receipt">Media receipt ↗</a><p>$scope</p></figcaption></figure>
+</section>
+<section class="experience" aria-label="Input, event and outcome">$experience</section>
+<section class="section" id="circuit">
+ <div class="section-heading"><div><p class="eyebrow">01 / Open the capability</p><h2>Meaning you can move through.</h2></div><a href="$studio">The visual alphabet ↗</a></div>
+$circuit_gap
+ <div id="circuit-player" $circuit_hidden>
+  <div id="circuit-tabs" class="circuit-tabs" role="group" aria-label="Circuit scenarios"></div>
+  <div class="circuit-intro"><p class="eyebrow" id="circuit-relationship"></p><h3 id="circuit-title"></h3><p id="circuit-context"></p></div>
+  <div class="workbench">
+   <div class="toolbar"><div class="appearance" role="group" aria-label="Visual material"><button id="enhanced" aria-pressed="true">Material</button><button id="base" aria-pressed="false">Base SVG</button></div><div class="zoom"><button id="fit">Fit</button><button id="zoom-out" aria-label="Zoom out">−</button><output id="zoom-label" aria-label="Circuit zoom"></output><button id="zoom-in" aria-label="Zoom in">+</button></div><a id="svg-download" download>Export SVG ↗</a></div>
+   <div id="viewport" tabindex="0" role="region" aria-label="Scrollable capability circuit"><div id="stage"></div></div>
+   <div class="flow-controls"><button id="play" aria-label="Play silver-ball flow">▶ Play flow</button><button id="restart" aria-label="Restart silver-ball flow">↺</button><label class="flow-scrub">Flow position<input id="flow-position" type="range" min="0" max="1" step="0.01" value="0" aria-label="Flow position"></label><output id="flow-time" aria-label="Flow time">0:00</output><label class="flow-speed">Speed<select id="flow-speed" aria-label="Flow playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label></div>
+   <div class="phase-bar"><span class="phase-label">Inspect a phase</span><div id="phases" role="group" aria-label="Animation phases"></div><button id="reset">All paths</button></div>
+   <p id="phase-caption" class="phase-caption" role="status"></p>
+   <p id="circuit-scope" class="circuit-scope"></p>
+  </div>
+  <div class="inspection"><div><p class="eyebrow">Select a component to inspect its meaning</p><h3 id="inspect-title">Every mark has a job.</h3><div id="inspect-body"></div></div><div class="circuit-links"><p class="eyebrow">Keep exploring</p><a id="projection-link">Source circuit contract ↗</a><a id="motion-link">Watch the composed circuit film ↗</a><p>The silver ball follows the authored flow. Fan-out splits it; an ALL join waits for every arrival. Motion illustrates the circuit and does not change its evidence status.</p></div></div>
+ </div>
+ <div class="mechanics">$mechanics</div>
+</section>
+<section class="section" id="evidence"><div class="section-heading"><div><p class="eyebrow">02 / Evidence and intended design</p><h2>See what each claim can carry.</h2></div><a href="$contract">Content contract ↗</a></div><div class="claim-grid">$claims</div><details class="evidence-drawer"><summary>Inspect the exact source artifacts</summary><div class="evidence-files">$evidence</div></details></section>
+<section class="section learning" id="learn"><div><p class="eyebrow">03 / Put the distinction to work</p><h2>Understand it.<br>Then test your judgment.</h2><p class="lead">$objective</p><div class="exercise"><p class="eyebrow">Your scenario</p><p>$exercise</p></div><p class="audience">For $audience</p></div><form id="assessment">$questions<button class="button primary" type="submit">Check my reasoning →</button><p id="assessment-result" role="status"></p></form></section>
+<section class="section" id="surfaces"><div class="section-heading"><div><p class="eyebrow">04 / One capability, many ways in</p><h2>Take the story with you.</h2></div></div><div class="surfaces">$surfaces</div></section>
+</main>
+<footer><a class="wordmark" href="../index.html">SideFX</a><span>Authority owns meaning. Providers realize it.<br><a href="../../agentic-engineering/index.html">Agentic Engineering / Enter the signature class ↗</a></span><details><summary>Edition provenance</summary><a href="$manifest">Composition manifest</a> · <a href="build-receipt.json">Build receipt</a><p>$capability_id</p></details></footer>
+<noscript><p class="no-script">The story, evidence, lesson questions and media links work without JavaScript. Open <a href="$studio">the grammar studio</a> for circuit exports.</p></noscript>
+</body></html>

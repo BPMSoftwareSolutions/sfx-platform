@@ -1,0 +1,1 @@
+window.ESTATE_TOPOLOGY_ENTRY={"scenarioId":"transact-governed-tooling-responsibility-binding","viewId":"n-37b338b1976f03975558f47e"};

@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  outputFileTracingIncludes: {
+    '/*': ['./generated/*.json'],
+  },
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: false,
@@ -19,6 +23,10 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'DENY' },
         ],
+      },
+      {
+        source: '/media/library/:path*',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {
         // §4 — private/auth routes are excluded from search indexing.
