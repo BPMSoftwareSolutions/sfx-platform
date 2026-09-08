@@ -26,6 +26,7 @@ function reselect(directory: string) {
     artifacts: {
       'estate-publication.json': digest(publicationBytes),
       'circuit-projections.json': digest(readFileSync(join(directory, 'circuit-projections.json'))),
+      'visual-publication.json': digest(readFileSync(join(directory, 'visual-publication.json'))),
     },
   };
   writeFileSync(join(directory, 'publication-manifest.json'), JSON.stringify(manifest));
@@ -33,11 +34,11 @@ function reselect(directory: string) {
 
 test('the selected real publication and every circuit validate together', () => {
   const { publication, circuits } = readValidatedPublication(source);
-  assert.equal(circuits.length, publication.coverage.scenarioFaces);
+  assert.equal(circuits.length, publication.coverage.scenarioFaces + publication.capabilities.filter(c=>!c.scenarios.length).length);
 });
 
 test('release validation refuses missing selection, missing circuit bytes and tampering', () => {
-  for (const file of ['publication-manifest.json', 'circuit-projections.json']) {
+  for (const file of ['publication-manifest.json', 'circuit-projections.json', 'visual-publication.json']) {
     fixture(directory => {
       rmSync(join(directory, file));
       assert.throws(() => readValidatedPublication(directory));

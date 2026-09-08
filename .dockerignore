@@ -14,7 +14,9 @@
 !generated/estate-publication.json
 !generated/circuit-projections.json
 !generated/publication-manifest.json
+!generated/visual-publication.json
 !public/**
 !scripts/validate-publication.ts
+!scripts/validate-media.ts
 !scripts/test.mjs
 !tests/**

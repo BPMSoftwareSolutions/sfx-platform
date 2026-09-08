@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { z } from 'zod';
 
 import { CircuitProjection, Digest, EstatePublication } from '../contracts/estate.ts';
+import { VisualPublication } from '../contracts/visuals.ts';
 
 export const PublicationManifest = z.object({
   version: z.literal(1),
@@ -11,6 +12,7 @@ export const PublicationManifest = z.object({
   artifacts: z.object({
     'estate-publication.json': Digest,
     'circuit-projections.json': Digest,
+    'visual-publication.json': Digest,
   }).strict(),
 }).strict();
 
@@ -52,11 +54,13 @@ export function validatePublication(publicationBytes: Buffer, circuitBytes: Buff
     publication.coverage.mechanics === publication.mechanics.length &&
     publication.coverage.providers === publication.providers.length &&
     publication.coverage.scenarioFaces === faces.size, 'Publication coverage mismatch');
-  require(circuits.length === faces.size, 'Circuit coverage mismatch');
+  const emptyCapabilities = new Set(publication.capabilities.filter(c=>!c.scenarios.length).map(c=>c.entityId));
+  require(circuits.length === faces.size + emptyCapabilities.size, 'Circuit coverage mismatch');
   const seen = new Set<string>();
   for (const circuit of circuits) {
     const key = JSON.stringify([circuit.capabilityId, circuit.scenarioId]);
-    require(faces.has(key) && !seen.has(key), 'Circuit owner/scenario mismatch or duplicate');
+    const overview=circuit.scenarioId===null && emptyCapabilities.has(circuit.capabilityId) && circuit.lens==='CAPABILITY_OVERVIEW' && circuit.fidelity==='PARTIAL_BOUNDARY';
+    require((faces.has(key)||overview) && !seen.has(key), 'Circuit owner/scenario mismatch or duplicate');
     seen.add(key);
     require(circuit.graphDigest === stableDigest({ nodes: circuit.nodes, edges: circuit.edges }),
       'Circuit graph digest mismatch');
@@ -71,11 +75,28 @@ export function readValidatedPublication(directory = join(process.cwd(), 'genera
   const manifest = PublicationManifest.parse(JSON.parse(readFileSync(join(directory, 'publication-manifest.json'), 'utf8')));
   const publicationBytes = readFileSync(join(directory, 'estate-publication.json'));
   const circuitBytes = readFileSync(join(directory, 'circuit-projections.json'));
+  const visualBytes = readFileSync(join(directory, 'visual-publication.json'));
   if (digest(publicationBytes) !== manifest.artifacts['estate-publication.json'] ||
-      digest(circuitBytes) !== manifest.artifacts['circuit-projections.json']) {
+      digest(circuitBytes) !== manifest.artifacts['circuit-projections.json'] ||
+      digest(visualBytes) !== manifest.artifacts['visual-publication.json']) {
     throw new Error('Selected publication artifact digest mismatch');
   }
   const validated = validatePublication(publicationBytes, circuitBytes);
+  const visuals=VisualPublication.parse(JSON.parse(visualBytes.toString('utf8')));
+  if (`sha256:${visuals.source.snapshotDigest}`!==validated.publication.source.snapshotId || `sha256:${visuals.source.mappingDigest}`!==validated.publication.source.projectionDigest) throw new Error('Media source generation differs from selected estate');
+  for(const entity of [...validated.publication.capabilities,...validated.publication.mechanics,...validated.publication.providers,...validated.publication.capabilities.flatMap(c=>c.scenarios)]){
+    for(const v of entity.visuals.filter(v=>v.state==='READY')){
+      if(!visuals.visuals.some(m=>m.revision===v.assetRevisionId&&m.objectPk===entity.semanticObjectPk&&m.definitionPk===entity.semanticObjectDefinitionPk&&m.kind===v.subjectKind&&m.purpose===v.purpose&&m.url===v.publishedUrl&&`sha256:${m.originalDigest}`===v.originalDigest&&m.mediaType===v.mediaType&&m.width===v.width&&m.height===v.height&&m.altText===v.altText&&m.model===v.generatorModel)) throw new Error('Entity image binding differs from SQL media selection');
+    }
+  }
+  for(const circuit of visuals.circuits){
+    const owner=validated.publication.capabilities.find(c=>c.semanticObjectDefinitionPk===circuit.capabilityDefinitionPk&&c.entityId===circuit.capabilityId);
+    if(!owner?.scenarios.some(s=>s.semanticObjectDefinitionPk===circuit.definitionPk&&s.semanticObjectPk===circuit.objectPk&&s.scenarioId===circuit.scenarioId))throw new Error('Stored circuit owner/definition mismatch');
+  }
+  for(const edition of visuals.editions){
+    const owner=validated.publication.capabilities.find(c=>c.semanticObjectDefinitionPk===edition.definitionPk);
+    if(!owner||edition.image&&!owner.visuals.some(v=>v.purpose==='DETAIL'&&v.state==='READY'&&v.publishedUrl===edition.image))throw new Error('Visual edition owner/selection mismatch');
+  }
   if (validated.publication.publicationId !== manifest.publicationId) {
     throw new Error('Selected publication identity mismatch');
   }

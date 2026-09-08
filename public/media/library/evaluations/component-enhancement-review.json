@@ -1,0 +1,100 @@
+{
+  "status": "REVIEWED_FOR_MASKED_COMPOSITING",
+  "reviewer": "Codex visual review",
+  "assets": {
+    "input": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "a36b7d5c4b55aa372bbf62e08fa262e19cd6619f887ed8a183a002e6c600f8ea",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "event": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "d5eef106a7241eca9f785c62ef7d1a5f8f8c5efb6e0deeac076fb102a983ad2a",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "outcome": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "d8365f8b1cc0ead8e70438d9b96567719c9a8c17d08905029808da80d1d8630f",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "provider-port": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "2d78a83e7b626aaf3b626000ec910eee205ed94ca44f33c87798a75e9360781b",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "provider": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "77a141f72443c881c5dd74c739dfd25b26b13e287ec6920da98ec4bf9028eb02",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "validation": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "82676593fbdc31a34b46830fa3c76bac6cf63827fba0bc5eba446bd1a56e319a",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "evidence": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "61fc4c1e3a2371be8e633fc89e1c5bec6dda31443a9eeb3b356faf24678911e6",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "human-approval": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "90d48f8fa031fa3583e91784dd251b14309b8d95c67f06ba5a46c75698b0a7a8",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "authority": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "ce74250c0fb98c50c4953b281e1e423a91cf130034fe64e6f40312899ed37ac8",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "branch": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "56d18f8422939af3a61faff956649cc8edd64863d7026f187143b3bbf417bc2e",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "fan-out": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "02680e06d55d8cb6b2d0e6fa444825b4d74707f0e4dfad8f63bf24a4c5e203b9",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "convergence": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "abc35fc08ce403bde4081f953b0c8e96ea079106dc336a8cb8bde92f57c811e1",
+      "note": "Source plate invents an enclosing surface. Accepted only as masked color/material; that surface is removed by the exact three-arm SVG mask. Raw plate is not an approved glyph.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "decision": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "19cdb8f327c934deacd241e410899220b4958c02335c8162e9128854ff77d3b5",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "termination": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "56a872dc54bb0ad38dc248e28854137ba4fc95732262702f8aa809de1d45ea27",
+      "note": "Source plate suggests a hollow rim. Accepted only as masked rim material around the original solid vector disk; raw plate is not an approved termination glyph.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    },
+    "rejection": {
+      "status": "ACCEPTED_MATERIAL",
+      "imageSha256": "3fa86cdc89a0d9a752b20e08dcc7509a51e8065d5816f236ca764e8f875b4169",
+      "note": "Family color, dimensional rim and text-free material reviewed. Canonical mask supplies silhouette and vector icons.",
+      "permittedUse": "Canonical-mask compositing only; never substitute the raw raster for a semantic primitive."
+    }
+  },
+  "contactSheet": "evaluations/component-enhancement-contact-sheet.png",
+  "contactSheetSha256": "d128dad3c23386f3d0b92a02e0bdacb85cb71645afbd9d04b0d87563044c295d",
+  "compositionReview": "Exact vector labels remain legible on continuous quiet faces. Branches and joins are masked to their original arms, termination retains its solid disk, and status captions remain separate.",
+  "rejectedPilot": "Initial convergence enclosing shell and underlit pilot treatments were superseded; initial images are retained with their original request receipts."
+}

@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: '/media/library/:path*',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
         // §4 — private/auth routes are excluded from search indexing.
         source: '/(workspace|sign-in|auth)/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],

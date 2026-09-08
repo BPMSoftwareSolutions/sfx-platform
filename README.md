@@ -4,6 +4,9 @@ The SideFX website — `www.sidefx.io`. Next.js App Router, TypeScript strict, T
 
 Built against [`docs/website-design-spec.md`](docs/website-design-spec.md). That spec governs; this
 README records how the implementation satisfies it and, just as importantly, where it does not yet.
+[`docs/architecture.md`](docs/architecture.md) codifies the architecture doctrine — pillars,
+boundaries, pipelines, contracts and honesty invariants — that the codebase is judged against.
+[`docs/visual-integration-audit.md`](docs/visual-integration-audit.md) is the ledger of open gates.
 
 ## Running it
 
@@ -75,6 +78,11 @@ generated/     the published estate — rebuildable, not hand-edited
 scripts/       the publication service
 tests/         publication integrity, route/phase, circuit geometry
 ```
+
+Python services live beside the web process, never inside it — estate analytics, semantic
+retrieval, media QA and authoring workers, codified in `docs/architecture.md` §7. The content
+lab's Python stack (polars, networkx, numpy, pydantic, Pillow, faster-whisper, mcp) is the
+proving ground for those services.
 
 `lib/routes.ts` is the single route and availability registry (§4). Navigation, footer, cards,
 CTAs and the sitemap all read from it, and a route marked `available: false` is never linked. A

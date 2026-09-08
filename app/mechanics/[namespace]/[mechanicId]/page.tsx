@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { EntityArt } from '@/components/estate/entity-art';
 
 import { Callout, FactList, Hero, NotDeclared, Section, SectionHeader, StatusBadge } from '@/components/ui';
 import { findMechanic, getMechanics, getProviders } from '@/lib/estate';
@@ -38,7 +39,7 @@ export default async function MechanicDetailPage({ params }: Params) {
 
   return (
     <>
-      <Hero eyebrow="Mechanic" eyebrowHref={ROUTES.mechanics.href} title={mechanic.title}>
+      <Hero eyebrow="Mechanic" eyebrowHref={ROUTES.mechanics.href} title={mechanic.title} subhead={mechanic.summary??undefined} media={<EntityArt visuals={mechanic.visuals} title={mechanic.title} kind="MECHANIC" priority/>}>
         <div className="flex flex-wrap gap-2">
           <StatusBadge tone="authority">{mechanic.entityId}</StatusBadge>
           {mechanic.mechanicKind ? <StatusBadge>{mechanic.mechanicKind}</StatusBadge> : null}

@@ -1,0 +1,115 @@
+{
+  "contractVersion": "capability-page.v1",
+  "capabilityId": "interlock-agent-operation",
+  "content": {
+    "path": "declarations/capability-content/interlock-agent-operation.json",
+    "sha256": "c9d53dfc94855b7e6a6b024e1e186650ab33898b6a3b438582f6c4c8c10e9434"
+  },
+  "film": {
+    "media": {
+      "path": "samples/content-catalog/interlock-agent-operation/episode-01.mp4",
+      "sha256": "f5f2aa58fad762eb39b741e4d3d16d736dbd7676f714aed77db587320ceb889f"
+    },
+    "receipt": {
+      "path": "samples/content-catalog/interlock-agent-operation/film.receipt.json",
+      "sha256": "4149d4f599b5b9dc481bde373ca7e818e60775fa733b84c9082d3335c136812b"
+    },
+    "poster": {
+      "path": "samples/content-catalog/interlock-agent-operation/thumbnail.jpg",
+      "sha256": "6ef95622fb05de1c1427db9c04b8e9e8b9d4f1e0ce016906a0b9e4e975bdd421"
+    },
+    "captions": {
+      "path": "samples/content-catalog/interlock-agent-operation/captions.vtt",
+      "sha256": "921c56a9026e5cb9a2791dd868d7c1fbd23061d29a536a93053a5fe7c531ef16"
+    },
+    "claimIds": [
+      "current-semantics",
+      "target-experience",
+      "local-simulation",
+      "human-story"
+    ]
+  },
+  "surfaces": {
+    "video": {
+      "path": "samples/content-catalog/interlock-agent-operation/episode-01.mp4",
+      "sha256": "f5f2aa58fad762eb39b741e4d3d16d736dbd7676f714aed77db587320ceb889f"
+    },
+    "short": {
+      "path": "samples/content-catalog/interlock-agent-operation/short.mp4",
+      "sha256": "d842b08e3d72a315ff5c64ede29f979cc0f0e5d4562d1a6874fdac6157ad0048"
+    },
+    "thumbnail": {
+      "path": "samples/content-catalog/interlock-agent-operation/thumbnail.jpg",
+      "sha256": "6ef95622fb05de1c1427db9c04b8e9e8b9d4f1e0ce016906a0b9e4e975bdd421"
+    },
+    "article": {
+      "path": "samples/content-catalog/interlock-agent-operation/article.html",
+      "sha256": "061a2087cb4e6d1d63763189e22077f017cb02a1f805cb53a14820e3a9142ab5"
+    },
+    "infographic": {
+      "path": "samples/content-catalog/interlock-agent-operation/infographic.svg",
+      "sha256": "50eb39cda246afc39bae338234c853ab5984cfe90cbe0fe6d4188cceddecd4f1"
+    },
+    "training": {
+      "path": "samples/content-catalog/interlock-agent-operation/training.html",
+      "sha256": "2fe34714834c91202c52498ec18d8f4305c32284b50620f26087aac74a2bbb53"
+    },
+    "demo": {
+      "path": "samples/content-catalog/interlock-agent-operation/demo.html",
+      "sha256": "ebcf818693a074b293216e16488cb03eaf2b07552f4944409cfc6aedbce2b61b"
+    },
+    "landing-page": {
+      "path": "samples/content-catalog/interlock-agent-operation/index.html",
+      "sha256": "d92e21cfdf8dab7b197541276ba4c4b8855c7816a62ac7553b4cfe58567723ff"
+    },
+    "evidence-story": {
+      "path": "samples/content-catalog/interlock-agent-operation/evidence.html",
+      "sha256": "6b8a007e0cfaede26fa8f158c8ff65fbfc471631963b5206d78da78bebf2f090"
+    }
+  },
+  "circuits": [
+    {
+      "projectionId": "scenario-target",
+      "relationship": "related-scenario",
+      "context": "The film asks who can authorize publication. This related target scenario asks how an operator would prove the exact live boundary: denial and permitted work must both be observed.",
+      "compiled": {
+        "path": "samples/infographic-grammar/scenario-target/projection.json",
+        "sha256": "2dd19c198c2a0d8c05fc3f27181e23c334ec84c73f69de72a52ad520b2acbba1"
+      },
+      "enhancementReceipt": {
+        "path": "samples/infographic-grammar/scenario-target/enhancement-receipt.json",
+        "sha256": "3dff79a9c0348f0f67f4ff7f3a3dfcfc57b171deeab4832166e8b144c9b499e1"
+      },
+      "motionReceipt": {
+        "path": "samples/infographic-grammar/scenario-target/motion-receipt-enhanced.json",
+        "sha256": "32afb4fc983a505ba83b7983ae5b9d1d5085b363c399df2bf1e80e713296c22e"
+      }
+    },
+    {
+      "projectionId": "scenario-current",
+      "relationship": "related-scenario",
+      "context": "Inspect the stored adjudication scenario behind the capability. Its ALLOW and OPERATOR_REQUIRED results define decisions; they do not establish live interception.",
+      "compiled": {
+        "path": "samples/infographic-grammar/scenario-current/projection.json",
+        "sha256": "7d8550c0fcf90411322032067df192fd766ad2a104c87209e05a1107383184e4"
+      },
+      "enhancementReceipt": {
+        "path": "samples/infographic-grammar/scenario-current/enhancement-receipt.json",
+        "sha256": "79dd117355d5b2752cd567003ea3337ccb06f0b309cf50d18758aea5631264cd"
+      }
+    },
+    {
+      "projectionId": "capability-current",
+      "relationship": "capability-overview",
+      "context": "Explore all seven source scenarios and their declared responsibilities. Stored activation and certification labels still need their own live evidence.",
+      "compiled": {
+        "path": "samples/infographic-grammar/capability-current/projection.json",
+        "sha256": "ffaf8cbde2b73c0dad358bc0deb68a9dda98c3cd1d5a108867c890a993021679"
+      },
+      "enhancementReceipt": {
+        "path": "samples/infographic-grammar/capability-current/enhancement-receipt.json",
+        "sha256": "62755bb31127786fcecf034edb177c2bbc580ead71df5cc79f282ea30cb0a245"
+      }
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "meaning": "Illustrative target timing, not execution telemetry.",
+  "contractSha256": "69ed238814e10aa35fa9bbbf052a74097fd0b4639d7cb2637135d5e5a3bebd65",
+  "events": [
+    {
+      "seconds": 0.0,
+      "action": "phase",
+      "ids": [
+        "Establish"
+      ]
+    },
+    {
+      "seconds": 0.625,
+      "action": "reveal",
+      "ids": [
+        "activation"
+      ]
+    },
+    {
+      "seconds": 2.208,
+      "action": "phase",
+      "ids": [
+        "Activate"
+      ]
+    },
+    {
+      "seconds": 2.833,
+      "action": "reveal",
+      "ids": [
+        "provider",
+        "port"
+      ]
+    },
+    {
+      "seconds": 3.25,
+      "action": "information-attachment",
+      "ids": [
+        "e07"
+      ]
+    },
+    {
+      "seconds": 4.25,
+      "action": "arrive",
+      "ids": [
+        "e00"
+      ]
+    },
+    {
+      "seconds": 4.875,
+      "action": "reveal",
+      "ids": [
+        "split"
+      ]
+    },
+    {
+      "seconds": 6.458,
+      "action": "phase",
+      "ids": [
+        "Execute"
+      ]
+    },
+    {
+      "seconds": 6.875,
+      "action": "information-attachment",
+      "ids": [
+        "e08",
+        "e09"
+      ]
+    },
+    {
+      "seconds": 7.875,
+      "action": "arrive",
+      "ids": [
+        "e01",
+        "e02"
+      ]
+    },
+    {
+      "seconds": 8.5,
+      "action": "reveal",
+      "ids": [
+        "deny-probe",
+        "permit-probe"
+      ]
+    },
+    {
+      "seconds": 9.5,
+      "action": "arrive",
+      "ids": [
+        "e03",
+        "e04"
+      ]
+    },
+    {
+      "seconds": 10.125,
+      "action": "reveal",
+      "ids": [
+        "join"
+      ]
+    },
+    {
+      "seconds": 11.792,
+      "action": "arrive",
+      "ids": [
+        "e05"
+      ]
+    },
+    {
+      "seconds": 12.417,
+      "action": "reveal",
+      "ids": [
+        "check"
+      ]
+    },
+    {
+      "seconds": 14.0,
+      "action": "phase",
+      "ids": [
+        "Resolve"
+      ]
+    },
+    {
+      "seconds": 15.0,
+      "action": "arrive",
+      "ids": [
+        "e06"
+      ]
+    },
+    {
+      "seconds": 15.625,
+      "action": "reveal",
+      "ids": [
+        "certified"
+      ]
+    },
+    {
+      "seconds": 17.208,
+      "action": "phase",
+      "ids": [
+        "Prove"
+      ]
+    },
+    {
+      "seconds": 17.833,
+      "action": "reveal",
+      "ids": [
+        "proof"
+      ]
+    },
+    {
+      "seconds": 18.25,
+      "action": "information-attachment",
+      "ids": [
+        "e10"
+      ]
+    }
+  ],
+  "durationSeconds": 22.25
+}

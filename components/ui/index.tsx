@@ -13,7 +13,7 @@ export function Section({
   labelledBy?: string;
 }) {
   return (
-    <section aria-labelledby={labelledBy} className={`mx-auto max-w-7xl px-4 py-16 ${className}`}>
+    <section aria-labelledby={labelledBy} className={`site-section mx-auto max-w-7xl px-4 py-16 ${className}`}>
       {children}
     </section>
   );
@@ -59,6 +59,7 @@ export function Hero({
   subhead,
   actions,
   children,
+  media,
 }: {
   eyebrow?: string;
   eyebrowHref?: string;
@@ -66,10 +67,16 @@ export function Hero({
   subhead?: string;
   actions?: ReactNode;
   children?: ReactNode;
+  media?: ReactNode;
 }) {
+  if(media)return <section className="capability-hero page-width"><div>
+    {eyebrow?<Eyebrow href={eyebrowHref}>{eyebrow}</Eyebrow>:null}
+    <h1>{title}</h1>{subhead?<p className="hero-lede">{subhead}</p>:null}
+    {actions?<div className="action-row">{actions}</div>:null}
+    {children?<div className="mt-7">{children}</div>:null}
+  </div>{media}</section>;
   return (
-    <div className="relative overflow-hidden border-b border-grid-line">
-      <div aria-hidden="true" className="blueprint-grid pointer-events-none absolute inset-0" />
+    <div className="site-hero relative border-b border-grid-line">
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:py-24">
         {eyebrow ? <Eyebrow href={eyebrowHref}>{eyebrow}</Eyebrow> : null}
         <h1 className="mt-3 max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">

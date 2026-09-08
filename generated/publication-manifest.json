@@ -1,8 +1,9 @@
 {
   "version": 1,
-  "publicationId": "sha256:4aa762a11811170624d9c2bc20e1ff02f183194853e4d5b0c46a0dd315ee81ed",
+  "publicationId": "sha256:6ba4855f516432201753aac7f7794d4eef1c7839491cfdf041194e22a8e3907f",
   "artifacts": {
-    "estate-publication.json": "sha256:161b6026256cb916a0ac93c6640d76573f08b797ef670525c3a4bd42a8aa20e0",
-    "circuit-projections.json": "sha256:d9cf70ac89ecc16bec339f29480576aa7c7d9ad3f666be5b70f592212f4d03d9"
+    "estate-publication.json": "sha256:1a47fdfbe3c8820e0ac10846306fe101307a6211fb43f600675e625ab268f5c0",
+    "circuit-projections.json": "sha256:ecf01e049eedba46cd6f5234487f5b9f9425c9cb03e1902567e54685b545aef2",
+    "visual-publication.json": "sha256:9034ff1ad9b5b58d67407d91f5c1ae0407ccf2d21b7dfdbc83ee66216c627a04"
   }
 }

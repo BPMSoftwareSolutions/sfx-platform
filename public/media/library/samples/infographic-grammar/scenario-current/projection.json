@@ -1,0 +1,850 @@
+{
+  "contractVersion": "infographic-projection.v1",
+  "grammarVersion": "sidefx-infographic-grammar.v1",
+  "id": "scenario-current",
+  "title": "A decision is not yet an interlock.",
+  "subtitle": "One adjudication scenario · current stored semantics",
+  "altitude": "scenario",
+  "scope": "Stored capsule semantics, source references and authored visual direction. No observed live interception.",
+  "sources": [
+    {
+      "id": "runtime",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Exact runtime execution plan",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "capsule",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Verified capsule evidence package",
+      "encoding": "json"
+    },
+    {
+      "id": "story",
+      "path": "declarations/episode-01-direction.json",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d",
+      "pointer": "",
+      "kind": "STAGING",
+      "label": "Fictional human experience",
+      "encoding": "json"
+    },
+    {
+      "id": "target",
+      "path": "declarations/infographic-design-intent.v1.json",
+      "sha256": "ef389df72699c9be8028ac9daeddb7a3251e34f34594805ccb256c2973dfdae9",
+      "pointer": "",
+      "kind": "TARGET",
+      "label": "Intended visual circuit",
+      "encoding": "json"
+    },
+    {
+      "id": "gap",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649",
+      "pointer": "",
+      "kind": "GAP",
+      "label": "Missing live enforcement and testimony",
+      "encoding": "json"
+    },
+    {
+      "id": "adjudication",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/mechanicBindings/2",
+      "kind": "DECLARED",
+      "label": "Adjudication expression",
+      "encoding": "capsule-entry"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "domain": "Governed agent work",
+      "scenarioIds": [
+        "adjudication"
+      ],
+      "coverage": "One source scenario",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "adjudication",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Adjudicate covered agent tool call",
+      "nodeIds": [
+        "request",
+        "act",
+        "operator",
+        "allow",
+        "select"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "label": "Admitted call envelope",
+      "detail": "ADJUDICATE / safe-tool",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "type": "input",
+      "productContract": "covered-agent-tool-call.v1",
+      "closure": null
+    },
+    {
+      "id": "act",
+      "label": "Adjudicate call",
+      "detail": "Stored authority transformation",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "type": "event",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "operator",
+      "label": "OPERATOR_REQUIRED",
+      "detail": "Returned decision label",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-tool-call-disposition.v1",
+      "closure": null
+    },
+    {
+      "id": "allow",
+      "label": "ALLOW",
+      "detail": "Returned decision label",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "type": "outcome",
+      "productContract": "agent-tool-call-disposition.v1",
+      "closure": null
+    },
+    {
+      "id": "provider",
+      "label": "Authority transformation",
+      "detail": "Bound provider / live state unknown",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support",
+      "type": "provider",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "port",
+      "label": "Adjudication port",
+      "detail": "Required responsibility",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "support",
+      "type": "provider-port",
+      "productContract": null,
+      "closure": null
+    },
+    {
+      "id": "receipt",
+      "label": "Expression + fixtures",
+      "detail": "Declared expectations; no live hook proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "capsule",
+        "adjudication"
+      ],
+      "layer": "support",
+      "type": "evidence",
+      "productContract": null,
+      "closure": null
+    }
+  ],
+  "junctions": [
+    {
+      "id": "select",
+      "label": "Tool name?",
+      "detail": "dangerous-tool",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "type": "decision",
+      "rule": "toolId equals dangerous-tool; otherwise ALLOW",
+      "join": null,
+      "quorum": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "e00",
+      "source": "request",
+      "target": "act",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e01",
+      "source": "act",
+      "target": "select",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e02",
+      "source": "select",
+      "target": "operator",
+      "type": "transition",
+      "label": "equals",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "guard": "toolId == dangerous-tool",
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e03",
+      "source": "select",
+      "target": "allow",
+      "type": "transition",
+      "label": "otherwise",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "guard": "otherwise",
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e04",
+      "source": "provider",
+      "target": "port",
+      "type": "provider-binding",
+      "label": "declared binding",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e05",
+      "source": "port",
+      "target": "act",
+      "type": "dependency",
+      "label": "supplies responsibility",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    },
+    {
+      "id": "e06",
+      "source": "receipt",
+      "target": "act",
+      "type": "evidence-attachment",
+      "label": "source semantics",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "guard": null,
+      "productContract": null,
+      "maxAttempts": null,
+      "exitCondition": null,
+      "stopTarget": null
+    }
+  ],
+  "providers": [
+    {
+      "nodeId": "provider",
+      "portIds": [
+        "port"
+      ],
+      "binding": "bound",
+      "state": "unknown"
+    }
+  ],
+  "humanAnchors": [
+    {
+      "person": "Platform engineer",
+      "input": "She authorized inspection.",
+      "event": "A queued publication needs a decision.",
+      "outcome": "A stored label does not establish that a tool was stopped.",
+      "basis": "STAGING",
+      "sourceRefs": [
+        "story"
+      ]
+    }
+  ],
+  "visualLayers": [
+    "human",
+    "mechanic",
+    "support"
+  ],
+  "animationBeats": [
+    {
+      "phase": "Establish",
+      "caption": "Establish the supplied call envelope.",
+      "entityIds": [
+        "request"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Activate",
+      "caption": "Open the stored responsibility and its provider binding.",
+      "entityIds": [
+        "act",
+        "port",
+        "provider"
+      ],
+      "edgeIds": [
+        "e00",
+        "e04"
+      ]
+    },
+    {
+      "phase": "Execute",
+      "caption": "Compare the tool name; illustrate the safe-tool alternative.",
+      "entityIds": [
+        "select"
+      ],
+      "edgeIds": [
+        "e01"
+      ]
+    },
+    {
+      "phase": "Resolve",
+      "caption": "The illustrated branch returns ALLOW. This is not effect dispatch.",
+      "entityIds": [
+        "allow"
+      ],
+      "edgeIds": [
+        "e03"
+      ]
+    },
+    {
+      "phase": "Prove",
+      "caption": "Inspect source semantics and fixture expectations; live enforcement remains unproven.",
+      "entityIds": [
+        "receipt"
+      ],
+      "edgeIds": [
+        "e06"
+      ]
+    }
+  ],
+  "zoomAggregations": [
+    {
+      "id": "aggregate:interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "altitude": "capability",
+      "memberIds": [
+        "request",
+        "act",
+        "operator",
+        "allow",
+        "provider",
+        "port",
+        "receipt",
+        "select"
+      ]
+    }
+  ],
+  "scenarioRelationships": [],
+  "layout": {
+    "width": 1495.5,
+    "height": 1242.0,
+    "boxes": {
+      "request": [
+        60.0,
+        430.0,
+        300,
+        170
+      ],
+      "act": [
+        415.0,
+        430.0,
+        300,
+        170
+      ],
+      "operator": [
+        1115.5,
+        318.0,
+        320,
+        170
+      ],
+      "allow": [
+        1115.5,
+        542.0,
+        320,
+        170
+      ],
+      "select": [
+        770.0,
+        412.0,
+        224,
+        206
+      ],
+      "provider": [
+        139.25,
+        832.0,
+        300,
+        170
+      ],
+      "port": [
+        597.75,
+        832.0,
+        300,
+        170
+      ],
+      "receipt": [
+        1056.25,
+        832.0,
+        300,
+        170
+      ]
+    },
+    "paths": {
+      "e00": {
+        "kind": "bezier",
+        "points": [
+          [
+            360.45,
+            515.0
+          ],
+          [
+            374.62,
+            515.0
+          ],
+          [
+            389.03,
+            515.0
+          ],
+          [
+            414.7,
+            515.0
+          ]
+        ]
+      },
+      "e01": {
+        "kind": "bezier",
+        "points": [
+          [
+            715.0,
+            515.0
+          ],
+          [
+            733.3333333333334,
+            515.0
+          ],
+          [
+            751.6666666666666,
+            515.0
+          ],
+          [
+            770.0,
+            515.0
+          ]
+        ]
+      },
+      "e02": {
+        "kind": "bezier",
+        "points": [
+          [
+            938.0,
+            463.5
+          ],
+          [
+            980.6428571428571,
+            420.8571428571429
+          ],
+          [
+            1048.0714285714287,
+            403.0
+          ],
+          [
+            1115.5,
+            403.0
+          ]
+        ]
+      },
+      "e03": {
+        "kind": "bezier",
+        "points": [
+          [
+            938.0,
+            566.5
+          ],
+          [
+            980.6428571428571,
+            609.1428571428571
+          ],
+          [
+            1048.0714285714287,
+            627.0
+          ],
+          [
+            1115.5,
+            627.0
+          ]
+        ]
+      },
+      "e04": {
+        "kind": "line",
+        "points": [
+          [
+            439.25,
+            917.0
+          ],
+          [
+            597.75,
+            917.0
+          ]
+        ]
+      },
+      "e05": {
+        "kind": "line",
+        "points": [
+          [
+            597.75,
+            883.0
+          ],
+          [
+            577.75,
+            883.0
+          ],
+          [
+            577.75,
+            644.0
+          ],
+          [
+            735.0,
+            644.0
+          ],
+          [
+            735.0,
+            481.0
+          ],
+          [
+            715.0,
+            481.0
+          ]
+        ]
+      },
+      "e06": {
+        "kind": "line",
+        "points": [
+          [
+            1056.25,
+            883.0
+          ],
+          [
+            1014.0,
+            883.0
+          ],
+          [
+            1014.0,
+            662.0
+          ],
+          [
+            750.0,
+            662.0
+          ],
+          [
+            750.0,
+            532.0
+          ],
+          [
+            735.0,
+            532.0
+          ],
+          [
+            735.0,
+            481.0
+          ],
+          [
+            715.0,
+            481.0
+          ]
+        ]
+      }
+    },
+    "edgeLabels": {
+      "e02": [
+        1017.4553571428572,
+        401.25892857142856
+      ],
+      "e03": [
+        1017.4553571428572,
+        596.7410714285714
+      ],
+      "e04": [
+        518.5,
+        895.0
+      ]
+    },
+    "junctionGlyphs": {
+      "select": {
+        "inputs": [
+          {
+            "point": [
+              770.0,
+              515.0
+            ],
+            "tangent": [
+              1.0,
+              0.0
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "point": [
+              938.0,
+              463.5
+            ],
+            "tangent": [
+              0.7071067811865475,
+              -0.7071067811865475
+            ]
+          },
+          {
+            "point": [
+              938.0,
+              566.5
+            ],
+            "tangent": [
+              0.7071067811865475,
+              0.7071067811865475
+            ]
+          }
+        ]
+      }
+    },
+    "edgeAnchors": {
+      "e01": {
+        "source": {
+          "point": [
+            715.0,
+            515.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        },
+        "target": {
+          "point": [
+            770.0,
+            515.0
+          ],
+          "tangent": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      "e02": {
+        "source": {
+          "point": [
+            938.0,
+            463.5
+          ],
+          "tangent": [
+            0.7071067811865475,
+            -0.7071067811865475
+          ]
+        },
+        "target": {
+          "point": [
+            1115.5,
+            403.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        }
+      },
+      "e03": {
+        "source": {
+          "point": [
+            938.0,
+            566.5
+          ],
+          "tangent": [
+            0.7071067811865475,
+            0.7071067811865475
+          ]
+        },
+        "target": {
+          "point": [
+            1115.5,
+            627.0
+          ],
+          "tangent": [
+            1,
+            0
+          ]
+        }
+      }
+    },
+    "boundaries": [],
+    "supportY": 832.0,
+    "legendY": 1102.0,
+    "engine": "Graphviz dot 14.1.2 + primitive connection anchors + semantic I/E/O aggregate interiors"
+  },
+  "topology": {
+    "request": {
+      "ancestors": [],
+      "descendants": [
+        "act",
+        "allow",
+        "operator",
+        "select"
+      ]
+    },
+    "act": {
+      "ancestors": [
+        "request"
+      ],
+      "descendants": [
+        "allow",
+        "operator",
+        "select"
+      ]
+    },
+    "operator": {
+      "ancestors": [
+        "act",
+        "request",
+        "select"
+      ],
+      "descendants": []
+    },
+    "allow": {
+      "ancestors": [
+        "act",
+        "request",
+        "select"
+      ],
+      "descendants": []
+    },
+    "provider": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "port": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "receipt": {
+      "ancestors": [],
+      "descendants": []
+    },
+    "select": {
+      "ancestors": [
+        "act",
+        "request"
+      ],
+      "descendants": [
+        "allow",
+        "operator"
+      ]
+    }
+  },
+  "aggregationEvidence": {
+    "aggregate:interlock-agent-operation": {
+      "DECLARED": 8
+    }
+  },
+  "contractSha256": "46f10b066d037d503da41b5bf700a8cadb9fbc219e17a7a0acf021aef5430b30",
+  "geometryFindings": [],
+  "junctionGeometryProof": {
+    "checkedContacts": 0,
+    "maxContactErrorSvgUnits": 0,
+    "maxTangentErrorDegrees": 0,
+    "measurements": [],
+    "findings": []
+  }
+}

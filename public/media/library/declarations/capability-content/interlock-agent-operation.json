@@ -1,0 +1,412 @@
+{
+  "contractVersion": "capability-content.v1",
+  "capabilityId": "interlock-agent-operation",
+  "title": "Govern one agent session through an admitted hook interlock",
+  "status": "EDITORIALLY_REVIEWED",
+  "source": {
+    "capsuleDigest": "sha256:4c1b3b1129809ef9bc1f3f8f298918cec65f6285c40e0e2295aaed97be8dccad",
+    "estateManifestDigest": "0b02db7ee691898d499cb9046737dce3f7c34aa8e1e3d6ca4908afeb823fb802"
+  },
+  "scenarioKeys": [
+    "interlock-agent-operation::interlock-agent-operation",
+    "interlock-agent-operation::admit-agent-interlock-request",
+    "interlock-agent-operation::activate-agent-interlock",
+    "interlock-agent-operation::certify-live-agent-interlock",
+    "interlock-agent-operation::adjudicate-covered-agent-tool-call",
+    "interlock-agent-operation::protect-agent-interlock-control-plane",
+    "interlock-agent-operation::hold-untrusted-or-uncovered-agent-operation"
+  ],
+  "audience": "Engineers, operators, architects, and product owners building dependable agentic systems.",
+  "humanProblem": "The agent can publish a capability change, but its assignment authorizes only inspection.",
+  "experience": {
+    "input": "Publication is queued beyond an inspection-only assignment.",
+    "event": "The target interlock resolves authority, keeps publication pending, and permits the exact inspection.",
+    "outcome": "The engineer receives an inspection report and retains the separate publication decision."
+  },
+  "entities": [
+    {
+      "entity": "Engineer",
+      "input": "Concerned by a queued effect",
+      "event": "Follows authority and evidence",
+      "outcome": "Reviews the requested inspection with control intact"
+    },
+    {
+      "entity": "Proposed publication",
+      "input": "Queued",
+      "event": "RESOLVE to inspection",
+      "outcome": "Still pending"
+    },
+    {
+      "entity": "Inspection",
+      "input": "Authorized but unfinished",
+      "event": "PERMIT in target simulation",
+      "outcome": "Illustrative report available"
+    },
+    {
+      "entity": "Interlock",
+      "input": "Intended pre-effect boundary",
+      "event": "Identity, authority, coverage, proof and requested mechanic checked",
+      "outcome": "Decision tied to intended effect evidence"
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "present-decision",
+      "meaning": "Exact stored adjudication expression selects ALLOW or OPERATOR_REQUIRED.",
+      "evidenceIds": [
+        "current"
+      ]
+    },
+    {
+      "id": "target-boundary",
+      "meaning": "Proposed pre-dispatch resolution and effect linkage complete the intended experience.",
+      "evidenceIds": [
+        "target",
+        "direction"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "current-semantics",
+      "text": "The inspected capsule contains decision expressions and declared status assertions; these do not establish observed live interception.",
+      "kind": "CAPSULE_DECLARATION",
+      "evidenceIds": [
+        "current",
+        "gaps"
+      ]
+    },
+    {
+      "id": "target-experience",
+      "text": "The intended interlock resolves exact authority before effects, permits admitted work and retains operator control.",
+      "kind": "TARGET_DESIGN",
+      "evidenceIds": [
+        "target",
+        "direction"
+      ]
+    },
+    {
+      "id": "local-simulation",
+      "text": "Seven reference cases evaluate an authored target policy; they dispatch no live tools.",
+      "kind": "OBSERVED_LOCAL_DEMO",
+      "evidenceIds": [
+        "simulation"
+      ]
+    },
+    {
+      "id": "human-story",
+      "text": "The fictional engineer receives the intended inspection while publication remains pending.",
+      "kind": "EDITORIAL_STAGING",
+      "evidenceIds": [
+        "direction"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "current",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "kind": "CAPSULE_EVIDENCE_PACKAGE",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a"
+    },
+    {
+      "id": "target",
+      "path": "declarations/episode-01-target-interlock.json",
+      "kind": "TARGET_DESIGN",
+      "sha256": "5e44ae86376dfce0db5b706c5a2a7cd29a135039b525b36ca698773c32391f4e"
+    },
+    {
+      "id": "direction",
+      "path": "declarations/episode-01-direction.json",
+      "kind": "EDITORIAL_DIRECTION",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d"
+    },
+    {
+      "id": "gaps",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "kind": "ENGINEERING_TESTIMONY",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649"
+    },
+    {
+      "id": "simulation",
+      "path": "samples/content-catalog/interlock-agent-operation/reference-simulation.json",
+      "kind": "TARGET_REFERENCE_SIMULATION",
+      "sha256": "255a0bdfce0ec89cfe027b258137ea43d1587fa515fc3b220b863c968ffe95b3"
+    }
+  ],
+  "emotionalArc": [
+    "concern",
+    "focused anticipation",
+    "relief"
+  ],
+  "permittedSurfaces": [
+    "video",
+    "short",
+    "thumbnail",
+    "article",
+    "infographic",
+    "training",
+    "demo",
+    "landing-page",
+    "evidence-story"
+  ],
+  "surfaceContracts": {
+    "video": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Cold Open",
+        "Scenario",
+        "Human Experience",
+        "Open the Event",
+        "Future Agentic Engineering Principle",
+        "Contrast With Today",
+        "SideFX Resolution",
+        "Evidence",
+        "Takeaway",
+        "Next Circuit"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "short": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Current evidence",
+        "Target experience",
+        "Missing closure"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "thumbnail": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Current evidence",
+        "Target experience",
+        "Missing closure"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "article": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Cold Open",
+        "Scenario",
+        "Human Experience",
+        "Open the Event",
+        "Future Agentic Engineering Principle",
+        "Contrast With Today",
+        "SideFX Resolution",
+        "Evidence",
+        "Takeaway",
+        "Next Circuit"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "infographic": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Current evidence",
+        "Target experience",
+        "Missing closure"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "training": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Cold Open",
+        "Scenario",
+        "Human Experience",
+        "Open the Event",
+        "Future Agentic Engineering Principle",
+        "Contrast With Today",
+        "SideFX Resolution",
+        "Evidence",
+        "Takeaway",
+        "Next Circuit"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "demo": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Current evidence",
+        "Target experience",
+        "Missing closure"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "landing-page": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Current evidence",
+        "Target experience",
+        "Missing closure"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    },
+    "evidence-story": {
+      "purpose": "Project the evidence and intended design of Episode 1.",
+      "structure": [
+        "Current evidence",
+        "Target experience",
+        "Missing closure"
+      ],
+      "claimIds": [
+        "current-semantics",
+        "target-experience",
+        "local-simulation",
+        "human-story"
+      ],
+      "evidenceIds": [
+        "current",
+        "target",
+        "direction",
+        "gaps",
+        "simulation"
+      ]
+    }
+  },
+  "scope": "Current snapshot evidence, an explicitly labeled target architecture, and fictional human staging. Reference simulation is not live hook execution. The target decision vocabulary is not relabeled as current capsule output.",
+  "storyTitle": "When the Agent Is Ready to Act, Who Decides?",
+  "training": {
+    "objective": "Distinguish present decision semantics from the intended live enforcement boundary and its closure evidence.",
+    "exercise": "Resolve an out-of-scope publication to a permitted inspection, then identify the live evidence needed to establish the target boundary.",
+    "questions": [
+      {
+        "question": "The agent is authorized to inspect a candidate but queues publication. What is the target response?",
+        "options": [
+          "Publish because the tool is available.",
+          "RESOLVE to the authorized inspection; keep publication pending.",
+          "Let the agent expand its own scope."
+        ],
+        "correct": 1,
+        "rationale": "RESOLVE offers a permitted next step without approving the original effect."
+      },
+      {
+        "question": "What does the current stored ALLOW expression establish?",
+        "options": [
+          "The stored expression defines how a supplied input maps to a decision.",
+          "All local tools are intercepted.",
+          "A live hook has been certified."
+        ],
+        "correct": 0,
+        "rationale": "Current decision semantics do not supply live effect-enforcement evidence."
+      },
+      {
+        "question": "Which evidence would close the intended live-boundary claim?",
+        "options": [
+          "A successful activation label.",
+          "Two probes in unrelated workspaces.",
+          "One identity-bound live session denies an unmanaged probe and permits a declared read-only probe, with coverage and effect receipts."
+        ],
+        "correct": 2,
+        "rationale": "Both observations must refer to the same exact live boundary."
+      },
+      {
+        "question": "After a permitted inspection, is publication authorized?",
+        "options": [
+          "No. Publication still needs its own authority and proof.",
+          "Yes. A successful inspection authorizes later effects."
+        ],
+        "correct": 0,
+        "rationale": "The inspection outcome never widens the agent's authority."
+      }
+    ]
+  }
+}

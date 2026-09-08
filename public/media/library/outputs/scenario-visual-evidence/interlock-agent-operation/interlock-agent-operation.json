@@ -1,0 +1,4196 @@
+{
+  "packageVersion": "scenario-visual-evidence.v1",
+  "key": "interlock-agent-operation::interlock-agent-operation",
+  "source": {
+    "estateManifestDigest": "0b02db7ee691898d499cb9046737dce3f7c34aa8e1e3d6ca4908afeb823fb802",
+    "capsuleDigest": "sha256:4c1b3b1129809ef9bc1f3f8f298918cec65f6285c40e0e2295aaed97be8dccad"
+  },
+  "scenarioSurface": {
+    "key": "interlock-agent-operation::interlock-agent-operation",
+    "capabilityId": "interlock-agent-operation",
+    "capabilityName": "Govern one agent session through an admitted hook interlock",
+    "scenarioId": "interlock-agent-operation",
+    "scenarioName": "Govern one requested agent operation without widening its authority",
+    "identityOrigin": "declared",
+    "scenarioKind": "Scenario",
+    "examples": [],
+    "input": [
+      {
+        "text": "one contract-admitted activation, certification, adjudication, or authenticated operator-control request",
+        "line": 47
+      }
+    ],
+    "event": [
+      {
+        "text": "the request is bound to exact live governance identities and routed to its declared operation",
+        "line": 48
+      }
+    ],
+    "outcome": [
+      {
+        "text": "return its exact ready, established, adjudicated, applied, or held outcome without treating activation, configuration, or an agent report as proof",
+        "line": 49
+      }
+    ],
+    "products": [
+      "agent-interlock-operation-outcome"
+    ],
+    "dependencies": [],
+    "providers": [],
+    "providerDiscovery": "not inferred from dependency names",
+    "actors": [
+      "operator"
+    ],
+    "altitude": null,
+    "notes": "  An operator gives an agent an assigned task. Before the agent performs that\n  task, this capability establishes an exact session-scoped hook boundary,\n  proves that the same live boundary both denies an unmanaged probe and allows\n  a declared read-only probe, and thereafter adjudicates every supported covered\n  local tool call. The declarative governed-run skill tells the agent how to use\n  this capability; the skill never carries or substitutes executable governance.\n\n  Activation is not certification. Certification joins evidence only from one\n  activation, harness session, workspace, ordered time boundary, adapter digest,\n  daemon digest, policy digest, and durable capability-authority digest. Test,\n  falsification, stale, cross-session, and cross-workspace receipts cannot\n  satisfy a production certification.\n\n  Production failure is closed. An unavailable adjudicator, malformed hook\n  request, malformed response, unsupported local effect surface, incomplete\n  adapter coverage, configuration conflict, or identity divergence holds the\n  operation. A harness that cannot attach the exact hook to its current session\n  returns a concrete relaunch requirement and does not claim governance.\n\n  The governed agent cannot lower its own mode, grant itself a bypass, replace\n  the hook, or mutate operator policy. Those controls cross a separately\n  authenticated operator boundary. Existing harness configuration is strictly\n  parsed, atomically merged without deleting unrelated settings, and restored\n  from an exact pre-change digest when rollback is required.\n\n  The claim is intentionally bounded. Certification covers only the local tool\n  surfaces the detected harness is proven to route through its declared hook.\n  Hosted and specialized paths outside that route are reported as uncovered and\n  never silently included. This capability does not prove an operating-system\n  filesystem, process, credential, or network effect boundary.",
+    "source": {
+      "capsuleFile": "interlock-agent-operation.sfxcap",
+      "capsuleDigest": "sha256:4c1b3b1129809ef9bc1f3f8f298918cec65f6285c40e0e2295aaed97be8dccad",
+      "featureEntry": "features/interlock-agent-operation.feature",
+      "featureDigest": "sha256:3ce9be109011ba6fcd1cfacdc22af3718ed561ca7b9d95b8eb837cc233d1d0b9",
+      "estateManifestDigest": "sha256:0b02db7ee691898d499cb9046737dce3f7c34aa8e1e3d6ca4908afeb823fb802",
+      "snapshot": "data/source-features/interlock-agent-operation.feature",
+      "scenarioLine": 46
+    },
+    "tags": [
+      "@capability:interlock-agent-operation",
+      "@root-scenario:interlock-agent-operation",
+      "@lifecycle:FIRST_ADMISSION",
+      "@scenario:interlock-agent-operation",
+      "@input:agent-interlock-operation-request",
+      "@input-contract:agent-interlock-operation-request.v1",
+      "@event:interlock-agent-operation",
+      "@event-authority:interlock-agent-operation.v1",
+      "@outcome:agent-interlock-operation-outcome",
+      "@outcome-contract:agent-interlock-operation-outcome.v1",
+      "@outcome-variants:ACTIVATION_READY|CERTIFICATION_ESTABLISHED|OPERATION_ADJUDICATED|OPERATOR_ACTION_APPLIED|GOVERNANCE_HELD",
+      "@outcome-terminal"
+    ]
+  },
+  "evidence": {
+    "execution": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/0"
+        },
+        "value": {
+          "nodeId": "interlock-agent-operation",
+          "scenario": {
+            "scenarioId": "interlock-agent-operation",
+            "input": {
+              "inputId": "agent-interlock-operation-request",
+              "contract": {
+                "contractId": "agent-interlock-operation-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "interlock-agent-operation",
+              "executionAuthorityId": "interlock-agent-operation.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-operation-outcome",
+              "contract": {
+                "contractId": "agent-interlock-operation-outcome.v1"
+              },
+              "terminal": true
+            }
+          },
+          "operations": [
+            {
+              "operationId": "interlock-agent-operation.operation.1",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "admit-agent-interlock-request"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.2",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "activate-agent-interlock"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.3",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "certify-live-agent-interlock"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.4",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "adjudicate-covered-agent-tool-call"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.5",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "protect-agent-interlock-control-plane"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.6",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "hold-untrusted-or-uncovered-agent-operation"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.7",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:interlock-agent-operation-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/1"
+        },
+        "value": {
+          "nodeId": "admit-agent-interlock-request",
+          "scenario": {
+            "scenarioId": "admit-agent-interlock-request",
+            "input": {
+              "inputId": "agent-interlock-operation-request",
+              "contract": {
+                "contractId": "agent-interlock-operation-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "admit-agent-interlock-request",
+              "executionAuthorityId": "admit-agent-interlock-request.v1"
+            },
+            "outcome": {
+              "outcomeId": "admitted-agent-interlock-request",
+              "contract": {
+                "contractId": "admitted-agent-interlock-request.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "admit-agent-interlock-request.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:admit-agent-interlock-request-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/2"
+        },
+        "value": {
+          "nodeId": "activate-agent-interlock",
+          "scenario": {
+            "scenarioId": "activate-agent-interlock",
+            "input": {
+              "inputId": "admitted-agent-interlock-activation-request",
+              "contract": {
+                "contractId": "admitted-agent-interlock-activation-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "activate-agent-interlock",
+              "executionAuthorityId": "activate-agent-interlock.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-activation-outcome",
+              "contract": {
+                "contractId": "agent-interlock-activation-outcome.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "activate-agent-interlock.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:activate-agent-interlock-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/3"
+        },
+        "value": {
+          "nodeId": "certify-live-agent-interlock",
+          "scenario": {
+            "scenarioId": "certify-live-agent-interlock",
+            "input": {
+              "inputId": "agent-interlock-certification-request",
+              "contract": {
+                "contractId": "agent-interlock-certification-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "certify-live-agent-interlock",
+              "executionAuthorityId": "certify-live-agent-interlock.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-certification-outcome",
+              "contract": {
+                "contractId": "agent-interlock-certification-outcome.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "certify-live-agent-interlock.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:certify-live-agent-interlock-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/4"
+        },
+        "value": {
+          "nodeId": "adjudicate-covered-agent-tool-call",
+          "scenario": {
+            "scenarioId": "adjudicate-covered-agent-tool-call",
+            "input": {
+              "inputId": "covered-agent-tool-call",
+              "contract": {
+                "contractId": "covered-agent-tool-call.v1"
+              }
+            },
+            "event": {
+              "eventId": "adjudicate-covered-agent-tool-call",
+              "executionAuthorityId": "adjudicate-covered-agent-tool-call.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-tool-call-disposition",
+              "contract": {
+                "contractId": "agent-tool-call-disposition.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "adjudicate-covered-agent-tool-call.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:adjudicate-covered-agent-tool-call-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/5"
+        },
+        "value": {
+          "nodeId": "protect-agent-interlock-control-plane",
+          "scenario": {
+            "scenarioId": "protect-agent-interlock-control-plane",
+            "input": {
+              "inputId": "agent-interlock-control-request",
+              "contract": {
+                "contractId": "agent-interlock-control-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "protect-agent-interlock-control-plane",
+              "executionAuthorityId": "protect-agent-interlock-control-plane.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-control-outcome",
+              "contract": {
+                "contractId": "agent-interlock-control-outcome.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "protect-agent-interlock-control-plane.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:protect-agent-interlock-control-plane-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/6"
+        },
+        "value": {
+          "nodeId": "hold-untrusted-or-uncovered-agent-operation",
+          "scenario": {
+            "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+            "input": {
+              "inputId": "untrusted-agent-operation",
+              "contract": {
+                "contractId": "untrusted-agent-operation.v1"
+              }
+            },
+            "event": {
+              "eventId": "hold-untrusted-or-uncovered-agent-operation",
+              "executionAuthorityId": "hold-untrusted-or-uncovered-agent-operation.v1"
+            },
+            "outcome": {
+              "outcomeId": "governance-hold",
+              "contract": {
+                "contractId": "governance-hold.v1"
+              },
+              "terminal": true
+            }
+          },
+          "operations": [
+            {
+              "operationId": "hold-untrusted-or-uncovered-agent-operation.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:hold-untrusted-or-uncovered-agent-operation-port"
+            }
+          ],
+          "transition": null
+        }
+      }
+    ],
+    "mechanics": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/0"
+        },
+        "value": {
+          "bindingId": "contract-admission",
+          "mechanicType": "contract-admission",
+          "providerCapabilityId": "sda-schema-contract-admission.v1",
+          "provider": "ScenarioKernel.NodePlatform.Schema.JsonSchemaContractAdmission",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "contractAuthorities": {
+              "authorityType": "consumer-contract-authorities.v1",
+              "contracts": {
+                "agent-interlock-operation-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "admitted-agent-interlock-activation-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-certification-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "covered-agent-tool-call.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-control-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "untrusted-agent-operation.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-operation-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "admitted-agent-interlock-request.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-activation-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-certification-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-tool-call-disposition.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-control-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "governance-hold.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/1"
+        },
+        "value": {
+          "bindingId": "port:activate-agent-interlock-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "activationOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "ACTIVATE"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "ATTACHED_IN_SESSION"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "activationOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/2"
+        },
+        "value": {
+          "bindingId": "port:adjudicate-covered-agent-tool-call-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "adjudicationOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "ADJUDICATE"
+                        }
+                      },
+                      "then": {
+                        "op": "if",
+                        "when": {
+                          "op": "equals",
+                          "left": {
+                            "op": "path",
+                            "from": "input",
+                            "path": "payload.toolId"
+                          },
+                          "right": {
+                            "op": "literal",
+                            "value": "dangerous-tool"
+                          }
+                        },
+                        "then": {
+                          "op": "literal",
+                          "value": "OPERATOR_REQUIRED"
+                        },
+                        "else": {
+                          "op": "literal",
+                          "value": "ALLOW"
+                        }
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "adjudicationOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/3"
+        },
+        "value": {
+          "bindingId": "port:admit-agent-interlock-request-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "admissionStatus": {
+                      "op": "if",
+                      "when": {
+                        "op": "includes",
+                        "in": {
+                          "op": "literal",
+                          "value": [
+                            "ACTIVATE",
+                            "CERTIFY",
+                            "ADJUDICATE",
+                            "CONTROL"
+                          ]
+                        },
+                        "value": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "ADMITTED"
+                      },
+                      "else": {
+                        "op": "literal",
+                        "value": "HELD"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/4"
+        },
+        "value": {
+          "bindingId": "port:certify-live-agent-interlock-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "certificationOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "CERTIFY"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "GOVERNANCE_PROVEN"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "certificationOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/5"
+        },
+        "value": {
+          "bindingId": "port:hold-untrusted-or-uncovered-agent-operation-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "holdOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "admissionStatus"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "HELD"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "MALFORMED_HOOK_INPUT"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "holdOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/6"
+        },
+        "value": {
+          "bindingId": "port:interlock-agent-operation-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "object",
+              "fields": {
+                "contractId": {
+                  "op": "literal",
+                  "value": "agent-interlock-operation-outcome.v1"
+                },
+                "payload": {
+                  "op": "object",
+                  "fields": {
+                    "disposition": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "admissionStatus"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "HELD"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "GOVERNANCE_HELD"
+                      },
+                      "else": {
+                        "op": "if",
+                        "when": {
+                          "op": "equals",
+                          "left": {
+                            "op": "path",
+                            "from": "input",
+                            "path": "payload.operation"
+                          },
+                          "right": {
+                            "op": "literal",
+                            "value": "ACTIVATE"
+                          }
+                        },
+                        "then": {
+                          "op": "literal",
+                          "value": "ACTIVATION_READY"
+                        },
+                        "else": {
+                          "op": "if",
+                          "when": {
+                            "op": "equals",
+                            "left": {
+                              "op": "path",
+                              "from": "input",
+                              "path": "payload.operation"
+                            },
+                            "right": {
+                              "op": "literal",
+                              "value": "CERTIFY"
+                            }
+                          },
+                          "then": {
+                            "op": "literal",
+                            "value": "CERTIFICATION_ESTABLISHED"
+                          },
+                          "else": {
+                            "op": "if",
+                            "when": {
+                              "op": "equals",
+                              "left": {
+                                "op": "path",
+                                "from": "input",
+                                "path": "payload.operation"
+                              },
+                              "right": {
+                                "op": "literal",
+                                "value": "ADJUDICATE"
+                              }
+                            },
+                            "then": {
+                              "op": "literal",
+                              "value": "OPERATION_ADJUDICATED"
+                            },
+                            "else": {
+                              "op": "if",
+                              "when": {
+                                "op": "equals",
+                                "left": {
+                                  "op": "path",
+                                  "from": "input",
+                                  "path": "payload.operation"
+                                },
+                                "right": {
+                                  "op": "literal",
+                                  "value": "CONTROL"
+                                }
+                              },
+                              "then": {
+                                "op": "literal",
+                                "value": "OPERATOR_ACTION_APPLIED"
+                              },
+                              "else": {
+                                "op": "literal",
+                                "value": "GOVERNANCE_HELD"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "details": {
+                      "op": "object",
+                      "fields": {
+                        "admissionStatus": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "admissionStatus"
+                        },
+                        "activationOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "activationOutcome"
+                        },
+                        "certificationOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "certificationOutcome"
+                        },
+                        "adjudicationOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "adjudicationOutcome"
+                        },
+                        "controlOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "controlOutcome"
+                        },
+                        "holdOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "holdOutcome"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/7"
+        },
+        "value": {
+          "bindingId": "port:protect-agent-interlock-control-plane-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "controlOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "CONTROL"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "OPERATOR_ACTION_APPLIED"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "controlOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "providers": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/0"
+        },
+        "value": {
+          "bindingId": "contract-admission",
+          "providerCapabilityId": "sda-schema-contract-admission.v1",
+          "provider": "ScenarioKernel.NodePlatform.Schema.JsonSchemaContractAdmission",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/1"
+        },
+        "value": {
+          "bindingId": "port:activate-agent-interlock-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/2"
+        },
+        "value": {
+          "bindingId": "port:adjudicate-covered-agent-tool-call-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/3"
+        },
+        "value": {
+          "bindingId": "port:admit-agent-interlock-request-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/4"
+        },
+        "value": {
+          "bindingId": "port:certify-live-agent-interlock-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/5"
+        },
+        "value": {
+          "bindingId": "port:hold-untrusted-or-uncovered-agent-operation-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/6"
+        },
+        "value": {
+          "bindingId": "port:interlock-agent-operation-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/7"
+        },
+        "value": {
+          "bindingId": "port:protect-agent-interlock-control-plane-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      }
+    ],
+    "contracts": [
+      {
+        "source": {
+          "entryId": "contracts/input.schema.json",
+          "entryRef": "capabilities/interlock-agent-operation/contracts/input.schema.json",
+          "entryDigest": "sha256:ec6c84a5b4142ef26d900b17530684f0748112e64ee69f20256264d08869626d",
+          "snapshot": "data/capsule-evidence/entries/ec6c84a5b4142ef26d900b17530684f0748112e64ee69f20256264d08869626d-d95efbe98fad66b9.json",
+          "pointer": ""
+        },
+        "value": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+          "title": "Agent Interlock Input Family",
+          "type": "object",
+          "required": [
+            "contractId",
+            "payload"
+          ],
+          "properties": {
+            "contractId": {
+              "enum": [
+                "agent-interlock-operation-request.v1",
+                "admitted-agent-interlock-activation-request.v1",
+                "agent-interlock-certification-request.v1",
+                "covered-agent-tool-call.v1",
+                "agent-interlock-control-request.v1",
+                "untrusted-agent-operation.v1"
+              ]
+            },
+            "payload": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "contracts/outcome.schema.json",
+          "entryRef": "capabilities/interlock-agent-operation/contracts/outcome.schema.json",
+          "entryDigest": "sha256:56dcfdaace83f4be7272c314dc31543c34e2019aa270165d306bd5b0d5e0088d",
+          "snapshot": "data/capsule-evidence/entries/56dcfdaace83f4be7272c314dc31543c34e2019aa270165d306bd5b0d5e0088d-6145bc2ccc7b92d0.json",
+          "pointer": ""
+        },
+        "value": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+          "title": "Agent Interlock Outcome Family",
+          "type": "object",
+          "required": [
+            "contractId",
+            "payload"
+          ],
+          "properties": {
+            "contractId": {
+              "enum": [
+                "agent-interlock-operation-request.v1",
+                "agent-interlock-operation-outcome.v1",
+                "admitted-agent-interlock-request.v1",
+                "agent-interlock-activation-outcome.v1",
+                "agent-interlock-certification-outcome.v1",
+                "agent-tool-call-disposition.v1",
+                "agent-interlock-control-outcome.v1",
+                "governance-hold.v1"
+              ]
+            },
+            "payload": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    ],
+    "topology": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/compositionPolicy"
+        },
+        "value": {
+          "carrierMode": "previous-admitted-outcome",
+          "contractAdmissionMode": "each-scenario-boundary",
+          "lineageMode": "retain-root-and-parent-execution",
+          "failureMode": "stop-at-first-non-success",
+          "cycleMode": "reject-recursive-invocation"
+        }
+      }
+    ],
+    "fixtures": [
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/0"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "activate-session",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "ACTIVATE"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-ready",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "ACTIVATION_READY"
+                },
+                {
+                  "conditionId": "activation-outcome-is-attached",
+                  "path": "payload.details.activationOutcome",
+                  "operator": "equals",
+                  "value": "ATTACHED_IN_SESSION"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/1"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "certify-session",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "CERTIFY"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-established",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "CERTIFICATION_ESTABLISHED"
+                },
+                {
+                  "conditionId": "certification-outcome-is-proven",
+                  "path": "payload.details.certificationOutcome",
+                  "operator": "equals",
+                  "value": "GOVERNANCE_PROVEN"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/2"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "adjudicate-tool-call",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "ADJUDICATE",
+                "toolId": "safe-tool"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-adjudicated",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "OPERATION_ADJUDICATED"
+                },
+                {
+                  "conditionId": "adjudication-outcome-is-allow",
+                  "path": "payload.details.adjudicationOutcome",
+                  "operator": "equals",
+                  "value": "ALLOW"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/3"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "adjudicate-dangerous-tool",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "ADJUDICATE",
+                "toolId": "dangerous-tool"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-adjudicated",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "OPERATION_ADJUDICATED"
+                },
+                {
+                  "conditionId": "adjudication-outcome-is-operator-required",
+                  "path": "payload.details.adjudicationOutcome",
+                  "operator": "equals",
+                  "value": "OPERATOR_REQUIRED"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/4"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "control-plane-action",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "CONTROL"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-applied",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "OPERATOR_ACTION_APPLIED"
+                },
+                {
+                  "conditionId": "control-outcome-is-applied",
+                  "path": "payload.details.controlOutcome",
+                  "operator": "equals",
+                  "value": "OPERATOR_ACTION_APPLIED"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/5"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "held-invalid-operation",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "INVALID"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-held",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "GOVERNANCE_HELD"
+                },
+                {
+                  "conditionId": "admission-status-is-held",
+                  "path": "payload.details.admissionStatus",
+                  "operator": "equals",
+                  "value": "HELD"
+                },
+                {
+                  "conditionId": "hold-outcome-is-malformed",
+                  "path": "payload.details.holdOutcome",
+                  "operator": "equals",
+                  "value": "MALFORMED_HOOK_INPUT"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "receipts": [
+      {
+        "source": {
+          "entryId": "runtime.projection-conformance.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/projection-conformance.json",
+          "entryDigest": "sha256:eff29d9d763919b405a021fc126f66b5b0c552c3cbe74d8ddb85f9781e4b2eed",
+          "snapshot": "data/capsule-evidence/entries/eff29d9d763919b405a021fc126f66b5b0c552c3cbe74d8ddb85f9781e4b2eed-ee9aa28e84782ab3.json",
+          "pointer": ""
+        },
+        "value": {
+          "conformanceType": "projected-artifact-mechanical-sterility.v1",
+          "sourceOrigin": "PROJECTED",
+          "forbiddenExecutableMechanics": {
+            "branch": 0,
+            "iteration": 0,
+            "exception-handling": 0,
+            "throw": 0,
+            "object-construction": 0,
+            "serialization": 0,
+            "normalization": 0,
+            "validation": 0,
+            "fallback": 0,
+            "retry": 0,
+            "state-mutation": 0,
+            "meaning-hidden-in-text": 0
+          },
+          "violations": [],
+          "disposition": "PURE_PROJECTION_CONFORMS"
+        }
+      }
+    ]
+  },
+  "providerQualification": "Bindings are declared suppliers, not proof of live availability. Simulation requires explicit fixture/provider evidence.",
+  "inputReality": {
+    "sourceSteps": [
+      {
+        "text": "one contract-admitted activation, certification, adjudication, or authenticated operator-control request",
+        "line": 47
+      }
+    ],
+    "contracts": [
+      {
+        "source": {
+          "entryId": "contracts/input.schema.json",
+          "entryRef": "capabilities/interlock-agent-operation/contracts/input.schema.json",
+          "entryDigest": "sha256:ec6c84a5b4142ef26d900b17530684f0748112e64ee69f20256264d08869626d",
+          "snapshot": "data/capsule-evidence/entries/ec6c84a5b4142ef26d900b17530684f0748112e64ee69f20256264d08869626d-d95efbe98fad66b9.json",
+          "pointer": ""
+        },
+        "value": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+          "title": "Agent Interlock Input Family",
+          "type": "object",
+          "required": [
+            "contractId",
+            "payload"
+          ],
+          "properties": {
+            "contractId": {
+              "enum": [
+                "agent-interlock-operation-request.v1",
+                "admitted-agent-interlock-activation-request.v1",
+                "agent-interlock-certification-request.v1",
+                "covered-agent-tool-call.v1",
+                "agent-interlock-control-request.v1",
+                "untrusted-agent-operation.v1"
+              ]
+            },
+            "payload": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "contracts/outcome.schema.json",
+          "entryRef": "capabilities/interlock-agent-operation/contracts/outcome.schema.json",
+          "entryDigest": "sha256:56dcfdaace83f4be7272c314dc31543c34e2019aa270165d306bd5b0d5e0088d",
+          "snapshot": "data/capsule-evidence/entries/56dcfdaace83f4be7272c314dc31543c34e2019aa270165d306bd5b0d5e0088d-6145bc2ccc7b92d0.json",
+          "pointer": ""
+        },
+        "value": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+          "title": "Agent Interlock Outcome Family",
+          "type": "object",
+          "required": [
+            "contractId",
+            "payload"
+          ],
+          "properties": {
+            "contractId": {
+              "enum": [
+                "agent-interlock-operation-request.v1",
+                "agent-interlock-operation-outcome.v1",
+                "admitted-agent-interlock-request.v1",
+                "agent-interlock-activation-outcome.v1",
+                "agent-interlock-certification-outcome.v1",
+                "agent-tool-call-disposition.v1",
+                "agent-interlock-control-outcome.v1",
+                "governance-hold.v1"
+              ]
+            },
+            "payload": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    ],
+    "actors": [
+      "operator"
+    ],
+    "humanSituation": "Requires editorial interpretation from the cited input contracts."
+  },
+  "eventExecutionReality": {
+    "responsibilities": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/0"
+        },
+        "value": {
+          "nodeId": "interlock-agent-operation",
+          "scenario": {
+            "scenarioId": "interlock-agent-operation",
+            "input": {
+              "inputId": "agent-interlock-operation-request",
+              "contract": {
+                "contractId": "agent-interlock-operation-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "interlock-agent-operation",
+              "executionAuthorityId": "interlock-agent-operation.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-operation-outcome",
+              "contract": {
+                "contractId": "agent-interlock-operation-outcome.v1"
+              },
+              "terminal": true
+            }
+          },
+          "operations": [
+            {
+              "operationId": "interlock-agent-operation.operation.1",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "admit-agent-interlock-request"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.2",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "activate-agent-interlock"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.3",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "certify-live-agent-interlock"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.4",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "adjudicate-covered-agent-tool-call"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.5",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "protect-agent-interlock-control-plane"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.6",
+              "kind": "invoke-scenario",
+              "scenarioNodeId": "hold-untrusted-or-uncovered-agent-operation"
+            },
+            {
+              "operationId": "interlock-agent-operation.operation.7",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:interlock-agent-operation-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/1"
+        },
+        "value": {
+          "nodeId": "admit-agent-interlock-request",
+          "scenario": {
+            "scenarioId": "admit-agent-interlock-request",
+            "input": {
+              "inputId": "agent-interlock-operation-request",
+              "contract": {
+                "contractId": "agent-interlock-operation-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "admit-agent-interlock-request",
+              "executionAuthorityId": "admit-agent-interlock-request.v1"
+            },
+            "outcome": {
+              "outcomeId": "admitted-agent-interlock-request",
+              "contract": {
+                "contractId": "admitted-agent-interlock-request.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "admit-agent-interlock-request.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:admit-agent-interlock-request-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/2"
+        },
+        "value": {
+          "nodeId": "activate-agent-interlock",
+          "scenario": {
+            "scenarioId": "activate-agent-interlock",
+            "input": {
+              "inputId": "admitted-agent-interlock-activation-request",
+              "contract": {
+                "contractId": "admitted-agent-interlock-activation-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "activate-agent-interlock",
+              "executionAuthorityId": "activate-agent-interlock.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-activation-outcome",
+              "contract": {
+                "contractId": "agent-interlock-activation-outcome.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "activate-agent-interlock.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:activate-agent-interlock-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/3"
+        },
+        "value": {
+          "nodeId": "certify-live-agent-interlock",
+          "scenario": {
+            "scenarioId": "certify-live-agent-interlock",
+            "input": {
+              "inputId": "agent-interlock-certification-request",
+              "contract": {
+                "contractId": "agent-interlock-certification-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "certify-live-agent-interlock",
+              "executionAuthorityId": "certify-live-agent-interlock.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-certification-outcome",
+              "contract": {
+                "contractId": "agent-interlock-certification-outcome.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "certify-live-agent-interlock.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:certify-live-agent-interlock-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/4"
+        },
+        "value": {
+          "nodeId": "adjudicate-covered-agent-tool-call",
+          "scenario": {
+            "scenarioId": "adjudicate-covered-agent-tool-call",
+            "input": {
+              "inputId": "covered-agent-tool-call",
+              "contract": {
+                "contractId": "covered-agent-tool-call.v1"
+              }
+            },
+            "event": {
+              "eventId": "adjudicate-covered-agent-tool-call",
+              "executionAuthorityId": "adjudicate-covered-agent-tool-call.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-tool-call-disposition",
+              "contract": {
+                "contractId": "agent-tool-call-disposition.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "adjudicate-covered-agent-tool-call.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:adjudicate-covered-agent-tool-call-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/5"
+        },
+        "value": {
+          "nodeId": "protect-agent-interlock-control-plane",
+          "scenario": {
+            "scenarioId": "protect-agent-interlock-control-plane",
+            "input": {
+              "inputId": "agent-interlock-control-request",
+              "contract": {
+                "contractId": "agent-interlock-control-request.v1"
+              }
+            },
+            "event": {
+              "eventId": "protect-agent-interlock-control-plane",
+              "executionAuthorityId": "protect-agent-interlock-control-plane.v1"
+            },
+            "outcome": {
+              "outcomeId": "agent-interlock-control-outcome",
+              "contract": {
+                "contractId": "agent-interlock-control-outcome.v1"
+              },
+              "terminal": false
+            }
+          },
+          "operations": [
+            {
+              "operationId": "protect-agent-interlock-control-plane.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:protect-agent-interlock-control-plane-port"
+            }
+          ],
+          "transition": null
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/6"
+        },
+        "value": {
+          "nodeId": "hold-untrusted-or-uncovered-agent-operation",
+          "scenario": {
+            "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+            "input": {
+              "inputId": "untrusted-agent-operation",
+              "contract": {
+                "contractId": "untrusted-agent-operation.v1"
+              }
+            },
+            "event": {
+              "eventId": "hold-untrusted-or-uncovered-agent-operation",
+              "executionAuthorityId": "hold-untrusted-or-uncovered-agent-operation.v1"
+            },
+            "outcome": {
+              "outcomeId": "governance-hold",
+              "contract": {
+                "contractId": "governance-hold.v1"
+              },
+              "terminal": true
+            }
+          },
+          "operations": [
+            {
+              "operationId": "hold-untrusted-or-uncovered-agent-operation.operation.1",
+              "kind": "invoke-port",
+              "mechanicBindingId": "port:hold-untrusted-or-uncovered-agent-operation-port"
+            }
+          ],
+          "transition": null
+        }
+      }
+    ],
+    "mechanics": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/0"
+        },
+        "value": {
+          "bindingId": "contract-admission",
+          "mechanicType": "contract-admission",
+          "providerCapabilityId": "sda-schema-contract-admission.v1",
+          "provider": "ScenarioKernel.NodePlatform.Schema.JsonSchemaContractAdmission",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "contractAuthorities": {
+              "authorityType": "consumer-contract-authorities.v1",
+              "contracts": {
+                "agent-interlock-operation-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "admitted-agent-interlock-activation-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-certification-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "covered-agent-tool-call.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-control-request.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "untrusted-agent-operation.v1": {
+                  "schemaRef": "input.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                  "schemaDigest": "212d6b8cf1bb4474f85b7de1bb29e82ff507b85e8945964b8ac949085cbe4e10",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
+                    "title": "Agent Interlock Input Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "admitted-agent-interlock-activation-request.v1",
+                          "agent-interlock-certification-request.v1",
+                          "covered-agent-tool-call.v1",
+                          "agent-interlock-control-request.v1",
+                          "untrusted-agent-operation.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-operation-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "admitted-agent-interlock-request.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-activation-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-certification-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-tool-call-disposition.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "agent-interlock-control-outcome.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "governance-hold.v1": {
+                  "schemaRef": "outcome.schema.json",
+                  "schemaId": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                  "schemaDigest": "3d36262a1f30f9a8832fe5eccef3d08d266a6b40fb47c3d52c4e53951d27c18a",
+                  "schema": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://schemas.agentic-harness.local/contracts/outcome.schema.json",
+                    "title": "Agent Interlock Outcome Family",
+                    "type": "object",
+                    "required": [
+                      "contractId",
+                      "payload"
+                    ],
+                    "properties": {
+                      "contractId": {
+                        "enum": [
+                          "agent-interlock-operation-request.v1",
+                          "agent-interlock-operation-outcome.v1",
+                          "admitted-agent-interlock-request.v1",
+                          "agent-interlock-activation-outcome.v1",
+                          "agent-interlock-certification-outcome.v1",
+                          "agent-tool-call-disposition.v1",
+                          "agent-interlock-control-outcome.v1",
+                          "governance-hold.v1"
+                        ]
+                      },
+                      "payload": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/1"
+        },
+        "value": {
+          "bindingId": "port:activate-agent-interlock-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "activationOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "ACTIVATE"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "ATTACHED_IN_SESSION"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "activationOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/2"
+        },
+        "value": {
+          "bindingId": "port:adjudicate-covered-agent-tool-call-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "adjudicationOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "ADJUDICATE"
+                        }
+                      },
+                      "then": {
+                        "op": "if",
+                        "when": {
+                          "op": "equals",
+                          "left": {
+                            "op": "path",
+                            "from": "input",
+                            "path": "payload.toolId"
+                          },
+                          "right": {
+                            "op": "literal",
+                            "value": "dangerous-tool"
+                          }
+                        },
+                        "then": {
+                          "op": "literal",
+                          "value": "OPERATOR_REQUIRED"
+                        },
+                        "else": {
+                          "op": "literal",
+                          "value": "ALLOW"
+                        }
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "adjudicationOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/3"
+        },
+        "value": {
+          "bindingId": "port:admit-agent-interlock-request-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "admissionStatus": {
+                      "op": "if",
+                      "when": {
+                        "op": "includes",
+                        "in": {
+                          "op": "literal",
+                          "value": [
+                            "ACTIVATE",
+                            "CERTIFY",
+                            "ADJUDICATE",
+                            "CONTROL"
+                          ]
+                        },
+                        "value": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "ADMITTED"
+                      },
+                      "else": {
+                        "op": "literal",
+                        "value": "HELD"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/4"
+        },
+        "value": {
+          "bindingId": "port:certify-live-agent-interlock-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "certificationOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "CERTIFY"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "GOVERNANCE_PROVEN"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "certificationOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/5"
+        },
+        "value": {
+          "bindingId": "port:hold-untrusted-or-uncovered-agent-operation-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "holdOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "admissionStatus"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "HELD"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "MALFORMED_HOOK_INPUT"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "holdOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/6"
+        },
+        "value": {
+          "bindingId": "port:interlock-agent-operation-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "object",
+              "fields": {
+                "contractId": {
+                  "op": "literal",
+                  "value": "agent-interlock-operation-outcome.v1"
+                },
+                "payload": {
+                  "op": "object",
+                  "fields": {
+                    "disposition": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "admissionStatus"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "HELD"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "GOVERNANCE_HELD"
+                      },
+                      "else": {
+                        "op": "if",
+                        "when": {
+                          "op": "equals",
+                          "left": {
+                            "op": "path",
+                            "from": "input",
+                            "path": "payload.operation"
+                          },
+                          "right": {
+                            "op": "literal",
+                            "value": "ACTIVATE"
+                          }
+                        },
+                        "then": {
+                          "op": "literal",
+                          "value": "ACTIVATION_READY"
+                        },
+                        "else": {
+                          "op": "if",
+                          "when": {
+                            "op": "equals",
+                            "left": {
+                              "op": "path",
+                              "from": "input",
+                              "path": "payload.operation"
+                            },
+                            "right": {
+                              "op": "literal",
+                              "value": "CERTIFY"
+                            }
+                          },
+                          "then": {
+                            "op": "literal",
+                            "value": "CERTIFICATION_ESTABLISHED"
+                          },
+                          "else": {
+                            "op": "if",
+                            "when": {
+                              "op": "equals",
+                              "left": {
+                                "op": "path",
+                                "from": "input",
+                                "path": "payload.operation"
+                              },
+                              "right": {
+                                "op": "literal",
+                                "value": "ADJUDICATE"
+                              }
+                            },
+                            "then": {
+                              "op": "literal",
+                              "value": "OPERATION_ADJUDICATED"
+                            },
+                            "else": {
+                              "op": "if",
+                              "when": {
+                                "op": "equals",
+                                "left": {
+                                  "op": "path",
+                                  "from": "input",
+                                  "path": "payload.operation"
+                                },
+                                "right": {
+                                  "op": "literal",
+                                  "value": "CONTROL"
+                                }
+                              },
+                              "then": {
+                                "op": "literal",
+                                "value": "OPERATOR_ACTION_APPLIED"
+                              },
+                              "else": {
+                                "op": "literal",
+                                "value": "GOVERNANCE_HELD"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "details": {
+                      "op": "object",
+                      "fields": {
+                        "admissionStatus": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "admissionStatus"
+                        },
+                        "activationOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "activationOutcome"
+                        },
+                        "certificationOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "certificationOutcome"
+                        },
+                        "adjudicationOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "adjudicationOutcome"
+                        },
+                        "controlOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "controlOutcome"
+                        },
+                        "holdOutcome": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "holdOutcome"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/7"
+        },
+        "value": {
+          "bindingId": "port:protect-agent-interlock-control-plane-port",
+          "mechanicType": "event-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs",
+          "configuration": {
+            "expression": {
+              "op": "merge",
+              "values": [
+                {
+                  "op": "path",
+                  "from": "input",
+                  "path": ""
+                },
+                {
+                  "op": "object",
+                  "fields": {
+                    "controlOutcome": {
+                      "op": "if",
+                      "when": {
+                        "op": "equals",
+                        "left": {
+                          "op": "path",
+                          "from": "input",
+                          "path": "payload.operation"
+                        },
+                        "right": {
+                          "op": "literal",
+                          "value": "CONTROL"
+                        }
+                      },
+                      "then": {
+                        "op": "literal",
+                        "value": "OPERATOR_ACTION_APPLIED"
+                      },
+                      "else": {
+                        "op": "path",
+                        "from": "input",
+                        "path": "controlOutcome"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "providers": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/0"
+        },
+        "value": {
+          "bindingId": "contract-admission",
+          "providerCapabilityId": "sda-schema-contract-admission.v1",
+          "provider": "ScenarioKernel.NodePlatform.Schema.JsonSchemaContractAdmission",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/1"
+        },
+        "value": {
+          "bindingId": "port:activate-agent-interlock-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/2"
+        },
+        "value": {
+          "bindingId": "port:adjudicate-covered-agent-tool-call-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/3"
+        },
+        "value": {
+          "bindingId": "port:admit-agent-interlock-request-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/4"
+        },
+        "value": {
+          "bindingId": "port:certify-live-agent-interlock-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/5"
+        },
+        "value": {
+          "bindingId": "port:hold-untrusted-or-uncovered-agent-operation-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/6"
+        },
+        "value": {
+          "bindingId": "port:interlock-agent-operation-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/7"
+        },
+        "value": {
+          "bindingId": "port:protect-agent-interlock-control-plane-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      }
+    ],
+    "topology": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/compositionPolicy"
+        },
+        "value": {
+          "carrierMode": "previous-admitted-outcome",
+          "contractAdmissionMode": "each-scenario-boundary",
+          "lineageMode": "retain-root-and-parent-execution",
+          "failureMode": "stop-at-first-non-success",
+          "cycleMode": "reject-recursive-invocation"
+        }
+      }
+    ],
+    "sideEffects": "Inspect exact mechanic configuration and effect policy; no inference from capability name."
+  },
+  "outcomeReality": {
+    "sourceSteps": [
+      {
+        "text": "return its exact ready, established, adjudicated, applied, or held outcome without treating activation, configuration, or an agent report as proof",
+        "line": 49
+      }
+    ],
+    "evidence": [
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/0"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "activate-session",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "ACTIVATE"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-ready",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "ACTIVATION_READY"
+                },
+                {
+                  "conditionId": "activation-outcome-is-attached",
+                  "path": "payload.details.activationOutcome",
+                  "operator": "equals",
+                  "value": "ATTACHED_IN_SESSION"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/1"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "certify-session",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "CERTIFY"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-established",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "CERTIFICATION_ESTABLISHED"
+                },
+                {
+                  "conditionId": "certification-outcome-is-proven",
+                  "path": "payload.details.certificationOutcome",
+                  "operator": "equals",
+                  "value": "GOVERNANCE_PROVEN"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/2"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "adjudicate-tool-call",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "ADJUDICATE",
+                "toolId": "safe-tool"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-adjudicated",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "OPERATION_ADJUDICATED"
+                },
+                {
+                  "conditionId": "adjudication-outcome-is-allow",
+                  "path": "payload.details.adjudicationOutcome",
+                  "operator": "equals",
+                  "value": "ALLOW"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/3"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "adjudicate-dangerous-tool",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "ADJUDICATE",
+                "toolId": "dangerous-tool"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-adjudicated",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "OPERATION_ADJUDICATED"
+                },
+                {
+                  "conditionId": "adjudication-outcome-is-operator-required",
+                  "path": "payload.details.adjudicationOutcome",
+                  "operator": "equals",
+                  "value": "OPERATOR_REQUIRED"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/4"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "control-plane-action",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "CONTROL"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-applied",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "OPERATOR_ACTION_APPLIED"
+                },
+                {
+                  "conditionId": "control-outcome-is-applied",
+                  "path": "payload.details.controlOutcome",
+                  "operator": "equals",
+                  "value": "OPERATOR_ACTION_APPLIED"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "source": {
+          "entryId": "fixtures.authority.json",
+          "entryRef": "capabilities/interlock-agent-operation/fixtures.authority.json",
+          "entryDigest": "sha256:461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690",
+          "snapshot": "data/capsule-evidence/entries/461b5975f52a5f1f989ec4ddfb23e65634f0e3caaa0fb0fbb65389c8616ec690-4ac004eb7ed962b7.json",
+          "pointer": "/fixtures/5"
+        },
+        "value": {
+          "scope": "capability",
+          "executionStatus": "DECLARED_EXPECTATION_NOT_EXECUTED",
+          "fixture": {
+            "fixtureId": "held-invalid-operation",
+            "input": {
+              "contractId": "agent-interlock-operation-request.v1",
+              "payload": {
+                "operation": "INVALID"
+              }
+            },
+            "portOutcomes": {
+              "authority-driven-composition": {
+                "authority": "interfaces.authority.json"
+              }
+            },
+            "expected": {
+              "disposition": "terminated",
+              "terminalScenarioId": "interlock-agent-operation",
+              "scenarioSequence": [
+                "interlock-agent-operation"
+              ],
+              "outcomeAssertions": [
+                {
+                  "conditionId": "disposition-is-held",
+                  "path": "payload.disposition",
+                  "operator": "equals",
+                  "value": "GOVERNANCE_HELD"
+                },
+                {
+                  "conditionId": "admission-status-is-held",
+                  "path": "payload.details.admissionStatus",
+                  "operator": "equals",
+                  "value": "HELD"
+                },
+                {
+                  "conditionId": "hold-outcome-is-malformed",
+                  "path": "payload.details.holdOutcome",
+                  "operator": "equals",
+                  "value": "MALFORMED_HOOK_INPUT"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "observedExecution": false
+  },
+  "visualDirection": {
+    "status": "CANDIDATE_REQUIRES_SEMANTIC_REVIEW",
+    "input": "Establish the human situation and supplied artifacts described by the input contracts.",
+    "event": "Expose each cited responsibility and its concrete transformation, validation, or provider interaction.",
+    "outcome": "Show only the resulting product and disposition supported by the selected fixture and contracts.",
+    "continuity": [
+      "Preserve source identities",
+      "Keep declared inputs distinct from derived working products"
+    ],
+    "mechanicalOverlays": [
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/0"
+        },
+        "value": {
+          "bindingId": "contract-admission",
+          "providerCapabilityId": "sda-schema-contract-admission.v1",
+          "provider": "ScenarioKernel.NodePlatform.Schema.JsonSchemaContractAdmission",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/1"
+        },
+        "value": {
+          "bindingId": "port:activate-agent-interlock-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/2"
+        },
+        "value": {
+          "bindingId": "port:adjudicate-covered-agent-tool-call-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/3"
+        },
+        "value": {
+          "bindingId": "port:admit-agent-interlock-request-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/4"
+        },
+        "value": {
+          "bindingId": "port:certify-live-agent-interlock-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/5"
+        },
+        "value": {
+          "bindingId": "port:hold-untrusted-or-uncovered-agent-operation-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/6"
+        },
+        "value": {
+          "bindingId": "port:interlock-agent-operation-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/mechanicBindings/7"
+        },
+        "value": {
+          "bindingId": "port:protect-agent-interlock-control-plane-port",
+          "providerCapabilityId": "sda-authority-transformation-port.v1",
+          "provider": "ScenarioKernel.NodePlatform.Execution.AuthorityTransformation",
+          "implementationRef": "languages/typescript/runtimes/node/admitted-consumer-platform.mjs"
+        }
+      },
+      {
+        "source": {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/compositionPolicy"
+        },
+        "value": {
+          "carrierMode": "previous-admitted-outcome",
+          "contractAdmissionMode": "each-scenario-boundary",
+          "lineageMode": "retain-root-and-parent-execution",
+          "failureMode": "stop-at-first-non-success",
+          "cycleMode": "reject-recursive-invocation"
+        }
+      }
+    ],
+    "unresolved": [
+      "Specific human environment",
+      "Fixture selection",
+      "Mechanical-to-visible mapping",
+      "Audience legibility"
+    ]
+  },
+  "animationBeats": [
+    {
+      "ordinal": 0,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "interlock-agent-operation",
+        "scenario": {
+          "scenarioId": "interlock-agent-operation",
+          "input": {
+            "inputId": "agent-interlock-operation-request",
+            "contract": {
+              "contractId": "agent-interlock-operation-request.v1"
+            }
+          },
+          "event": {
+            "eventId": "interlock-agent-operation",
+            "executionAuthorityId": "interlock-agent-operation.v1"
+          },
+          "outcome": {
+            "outcomeId": "agent-interlock-operation-outcome",
+            "contract": {
+              "contractId": "agent-interlock-operation-outcome.v1"
+            },
+            "terminal": true
+          }
+        },
+        "operations": [
+          {
+            "operationId": "interlock-agent-operation.operation.1",
+            "kind": "invoke-scenario",
+            "scenarioNodeId": "admit-agent-interlock-request"
+          },
+          {
+            "operationId": "interlock-agent-operation.operation.2",
+            "kind": "invoke-scenario",
+            "scenarioNodeId": "activate-agent-interlock"
+          },
+          {
+            "operationId": "interlock-agent-operation.operation.3",
+            "kind": "invoke-scenario",
+            "scenarioNodeId": "certify-live-agent-interlock"
+          },
+          {
+            "operationId": "interlock-agent-operation.operation.4",
+            "kind": "invoke-scenario",
+            "scenarioNodeId": "adjudicate-covered-agent-tool-call"
+          },
+          {
+            "operationId": "interlock-agent-operation.operation.5",
+            "kind": "invoke-scenario",
+            "scenarioNodeId": "protect-agent-interlock-control-plane"
+          },
+          {
+            "operationId": "interlock-agent-operation.operation.6",
+            "kind": "invoke-scenario",
+            "scenarioNodeId": "hold-untrusted-or-uncovered-agent-operation"
+          },
+          {
+            "operationId": "interlock-agent-operation.operation.7",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:interlock-agent-operation-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/0"
+        }
+      ],
+      "visibleChange": null
+    },
+    {
+      "ordinal": 1,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "admit-agent-interlock-request",
+        "scenario": {
+          "scenarioId": "admit-agent-interlock-request",
+          "input": {
+            "inputId": "agent-interlock-operation-request",
+            "contract": {
+              "contractId": "agent-interlock-operation-request.v1"
+            }
+          },
+          "event": {
+            "eventId": "admit-agent-interlock-request",
+            "executionAuthorityId": "admit-agent-interlock-request.v1"
+          },
+          "outcome": {
+            "outcomeId": "admitted-agent-interlock-request",
+            "contract": {
+              "contractId": "admitted-agent-interlock-request.v1"
+            },
+            "terminal": false
+          }
+        },
+        "operations": [
+          {
+            "operationId": "admit-agent-interlock-request.operation.1",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:admit-agent-interlock-request-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/1"
+        }
+      ],
+      "visibleChange": null
+    },
+    {
+      "ordinal": 2,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "activate-agent-interlock",
+        "scenario": {
+          "scenarioId": "activate-agent-interlock",
+          "input": {
+            "inputId": "admitted-agent-interlock-activation-request",
+            "contract": {
+              "contractId": "admitted-agent-interlock-activation-request.v1"
+            }
+          },
+          "event": {
+            "eventId": "activate-agent-interlock",
+            "executionAuthorityId": "activate-agent-interlock.v1"
+          },
+          "outcome": {
+            "outcomeId": "agent-interlock-activation-outcome",
+            "contract": {
+              "contractId": "agent-interlock-activation-outcome.v1"
+            },
+            "terminal": false
+          }
+        },
+        "operations": [
+          {
+            "operationId": "activate-agent-interlock.operation.1",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:activate-agent-interlock-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/2"
+        }
+      ],
+      "visibleChange": null
+    },
+    {
+      "ordinal": 3,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "certify-live-agent-interlock",
+        "scenario": {
+          "scenarioId": "certify-live-agent-interlock",
+          "input": {
+            "inputId": "agent-interlock-certification-request",
+            "contract": {
+              "contractId": "agent-interlock-certification-request.v1"
+            }
+          },
+          "event": {
+            "eventId": "certify-live-agent-interlock",
+            "executionAuthorityId": "certify-live-agent-interlock.v1"
+          },
+          "outcome": {
+            "outcomeId": "agent-interlock-certification-outcome",
+            "contract": {
+              "contractId": "agent-interlock-certification-outcome.v1"
+            },
+            "terminal": false
+          }
+        },
+        "operations": [
+          {
+            "operationId": "certify-live-agent-interlock.operation.1",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:certify-live-agent-interlock-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/3"
+        }
+      ],
+      "visibleChange": null
+    },
+    {
+      "ordinal": 4,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "adjudicate-covered-agent-tool-call",
+        "scenario": {
+          "scenarioId": "adjudicate-covered-agent-tool-call",
+          "input": {
+            "inputId": "covered-agent-tool-call",
+            "contract": {
+              "contractId": "covered-agent-tool-call.v1"
+            }
+          },
+          "event": {
+            "eventId": "adjudicate-covered-agent-tool-call",
+            "executionAuthorityId": "adjudicate-covered-agent-tool-call.v1"
+          },
+          "outcome": {
+            "outcomeId": "agent-tool-call-disposition",
+            "contract": {
+              "contractId": "agent-tool-call-disposition.v1"
+            },
+            "terminal": false
+          }
+        },
+        "operations": [
+          {
+            "operationId": "adjudicate-covered-agent-tool-call.operation.1",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:adjudicate-covered-agent-tool-call-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/4"
+        }
+      ],
+      "visibleChange": null
+    },
+    {
+      "ordinal": 5,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "protect-agent-interlock-control-plane",
+        "scenario": {
+          "scenarioId": "protect-agent-interlock-control-plane",
+          "input": {
+            "inputId": "agent-interlock-control-request",
+            "contract": {
+              "contractId": "agent-interlock-control-request.v1"
+            }
+          },
+          "event": {
+            "eventId": "protect-agent-interlock-control-plane",
+            "executionAuthorityId": "protect-agent-interlock-control-plane.v1"
+          },
+          "outcome": {
+            "outcomeId": "agent-interlock-control-outcome",
+            "contract": {
+              "contractId": "agent-interlock-control-outcome.v1"
+            },
+            "terminal": false
+          }
+        },
+        "operations": [
+          {
+            "operationId": "protect-agent-interlock-control-plane.operation.1",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:protect-agent-interlock-control-plane-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/5"
+        }
+      ],
+      "visibleChange": null
+    },
+    {
+      "ordinal": 6,
+      "status": "EXECUTION_FACT_REQUIRES_VISUAL_DIRECTION",
+      "executionFact": {
+        "nodeId": "hold-untrusted-or-uncovered-agent-operation",
+        "scenario": {
+          "scenarioId": "hold-untrusted-or-uncovered-agent-operation",
+          "input": {
+            "inputId": "untrusted-agent-operation",
+            "contract": {
+              "contractId": "untrusted-agent-operation.v1"
+            }
+          },
+          "event": {
+            "eventId": "hold-untrusted-or-uncovered-agent-operation",
+            "executionAuthorityId": "hold-untrusted-or-uncovered-agent-operation.v1"
+          },
+          "outcome": {
+            "outcomeId": "governance-hold",
+            "contract": {
+              "contractId": "governance-hold.v1"
+            },
+            "terminal": true
+          }
+        },
+        "operations": [
+          {
+            "operationId": "hold-untrusted-or-uncovered-agent-operation.operation.1",
+            "kind": "invoke-port",
+            "mechanicBindingId": "port:hold-untrusted-or-uncovered-agent-operation-port"
+          }
+        ],
+        "transition": null
+      },
+      "sourceRefs": [
+        {
+          "entryId": "runtime.execution-plan.node.v2.json",
+          "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+          "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+          "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+          "pointer": "/nodes/6"
+        }
+      ],
+      "visibleChange": null
+    }
+  ],
+  "disposition": "MECHANICS_EXTRACTED_REQUIRES_DIRECTION",
+  "findings": [],
+  "reviewRequired": true
+}

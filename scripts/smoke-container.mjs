@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const origin = process.argv[2] ?? 'http://127.0.0.1:3000';
 const noindex = process.argv.includes('--noindex');
@@ -7,6 +8,7 @@ const revisionArgument = process.argv.indexOf('--revision');
 const expectedRevision = revisionArgument < 0 ? undefined : process.argv[revisionArgument + 1];
 if (revisionArgument >= 0) assert.ok(expectedRevision, '--revision requires the image source commit');
 const publication = JSON.parse(readFileSync(new URL('../generated/estate-publication.json', import.meta.url), 'utf8'));
+const visuals = JSON.parse(readFileSync(new URL('../generated/visual-publication.json', import.meta.url), 'utf8'));
 const paths = ['/', '/platform', '/capabilities', '/mechanics', '/providers', '/build', '/contact', '/docs/ownership', '/sitemap.xml', '/robots.txt', '/healthz', '/readyz'];
 for (const kind of ['capabilities', 'mechanics', 'providers']) paths.push(`/${kind}/${publication[kind][0].urlKey}`);
 
@@ -53,3 +55,19 @@ assert.equal(new URL(redirect.headers.get('location'), origin).pathname, '/manag
 const missing = await fetch(new URL('/capabilities/estate/not-a-real-capability', origin));
 assert.equal(missing.status, 404);
 console.log(`PASS ${assets.size} static assets, canonical redirect and missing capability`);
+const media=new Set(visuals.visuals.map(v=>v.url));
+for(const edition of visuals.editions)for(const url of [edition.circuitUrl,edition.captions])if(url)media.add(url);
+for(const circuit of [visuals.circuits[0],visuals.circuits.at(-1)])if(circuit)for(const url of circuit.artifacts)media.add(url);
+for(const path of media){
+ const response=await fetch(new URL(path,origin),{signal:AbortSignal.timeout(15000)});
+ assert.equal(response.status,200,`Missing published media ${path}`);
+ const bytes=Buffer.from(await response.arrayBuffer());
+ assert.equal(createHash('sha256').update(bytes).digest('hex'),visuals.artifacts[path].sha256,`Changed published media ${path}`);
+}
+for(const edition of visuals.editions.filter(e=>e.film)){
+ const response=await fetch(new URL(edition.film,origin),{headers:{Range:'bytes=0-1023'},signal:AbortSignal.timeout(15000)});
+ assert.equal(response.status,206,'Film seeking requires HTTP range support');
+ assert.match(response.headers.get('content-range')??'',/^bytes 0-1023\/[0-9]+$/);
+ assert.equal((await response.arrayBuffer()).byteLength,1024);
+}
+console.log(`PASS ${media.size} media byte hashes, published circuit closure samples and film seeking`);

@@ -19,6 +19,8 @@ export default function ProvidersPage() {
   ].sort();
 
   const items: CatalogItem[] = providers.map((provider) => ({
+    kind: provider.kind,
+    visuals: provider.visuals,
     id: provider.entityId,
     href: `/providers/${provider.urlKey}`,
     title: provider.title,

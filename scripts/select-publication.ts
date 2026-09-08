@@ -13,6 +13,7 @@ const manifest = {
   artifacts: {
     'estate-publication.json': digest(publicationBytes),
     'circuit-projections.json': digest(circuitBytes),
+    'visual-publication.json': digest(readFileSync(join(directory, 'visual-publication.json'))),
   },
 };
 const file = join(directory, 'publication-manifest.json');

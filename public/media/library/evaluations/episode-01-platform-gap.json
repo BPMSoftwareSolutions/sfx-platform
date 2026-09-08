@@ -1,0 +1,86 @@
+{
+  "reportVersion": "training-capability-gap.v1",
+  "status": "ENGINEERING_TESTIMONY_NOT_PLATFORM_CHANGE",
+  "capabilityId": "interlock-agent-operation",
+  "source": {
+    "estateManifestDigest": "0b02db7ee691898d499cb9046737dce3f7c34aa8e1e3d6ca4908afeb823fb802",
+    "capsuleDigest": "sha256:4c1b3b1129809ef9bc1f3f8f298918cec65f6285c40e0e2295aaed97be8dccad"
+  },
+  "currentEvidence": [
+    {
+      "fact": "Adjudication compares payload.toolId to dangerous-tool: OPERATOR_REQUIRED if equal, ALLOW otherwise.",
+      "sourceRef": {
+        "entryId": "runtime.execution-plan.node.v2.json",
+        "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+        "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+        "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+        "pointer": "/mechanicBindings/2"
+      }
+    },
+    {
+      "fact": "ACTIVATE produces ATTACHED_IN_SESSION in the stored transformation.",
+      "sourceRef": {
+        "entryId": "runtime.execution-plan.node.v2.json",
+        "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+        "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+        "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+        "pointer": "/mechanicBindings/1"
+      }
+    },
+    {
+      "fact": "CERTIFY produces GOVERNANCE_PROVEN in the stored transformation.",
+      "sourceRef": {
+        "entryId": "runtime.execution-plan.node.v2.json",
+        "entryRef": "capsule-runtime/interlock-agent-operation/execution-plan.node.json",
+        "entryDigest": "sha256:18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38",
+        "snapshot": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+        "pointer": "/mechanicBindings/4"
+      }
+    },
+    {
+      "fact": "The available conformance receipt concerns projected-artifact mechanical sterility, not live hook enforcement.",
+      "sourceRef": {
+        "entryId": "runtime.projection-conformance.json",
+        "entryRef": "capsule-runtime/interlock-agent-operation/projection-conformance.json",
+        "entryDigest": "sha256:eff29d9d763919b405a021fc126f66b5b0c552c3cbe74d8ddb85f9781e4b2eed",
+        "snapshot": "data/capsule-evidence/entries/eff29d9d763919b405a021fc126f66b5b0c552c3cbe74d8ddb85f9781e4b2eed-ee9aa28e84782ab3.json",
+        "pointer": ""
+      }
+    }
+  ],
+  "currentEvidenceLimit": "Inspection establishes the stored decision logic and fixture expectations. No live interception, attachment, authenticated operator effect, or two-sided session probe is observed here.",
+  "targetDesign": "declarations/episode-01-target-interlock.json",
+  "gaps": [
+    {
+      "id": "G01",
+      "missing": "Pre-effect interception and exact tool-path coverage",
+      "acceptance": "A requested unmanaged effect is denied before dispatch, with an observed no-effect receipt."
+    },
+    {
+      "id": "G02",
+      "missing": "Same-session two-sided certification",
+      "acceptance": "Deny and permit probes bind the same activation, session, workspace, adapter, daemon, policy, authority, and ordered time boundary."
+    },
+    {
+      "id": "G03",
+      "missing": "Authority and mechanic resolution beyond a tool-name branch",
+      "acceptance": "Unknown tools and authority mismatches never fall through to permission; exact admitted effect and next legal action are established."
+    },
+    {
+      "id": "G04",
+      "missing": "Authenticated operator control",
+      "acceptance": "An agent-supplied control request cannot grant approval, bypass a hook, or change its own policy."
+    },
+    {
+      "id": "G05",
+      "missing": "Decision-to-effect testimony",
+      "acceptance": "Each actual permitted effect binds its request, authority, decision, provider or mechanic, output, and lineage."
+    },
+    {
+      "id": "G06",
+      "missing": "Failure-path and freshness evidence",
+      "acceptance": "Unavailable adjudication, identity drift, malformed inputs, stale proofs, and uncovered paths hold before effects."
+    }
+  ],
+  "handoff": "Use this as bounded improvement testimony through the governed capability-change lifecycle. This content task does not modify the platform."
+}

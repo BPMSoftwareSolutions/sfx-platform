@@ -1,0 +1,388 @@
+{
+  "contractVersion": "infographic-projection.v1",
+  "grammarVersion": "sidefx-infographic-grammar.v1",
+  "id": "scenario-current",
+  "title": "A decision is not yet an interlock.",
+  "subtitle": "One adjudication scenario · current stored semantics",
+  "altitude": "scenario",
+  "scope": "Stored capsule semantics, source references and authored visual direction. No observed live interception.",
+  "sources": [
+    {
+      "id": "runtime",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Exact runtime execution plan",
+      "encoding": "capsule-entry"
+    },
+    {
+      "id": "capsule",
+      "path": "outputs/scenario-visual-evidence/interlock-agent-operation/interlock-agent-operation.json",
+      "sha256": "4a682135a10ed6a5ea014d31cdd95f380ed39519daddf5da132099fb9e98b90a",
+      "pointer": "",
+      "kind": "DECLARED",
+      "label": "Verified capsule evidence package",
+      "encoding": "json"
+    },
+    {
+      "id": "story",
+      "path": "declarations/episode-01-direction.json",
+      "sha256": "79f3848afd6d7ec33a58140380040bffaa059ed3e63cc7fdea67e0a766328f3d",
+      "pointer": "",
+      "kind": "STAGING",
+      "label": "Fictional human experience",
+      "encoding": "json"
+    },
+    {
+      "id": "target",
+      "path": "declarations/infographic-design-intent.v1.json",
+      "sha256": "ef389df72699c9be8028ac9daeddb7a3251e34f34594805ccb256c2973dfdae9",
+      "pointer": "",
+      "kind": "TARGET",
+      "label": "Intended visual circuit",
+      "encoding": "json"
+    },
+    {
+      "id": "gap",
+      "path": "evaluations/episode-01-platform-gap.json",
+      "sha256": "f1ede79ac956bd79e6d5bc71d8e7828516b36bda612f2da1fa281a406e9b6649",
+      "pointer": "",
+      "kind": "GAP",
+      "label": "Missing live enforcement and testimony",
+      "encoding": "json"
+    },
+    {
+      "id": "adjudication",
+      "path": "data/capsule-evidence/entries/18457e0707fc58e068a67f54d17d6df95e9b1ce0bcb4f5af9653433ab0986b38-f69129442ac57290.json",
+      "sha256": "3faf2878fca1d2d1b091d4e237c7e2d1a25efa06c6f38a011d9aa32b3a35ed08",
+      "pointer": "/mechanicBindings/2",
+      "kind": "DECLARED",
+      "label": "Adjudication expression",
+      "encoding": "capsule-entry"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "domain": "Governed agent work",
+      "scenarioIds": [
+        "adjudication"
+      ],
+      "coverage": "One source scenario",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "adjudication",
+      "capabilityId": "interlock-agent-operation",
+      "label": "Adjudicate covered agent tool call",
+      "nodeIds": [
+        "request",
+        "act",
+        "operator",
+        "allow",
+        "select"
+      ],
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "type": "input",
+      "label": "Admitted call envelope",
+      "detail": "ADJUDICATE / safe-tool",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "mechanic",
+      "productContract": "covered-agent-tool-call.v1"
+    },
+    {
+      "id": "act",
+      "type": "event",
+      "label": "Adjudicate call",
+      "detail": "Stored authority transformation",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic"
+    },
+    {
+      "id": "operator",
+      "type": "outcome",
+      "label": "OPERATOR_REQUIRED",
+      "detail": "Returned decision label",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-tool-call-disposition.v1"
+    },
+    {
+      "id": "allow",
+      "type": "outcome",
+      "label": "ALLOW",
+      "detail": "Returned decision label",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "productContract": "agent-tool-call-disposition.v1"
+    },
+    {
+      "id": "provider",
+      "type": "provider",
+      "label": "Authority transformation",
+      "detail": "Bound provider / live state unknown",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "port",
+      "type": "provider-port",
+      "label": "Adjudication port",
+      "detail": "Required responsibility",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "support"
+    },
+    {
+      "id": "receipt",
+      "type": "evidence",
+      "label": "Expression + fixtures",
+      "detail": "Declared expectations; no live hook proof",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": null,
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "capsule",
+        "adjudication"
+      ],
+      "layer": "support"
+    }
+  ],
+  "junctions": [
+    {
+      "id": "select",
+      "type": "decision",
+      "label": "Tool name?",
+      "detail": "dangerous-tool",
+      "capabilityId": "interlock-agent-operation",
+      "scenarioId": "adjudication",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "layer": "mechanic",
+      "rule": "toolId equals dangerous-tool; otherwise ALLOW"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e00",
+      "source": "request",
+      "target": "act",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e01",
+      "source": "act",
+      "target": "select",
+      "type": "transition",
+      "label": "",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e02",
+      "source": "select",
+      "target": "operator",
+      "type": "transition",
+      "label": "equals",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "guard": "toolId == dangerous-tool"
+    },
+    {
+      "id": "e03",
+      "source": "select",
+      "target": "allow",
+      "type": "transition",
+      "label": "otherwise",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "adjudication"
+      ],
+      "guard": "otherwise"
+    },
+    {
+      "id": "e04",
+      "source": "provider",
+      "target": "port",
+      "type": "provider-binding",
+      "label": "declared binding",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e05",
+      "source": "port",
+      "target": "act",
+      "type": "dependency",
+      "label": "supplies responsibility",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    },
+    {
+      "id": "e06",
+      "source": "receipt",
+      "target": "act",
+      "type": "evidence-attachment",
+      "label": "source semantics",
+      "basis": "DECLARED",
+      "sourceRefs": [
+        "runtime"
+      ]
+    }
+  ],
+  "providers": [
+    {
+      "nodeId": "provider",
+      "portIds": [
+        "port"
+      ],
+      "binding": "bound",
+      "state": "unknown"
+    }
+  ],
+  "humanAnchors": [
+    {
+      "person": "Platform engineer",
+      "input": "She authorized inspection.",
+      "event": "A queued publication needs a decision.",
+      "outcome": "A stored label does not establish that a tool was stopped.",
+      "basis": "STAGING",
+      "sourceRefs": [
+        "story"
+      ]
+    }
+  ],
+  "visualLayers": [
+    "human",
+    "mechanic",
+    "support"
+  ],
+  "animationBeats": [
+    {
+      "phase": "Establish",
+      "caption": "Establish the supplied call envelope.",
+      "entityIds": [
+        "request"
+      ],
+      "edgeIds": []
+    },
+    {
+      "phase": "Activate",
+      "caption": "Open the stored responsibility and its provider binding.",
+      "entityIds": [
+        "act",
+        "port",
+        "provider"
+      ],
+      "edgeIds": [
+        "e00",
+        "e04"
+      ]
+    },
+    {
+      "phase": "Execute",
+      "caption": "Compare the tool name; illustrate the safe-tool alternative.",
+      "entityIds": [
+        "select"
+      ],
+      "edgeIds": [
+        "e01"
+      ]
+    },
+    {
+      "phase": "Resolve",
+      "caption": "The illustrated branch returns ALLOW. This is not effect dispatch.",
+      "entityIds": [
+        "allow"
+      ],
+      "edgeIds": [
+        "e03"
+      ]
+    },
+    {
+      "phase": "Prove",
+      "caption": "Inspect source semantics and fixture expectations; live enforcement remains unproven.",
+      "entityIds": [
+        "receipt"
+      ],
+      "edgeIds": [
+        "e06"
+      ]
+    }
+  ],
+  "zoomAggregations": [
+    {
+      "id": "aggregate:interlock-agent-operation",
+      "label": "Interlock Agent Operation",
+      "altitude": "capability",
+      "memberIds": [
+        "request",
+        "act",
+        "operator",
+        "allow",
+        "provider",
+        "port",
+        "receipt",
+        "select"
+      ]
+    }
+  ],
+  "scenarioRelationships": []
+}

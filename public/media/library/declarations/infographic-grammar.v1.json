@@ -1,0 +1,216 @@
+{
+  "version": "sidefx-infographic-grammar.v1",
+  "principle": "Shape identifies meaning. Evidence status is a separate visual channel. Zoom preserves identity and proof scope.",
+  "nodeTypes": {
+    "input": {
+      "label": "Input",
+      "shape": "rounded-rectangle",
+      "color": "#75baff",
+      "meaning": "Admitted incoming product, data, or state. Name the admission scope; receipt is required to claim observed admission."
+    },
+    "event": {
+      "label": "Event",
+      "shape": "beveled-rectangle",
+      "color": "#4eddeb",
+      "meaning": "Execution or exercise of a responsibility."
+    },
+    "outcome": {
+      "label": "Outcome",
+      "shape": "capsule",
+      "color": "#72e1ad",
+      "meaning": "Resulting product, experience, or disposition. Completion is not implied by shape alone."
+    },
+    "provider-port": {
+      "label": "Provider port",
+      "shape": "socket",
+      "color": "#82a8f9",
+      "meaning": "Required responsibility boundary; distinct from its fulfiller."
+    },
+    "provider": {
+      "label": "Provider",
+      "shape": "tabbed-tile",
+      "color": "#b397ed",
+      "meaning": "Fulfiller attached to one or more ports. Binding and operating state are separate."
+    },
+    "validation": {
+      "label": "Validation",
+      "shape": "shield-check",
+      "color": "#67d7bb",
+      "meaning": "Named conformance or admission criteria; a check glyph does not assert a passed run."
+    },
+    "evidence": {
+      "label": "Evidence",
+      "shape": "document-stack",
+      "color": "#d7ecf6",
+      "meaning": "Source declaration, expectation, observation, or required proof; always identify which."
+    },
+    "human-approval": {
+      "label": "Human approval",
+      "shape": "person-in-gate",
+      "color": "#f2c472",
+      "meaning": "Separately authenticated human decision boundary; no agent self-approval."
+    },
+    "authority": {
+      "label": "Policy / authority",
+      "shape": "top-band-frame",
+      "color": "#f6e6b6",
+      "meaning": "The governing semantic authority for a named operation and scope."
+    }
+  },
+  "junctionTypes": {
+    "branch": {
+      "label": "Branch",
+      "shape": "fork",
+      "color": "#83cfd5",
+      "meaning": "One path chooses exactly one guarded route; includes an explicit otherwise path."
+    },
+    "fan-out": {
+      "label": "Fan-out",
+      "shape": "radial-hub",
+      "color": "#83cfd5",
+      "meaning": "One product feeds every declared outgoing dependent; concurrency is a separate claim."
+    },
+    "convergence": {
+      "label": "Convergence",
+      "shape": "merge",
+      "color": "#83cfd5",
+      "meaning": "Many arrivals form one continuation under a declared all, any, or quorum policy."
+    },
+    "decision": {
+      "label": "Decision / selection",
+      "shape": "diamond",
+      "color": "#83cfd5",
+      "meaning": "Compare alternatives and select one under a named rule. A displayed alternative is not an executed route."
+    },
+    "termination": {
+      "label": "Termination",
+      "shape": "solid-end-cap",
+      "color": "#d7ecf6",
+      "meaning": "This route has ended; no outgoing control or product edge."
+    },
+    "rejection": {
+      "label": "Rejection / hold",
+      "shape": "barred-octagon",
+      "color": "#efa585",
+      "meaning": "Stop the requested effect; retain its exact DENY, HOLD, or rejected disposition and reason."
+    }
+  },
+  "edgeTypes": {
+    "transition": {
+      "label": "Transition",
+      "stroke": "solid-arrow",
+      "meaning": "Directed progression within a capability; does not by itself prove an observed execution."
+    },
+    "product-transfer": {
+      "label": "Product transfer",
+      "stroke": "double-tip-arrow",
+      "meaning": "A named outcome feeds a named input of another capability. Both ports bind the same product contract."
+    },
+    "provider-binding": {
+      "label": "Provider binding",
+      "stroke": "socket-line",
+      "meaning": "A provider fulfills a provider port; no execution flow is implied."
+    },
+    "evidence-attachment": {
+      "label": "Evidence attachment",
+      "stroke": "dotted-no-arrow",
+      "meaning": "Evidence supports or is required by a named claim; never a control-flow continuation."
+    },
+    "authority": {
+      "label": "Governs",
+      "stroke": "gold-no-arrow",
+      "meaning": "Policy controls the named mechanic or decision."
+    },
+    "dependency": {
+      "label": "Dependency",
+      "stroke": "dashed-open-tip",
+      "meaning": "Declared prerequisite only; neither product transfer nor execution order is inferred."
+    },
+    "retry": {
+      "label": "Loop / retry",
+      "stroke": "return-arrow",
+      "meaning": "Bounded reattempt, with maxAttempts, an exit condition, and a terminal stop target."
+    }
+  },
+  "evidenceModes": {
+    "DECLARED": {
+      "label": "CURRENT / DECLARED",
+      "line": "solid",
+      "accent": "#8adfd5",
+      "meaning": "Digest-bound source semantics or fixture expectations, not a successful live run."
+    },
+    "OBSERVED": {
+      "label": "OBSERVED / RECEIPT",
+      "line": "solid",
+      "accent": "#f2f6f8",
+      "meaning": "An inspectable receipt establishes this exact event and scope."
+    },
+    "TARGET": {
+      "label": "TARGET / INTENDED",
+      "line": "status-label",
+      "accent": "#b6a4ff",
+      "meaning": "Authored future design. Keep the primitive's shape and family color; identify the mode with a violet TARGET label, without an enclosing box."
+    },
+    "GAP": {
+      "label": "GAP / REQUIRED",
+      "line": "status-label-and-interrupted-connector",
+      "accent": "#efbe77",
+      "meaning": "Missing evidence or unfinished responsibility. Use an amber GAP label and interrupted supporting connector, with a closure requirement and no enclosing box."
+    },
+    "STAGING": {
+      "label": "HUMAN / ILLUSTRATIVE",
+      "line": "neutral",
+      "accent": "#aab8c8",
+      "meaning": "Fictional human anchor, never implementation proof."
+    }
+  },
+  "providerStates": [
+    "active",
+    "candidate",
+    "simulated",
+    "degraded",
+    "isolated",
+    "unknown"
+  ],
+  "providerBindings": [
+    "bound",
+    "candidate",
+    "open"
+  ],
+  "phases": [
+    "Establish",
+    "Activate",
+    "Execute",
+    "Resolve",
+    "Prove"
+  ],
+  "layout": {
+    "readingOrder": [
+      "input",
+      "event",
+      "outcome"
+    ],
+    "layers": [
+      "human",
+      "mechanic",
+      "support"
+    ],
+    "nodeGap": 28,
+    "edgeLabels": "Explicit guard or product name; no color-only meaning.",
+    "crossings": "Avoid; an unmarked crossing is never a junction.",
+    "typographyPx": {
+      "nodeTitle": 23,
+      "bodyAndEdge": 16,
+      "evidenceCaption": 13,
+      "sectionMicroLabel": 12
+    },
+    "componentBorders": "Draw only the defining primitive geometry. Never add a generic enclosing rectangle around a component."
+  },
+  "zoom": {
+    "scenario": "Input, event, outcome; explicit ports, providers, decisions and evidence.",
+    "capability": "Every scenario remains enumerable with stable identity; shared providers and exact declared relationships remain inspectable.",
+    "estate": "Bounded capability units expose typed input and outcome ports; named domains are editorial groupings, not inferred authority."
+  },
+  "aggregationLaw": "Aggregate membership is explicit. Keep member IDs and evidence-mode counts. Never replace mixed or missing evidence with a single proven state.",
+  "motionLaw": "The same node and edge IDs drive the static SVG and five frame states. Highlighting is illustrative; it never upgrades evidence. Select one branch route; fan-out may highlight all. No automatic playback, and honor reduced motion."
+}

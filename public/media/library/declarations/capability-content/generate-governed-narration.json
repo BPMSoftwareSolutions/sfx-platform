@@ -1,0 +1,494 @@
+{
+  "contractVersion": "capability-content.v1",
+  "capabilityId": "generate-governed-narration",
+  "title": "Generate Governed Narration",
+  "status": "EDITORIALLY_REVIEWED",
+  "source": {
+    "capsuleDigest": "sha256:09a39695433e4f902efc7b5b0442905b8025695fed69022eb3ad2556ef059fe0",
+    "estateManifestDigest": "0b02db7ee691898d499cb9046737dce3f7c34aa8e1e3d6ca4908afeb823fb802"
+  },
+  "scenarioKeys": [
+    "generate-governed-narration::generate-governed-narration",
+    "generate-governed-narration::resolve-narration-generation-authority",
+    "generate-governed-narration::invoke-governed-narration-provider",
+    "generate-governed-narration::materialize-narration-artifact",
+    "generate-governed-narration::admit-governed-narration-asset"
+  ],
+  "audience": "Video producers and engineers responsible for dependable AI-assisted content production.",
+  "humanProblem": "A producer has a script and a ready cut, but cannot continue the edit without usable narration.",
+  "experience": {
+    "input": "A producer has unfinished narration, a marked-up script and waiting work.",
+    "event": "The local demo retains the script, skips an unavailable primary and an incompatible candidate, obtains live speech, and verifies its file.",
+    "outcome": "The producer can hear her narration and return to the cut; one local job is complete."
+  },
+  "entities": [
+    {
+      "entity": "Producer",
+      "input": "Holding the marked script; interrupted, tense",
+      "event": "Leans forward, watches options checked and work resume",
+      "outcome": "Puts on headphones, listens, returns to editing",
+      "continuity": "Same person, charcoal jacket, bun, studio"
+    },
+    {
+      "entity": "Narration script",
+      "input": "Human creative intent, still waiting",
+      "event": "The exact local script digest survives provider selection",
+      "outcome": "Its words are audible in a real WAV",
+      "continuity": "Original text unchanged"
+    },
+    {
+      "entity": "Provider A",
+      "input": "Unavailable in this injected failure",
+      "event": "Kept outside the active path",
+      "outcome": "Remains disconnected",
+      "continuity": "Simulated failure throughout"
+    },
+    {
+      "entity": "Provider B",
+      "input": "Possible alternative",
+      "event": "Rejected: declared text-only capability",
+      "outcome": "Never invoked",
+      "continuity": "Local demonstration candidate"
+    },
+    {
+      "entity": "Provider C",
+      "input": "Compatible audio alternative",
+      "event": "Gemini synthesizes the original narration",
+      "outcome": "Live-generated speech file exists",
+      "continuity": "Actual named model recorded in receipt"
+    },
+    {
+      "entity": "Provider D",
+      "input": "Standby alternative",
+      "event": "Not selected",
+      "outcome": "Not invoked",
+      "continuity": "No fabricated test or service call"
+    },
+    {
+      "entity": "Audio and evidence",
+      "input": "No new narration asset",
+      "event": "Bytes materialize; file is hashed; provider and request retained",
+      "outcome": "Playable narration plus a local receipt",
+      "continuity": "Waveform comes from the actual generated audio"
+    },
+    {
+      "entity": "Queue",
+      "input": "Seven illustrative local jobs",
+      "event": "One narration job handled",
+      "outcome": "Six remain",
+      "continuity": "Never claims the entire queue drained"
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "authority",
+      "meaning": "Bind narration to admitted scene intent and performance profile.",
+      "evidenceIds": [
+        "narration-reality",
+        "direction"
+      ]
+    },
+    {
+      "id": "selection",
+      "meaning": "Preserve the request while distinguishing unavailable, incompatible and selected demo providers.",
+      "evidenceIds": [
+        "demo",
+        "switch-reality"
+      ]
+    },
+    {
+      "id": "realization",
+      "meaning": "Speech response becomes a materialized audio artifact with digest and provenance.",
+      "evidenceIds": [
+        "demo",
+        "audio",
+        "direction"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "promise",
+      "text": "The narration capability accepts an admitted scene graph and returns one narration asset or exact held/rejection evidence.",
+      "kind": "CAPSULE_DECLARATION",
+      "evidenceIds": [
+        "narration-reality"
+      ]
+    },
+    {
+      "id": "boundaries",
+      "text": "The declared narration flow resolves authority, invokes a speech provider, materializes an artifact, and admits the resulting asset.",
+      "kind": "CAPSULE_DECLARATION",
+      "evidenceIds": [
+        "direction",
+        "narration-reality"
+      ]
+    },
+    {
+      "id": "switch-scope",
+      "text": "Provider-switching declarations preserve non-provider meaning and user-facing continuity; they are a supporting responsibility in this editorial composition.",
+      "kind": "CAPSULE_DECLARATION",
+      "evidenceIds": [
+        "switch-reality"
+      ]
+    },
+    {
+      "id": "same-script",
+      "text": "The local demo preserves the exact script digest through provider selection.",
+      "kind": "OBSERVED_LOCAL_DEMO",
+      "evidenceIds": [
+        "demo"
+      ]
+    },
+    {
+      "id": "provider-change",
+      "text": "In the local demo, A is unavailable by simulation, B is text-only and ineligible, C makes a live Gemini speech call, and D is not invoked.",
+      "kind": "OBSERVED_LOCAL_DEMO",
+      "evidenceIds": [
+        "demo"
+      ]
+    },
+    {
+      "id": "playable",
+      "text": "A real 8.21-second WAV is saved and hash-verified; one of seven illustrative local jobs completes.",
+      "kind": "OBSERVED_LOCAL_DEMO",
+      "evidenceIds": [
+        "demo",
+        "audio"
+      ]
+    },
+    {
+      "id": "human-payoff",
+      "text": "The fictional producer listens with relief and returns to editing.",
+      "kind": "EDITORIAL_STAGING",
+      "evidenceIds": [
+        "direction"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "narration-capsule",
+      "path": "data/capsule-evidence/capabilities/generate-governed-narration.json",
+      "sha256": "094a6360a8706bf13cbfa1200414411b70fc53c0ba53b40775b92d19de9bf173",
+      "kind": "CAPSULE_INDEX"
+    },
+    {
+      "id": "narration-reality",
+      "path": "outputs/scenario-visual-evidence/generate-governed-narration/generate-governed-narration.json",
+      "sha256": "342a58e95f93e37052b6324b1ee7321965fcbca6bd9e70d69beabb9d1f99dbc4",
+      "kind": "CAPSULE_EVIDENCE_PACKAGE"
+    },
+    {
+      "id": "switch-reality",
+      "path": "outputs/scenario-visual-evidence/determine-model-role-provider-switch/determine-model-role-provider-switch.json",
+      "sha256": "c4c8ebe622f168b16a096b76b636828eb36943e6261ab3a84c406a0f4747ae31",
+      "kind": "CAPSULE_EVIDENCE_PACKAGE"
+    },
+    {
+      "id": "demo",
+      "path": "samples/narration-continuity/demo.receipt.json",
+      "sha256": "8a0be6b11037613616f102fcc594f7f6570721cb5c7545b8a5e68045044cebb5",
+      "kind": "OBSERVED_LOCAL_DEMO"
+    },
+    {
+      "id": "audio",
+      "path": "samples/narration-continuity/finished-narration.wav",
+      "sha256": "b98b6be36f3efec2ad5f4f2e3b90aba47c4bd3917378069a93a211d6514fd25a",
+      "kind": "GENERATED_AUDIO"
+    },
+    {
+      "id": "direction",
+      "path": "declarations/narration-continuity.film.json",
+      "sha256": "0cbab2403c29baefb0e4d3a61dfed2a268ab0c58e222946fa012ed83df13111c",
+      "kind": "EDITORIAL_DIRECTION"
+    }
+  ],
+  "emotionalArc": [
+    "concern",
+    "focused anticipation",
+    "relief"
+  ],
+  "permittedSurfaces": [
+    "video",
+    "short",
+    "thumbnail",
+    "article",
+    "infographic",
+    "training",
+    "demo",
+    "landing-page",
+    "evidence-story"
+  ],
+  "surfaceContracts": {
+    "video": {
+      "purpose": "Express the same human experience as video.",
+      "structure": [
+        "Human interruption",
+        "Provider action",
+        "Artifact and evidence",
+        "Audible payoff"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "short": {
+      "purpose": "Express the same human experience as short.",
+      "structure": [
+        "Compressed interruption",
+        "One provider transformation",
+        "One audible payoff"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "thumbnail": {
+      "purpose": "Express the same human experience as thumbnail.",
+      "structure": [
+        "Recognizable producer",
+        "Unfinished work or relief",
+        "A truthful curiosity hook"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "article": {
+      "purpose": "Express the same human experience as article.",
+      "structure": [
+        "Human problem",
+        "Capability promise",
+        "Mechanics",
+        "Observed demonstration",
+        "Interpretation and limits"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "infographic": {
+      "purpose": "Express the same human experience as infographic.",
+      "structure": [
+        "Persistent entities",
+        "Input relationships",
+        "Event transformation",
+        "Outcome evidence"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "training": {
+      "purpose": "Express the same human experience as training.",
+      "structure": [
+        "Learning objective",
+        "Scenario",
+        "Demonstration",
+        "Exercise",
+        "Assessment and answer rationale"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "demo": {
+      "purpose": "Express the same human experience as demo.",
+      "structure": [
+        "Failure injection scope",
+        "Ordered candidate checks",
+        "Live audio result",
+        "Verified receipt"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "landing-page": {
+      "purpose": "Express the same human experience as landing-page.",
+      "structure": [
+        "Audience and problem",
+        "Experience promise",
+        "Watch/read/learn/inspect",
+        "Evidence"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    },
+    "evidence-story": {
+      "purpose": "Express the same human experience as evidence-story.",
+      "structure": [
+        "Claim",
+        "Source authority or observed receipt",
+        "What it proves",
+        "What it does not prove"
+      ],
+      "claimIds": [
+        "promise",
+        "boundaries",
+        "switch-scope",
+        "same-script",
+        "provider-change",
+        "playable",
+        "human-payoff"
+      ],
+      "evidenceIds": [
+        "narration-capsule",
+        "narration-reality",
+        "switch-reality",
+        "demo",
+        "audio",
+        "direction"
+      ]
+    }
+  },
+  "scope": "Editorial composition led by Generate Governed Narration, with provider-switching context. The local demo is observed; a managed end-to-end recovery is not asserted. The fictional producer and studio dramatize the human experience.",
+  "storyTitle": "The provider changed. The story stayed hers.",
+  "training": {
+    "objective": "Distinguish capability meaning, provider selection, media materialization, and evidence of completion.",
+    "exercise": "A returns unavailable; B can only return text; C returns an audio payload. Describe the next permitted action and the evidence still needed before declaring an asset ready.",
+    "questions": [
+      {
+        "question": "Does selecting C prove that narration exists?",
+        "options": [
+          "Yes, selection completes the job.",
+          "No, the media must be returned and materialized."
+        ],
+        "correct": 1,
+        "rationale": "Selection and artifact completion are separate boundaries."
+      },
+      {
+        "question": "Which part of the film is an observed fact?",
+        "options": [
+          "The fictional producer experienced a real outage.",
+          "The local demo produced a hash-verified WAV."
+        ],
+        "correct": 1,
+        "rationale": "The producer is staging. The local audio and receipt are inspectable artifacts."
+      },
+      {
+        "question": "Can B serve this audio request?",
+        "options": [
+          "No: its declared modality is text only.",
+          "Yes: any provider is interchangeable."
+        ],
+        "correct": 0,
+        "rationale": "Provider substitution must satisfy the requested modality and other constraints."
+      }
+    ]
+  }
+}

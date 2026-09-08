@@ -13,5 +13,5 @@ export default defineConfig([
   },
   // App Router's shared root layout is the document; the Pages Router rule does not apply.
   { files: ['app/layout.tsx'], rules: { '@next/next/no-page-custom-font': 'off' } },
-  globalIgnores(['.next/**', 'generated/**', 'artifacts/**', 'next-env.d.ts']),
+  globalIgnores(['.next/**', 'generated/**', 'public/media/**', 'artifacts/**', 'next-env.d.ts']),
 ]);
