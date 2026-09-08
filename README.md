@@ -8,8 +8,8 @@ README records how the implementation satisfies it and, just as importantly, whe
 ## Running it
 
 ```bash
-npm install
-npm run publish:estate     # builds generated/ from the estate source
+npm ci
+npm run validate:estate    # validate the committed, selected publication
 npm run dev                # http://localhost:3000
 ```
 
@@ -18,10 +18,14 @@ Other scripts:
 | Script | What it does |
 | --- | --- |
 | `npm run publish:estate` | Reads one pinned generation of the estate and writes `generated/` |
-| `npm run build` | Publishes the estate (tolerating a missing source), then builds |
+| `npm run select:estate` | Validates and pins both generated artifacts in a digest manifest after a deliberate publication refresh |
+| `npm run validate:estate` | Checks the selected bytes, schema, identities, coverage and circuit integrity |
+| `npm run build` | Requires the selected valid publication, then builds standalone output; never reads the development database |
+| `npm run build:preview` | Development preview allowing missing source data; never used by the release workflow |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test` | Publication integrity, route/phase and circuit geometry checks |
-| `npm run check` | Typecheck plus tests |
+| `npm run check` | ESLint, typecheck and tests |
+| `npm run smoke -- <origin> --noindex` | Checks a running staging image through HTTP, including static assets, probes and circuit pages |
 
 ## Where the content comes from
 
@@ -43,6 +47,11 @@ lib/estate.ts  →  pages
 Override the source with `--source <file>` or `SIDEFX_ESTATE_SOURCE`. With no source and no
 existing publication, the site renders its unavailable state and disables dependent actions rather
 than showing an empty catalog (§11.4).
+
+After refreshing source content, run `npm run publish:estate`, then `npm run select:estate`,
+review the publication diff, and commit all three `generated/*.json` artifacts together. Selection
+records exact bytes; it is not evidence of editorial approval or upstream database verification.
+Production builds fail on absent, altered, mixed, empty or incomplete artifacts.
 
 The current generation publishes **218 capabilities, 824 scenario faces, 191 mechanics, 74
 providers and 314 declared provider–mechanic relationships**, plus four preserved findings — see
@@ -86,8 +95,9 @@ test enforces this.
 - **Boundary-view fidelity**: the current generation's blueprints carry nodes and no normalized
   edges, so circuits render the source-backed Input → Event → Responsibility → Outcome boundary
   with unresolved members shown as unresolved. Nothing is inferred to fill a gap.
-- **Contact** with a server action: validation, rate limiting, honeypot, idempotency key, an
-  inquiry reference, and preserved values plus a focused error summary on failure.
+- **Contact** with a server action: validation, rate limiting, honeypot, and preserved values plus
+  a focused error summary. Hosted submissions report unavailable until durable delivery exists;
+  development-only receipts support an idempotency key and temporary reference.
 - **Intent composer** at `/build`: typed and spoken input with equal functionality, retained
   intent, and full handling of denied or unsupported microphone access.
 - **Accessibility**: skip link, semantic menus with expanded state and Escape/focus return,
@@ -110,7 +120,7 @@ otherwise imply it works:
 | Target requirement/readiness records | No capability claims a target. Absence is shown as undeclared, not as "unsupported". |
 | Authenticated workspace | `/workspace/*` and `/sign-in` are registered as unavailable and are unlinked and noindex. |
 | Legal entity identity and approved copy | `/legal/*` describe implemented behavior and state plainly that they are not yet in force. |
-| Mail recipient and provider | An accepted inquiry is recorded with a reference; it never claims delivery. Set `SIDEFX_INQUIRY_RECIPIENT` and `SIDEFX_MAIL_API_KEY`. |
+| Durable inquiry store and mail worker | Hosted builds reject submissions with values preserved. Development receipt is process-local only. Environment variables alone do not enable delivery. |
 | Analytics configuration | No provider is loaded. |
 | P2/P3 routes (`/training`, `/latest`, `/platform/knowledge`, `/pricing`) | Described as planned text where relevant; never linked. |
 
@@ -121,7 +131,18 @@ quietly replaced or a draft presented as live authoring.
 
 | Variable | Purpose |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_ORIGIN` | Canonical origin (default `https://www.sidefx.io`) |
+| `NEXT_PUBLIC_SITE_ORIGIN` | Build-time canonical origin (default `https://www.sidefx.io`); shared across staging and production |
+| `SIDEFX_INDEXING` | Runtime slot setting; `disabled` applies noindex headers to every response and disallows all robots |
 | `SIDEFX_ESTATE_SOURCE` | Path to the estate inventory read by the publication service |
 | `SIDEFX_MAX_PUBLICATION_AGE_DAYS` | Age after which the site shows its stale-publication notice (default 30) |
-| `SIDEFX_INQUIRY_RECIPIENT`, `SIDEFX_MAIL_API_KEY` | Contact delivery; without both, delivery reports as unconfigured |
+| `SIDEFX_INQUIRY_RECIPIENT`, `SIDEFX_MAIL_API_KEY` | Reserved for the future delivery adapter; not sufficient to enable contact submission |
+
+## Azure container delivery
+
+The current target is the existing Azure App Service `sidefx` in East US 2, classic Docker mode,
+on `ASP-sidefxgroup-ad2e`. A dedicated `sidefx/sfx-platform` image repository uses the existing
+`bpmaiengineacr` registry. Configuration is in [`infra/azure.json`](infra/azure.json).
+
+See [`docs/azure-deployment.md`](docs/azure-deployment.md) for local image verification, the
+GitHub OIDC staging workflow, runtime settings, receipts and promotion/rollback prerequisites.
+P1 remains incomplete; staging infrastructure does not satisfy the outstanding product gates.

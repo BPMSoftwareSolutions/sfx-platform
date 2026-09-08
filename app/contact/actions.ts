@@ -63,6 +63,16 @@ export async function submitInquiry(_previous: ContactState, formData: FormData)
     };
   }
 
+  // The current store is process-local and has no delivery worker. Hosted builds must not
+  // acknowledge durable receipt until that adapter exists, even if mail env vars are present.
+  if (process.env.NODE_ENV === 'production') {
+    return {
+      status: 'retryable-error',
+      message: 'Contact delivery is not available yet. Your message has not been submitted; keep a copy and try again later.',
+      values: echo,
+    };
+  }
+
   try {
     const stored = recordInquiry(parsed.data);
     return {

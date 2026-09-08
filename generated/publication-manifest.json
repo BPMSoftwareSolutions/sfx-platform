@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "publicationId": "sha256:4aa762a11811170624d9c2bc20e1ff02f183194853e4d5b0c46a0dd315ee81ed",
+  "artifacts": {
+    "estate-publication.json": "sha256:161b6026256cb916a0ac93c6640d76573f08b797ef670525c3a4bd42a8aa20e0",
+    "circuit-projections.json": "sha256:d9cf70ac89ecc16bec339f29480576aa7c7d9ad3f666be5b70f592212f4d03d9"
+  }
+}

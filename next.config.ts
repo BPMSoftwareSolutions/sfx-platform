@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  outputFileTracingIncludes: {
+    '/*': ['./generated/*.json'],
+  },
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: false,

@@ -1,0 +1,127 @@
+name: Container and Azure staging
+
+on:
+  push:
+    branches: [main, 'codex/azure-container-deployment']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: container-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.20.0'
+      - name: Build and check the final Linux image
+        run: docker build --platform linux/amd64 --build-arg SOURCE_COMMIT="$GITHUB_SHA" -t sidefx-tested:ci .
+      - name: Exercise the runtime, staging indexing, readiness failures and restart
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          docker image inspect sidefx-tested:ci --format '{{.Id}}' > artifacts/image-id.txt
+          test "$(docker image inspect sidefx-tested:ci --format '{{.Config.User}}')" = node
+          docker run -d --name sidefx-smoke -p 127.0.0.1:3000:3000 -e SIDEFX_INDEXING=disabled sidefx-tested:ci
+          node scripts/smoke-container.mjs http://127.0.0.1:3000 --noindex | tee artifacts/smoke.txt
+          docker exec sidefx-smoke node -e "const fs=require('node:fs'); for(const p of ['.env','.git','scripts','tests']) if(fs.existsSync(p)) process.exit(1)"
+          docker exec sidefx-smoke node -e "require('node:fs').renameSync('generated/circuit-projections.json','generated/circuit-projections.hidden')"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/readyz)" = 503
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/healthz)" = 200
+          docker exec sidefx-smoke node -e "require('node:fs').renameSync('generated/circuit-projections.hidden','generated/circuit-projections.json')"
+          docker restart --time 15 sidefx-smoke
+          node scripts/smoke-container.mjs http://127.0.0.1:3000 --noindex | tee artifacts/restart-smoke.txt
+          docker stop --time 15 sidefx-smoke
+          test "$(docker inspect sidefx-smoke --format '{{.State.ExitCode}}')" != 137
+          docker logs sidefx-smoke > artifacts/container.log 2>&1
+          cp generated/publication-manifest.json artifacts/
+          sha256sum package-lock.json > artifacts/dependency-lock.sha256
+          printf '%s\n' "$GITHUB_SHA" > artifacts/source-commit.txt
+          docker save sidefx-tested:ci | gzip > artifacts/image.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tested-container
+          path: artifacts/
+          retention-days: 14
+      - name: Failure logs
+        if: failure()
+        run: docker logs sidefx-smoke || true
+
+  staging:
+    needs: container
+    if: github.event_name != 'pull_request' && vars.AZURE_STAGING_ENABLED == 'true'
+    environment: staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency: azure-sidefx-staging
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.20.0'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: tested-container
+          path: artifacts/
+      - uses: azure/login@8216e11d8cd9b42fe925c852af8e76311ff067ac # v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Publish the tested image and deploy staging by digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          registry=$(jq -r .registryName infra/azure.json)
+          server=$(jq -r .registryServer infra/azure.json)
+          repository=$(jq -r .imageRepository infra/azure.json)
+          group=$(jq -r .resourceGroup infra/azure.json)
+          app=$(jq -r .appName infra/azure.json)
+          slot=$(jq -r .stagingSlot infra/azure.json)
+          tag="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          gzip -dc artifacts/image.tar.gz | docker load
+          test "$(docker image inspect sidefx-tested:ci --format '{{.Id}}')" = "$(cat artifacts/image-id.txt)"
+          az acr login --name "$registry"
+          docker tag sidefx-tested:ci "$server/$repository:$tag"
+          docker push "$server/$repository:$tag"
+          digest=$(az acr repository show -n "$registry" --image "$repository:$tag" --query digest -o tsv)
+          [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
+          docker pull "$server/$repository@$digest"
+          test "$(docker image inspect "$server/$repository@$digest" --format '{{.Id}}')" = "$(cat artifacts/image-id.txt)"
+          az acr repository update -n "$registry" --image "$repository:$tag" --write-enabled false --delete-enabled false -o none
+          az acr repository update -n "$registry" --image "$repository@$digest" --write-enabled false --delete-enabled false -o none
+          previous=$(az webapp config show -g "$group" -n "$app" --slot "$slot" --query linuxFxVersion -o tsv)
+          [[ "$previous" == DOCKER\|* ]]
+          image="$server/$repository@$digest"
+          az webapp config container set -g "$group" -n "$app" --slot "$slot" --container-image-name "$image" --container-registry-url "https://$server" -o none
+          az webapp restart -g "$group" -n "$app" --slot "$slot"
+          host=$(az webapp show -g "$group" -n "$app" --slot "$slot" --query defaultHostName -o tsv)
+          jq -n --arg source "$GITHUB_SHA" --arg image "$image" --arg previous "$previous" --arg url "https://$host" --slurpfile publication generated/publication-manifest.json \
+            '{sourceCommit:$source,image:$image,previousImage:$previous,url:$url,publication:$publication[0],scope:"staging; P1 incomplete"}' > artifacts/deployment.json
+          node scripts/smoke-container.mjs "https://$host" --noindex | tee artifacts/azure-smoke.txt
+          test "$(az webapp config show -g "$group" -n "$app" --slot "$slot" --query linuxFxVersion -o tsv)" = "DOCKER|$image"
+          echo "Staging: https://$host" >> "$GITHUB_STEP_SUMMARY"
+          echo "Image: $image" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: staging-receipt
+          path: |
+            artifacts/deployment.json
+            artifacts/azure-smoke.txt
+            artifacts/publication-manifest.json
+            artifacts/source-commit.txt
+            artifacts/dependency-lock.sha256
+          retention-days: 90

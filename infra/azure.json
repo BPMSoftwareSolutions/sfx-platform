@@ -1,0 +1,16 @@
+{
+  "subscriptionId": "878efc24-f06f-4255-83c0-2d38e71dc51c",
+  "resourceGroup": "sidefx_group",
+  "appName": "sidefx",
+  "location": "eastus2",
+  "planName": "ASP-sidefxgroup-ad2e",
+  "containerMode": "classic",
+  "port": 3000,
+  "stagingSlot": "staging",
+  "registryName": "bpmaiengineacr",
+  "registryResourceGroup": "BPMSoftwareSolutions",
+  "registryServer": "bpmaiengineacr.azurecr.io",
+  "imageRepository": "sidefx/sfx-platform",
+  "deploymentIdentityName": "sfx-platform-github-staging",
+  "githubRepository": "BPMSoftwareSolutions/sfx-platform"
+}

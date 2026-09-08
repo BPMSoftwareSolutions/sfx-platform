@@ -3,16 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "description": "SideFX website — capability management and engineering platform (www.sidefx.io)",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "publish:estate": "node scripts/publish-estate.mjs",
     "dev": "next dev",
-    "build": "npm run publish:estate -- --allow-missing && next build",
+    "build": "npm run validate:estate && next build",
+    "build:preview": "npm run publish:estate -- --allow-missing && next build",
+    "select:estate": "tsx scripts/select-publication.ts",
+    "validate:estate": "tsx scripts/validate-publication.ts",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/",
-    "check": "npm run typecheck && npm run test"
+    "test": "node scripts/test.mjs",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "smoke": "node scripts/smoke-container.mjs"
   },
   "dependencies": {
     "next": "16.3.4",
@@ -25,7 +31,10 @@
     "@types/node": "26.5.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.4",
     "tailwindcss": "4.3.3",
+    "tsx": "4.23.13",
     "typescript": "5.9.3"
   }
 }

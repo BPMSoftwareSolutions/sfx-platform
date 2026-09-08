@@ -60,9 +60,9 @@ export default function PrivacyPage() {
           <div>
             <h3 className="font-display text-base font-semibold text-text">Contact inquiries</h3>
             <p className="mt-2">
-              An inquiry is validated, rate-limited and recorded with a reference before it is
-              acknowledged. Where mail delivery is not configured, the acknowledgement says so rather
-              than claiming the message was sent.
+              This deployment validates submissions but cannot accept or deliver inquiries yet.
+              It returns an unavailable message and preserves the form values. A durable store and
+              delivery service must be connected before inquiries can be accepted.
             </p>
           </div>
           <div>
