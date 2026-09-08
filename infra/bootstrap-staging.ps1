@@ -40,6 +40,9 @@ $null = Invoke-AzureJson @('identity', 'federated-credential', 'create', '-g', $
 $null = Invoke-AzureJson @('role', 'assignment', 'create', '--assignee-object-id', $identity.principalId, '--assignee-principal-type', 'ServicePrincipal', '--role', 'AcrPush', '--scope', $registry.id)
 # Deployment identity can change this staging slot, not production or subscription resources.
 $null = Invoke-AzureJson @('role', 'assignment', 'create', '--assignee-object-id', $identity.principalId, '--assignee-principal-type', 'ServicePrincipal', '--role', 'Website Contributor', '--scope', $slotResource.id)
+# Azure's container command reads the parent app's kind/configuration when updating a slot.
+$appResourceId = $slotResource.id -replace '/slots/[^/]+$', ''
+$null = Invoke-AzureJson @('role', 'assignment', 'create', '--assignee-object-id', $identity.principalId, '--assignee-principal-type', 'ServicePrincipal', '--role', 'Reader', '--scope', $appResourceId)
 
 $environmentFile = Join-Path ([IO.Path]::GetTempPath()) "sidefx-github-environment-$([Guid]::NewGuid()).json"
 try {

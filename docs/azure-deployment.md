@@ -45,7 +45,8 @@ query result; upstream source digests remain retained provenance.
 Run `infra/bootstrap-staging.ps1` from PowerShell 7 with Azure and GitHub administrative access.
 It creates a staging slot on the existing plan, assigns the slot an ACR pull identity and creates
 the `sfx-platform-github-staging` user-assigned identity for GitHub OIDC. Its Website Contributor
-scope is the staging slot only. AcrPush is scoped to the existing registry under its legacy RBAC
+scope is the staging slot only. Reader on the parent app allows the Azure CLI to inspect its metadata
+while configuring a slot; it does not grant production writes. AcrPush is scoped to the existing registry under its legacy RBAC
 mode; no registry admin password is used. An ABAC registry requires revising the role binding.
 
 The GitHub `staging` environment trusts only `main` and the implementation branch
