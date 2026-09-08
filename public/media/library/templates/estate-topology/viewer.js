@@ -4,6 +4,17 @@
 function planTrace(graph, preferred) {
   const visited = new Set(), reached = new Set(), waves = [];
   const flow = graph.edges.filter(e => e.kind !== 'provider-binding');
+  const bindings = graph.edges.filter(e => e.kind === 'provider-binding'), byPort = new Map();
+  for (const edge of bindings) {
+    if (!byPort.has(edge.target)) byPort.set(edge.target, []);
+    byPort.get(edge.target).push(edge);
+  }
+  const portBindings = ids => [...new Set(ids)].flatMap(id => (byPort.get(id) || []).filter(e => !visited.has(e.id)));
+  const appendWave = edges => {
+    if (!edges.length) return;
+    for (const edge of edges) { visited.add(edge.id); reached.add(edge.source); reached.add(edge.target); }
+    waves.push(edges.map(edge => ({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind})));
+  };
   const nodes=new Map(graph.nodes.map(n=>[n.id,n])),out=new Map(),required=new Map(),targets=new Set();
   for(const edge of flow){
     if(!out.has(edge.source))out.set(edge.source,[]);out.get(edge.source).push(edge);targets.add(edge.target);
@@ -25,7 +36,8 @@ function planTrace(graph, preferred) {
   let frontier=[];
   if(preferred&&start)activate(start,frontier);
   else for(const root of roots)activate(root.id,frontier);
-  while (visited.size < flow.length) {
+  let remainingFlow = flow.length;
+  while (remainingFlow) {
     if (!frontier.length) {
       const next=flow.find(e=>!visited.has(e.id)&&eligible(e.source)&&reached.has(e.source)) || flow.find(e=>!visited.has(e.id)&&eligible(e.source)) || flow.find(e=>!visited.has(e.id));
       if (!next) break;
@@ -34,16 +46,16 @@ function planTrace(graph, preferred) {
     }
     const batch=frontier.filter(e=>!visited.has(e.id));frontier=[];
     if(!batch.length)continue;
-    for(const edge of batch){visited.add(edge.id);reached.add(edge.source);reached.add(edge.target);}
-    waves.push(batch.map(edge=>({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind})));
+    // A root/selected port needs its implementation binding before it continues.
+    appendWave(portBindings(batch.map(edge => edge.source)));
+    // Incoming flow and the corresponding provider binding arrive at the port together.
+    // Bindings do not activate other ports that happen to share this provider.
+    appendWave([...batch, ...portBindings(batch.map(edge => edge.target))]);
+    remainingFlow -= batch.length;
     for(const edge of batch)activate(edge.target,frontier);
   }
-  const references=[];
-  for (const edge of graph.edges.filter(e => e.kind === 'provider-binding')) {
-    visited.add(edge.id); reached.add(edge.source); reached.add(edge.target);
-    references.push({edgeId:edge.id,source:edge.source,target:edge.target,kind:edge.kind});
-  }
-  if(references.length)waves.push(references);
+  // Binding-only components have no flow arrival to accompany.
+  appendWave(bindings.filter(edge => !visited.has(edge.id)));
   for (const node of graph.nodes) if (!reached.has(node.id)) waves.push([{nodeId:node.id}]);
   return waves;
 }
