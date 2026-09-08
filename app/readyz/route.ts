@@ -4,7 +4,11 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export function GET() {
-  const headers = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' };
+  const headers = {
+    'Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex, nofollow',
+    'X-SideFX-Release': process.env.SIDEFX_RELEASE_REVISION ?? 'development',
+  };
   try {
     readValidatedPublication();
     const maxAge = Number(process.env.SIDEFX_MAX_PUBLICATION_AGE_DAYS ?? 30);

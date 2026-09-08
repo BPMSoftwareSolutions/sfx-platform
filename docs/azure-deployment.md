@@ -68,6 +68,9 @@ then restores the artifact and exercises restart/graceful stop. The stored Docke
 by the staging job and its image ID compared with the tested one; it is not rebuilt. After push,
 the registry digest is pulled and compared again, then the tag and manifest are write/delete locked.
 App Service receives the digest reference. Azure ingress smoke checks must pass before the job succeeds.
+The image embeds its source commit in `SIDEFX_RELEASE_REVISION`; `/readyz` exposes it in the nonsecret
+`X-SideFX-Release` header. Smoke checks wait for that exact revision and a JSON ready response, so a
+starter page or the previous healthy release cannot satisfy a new deployment's readiness check.
 
 Artifacts record commit, lockfile hash, publication selection, image ID/digest, previous slot image,
 URL and test logs. GitHub retains the tested image archive for 14 days and staging receipt for 90 days;

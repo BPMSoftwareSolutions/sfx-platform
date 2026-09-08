@@ -15,6 +15,7 @@ RUN mkdir -p public && npm run build && npm run check
 FROM base AS runtime
 ENV NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000
 ARG SOURCE_COMMIT=unknown
+ENV SIDEFX_RELEASE_REVISION=$SOURCE_COMMIT
 LABEL org.opencontainers.image.source="https://github.com/BPMSoftwareSolutions/sfx-platform" \
       org.opencontainers.image.revision=$SOURCE_COMMIT
 COPY --from=build --chown=node:node /app/.next/standalone ./

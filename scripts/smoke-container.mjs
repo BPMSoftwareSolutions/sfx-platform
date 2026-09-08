@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 
 const origin = process.argv[2] ?? 'http://127.0.0.1:3000';
 const noindex = process.argv.includes('--noindex');
+const revisionArgument = process.argv.indexOf('--revision');
+const expectedRevision = revisionArgument < 0 ? undefined : process.argv[revisionArgument + 1];
+if (revisionArgument >= 0) assert.ok(expectedRevision, '--revision requires the image source commit');
 const publication = JSON.parse(readFileSync(new URL('../generated/estate-publication.json', import.meta.url), 'utf8'));
 const paths = ['/', '/platform', '/capabilities', '/mechanics', '/providers', '/build', '/contact', '/docs/ownership', '/sitemap.xml', '/robots.txt', '/healthz', '/readyz'];
 for (const kind of ['capabilities', 'mechanics', 'providers']) paths.push(`/${kind}/${publication[kind][0].urlKey}`);
@@ -10,8 +13,9 @@ for (const kind of ['capabilities', 'mechanics', 'providers']) paths.push(`/${ki
 for (let attempt = 0; ; attempt++) {
   try {
     const response = await fetch(new URL('/readyz', origin), { signal: AbortSignal.timeout(5000) });
-    if (response.ok) break;
-    if (attempt === 59) throw new Error(`Readiness returned ${response.status}`);
+    const body = response.ok ? await response.json().catch(() => null) : null;
+    if (body?.status === 'ready' && (!expectedRevision || response.headers.get('x-sidefx-release') === expectedRevision)) break;
+    if (attempt === 59) throw new Error(`Expected release did not become ready (HTTP ${response.status})`);
   } catch (error) {
     if (attempt === 59) throw error;
   }
@@ -27,6 +31,7 @@ for (const path of paths) {
   if (['/healthz', '/readyz'].includes(path)) {
     assert.match(response.headers.get('cache-control') ?? '', /no-store/);
     assert.deepEqual(JSON.parse(body), { status: path === '/healthz' ? 'ok' : 'ready' });
+    if (path === '/readyz' && expectedRevision) assert.equal(response.headers.get('x-sidefx-release'), expectedRevision);
   }
   if (path === '/robots.txt' && noindex) assert.match(body, /Disallow: \/\s*$/);
   if (path.startsWith('/capabilities/')) {
