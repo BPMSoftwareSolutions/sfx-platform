@@ -5,14 +5,16 @@ import { z } from 'zod';
 
 import { CircuitProjection, Digest, EstatePublication } from '../contracts/estate.ts';
 import { VisualPublication } from '../contracts/visuals.ts';
+import { InputContractPublication } from '../contracts/input-contract.ts';
 
 export const PublicationManifest = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   publicationId: Digest,
   artifacts: z.object({
     'estate-publication.json': Digest,
     'circuit-projections.json': Digest,
     'visual-publication.json': Digest,
+    'input-contracts.json': Digest,
   }).strict(),
 }).strict();
 
@@ -71,17 +73,46 @@ export function validatePublication(publicationBytes: Buffer, circuitBytes: Buff
   return { publication, circuits };
 }
 
+export function validateInputContracts(bytes: Buffer, estate: EstatePublication) {
+  const raw = JSON.parse(bytes.toString('utf8'));
+  const contracts = InputContractPublication.parse(raw);
+  if (contracts.publicationId !== stableDigest({ ...raw, publicationId: '', builtAt: '' })) {
+    throw new Error('Input contract publication content digest mismatch');
+  }
+  if (contracts.source.snapshotId !== estate.source.snapshotId ||
+      contracts.source.projectionDigest !== estate.source.projectionDigest) {
+    throw new Error('Input contract source generation differs from selected estate');
+  }
+  for (const [key, schema] of Object.entries(contracts.schemas)) {
+    if (key !== stableDigest(schema)) throw new Error('Input contract schema digest mismatch');
+  }
+  const owners = new Map(estate.capabilities.map(capability => [capability.entityId, capability]));
+  for (const [id, entry] of Object.entries(contracts.capabilities)) {
+    if (!owners.get(id)?.scenarios.some(scenario => scenario.scenarioId === entry.scenarioId)) {
+      throw new Error('Input contract owner/scenario mismatch');
+    }
+    if (entry.schemaRef && (!contracts.schemas[entry.schemaRef] || !entry.sourceSchemaDigest || !entry.contractId) ||
+        !entry.schemaRef && entry.sourceSchemaDigest) {
+      throw new Error('Input contract schema reference is unresolved');
+    }
+  }
+  return contracts;
+}
+
 export function readValidatedPublication(directory = join(process.cwd(), 'generated')) {
   const manifest = PublicationManifest.parse(JSON.parse(readFileSync(join(directory, 'publication-manifest.json'), 'utf8')));
   const publicationBytes = readFileSync(join(directory, 'estate-publication.json'));
   const circuitBytes = readFileSync(join(directory, 'circuit-projections.json'));
   const visualBytes = readFileSync(join(directory, 'visual-publication.json'));
+  const inputBytes = readFileSync(join(directory, 'input-contracts.json'));
   if (digest(publicationBytes) !== manifest.artifacts['estate-publication.json'] ||
       digest(circuitBytes) !== manifest.artifacts['circuit-projections.json'] ||
-      digest(visualBytes) !== manifest.artifacts['visual-publication.json']) {
+      digest(visualBytes) !== manifest.artifacts['visual-publication.json'] ||
+      digest(inputBytes) !== manifest.artifacts['input-contracts.json']) {
     throw new Error('Selected publication artifact digest mismatch');
   }
   const validated = validatePublication(publicationBytes, circuitBytes);
+  const inputContracts = validateInputContracts(inputBytes, validated.publication);
   const visuals=VisualPublication.parse(JSON.parse(visualBytes.toString('utf8')));
   if (`sha256:${visuals.source.snapshotDigest}`!==validated.publication.source.snapshotId || `sha256:${visuals.source.mappingDigest}`!==validated.publication.source.projectionDigest) throw new Error('Media source generation differs from selected estate');
   for(const entity of [...validated.publication.capabilities,...validated.publication.mechanics,...validated.publication.providers,...validated.publication.capabilities.flatMap(c=>c.scenarios)]){
@@ -100,5 +131,5 @@ export function readValidatedPublication(directory = join(process.cwd(), 'genera
   if (validated.publication.publicationId !== manifest.publicationId) {
     throw new Error('Selected publication identity mismatch');
   }
-  return { ...validated, manifest };
+  return { ...validated, manifest, inputContracts };
 }

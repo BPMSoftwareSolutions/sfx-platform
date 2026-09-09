@@ -43,7 +43,7 @@ Other scripts:
 | `npm run publish:contracts` | Publishes each capability's declared input contract schema for the input form |
 | `npm run restore:media` | Restores `public/media` from the selected SQL publication |
 | `npm run validate:media` | Verifies every restored media file against its SQL publication hash |
-| `npm run select:estate` | Validates and pins both generated artifacts in a digest manifest after a deliberate publication refresh |
+| `npm run select:estate` | Validates estate/circuits and input contracts, then pins all four generated artifacts in a digest manifest |
 | `npm run validate:estate` | Checks the selected bytes, schema, identities, coverage and circuit integrity |
 | `npm run build` | Requires the selected valid publication, then builds standalone output; never reads the development database |
 | `npm run build:preview` | Development preview allowing missing source data; never used by the release workflow |
@@ -73,8 +73,9 @@ Override the source with `--source <file>` or `SIDEFX_ESTATE_SOURCE`. With no so
 existing publication, the site renders its unavailable state and disables dependent actions rather
 than showing an empty catalog (§11.4).
 
-After refreshing source content, run `npm run publish:estate`, then `npm run select:estate`,
-review the publication diff, and commit all three `generated/*.json` artifacts together. Selection
+After refreshing source content, run `npm run publish:estate`, `npm run publish:contracts`, then
+`npm run select:estate`. Review and commit the estate, circuit, visual and input-contract artifacts
+with their manifest in `generated/`. Selection
 records exact bytes; it is not evidence of editorial approval or upstream database verification.
 Production builds fail on absent, altered, mixed, empty or incomplete artifacts.
 
@@ -99,9 +100,11 @@ credential (§11.1). The API service is the boundary that does, exactly as the P
 sit beside the web process in §7 and §8.7.
 
 The service exposes **one** route, `POST /commands`, taking the same closed envelope the CLI
-uses — `{ object, operation, subject, input }`. That is `sidefx-cli`'s Entity Neutrality Law
+uses — `{ object, operation, subject, namespace?, input }`. That is `sidefx-cli`'s Entity Neutrality Law
 observed literally: no capability, verb or vendor appears in a path or a branch, so adding a
 capability to the estate adds nothing to this repository.
+The committed web policy permits only `capability invoke`; preparation and other project
+commands are blocked before dispatch. The service defaults to loopback.
 
 ```bash
 cd services/capability-api && npm install
@@ -126,6 +129,8 @@ The schemas come from `npm run publish:contracts`, which reads each capability's
 input contract and the retained JSON Schema it references from one pinned generation into
 `generated/input-contracts.json` — 216 of 218 capabilities declare one. A capability with no
 declared contract gets raw input and no claimed shape.
+Run `npm run select:estate` after publication. Manifest v2 includes the input contracts;
+builds and page reads verify their hashes, schema references and selected estate generation.
 
 Where the estate workspace publishes example requests, `SIDEFX_CAPABILITY_EXAMPLES` seeds the
 form with one. Examples are matched by the `contractId` the example itself declares against the
@@ -133,8 +138,8 @@ contract the capability declares — never by filename, which is not evidence of
 Examples are read while pages are prerendered, so the variable belongs to the build, unlike
 `SIDEFX_INVOCATION_ENDPOINT`, which is read per request.
 
-The form does not validate. Admission belongs to the capability's contract, and its refusal is a
-real result the page shows.
+The form checks JSON syntax and preserves invalid drafts with an error, blocking Run and mode
+switching until corrected. Semantic admission belongs to the capability's contract.
 
 ### What a run reports
 
@@ -148,11 +153,15 @@ The page renders what the estate returned and nothing else:
 | `CAPABILITY_PREPARATION_REQUIRED` | No preparation is retained for the current estate generation, so it cannot execute yet |
 | `CAPABILITY_PREPARATION_STALE` | A preparation exists but was made against a different generation or toolchain |
 | `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
-| `NOT_CONFIGURED` / `UNREACHABLE` | The site could not reach the estate; the only states the website itself authors |
+| `NOT_CONFIGURED` / `RATE_LIMITED` / `INVALID_JSON` | The site did not dispatch a request |
+| `UNKNOWN` | Execution could not be confirmed after a timeout, lost/unreadable response or unclassified error. Confirm whether it completed before retrying |
 
 A refusal is never filled in with another capability's result, and a rejected input is reported
 as rejected rather than corrected. Execution is an explicit user action: opening a capability,
 inspecting its circuit or playing its flow invokes nothing (§13.1).
+Failed executions retain their full kernel record even when returned inside an SDK error.
+The client defaults to a 630-second response deadline, beyond the API's 600-second command
+deadline; losing the response does not establish cancellation.
 
 ### Preparation is what gates coverage
 

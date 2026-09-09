@@ -39,12 +39,12 @@ test('with no endpoint configured the site executes nothing and says so', async 
   assert.equal(view.code, 'NOT_CONFIGURED');
 });
 
-test('an unreachable estate is reported as unreachable, never as a failed capability', async () => {
+test('an unreachable estate leaves execution unconfirmed', async () => {
   // Port 1 is not listening; the client must not invent a disposition for this.
   const { invokeCapability } = await clientWith('http://127.0.0.1:1');
   const view = await invokeCapability('any-capability', {});
-  assert.equal(view.status, 'UNAVAILABLE');
-  if (view.status !== 'UNAVAILABLE') return;
+  assert.equal(view.status, 'UNKNOWN');
+  if (view.status !== 'UNKNOWN') return;
   assert.equal(view.code, 'UNREACHABLE');
 });
 
@@ -77,6 +77,8 @@ test('a real execution is carried through with its own disposition and testimony
     assert.equal(envelope.object, 'capability');
     assert.equal(envelope.operation, 'invoke');
     assert.equal(envelope.subject, 'resolve-sidefx-eligible-providers');
+    assert.equal(envelope.namespace, 'sidefx');
+    assert.deepEqual(envelope.input, { contractId: 'x' });
     response.writeHead(200, { 'content-type': 'application/json' });
     response.end(JSON.stringify({
       result: {
@@ -92,7 +94,7 @@ test('a real execution is carried through with its own disposition and testimony
   });
   try {
     const { invokeCapability } = await clientWith(origin);
-    const view = await invokeCapability('resolve-sidefx-eligible-providers', { contractId: 'x' });
+    const view = await invokeCapability('resolve-sidefx-eligible-providers', { contractId: 'x' }, 'sidefx');
     assert.equal(view.status, 'EXECUTED');
     if (view.status !== 'EXECUTED') return;
     assert.equal(view.disposition, 'terminated');
@@ -101,6 +103,7 @@ test('a real execution is carried through with its own disposition and testimony
     assert.deepEqual(view.outcome, { eligibleCount: 0 });
     // Provenance travels from the estate untouched.
     assert.equal(view.evidence.bodyStorage, 'MEMORY_ONLY');
+    assert.equal(view.execution.observations.length, 5);
   } finally { server.close(); }
 });
 
@@ -133,8 +136,65 @@ test('an unreadable estate response never becomes a fabricated result', async ()
   try {
     const { invokeCapability } = await clientWith(origin);
     const view = await invokeCapability('c', {});
-    assert.equal(view.status, 'UNAVAILABLE');
-    if (view.status !== 'UNAVAILABLE') return;
+    assert.equal(view.status, 'UNKNOWN');
+    if (view.status !== 'UNKNOWN') return;
     assert.equal(view.code, 'BAD_RESPONSE');
   } finally { server.close(); }
+});
+
+test('a failed kernel execution wrapped in an SDK error retains its full record', async () => {
+  const execution = {
+    capabilityId: 'c', scenarioId: 's',
+    result: { executionId: 'e', scenarioId: 's', disposition: 'failed', outcome: null, error: { message: 'provider failed' } },
+    executions: [{ executionId: 'e' }], observations: [{ sequence: 1, disposition: 'failed' }], evidence: { bodyStorage: 'MEMORY_ONLY' },
+  };
+  const { server, origin } = await listen((_request, response) => response.end(JSON.stringify({
+    error: { code: 'CAPABILITY_EXECUTION_FAILED', message: 'failed', details: { result: { disposition: 'failed', outcome: execution } } },
+    executionState: 'UNKNOWN', durationMs: 20,
+  })));
+  try {
+    const { invokeCapability } = await clientWith(origin);
+    const view = await invokeCapability('c', {});
+    assert.equal(view.status, 'EXECUTED');
+    if (view.status !== 'EXECUTED') return;
+    assert.equal(view.disposition, 'failed');
+    assert.deepEqual(view.execution, execution);
+  } finally { server.close(); }
+});
+
+test('timing out after the service accepts a request does not claim that execution stopped', async t => {
+  let accepted = false, finish!: () => void;
+  const completed = new Promise<void>(resolve => { finish = resolve; });
+  const { server, origin } = await listen(async (request, response) => {
+    for await (const chunk of request) void chunk;
+    accepted = true;
+    setTimeout(() => { response.end('{}'); finish(); }, 150);
+  });
+  t.after(() => { server.closeAllConnections(); server.close(); });
+  const previous = process.env.SIDEFX_INVOCATION_TIMEOUT_MS;
+  try {
+    process.env.SIDEFX_INVOCATION_TIMEOUT_MS = '100';
+    const { invokeCapability } = await clientWith(origin);
+    const view = await invokeCapability('c', {});
+    assert.equal(accepted, true);
+    assert.equal(view.status, 'UNKNOWN');
+    await completed;
+  } finally {
+    if (previous === undefined) delete process.env.SIDEFX_INVOCATION_TIMEOUT_MS;
+    else process.env.SIDEFX_INVOCATION_TIMEOUT_MS = previous;
+  }
+});
+
+test('only explicit pre-dispatch errors or preparation refusals establish no execution', async () => {
+  for (const [code, executionState, expected] of [
+    ['COMMAND_CAPACITY_REACHED', 'NOT_STARTED', 'REFUSED'],
+    ['DELIVERY_PROCESS_TIMEOUT', 'UNKNOWN', 'UNKNOWN'],
+    ['COMMAND_FAILED', undefined, 'UNKNOWN'],
+  ]) {
+    const { server, origin } = await listen((_request, response) => response.end(JSON.stringify({ error: { code, message: code }, executionState })));
+    try {
+      const { invokeCapability } = await clientWith(origin);
+      assert.equal((await invokeCapability('c', {})).status, expected);
+    } finally { server.close(); }
+  }
 });

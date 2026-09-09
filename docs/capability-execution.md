@@ -19,7 +19,7 @@ server action                      app/capabilities/[namespace]/[capabilityId]/a
   │  resolves the identity against the published estate, rate-limits, parses JSON
   ▼
 capability API                     services/capability-api  ← holds the database boundary
-  │  POST /commands { object, operation, subject, input }
+  │  POST /commands { object, operation, subject, namespace?, input }
   ▼
 sfx SDK                            sidefx-cli — validates against the command mapping
   ▼
@@ -45,6 +45,9 @@ worked.
 `sidefx-cli`'s Entity Neutrality Law observed literally, and it has a practical consequence worth
 stating: **adding a capability to the estate adds nothing to this repository.** No route, no
 component, no mapping, no copy. The 219th capability and the 220th are the same code path.
+The committed web command policy permits only `capability invoke`. The API and SDK receive the
+intersection of that policy and the project mapping; `prepare` and future project operations
+are refused before dispatch unless deliberately added to the web policy.
 
 **The estate owns meaning.** This platform forwards a command envelope and renders a result. It
 interprets no canonical input, implements no provider, and holds no admission policy.
@@ -115,14 +118,23 @@ contract and the retained JSON Schema it references from one pinned generation i
 `generated/input-contracts.json`. **216 of 218** capabilities with a root scenario declare one; a
 capability without one gets raw input and no claimed shape.
 
+Run `npm run select:estate` after publishing contracts. Manifest v2 binds `input-contracts.json`
+alongside the estate, circuits and visuals. Release validation and page reads verify the file
+hash, publication identity, canonical schema digests, references, capability/scenario owners,
+and the selected snapshot/projection. The v2 input publication retains the original SQL schema
+digest separately from its canonical JSON digest. Mixed generations and altered bytes fail
+validation before a form is offered.
+
 Where the estate workspace publishes example requests, `SIDEFX_CAPABILITY_EXAMPLES` seeds the form
 with one. Examples are matched by the `contractId` the example itself declares against the contract
 the capability declares — never by filename, which is not evidence of applicability. Examples are
 read while pages are prerendered, so that variable belongs to the build; the command endpoint is
 read per request.
 
-The form does not validate. Admission belongs to the capability's contract, and its refusal is a
-real result the page shows.
+The form checks JSON syntax. Invalid drafts remain visible with an error and block Run and mode
+switching until corrected. Removing an array item preserves drafts on the surviving items.
+A supplied value that differs from a schema constant remains visible and editable as JSON.
+Semantic admission belongs to the capability's contract, and its refusal is a real result the page shows.
 
 ## Reading a result
 
@@ -136,11 +148,14 @@ The page renders what the estate returned and nothing else.
 | `CAPABILITY_PREPARATION_REQUIRED` | No preparation retained for this generation |
 | `CAPABILITY_PREPARATION_STALE` | A preparation exists but was made against a different generation or toolchain |
 | `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
-| `NOT_CONFIGURED`, `UNREACHABLE`, `BAD_RESPONSE`, `RATE_LIMITED`, `INVALID_JSON` | The site could not reach or read the estate. The only states the website itself authors |
+| `NOT_CONFIGURED`, `RATE_LIMITED`, `INVALID_JSON` | The website did not dispatch a request |
+| `UNKNOWN` (`UNREACHABLE`, `BAD_RESPONSE`, `REQUEST_FAILED`, or an unclassified service error) | Execution is unconfirmed. The command may still be running or may have completed; confirm before retrying |
 
-The estate returns more than the page currently shows. Each result carries the full `observations`
+Each result carries the full `observations`
 and `executions` arrays — one record per observed kernel step, and one per nested scenario
-execution — of which the page reports only counts today. That testimony is what the workbench's
+execution. The page shows counts and an expandable full execution record, including kernel errors.
+An SDK error containing that record is still an execution, with its original disposition.
+That testimony is what the workbench's
 **observed-execution** trace binds to (spec §5.0, §12.4): the branch actually taken, the
 disposition actually reached, observed timestamps, and absence drawn as absence. It is the reason
 this surface returns evidence rather than just an outcome.
@@ -169,12 +184,14 @@ SIDEFX_INVOCATION_ENDPOINT=http://127.0.0.1:8787 npm run dev
 | Variable | Read at | Purpose |
 | --- | --- | --- |
 | `SIDEFX_INVOCATION_ENDPOINT` | request | Capability command service; absent means execution unavailable |
-| `SIDEFX_INVOCATION_TIMEOUT_MS` | request | Bound on one invocation (default 30000) |
+| `SIDEFX_INVOCATION_TIMEOUT_MS` | request | Response deadline (default 630000), longer than the service's 600000 ms command deadline |
 | `SIDEFX_CAPABILITY_EXAMPLES` | build | Example requests, matched by declared `contractId` |
 
 The service resolves its command mapping and process bindings from the `sfx-embody` workspace,
 which owns the database delivery, its credential reference and its integrity checks. The
 connection string never passes through this repository.
+The API defaults to `127.0.0.1`. A response timeout does not cancel estate execution or establish
+that nothing ran; the page reports execution unconfirmed and does not retry automatically.
 
 The API is directly usable:
 
@@ -187,7 +204,7 @@ curl -X POST http://127.0.0.1:8787/commands -H 'content-type: application/json' 
 
 | Gap | Effect |
 | --- | --- |
-| **No authentication on the command API** | Safe on loopback; it must not be exposed until an authorization boundary exists. Execution is unauthenticated by design today because the bodies are pure computation over their input, but that is a property of the current provider, not a guarantee |
+| **No authentication on the command API** | Loopback is the default; remote deployment requires an authorization boundary |
 | **Preparation coverage** | 94 of 219. The rest report their declared reason when run |
 | **The service is not deployed** | The Azure image carries the web process only; no environment has the endpoint configured, so hosted deployments report execution unavailable |
 | **No preparation from the site** | Preparation is a CLI/estate operation. The site cannot trigger it, and does not offer to |
@@ -204,3 +221,8 @@ Measured against the running stack, not asserted:
   a real execution, not a page error.
 - An unprepared capability: `CAPABILITY_PREPARATION_REQUIRED` rendered as its own state.
 - Nothing executes on page load.
+
+Regression coverage exercises forbidden operations, overlapping partial-body uploads at a
+capacity of one, failed execution records inside SDK errors, accepted requests that outlive
+the client deadline, invalid form drafts and array removal, and altered or mixed-generation
+input publications. These are transport/UI/publication tests; they do not claim estate admission.

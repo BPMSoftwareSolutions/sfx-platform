@@ -52,5 +52,5 @@ export async function runCapability(
     };
   }
 
-  return invokeCapability(capability.entityId, input);
+  return invokeCapability(capability.entityId, input, capability.namespaceId ?? undefined);
 }

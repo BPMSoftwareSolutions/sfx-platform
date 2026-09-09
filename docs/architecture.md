@@ -144,6 +144,7 @@ The architecture is a stack of strict separations. Each row is a boundary that n
 ┌─ Publication layer ──────────▼──────────────────────────────────────────┐
 │  scripts/publish-estate.mjs → generated/estate-publication.json         │
 │                             → generated/circuit-projections.json        │
+│  scripts/publish-input-contracts.mjs → generated/input-contracts.json   │
 │  scripts/select-publication.ts → publication-manifest.json (digest pin) │
 └──────────────────────────────┬──────────────────────────────────────────┘
                                │ validated on every read
@@ -167,6 +168,7 @@ The architecture is a stack of strict separations. Each row is a boundary that n
 ### 4.1 Reading rules
 
 - The website **never opens a database connection** (§11.1). It reads `generated/`, validated against `contracts/estate.ts` and the manifest digests on every load (`lib/publication-validation.ts`).
+- Manifest v2 pins estate, circuits, visuals and input contracts. Input contract v2 verifies canonical schema digests and preserves original source digests separately; snapshot/projection and capability/scenario ownership must match the selected estate before a form is rendered.
 - Pages load data at **capability/scenario scope**. The whole-estate graph never reaches a page bundle (§12.4).
 - Source states are preserved exactly and paired with a readable explanation. The readable form never replaces the source value (§11.3).
 - Python services live **beside** the web process, not inside it — external workers with their own runtimes, job lifecycles and durability (§7, §8.7). The web process never embeds an interpreter and never acts as their scheduler.

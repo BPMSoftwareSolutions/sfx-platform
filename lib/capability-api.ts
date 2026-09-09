@@ -1,4 +1,5 @@
-import { CommandResponse, type InvocationView } from '@/contracts/invocation';
+import { z } from 'zod';
+import { CommandResponse, EstateExecution, type InvocationView } from '@/contracts/invocation';
 
 /**
  * Capability API client — §11.1, §13.1.
@@ -7,8 +8,7 @@ import { CommandResponse, type InvocationView } from '@/contracts/invocation';
  * no runtime and holds no credential: it posts a command envelope to the service running
  * beside the web process and returns what came back.
  *
- * With no endpoint configured, execution is reported unavailable and the page offers no run
- * control, rather than rendering a button that cannot work (§11.4).
+ * With no endpoint configured, a Run request reports execution unavailable without dispatch.
  */
 
 /**
@@ -17,8 +17,8 @@ import { CommandResponse, type InvocationView } from '@/contracts/invocation';
  * imported.
  */
 const endpoint = () => process.env.SIDEFX_INVOCATION_ENDPOINT;
-/** Bounded so a slow estate command cannot hold a request open indefinitely. */
-const timeoutMs = () => Number(process.env.SIDEFX_INVOCATION_TIMEOUT_MS ?? 30_000);
+/** Give the service's default 600s command deadline time to return its response. */
+const timeoutMs = () => Number(process.env.SIDEFX_INVOCATION_TIMEOUT_MS ?? 630_000);
 
 export function invocationConfigured(): boolean {
   return Boolean(endpoint());
@@ -46,7 +46,7 @@ export function rateLimit(clientKey: string): boolean {
  * The envelope is entity-neutral — object, operation and subject are data — so this function
  * never grows a branch per capability.
  */
-export async function invokeCapability(capabilityId: string, input: unknown): Promise<InvocationView> {
+export async function invokeCapability(capabilityId: string, input: unknown, namespace?: string): Promise<InvocationView> {
   const configured = endpoint();
   if (!configured) {
     return {
@@ -62,23 +62,23 @@ export async function invokeCapability(capabilityId: string, input: unknown): Pr
     response = await fetch(new URL('/commands', configured), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ object: 'capability', operation: 'invoke', subject: capabilityId, input }),
+      body: JSON.stringify({ object: 'capability', operation: 'invoke', subject: capabilityId, input, ...(namespace === undefined ? {} : { namespace }) }),
       signal: AbortSignal.timeout(timeoutMs()),
       cache: 'no-store',
     });
   } catch {
     return {
-      status: 'UNAVAILABLE',
+      status: 'UNKNOWN',
       capabilityId,
       code: 'UNREACHABLE',
-      message: 'The capability command service did not respond. Nothing was executed.',
+      message: 'Execution could not be confirmed. The request may still be running or may have completed. Check before retrying.',
     };
   }
 
   const parsed = CommandResponse.safeParse(await response.json().catch(() => undefined));
   if (!parsed.success) {
     return {
-      status: 'UNAVAILABLE',
+      status: 'UNKNOWN',
       capabilityId,
       code: 'BAD_RESPONSE',
       message: 'The capability command service returned a response this site could not read.',
@@ -86,11 +86,22 @@ export async function invokeCapability(capabilityId: string, input: unknown): Pr
   }
 
   if ('error' in parsed.data) {
-    // The estate's own refusal, carried through with its code intact.
-    return { status: 'REFUSED', capabilityId, code: parsed.data.error.code, message: parsed.data.error.message };
+    const failed = z.object({ result: z.object({ outcome: EstateExecution }) }).safeParse(parsed.data.error.details);
+    if (failed.success) return executionView(capabilityId, failed.data.result.outcome, parsed.data.durationMs ?? null);
+    const { code, message } = parsed.data.error;
+    const notStarted = parsed.data.executionState === 'NOT_STARTED' || [
+      'CAPABILITY_PREPARATION_REQUIRED', 'CAPABILITY_PREPARATION_STALE', 'CAPABILITY_NOT_FOUND',
+      'CAPABILITY_NAMESPACE_AMBIGUOUS', 'CAPABILITY_ROOT_SCENARIO_UNRESOLVED',
+    ].includes(code);
+    return { status: notStarted ? 'REFUSED' : 'UNKNOWN', capabilityId, code, message };
   }
 
   const { result, durationMs } = parsed.data;
+  return executionView(capabilityId, result, durationMs);
+}
+
+function executionView(capabilityId: string, result: EstateExecution, durationMs: number | null): InvocationView {
+  if (result.capabilityId !== capabilityId) return { status: 'UNKNOWN', capabilityId, code: 'BAD_RESPONSE', message: 'The returned execution belongs to a different capability.' };
   return {
     status: 'EXECUTED',
     capabilityId: result.capabilityId,
@@ -101,5 +112,6 @@ export async function invokeCapability(capabilityId: string, input: unknown): Pr
     executionCount: result.executions.length,
     durationMs,
     evidence: result.evidence,
+    execution: result,
   };
 }

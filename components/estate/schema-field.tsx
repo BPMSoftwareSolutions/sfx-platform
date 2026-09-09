@@ -1,6 +1,7 @@
 'use client';
 
 import type { JsonSchema } from '@/contracts/input-contract';
+import { childPath, type JsonEditor } from '@/lib/json-drafts';
 import {
   describeField,
   emptyValue,
@@ -28,14 +29,18 @@ interface Props {
   label: string;
   required?: boolean;
   path: string;
+  editor: JsonEditor;
 }
 
-export function SchemaField({ schema, root, value, onChange, label, required, path }: Props) {
+export function SchemaField({ schema, root, value, onChange, label, required, path, editor }: Props) {
   const field = describeField(schema, root);
-  const id = `f-${path.replaceAll(/[^a-zA-Z0-9]/g, '-')}`;
+  const id = `f-${encodeURIComponent(path)}`;
   const hint = field.description;
 
   if (field.kind === 'const') {
+    if (JSON.stringify(value) !== JSON.stringify(field.schema.const)) {
+      return <RawField id={id} label={label} hint={`The contract expects ${JSON.stringify(field.schema.const)}. Your supplied value is shown below.`} value={value} onChange={onChange} path={path} editor={editor} />;
+    }
     return (
       <div className="schema-field">
         <span className="schema-label">
@@ -51,7 +56,7 @@ export function SchemaField({ schema, root, value, onChange, label, required, pa
     const current = (value && typeof value === 'object' && !Array.isArray(value) ? value : {}) as Record<string, unknown>;
     const properties = objectProperties(field.schema);
     if (!properties.length) {
-      return <RawField id={id} label={label} hint={hint} value={value} onChange={onChange} />;
+      return <RawField id={id} label={label} hint={hint} value={value} onChange={onChange} path={path} editor={editor} />;
     }
     return (
       <fieldset className="schema-object">
@@ -67,7 +72,8 @@ export function SchemaField({ schema, root, value, onChange, label, required, pa
             root={root}
             label={key}
             required={required.has(key)}
-            path={`${path}.${key}`}
+            path={childPath(path, key)}
+            editor={editor}
             value={current[key]}
             onChange={next => onChange({ ...current, [key]: next })}
           />
@@ -79,7 +85,7 @@ export function SchemaField({ schema, root, value, onChange, label, required, pa
   if (field.kind === 'array') {
     const items = Array.isArray(value) ? value : [];
     const child = itemSchema(field.schema);
-    if (!child) return <RawField id={id} label={label} hint={hint} value={value} onChange={onChange} />;
+    if (!child) return <RawField id={id} label={label} hint={hint} value={value} onChange={onChange} path={path} editor={editor} />;
     return (
       <fieldset className="schema-object">
         <legend>
@@ -92,11 +98,15 @@ export function SchemaField({ schema, root, value, onChange, label, required, pa
               schema={child}
               root={root}
               label={`${index}`}
-              path={`${path}.${index}`}
+              path={childPath(path, index)}
+              editor={editor}
               value={item}
               onChange={next => onChange(items.map((existing, i) => (i === index ? next : existing)))}
             />
-            <button type="button" className="text-link" onClick={() => onChange(items.filter((_, i) => i !== index))}>
+            <button type="button" className="text-link" onClick={() => {
+              editor.removeItem(path, index);
+              onChange(items.filter((_, i) => i !== index));
+            }}>
               Remove item {index}
             </button>
           </div>
@@ -163,13 +173,14 @@ export function SchemaField({ schema, root, value, onChange, label, required, pa
     );
   }
 
-  return <RawField id={id} label={label} hint={hint} value={value} onChange={onChange} />;
+  return <RawField id={id} label={label} hint={hint} value={value} onChange={onChange} path={path} editor={editor} />;
 }
 
 /** A shape the form cannot render faithfully is edited as JSON, and says so. */
 function RawField({
-  id, label, hint, value, onChange,
-}: { id: string; label: string; hint?: string; value: unknown; onChange: (value: unknown) => void }) {
+  id, label, hint, value, onChange, path, editor,
+}: { id: string; label: string; hint?: string; value: unknown; onChange: (value: unknown) => void; path: string; editor: JsonEditor }) {
+  const draft = editor.drafts[path];
   return (
     <div className="schema-field">
       <label className="schema-label" htmlFor={id}>
@@ -179,11 +190,12 @@ function RawField({
         id={id}
         rows={3}
         spellCheck={false}
-        defaultValue={value === undefined ? '' : JSON.stringify(value, null, 2)}
-        onChange={event => {
-          try { onChange(JSON.parse(event.target.value)); } catch { /* keep the last valid value */ }
-        }}
+        value={draft?.text ?? (value === undefined ? '' : JSON.stringify(value, null, 2))}
+        aria-invalid={draft?.error ? true : undefined}
+        aria-describedby={draft?.error ? `${id}-error` : undefined}
+        onChange={event => editor.edit(path, event.target.value, onChange)}
       />
+      {draft?.error ? <p id={`${id}-error`} role="alert">Not valid JSON: {draft.error}. Correct this draft before running or switching modes.</p> : null}
       <p className="schema-hint">{hint ?? 'This contract shape is edited as JSON so it is not misrepresented by a simpler control.'}</p>
     </div>
   );

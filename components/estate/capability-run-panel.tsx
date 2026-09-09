@@ -5,6 +5,7 @@ import { useId, useMemo, useState, useTransition } from 'react';
 import type { JsonSchema } from '@/contracts/input-contract';
 import type { InvocationView } from '@/contracts/invocation';
 import { initialDocument, objectProperties, requiredKeys } from '@/lib/json-schema-form';
+import { childPath, hasInvalidDraft, parseDraft, removeItemDrafts, type JsonDrafts, type JsonEditor } from '@/lib/json-drafts';
 import { SchemaField } from './schema-field';
 
 /**
@@ -51,18 +52,30 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
   const [document, setDocument] = useState<unknown>(seed);
   const [raw, setRaw] = useState(() => JSON.stringify(seed, null, 2));
   const [rawError, setRawError] = useState<string | undefined>();
+  const [drafts, setDrafts] = useState<JsonDrafts>({});
+  const invalidInput = !!rawError || hasInvalidDraft(drafts);
+  const editor: JsonEditor = {
+    drafts,
+    edit(path, text, commit) {
+      const parsed = parseDraft(text);
+      setDrafts(previous => ({ ...previous, [path]: parsed.draft }));
+      if (!parsed.draft.error) commit(parsed.value);
+    },
+    removeItem(path, index) { setDrafts(previous => removeItemDrafts(previous, path, index)); },
+  };
   const [view, setView] = useState<InvocationView | undefined>();
   const [pending, startTransition] = useTransition();
 
   /** The document is the single value; each mode is a view of it. */
   const toMode = (next: Mode) => {
-    if (next === mode) return;
+    if (next === mode || invalidInput) return;
     if (next === 'raw') setRaw(JSON.stringify(document, null, 2));
     else {
       try { setDocument(JSON.parse(raw)); setRawError(undefined); }
       catch (error) { setRawError(error instanceof Error ? error.message : 'Invalid JSON'); return; }
     }
     setMode(next);
+    setDrafts({});
   };
 
   const editRaw = (text: string) => {
@@ -72,9 +85,13 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
   };
 
   const execute = () => {
+    if (invalidInput || pending) return;
     const payload = mode === 'raw' ? raw : JSON.stringify(document);
     setView(undefined);
-    startTransition(async () => setView(await run(namespace, capabilityId, payload)));
+    startTransition(async () => {
+      try { setView(await run(namespace, capabilityId, payload)); }
+      catch { setView({ status: 'UNKNOWN', capabilityId, code: 'REQUEST_FAILED', message: 'The page lost contact before execution could be confirmed.' }); }
+    });
   };
 
   const properties = schema ? objectProperties(schema) : [];
@@ -92,7 +109,7 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
               name={`${baseId}-mode`}
               value={option}
               checked={mode === option}
-              disabled={option === 'form' && !schema}
+              disabled={(option === 'form' && !schema) || (option !== mode && invalidInput)}
               onChange={() => toMode(option)}
             />
             <span>{option === 'form' ? 'form' : 'raw'}</span>
@@ -114,7 +131,8 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
               root={schema}
               label={key}
               required={required.has(key)}
-              path={key}
+              path={childPath('', key)}
+              editor={editor}
               value={current[key]}
               onChange={next => setDocument({ ...current, [key]: next })}
             />
@@ -148,7 +166,7 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
       </p>
 
       <div className="action-row">
-        <button className="button-primary" type="button" onClick={execute} disabled={pending}>
+        <button className="button-primary" type="button" onClick={execute} disabled={pending || invalidInput}>
           {pending ? 'Executing…' : 'Run this capability'} <span aria-hidden="true">→</span>
         </button>
       </div>
@@ -165,10 +183,20 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
 function summarise(view: InvocationView): string {
   if (view.status === 'EXECUTED') return `Execution complete — disposition ${view.disposition}.`;
   if (view.status === 'REFUSED') return `Not executed — ${view.code}.`;
+  if (view.status === 'UNKNOWN') return 'Execution unconfirmed — check its status before retrying.';
   return `Not executed — ${view.message}`;
 }
 
 function Result({ view }: { view: InvocationView }) {
+  if (view.status === 'UNKNOWN') {
+    return (
+      <div className="invocation-result invocation-result--refused">
+        <p className="kicker">Execution unconfirmed · {view.code}</p>
+        <p>{view.message}</p>
+        <p className="invocation-note">The request may still be running or may have completed. Losing the response does not cancel execution. Check its status before retrying.</p>
+      </div>
+    );
+  }
   if (view.status === 'UNAVAILABLE') {
     return (
       <div className="invocation-result invocation-result--refused">
@@ -201,7 +229,7 @@ function Result({ view }: { view: InvocationView }) {
         </div>
         <div>
           <p className="kicker">Kernel testimony</p>
-          <p>{view.observationCount} observations · {view.executionCount} executions · {view.durationMs} ms</p>
+          <p>{view.observationCount} observations · {view.executionCount} executions{view.durationMs !== null ? ` · ${view.durationMs} ms` : ''}</p>
         </div>
       </div>
 
@@ -220,6 +248,10 @@ function Result({ view }: { view: InvocationView }) {
       <details>
         <summary>Execution provenance</summary>
         <pre>{JSON.stringify(view.evidence, null, 2)}</pre>
+      </details>
+      <details>
+        <summary>Full execution record</summary>
+        <pre>{JSON.stringify(view.execution, null, 2)}</pre>
       </details>
     </div>
   );

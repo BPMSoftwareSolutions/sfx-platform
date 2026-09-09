@@ -1,10 +1,8 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import {
-  InputContractPublication,
+  type InputContractPublication,
   type ResolvedInputContract,
 } from '@/contracts/input-contract';
+import { readValidatedPublication } from './publication-validation';
 
 /**
  * Input contract reader — §11.1.
@@ -17,15 +15,14 @@ let cached: InputContractPublication | null | undefined;
 
 function load(): InputContractPublication | null {
   try {
-    const bytes = readFileSync(join(process.cwd(), 'generated', 'input-contracts.json'), 'utf8');
-    return InputContractPublication.parse(JSON.parse(bytes));
+    return readValidatedPublication().inputContracts;
   } catch {
     return null;
   }
 }
 
 export function getInputContract(capabilityId: string): ResolvedInputContract {
-  cached ??= load();
+  if (cached === undefined) cached = load();
   const entry = cached?.capabilities[capabilityId];
   if (!entry) return { contractId: null, schema: null };
   return {

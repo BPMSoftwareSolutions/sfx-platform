@@ -18,7 +18,7 @@ export const EstateExecution = z.object({
     executionId: z.string(),
     scenarioId: z.string(),
     /** Canonical kernel vocabulary — `terminated`, `rejected`, `failed`. Never translated. */
-    disposition: z.string(),
+    disposition: z.enum(['terminated', 'rejected', 'failed']),
     outcome: z.unknown().nullable(),
   }).loose(),
   executions: z.array(z.unknown()).default([]),
@@ -36,14 +36,15 @@ export const CommandResponse = z.union([
       details: z.unknown().nullable().optional(),
     }),
     durationMs: z.number().nonnegative().optional(),
+    executionState: z.enum(['NOT_STARTED', 'UNKNOWN']).optional(),
   }),
 ]);
 export type CommandResponse = z.infer<typeof CommandResponse>;
 
 /**
  * What the page shows. `EXECUTED` carries a real kernel disposition; `REFUSED` carries the
- * estate's own refusal code; `UNAVAILABLE` means the site could not reach the estate at all
- * and is the only state the website itself authors.
+ * confirmed pre-execution refusal; `UNAVAILABLE` means the site did not send a request.
+ * `UNKNOWN` means the response cannot establish whether execution occurred.
  */
 export type InvocationView =
   | {
@@ -54,8 +55,9 @@ export type InvocationView =
       outcome: unknown;
       observationCount: number;
       executionCount: number;
-      durationMs: number;
+      durationMs: number | null;
       evidence: Record<string, unknown>;
+      execution: EstateExecution;
     }
   | {
       status: 'REFUSED';
@@ -67,6 +69,12 @@ export type InvocationView =
   | {
       status: 'UNAVAILABLE';
       capabilityId: string;
-      code: 'NOT_CONFIGURED' | 'UNREACHABLE' | 'INVALID_JSON' | 'RATE_LIMITED' | 'BAD_RESPONSE';
+      code: 'NOT_CONFIGURED' | 'INVALID_JSON' | 'RATE_LIMITED';
+      message: string;
+    }
+  | {
+      status: 'UNKNOWN';
+      capabilityId: string;
+      code: string;
       message: string;
     };

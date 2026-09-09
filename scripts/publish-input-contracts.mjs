@@ -84,12 +84,16 @@ let withSchema = 0;
 
 for (const row of result.recordsets[0]) {
   let schemaRef = null;
+  let sourceSchemaDigest = null;
   if (row.schema_text) {
+    const retainedDigest = `sha256:${row.schema_digest}`;
+    if (digest(row.schema_text) !== retainedDigest) throw new Error('INPUT_CONTRACT_SOURCE_DIGEST_MISMATCH');
     try {
       const schema = JSON.parse(row.schema_text);
-      const key = `sha256:${row.schema_digest}`;
+      const key = stableDigest(schema);
       schemas[key] ??= schema;
       schemaRef = key;
+      sourceSchemaDigest = retainedDigest;
       withSchema += 1;
     } catch {
       // Retained content that is not JSON is published as absent, never as a guessed shape.
@@ -100,11 +104,12 @@ for (const row of result.recordsets[0]) {
     scenarioId: row.scenario_id,
     contractId: row.contract_id ?? null,
     schemaRef,
+    sourceSchemaDigest,
   };
 }
 
 const content = {
-  publicationType: 'sidefx-input-contract-publication.v1',
+  publicationType: 'sidefx-input-contract-publication.v2',
   publicationId: '',
   builtAt: '',
   source: {

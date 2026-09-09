@@ -23,18 +23,20 @@ export const CapabilityInputContract = z.object({
   contractId: z.string().nullable(),
   /** Key into `schemas`, or null when no schema was retained for it. */
   schemaRef: Digest.nullable(),
+  /** Digest of the original SQL source bytes, before JSON parsing/canonicalization. */
+  sourceSchemaDigest: Digest.nullable(),
 });
 export type CapabilityInputContract = z.infer<typeof CapabilityInputContract>;
 
 export const InputContractPublication = z.object({
-  publicationType: z.literal('sidefx-input-contract-publication.v1'),
+  publicationType: z.literal('sidefx-input-contract-publication.v2'),
   publicationId: Digest,
   builtAt: z.string(),
   source: z.object({
-    snapshotId: z.string(),
-    projectionDigest: z.string(),
-    viewDefinitionDigest: z.string(),
-    queryDigest: z.string(),
+    snapshotId: Digest,
+    projectionDigest: Digest,
+    viewDefinitionDigest: Digest,
+    queryDigest: Digest,
     disposition: z.literal('READ_QUERY_COMPLETE'),
   }),
   capabilities: z.record(z.string(), CapabilityInputContract),

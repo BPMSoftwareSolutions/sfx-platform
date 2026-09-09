@@ -16,8 +16,8 @@ function fixture(run:(directory:string)=>void){
 function reselect(dir:string){
  const folder=join(dir,'generated'),p=JSON.parse(readFileSync(join(folder,'estate-publication.json'),'utf8'));
  p.publicationId=stableDigest({...p,publicationId:'',builtAt:''});writeFileSync(join(folder,'estate-publication.json'),JSON.stringify(p));
- const artifacts=Object.fromEntries(['estate-publication.json','circuit-projections.json','visual-publication.json'].map(f=>[f,digest(readFileSync(join(folder,f)))]));
- writeFileSync(join(folder,'publication-manifest.json'),JSON.stringify({version:1,publicationId:p.publicationId,artifacts}));
+ const artifacts=Object.fromEntries(['estate-publication.json','circuit-projections.json','visual-publication.json','input-contracts.json'].map(f=>[f,digest(readFileSync(join(folder,f)))]));
+ writeFileSync(join(folder,'publication-manifest.json'),JSON.stringify({version:2,publicationId:p.publicationId,artifacts}));
 }
 test('all selected images and stored circuit closures match their delivered bytes',()=>{
  assert.ok(visual.visuals.length>=20);assert.ok(visual.materials.length===15);assert.ok(visual.circuits.length>0);
