@@ -134,6 +134,13 @@ The page renders what the estate returned and nothing else.
 | `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
 | `NOT_CONFIGURED`, `UNREACHABLE`, `BAD_RESPONSE`, `RATE_LIMITED`, `INVALID_JSON` | The site could not reach or read the estate. The only states the website itself authors |
 
+The estate returns more than the page currently shows. Each result carries the full `observations`
+and `executions` arrays — one record per observed kernel step, and one per nested scenario
+execution — of which the page reports only counts today. That testimony is what the workbench's
+**observed-execution** trace binds to (spec §5.0, §12.4): the branch actually taken, the
+disposition actually reached, observed timestamps, and absence drawn as absence. It is the reason
+this surface returns evidence rather than just an outcome.
+
 Two distinctions the surface must never blur:
 
 1. **A rejection is an execution.** The kernel ran and refused the value. It is reported with its

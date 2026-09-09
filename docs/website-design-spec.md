@@ -248,13 +248,40 @@ Each page spec lists: purpose, hero (H1 + subhead + CTA), section blocks with di
 
 **Execution.** Any prepared capability runs from the workbench; a composed solution runs when each of its cells can. Results carry the kernel's own disposition, outcome and testimony, and a contract rejection is reported as an execution rather than an error. A capability the estate has not prepared says so in its own words. The execution surface, its refusal vocabulary and its coverage are specified in [`docs/capability-execution.md`](capability-execution.md).
 
+**Trace: two modes that must never be mistaken for each other.** The workbench traces flow through the circuit both ways, and the distinction between them is the single most dangerous thing on the surface to blur.
+
+| | **Simulated** — *Illustrative flow* | **Live** — *Observed execution* |
+| --- | --- | --- |
+| Driven by | Declared topology and routes | The kernel testimony an execution actually returned |
+| Shows | What the declared circuit permits | What was observed, and only that |
+| Invokes | Nothing (§13.1) | Nothing further; it replays evidence already produced |
+| Available | Any circuit, any time | Only after an execution of that capability, in this session |
+| Decisions | One selected illustrative alternative | The branch actually taken |
+
+Laws governing them:
+
+- A live trace is rendered **only** from execution evidence returned by the estate. It is never reconstructed from topology, never interpolated, and never completed by inference where testimony is absent.
+- A gap in testimony is drawn as a gap. A nested scenario that reported no observations shows as unobserved, not as skipped and not as successful.
+- Where the observed path **diverges** from the declared topology, the divergence is shown and named. It is a finding about the capability, not a rendering error to be smoothed away.
+- A refusal terminates the live trace exactly where the kernel stopped — an input refused at admission traces one step and stops, and that is the honest picture of what happened.
+- A simulated trace may never be presented, labelled, coloured or animated as an execution, and there is no live replay of an execution that did not occur. The mode is stated in words on the surface at all times, not only in a legend.
+- Observed timing is shown as observed. Replay speed may be adjusted, and when it is, the timing is labelled adjusted rather than silently rescaled.
+
+**Input and outcome experience.** A capability's input form and its outcome view are authored on the platform, so the UX a person actually gets is part of the capability rather than an afterthought bolted on downstream.
+
+- **Input.** The generated form (§5.0, from the declared contract) is the starting point. The author refines it in the workbench — ordering, grouping, labels, help text, and the control used for a field — and saves it with the draft.
+- **Outcome.** The declared outcome is rendered through an authored outcome view. SCL already declares the experience the outcome must deliver (`outcome.experience.statement`, §11.2); the outcome view is where that declared experience becomes something a person sees, which is what closes the loop from intent to effect.
+- **Presentation never becomes meaning.** This is the §12.1 semantic boundary applied to forms: an authored form may *present* the contract and may never redefine it. It cannot introduce a field the contract does not declare, relax a required member, alter a fixed value, or make an inadmissible input appear admissible. Admission stays with the capability's contract, and its refusal stays visible.
+- **An outcome view renders actual values.** It never fabricates a field, never hides a finding, and never renders a rejection or a failure as a success. A refusal has its own presentation and cannot be styled away.
+- Both travel with the draft as **presentation metadata** — versioned, exported alongside authority and embodiments under §1.6, and clearly separated from semantic authority so that no consumer can mistake a layout choice for declared meaning.
+
 **Ownership.** A composed solution is a capability draft with lineage: saved to the authenticated workspace, revisioned, and exported as authority and available embodiments under the §1.6 contract. Public publication remains a separate explicit action.
 
 **Demonstrability is a design requirement, not a nicety.** The workbench is the platform's primary teaching surface: recorded scenario walkthroughs feed the YouTube channel and the §5.12 courses, and they are how most users will first understand the product. The surface must therefore be reproducibly automatable — stable identifiers on every control, canvas and selection state addressable by URL, a pinned estate generation for a recorded scenario, no state reachable only through timing or animation, and reduced-motion parity for every demonstrated interaction. **A scenario that cannot be recorded reproducibly is a workbench defect, not a recording problem.**
 
 **Explicit states:** empty canvas; estate unavailable; execution unavailable in this deployment; capability not prepared; provider slot unresolved; connection refused by contract; draft unsaved. Each is stated in words, never implied by an absent control.
 
-**Current state (P1 gap).** Today the pieces exist separately and the workbench does not: `/capabilities` supplies the palette's data, the compiled circuit workbench provides read-only inspection with component search and route tracing, and capability execution runs a single prepared capability from its detail page. Canvas composition, wiring, marketplace slot filling and solution-level execution are unbuilt. Until they ship, `/workbench` is registered unavailable and unlinked per §4; no page implies the composition surface exists.
+**Current state (P1 gap).** Today the pieces exist separately and the workbench does not: `/capabilities` supplies the palette's data, the compiled circuit workbench provides read-only inspection with component search and illustrative route tracing, and capability execution runs a single prepared capability from its detail page — returning the kernel testimony the observed-execution trace will be built from. Unbuilt: canvas composition, contract-checked wiring, marketplace slot filling, solution-level execution, the observed-execution overlay, and authored input/outcome presentation. Until they ship, `/workbench` is registered unavailable and unlinked per §4; no page implies the composition surface exists, and no surface offers an observed trace it cannot bind to real testimony.
 
 **SEO:** title `Capability Workbench — SideFX`, description from the differentiator in §1.3.
 
@@ -673,6 +700,8 @@ The supplied portal summary establishes the intended existing app: **`sidefx` �
 | Remaining dependency | Owner role | Required by |
 | --- | --- | --- |
 | Workbench canvas: composition, contract-checked wiring, provider slot filling and solution-level execution | Product/website engineering | P1 workbench (§5.0) |
+| Observed-execution overlay bound to returned kernel testimony, distinct from illustrative flow | Website/visual engineering | P1 workbench trace (§5.0, §12.4) |
+| Authored input form and outcome view, versioned with the draft and exported as presentation | Product/website engineering | P1 workbench experience (§5.0, §1.6) |
 | Capability command service deployment and authorization, so execution works in a hosted environment | Platform engineering | P1 execution on the hosted site |
 | Recorded scenario harness driving the real workbench against a pinned generation | Training/content owner | P2 courses and the YouTube channel (§5.12) |
 | Public capability scope and claim/evidence records, with private fields excluded | Product/content owner | P1 publication |
@@ -840,7 +869,11 @@ Opening a capability selects its overview and a meaningful initial scenario. Sel
 
 Reuse `templates/circuit-flow.js` from the content lab through a pinned integration. The silver sphere follows exact compiled edge paths and junction arms. Fan-out emits the declared branches; joins wait for the required arrivals; decisions take only the selected illustrative alternative. Support links do not carry execution spheres. Refuse unsupported retries or traces rather than inventing their iteration or timing.
 
-Playback begins only on **Play flow**. Pause/resume, replay, seek and speed preserve deterministic viewer state. Base/Material switching retains selection, zoom and flow time. Reduced motion advances to event boundaries. Hiding/leaving the page stops motion; node inspection pauses it. Label this mode **Illustrative flow**. A future observed-execution overlay requires a trace bound to actual execution evidence and timestamps, with clear missing-event handling.
+Playback begins only on **Play flow**. Pause/resume, replay, seek and speed preserve deterministic viewer state. Base/Material switching retains selection, zoom and flow time. Reduced motion advances to event boundaries. Hiding/leaving the page stops motion; node inspection pauses it. Label this mode **Illustrative flow**.
+
+The observed-execution overlay is now specified rather than deferred, because executions return real kernel testimony (§5.0, `docs/capability-execution.md`). Label it **Observed execution** and bind it to that testimony alone: one step per observed step, the branch actually taken, the disposition actually reached, and observed timestamps. Absent testimony is drawn as absent — never interpolated, never completed from topology. A path that diverges from the declared circuit is shown as a divergence and named. A refusal ends the trace where the kernel stopped.
+
+The two modes are never interchangeable and never visually confusable: the active mode is stated in words on the surface, illustrative flow may not be styled or animated to read as an execution, and there is no observed-execution playback for an execution that did not happen. Where both are available for the same circuit, switching between them restates the mode and never carries one mode's trace into the other's presentation.
 
 Public reading and the text explanation remain available without JavaScript. The IDE's interactive functions can require JavaScript, with a clear explanation and access to the read-only example/docs when it is unavailable. Large graphs load at capability/scenario scope and use drill-down rather than rendering the entire estate in the homepage bundle.
 

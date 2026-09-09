@@ -360,6 +360,8 @@ These are non-negotiable, testable rules. The test suite (`tests/`) and validati
 8. Claims → evidence record or the claim is not published (§1.7).
 9. Execution → the capability's own disposition, including a contract rejection, reported as it happened; never corrected, never replaced by another capability's result (§5.5).
 10. Cannot execute → the estate's own refusal code, shown as a state; never a silently absent control and never a fabricated outcome (§5.5).
+11. Simulated flow → labelled illustration, never styled, worded or timed to read as an observed execution. An observed trace is drawn only from returned kernel testimony; absent testimony is drawn as absent (spec §5.0, §12.4).
+12. Authored presentation → an input form or outcome view may present a contract and never redefine it, and never renders a refusal as a success. Presentation is exported as presentation, never as semantic authority (§12.1 applied to forms).
 
 ## 9. Contracts
 
