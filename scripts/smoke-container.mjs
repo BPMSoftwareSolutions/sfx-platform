@@ -71,3 +71,20 @@ for(const edition of visuals.editions.filter(e=>e.film)){
  assert.equal((await response.arrayBuffer()).byteLength,1024);
 }
 console.log(`PASS ${media.size} media byte hashes, published circuit closure samples and film seeking`);
+
+// §13.1 — every capability page carries the execution surface, and nothing executes on load.
+// Whether a given capability can execute is the estate's answer at run time, so the image is
+// checked for the control and its stated limits, not for a preparation outcome.
+for (const kind of ['capabilities']) {
+  for (const capability of [publication[kind][0], publication[kind].at(-1)]) {
+    const response = await fetch(new URL(`/${kind}/${capability.urlKey}`, origin), { signal: AbortSignal.timeout(15000) });
+    assert.equal(response.status, 200);
+    const body = await response.text();
+    assert.match(body, /invocation-panel/, `${capability.entityId}: no execution surface`);
+    assert.match(body, /Run this capability/, `${capability.entityId}: no run control`);
+    assert.doesNotMatch(body, /invocation-result/, `${capability.entityId}: a result rendered before any run`);
+    // The page must keep stating what an execution does not establish.
+    assert.match(body, /separately unevaluated/, `${capability.entityId}: execution limits dropped`);
+  }
+}
+console.log('PASS capability execution surface present, inert on load, with its limits stated');

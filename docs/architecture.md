@@ -114,7 +114,8 @@ This is the architectural expression of the product story: **Speak it. See the c
 9. **The web process is disposable.** Durable state (media bytes, drafts, jobs, inquiries, artifacts) lives in external services. A restart loses nothing; local files and caches are never authoritative (§8.7).
 10. **Content is generated, not hard-coded.** The platform's data is the content system: pages, cards, counts, circuits, metadata, relationships, selections and images are derived from the publication by declared rules. Editorial copy is reviewed narrative that *selects estate records by identity* — it never restates facts the publication already carries, and it never overrides them (§6, §8.1, §11.3).
 11. **Python is the analytical embodiment.** Data science and data analysis leverage — the Python ecosystem — is a first-class platform asset, not an afterthought. Python services consume the pinned generation and publish digest-pinned analysis projections through the same contracts, jobs and honesty discipline as everything else (§7).
-12. **Maximum freedom to discover; minimum freedom to redefine meaning.** Neural networks enter through provider slots as probabilistic mechanics/providers inside the deterministic semantic circuit. They get freedom to infer, and no power to change why the inference exists, what input is admissible, what evidence is required, or what experience must close (§1.2, spec §13.2).
+12. **Execution is an explicit act, and never a claim.** A capability runs only because a person asked it to; rendering a page, opening a circuit or playing its flow invokes nothing. What comes back is the capability's own disposition — including its refusal of the input — reported as it happened. A completed execution is not managed admission and not conformance evidence; those remain separately unevaluated (§1.7, §5.5).
+13. **Maximum freedom to discover; minimum freedom to redefine meaning.** Neural networks enter through provider slots as probabilistic mechanics/providers inside the deterministic semantic circuit. They get freedom to infer, and no power to change why the inference exists, what input is admissible, what evidence is required, or what experience must close (§1.2, spec §13.2).
 
 ## 3. System boundaries
 
@@ -128,6 +129,7 @@ The architecture is a stack of strict separations. Each row is a boundary that n
 | **Visibility boundary** | Public pages | Private drafts, authority, artifact access | Independent per-resource authorization, never page visibility alone (§11.4) |
 | **Determinism boundary** | Compiled SVG / typed graph | Generated art, illustrative flow | The renderer and player; art is labeled illustration (§12.3–12.4) |
 | **Inference boundary** | Neural inference (learned weights, latent meaning) | Semantic authority (declared meaning, evidence rules) | The provider contract: admissible inputs, output contract, confidence/evidence obligations. The network infers; it never defines (§1.2) |
+| **Execution boundary** | Web process (no connection, no runtime) | Estate runtime (SQL authority, in-memory bodies, Scenario Kernel) | The capability command API beside the web process, over one entity-neutral envelope (§5.5, §11.1) |
 | **State boundary** | Web container (stateless, disposable) | Durable services (DB, jobs, media, mail) | Service adapters with their own lifecycles (§8.7) |
 | **Configuration boundary** | Build-time constants | Environment-specific secrets/endpoints | Server-side runtime config; `NEXT_PUBLIC_*` is build-embedded only (§8.7) |
 
@@ -169,7 +171,7 @@ The architecture is a stack of strict separations. Each row is a boundary that n
 - Source states are preserved exactly and paired with a readable explanation. The readable form never replaces the source value (§11.3).
 - Python services live **beside** the web process, not inside it — external workers with their own runtimes, job lifecycles and durability (§7, §8.7). The web process never embeds an interpreter and never acts as their scheduler.
 
-## 5. The four pipelines
+## 5. The five pipelines
 
 ### 5.1 Estate publication (read path)
 
@@ -225,6 +227,24 @@ commit + lockfile + approved publication → checks + Linux build
 - One image, promoted by digest. Prior image retained for rollback; an application rollback never auto-reverses database writes (§8.6).
 - The image embeds its source commit; `/readyz` exposes the release identity so a starter page or stale healthy release cannot satisfy a new deployment check (§8.5–8.7).
 - Staging is noindex at the proxy, but that is not access control — private content requires real authorization before it exists (§8.7).
+
+### 5.5 Capability execution (invocation path)
+
+```
+explicit user action -> command envelope { object, operation, subject, input }
+-> capability API beside the web process -> sfx SDK -> estate process delivery
+-> one restricted read of the retained preparation -> body rebuilt in memory and checked
+   against its stored proof -> Scenario Kernel -> disposition, outcome and testimony
+```
+
+- The web process holds no connection string, spawns no runtime and embeds no interpreter. The API service is the only thing that crosses the execution boundary (§3, §11.1).
+- The surface is **entity-neutral**: one route, with object/operation/subject as data. Adding a capability to the estate adds no route, component or mapping to this repository.
+- **Preparation gates execution.** A capability is invocable once the estate has resolved its bindings and proved its retained fixtures into `runtime.capability_preparation`. The site cannot prepare; it can only invoke what is prepared, and reports `CAPABILITY_PREPARATION_REQUIRED` or `_STALE` as the estate's own answer.
+- Input is composed from the capability's declared contract — a generated form or raw JSON over one document. The form renders the contract and validates nothing: admission belongs to the capability, and its refusal is a real result (§13.1).
+- A generation change invalidates preparations conservatively. A stale preparation is never executed for a newer generation.
+
+Coverage, contracts, refusal vocabulary and open gaps are recorded in
+[capability-execution.md](capability-execution.md).
 
 ## 6. Content generation architecture
 
@@ -338,10 +358,12 @@ These are non-negotiable, testable rules. The test suite (`tests/`) and validati
 6. Drafts → a failed edit retains the prior valid circuit with a visible mismatch notice (§12.2).
 7. CTA → an integration gate that is open means P1 is **reported incomplete**, never a silent contact-form swap or canned draft presented as live (§9).
 8. Claims → evidence record or the claim is not published (§1.7).
+9. Execution → the capability's own disposition, including a contract rejection, reported as it happened; never corrected, never replaced by another capability's result (§5.5).
+10. Cannot execute → the estate's own refusal code, shown as a state; never a silently absent control and never a fabricated outcome (§5.5).
 
 ## 9. Contracts
 
-`contracts/estate.ts` is the versioned data contract (§11.3). Field names are **website projection fields** — they do not assert identical database columns. The publication service is the only producer; the site only reads validated bytes.
+`contracts/invocation.ts` and `contracts/input-contract.ts` carry the execution surface: the command result the estate returns, and the declared input contract the form is generated from. `contracts/estate.ts` is the versioned data contract (§11.3). Field names are **website projection fields** — they do not assert identical database columns. The publication service is the only producer; the site only reads validated bytes.
 
 | Contract | Carries |
 | --- | --- |
@@ -391,6 +413,7 @@ The architecture is established; portions remain unimplemented. Per §10 and the
 | Durable inquiry store + mail worker | 4, spec §8.7 | Hosted builds reject submissions with values preserved |
 | Legal entity, analytics config, workspace routes | 4, 5.4 | Registered unavailable; unlinked, noindex |
 | Estate analytics, semantic retrieval, media QA services | 7 | Lab assets exist; platform services not wired (§7.4) |
+| Capability execution service deployment and authorization | 5.5 | Connected locally: 94 of 219 capabilities prepared and invocable, refusals reported with the estate's own codes. The command API is unauthenticated and not deployed to any environment, so hosted builds report execution unavailable |
 
 While a gate is open, the site reports P1 incomplete rather than substituting behavior (§9). This document is updated when a gate closes — the architecture is the contract, the audit is the ledger.
 

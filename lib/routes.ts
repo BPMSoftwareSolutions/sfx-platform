@@ -94,6 +94,21 @@ export const ROUTES = {
   providers: { href: '/providers', label: 'Providers', phase: 'P1', available: true, indexable: true },
 
   build: { href: '/build', label: 'Build a capability', phase: 'P1', available: true, indexable: true },
+  /**
+   * §5.0 — the Capability Workbench, the product's centre of gravity. Registered and unavailable:
+   * composition, contract-checked wiring and solution-level execution are unbuilt, so nothing may
+   * link to it and the primary CTA falls back through this registry rather than leading somewhere
+   * that cannot do what the page implies.
+   */
+  workbench: {
+    href: '/workbench',
+    label: 'Workbench',
+    phase: 'P1',
+    available: false,
+    indexable: false,
+    description: 'Compose, inspect and run capabilities on one canvas.',
+  },
+
   workspace: { href: '/workspace', label: 'Workspace', phase: 'P1', available: false, indexable: false },
   signIn: { href: '/sign-in', label: 'Sign in', phase: 'P1', available: false, indexable: false },
 

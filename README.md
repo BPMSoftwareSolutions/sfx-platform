@@ -7,6 +7,8 @@ README records how the implementation satisfies it and, just as importantly, whe
 [`docs/architecture.md`](docs/architecture.md) codifies the architecture doctrine — pillars,
 boundaries, pipelines, contracts and honesty invariants — that the codebase is judged against.
 [`docs/visual-integration-audit.md`](docs/visual-integration-audit.md) is the ledger of open gates.
+[`docs/capability-execution.md`](docs/capability-execution.md) documents capability execution — the
+surface that runs a capability from the database, and the platform's centre of gravity.
 
 ## Running it
 
@@ -38,6 +40,7 @@ Other scripts:
 | Script | What it does |
 | --- | --- |
 | `npm run publish:estate` | Reads one pinned generation of the estate and writes `generated/` |
+| `npm run publish:contracts` | Publishes each capability's declared input contract schema for the input form |
 | `npm run restore:media` | Restores `public/media` from the selected SQL publication |
 | `npm run validate:media` | Verifies every restored media file against its SQL publication hash |
 | `npm run select:estate` | Validates and pins both generated artifacts in a digest manifest after a deliberate publication refresh |
@@ -78,6 +81,93 @@ Production builds fail on absent, altered, mixed, empty or incomplete artifacts.
 The current generation publishes **218 capabilities, 824 scenario faces, 191 mechanics, 74
 providers and 314 declared provider–mechanic relationships**, plus four preserved findings — see
 `/platform/capability-estate`.
+
+## Executing a capability
+
+Every published capability page offers **Run this capability**. The command goes to a capability
+API running beside the web process, which reads the capability's prepared authority from SQL,
+rebuilds its body in memory and executes it there. Typical round trip is about three seconds.
+
+```
+browser  ->  server action  ->  services/capability-api  ->  sfx SDK  ->  SQL preparation
+                                (holds the connection)                    -> body in memory
+                                                                          -> Scenario Kernel
+```
+
+The website itself still opens no database connection, spawns no runtime and holds no
+credential (§11.1). The API service is the boundary that does, exactly as the Python services
+sit beside the web process in §7 and §8.7.
+
+The service exposes **one** route, `POST /commands`, taking the same closed envelope the CLI
+uses — `{ object, operation, subject, input }`. That is `sidefx-cli`'s Entity Neutrality Law
+observed literally: no capability, verb or vendor appears in a path or a branch, so adding a
+capability to the estate adds nothing to this repository.
+
+```bash
+cd services/capability-api && npm install
+SIDEFX_PROJECT_DIR=../../../sfx-embody npm start        # needs the database connection string
+SIDEFX_INVOCATION_ENDPOINT=http://127.0.0.1:8787 npm run dev
+```
+
+### Composing the input
+
+The input is composed one of two ways, switched like the body modes of a request tool:
+
+- **form** — fields generated from the capability's own declared input contract. A value the
+  contract fixes (`const`) is shown as fixed rather than editable, enums become selects, arrays
+  get item builders, and nested objects nest. A shape the form cannot render faithfully is
+  edited as JSON rather than approximated by a control that would misrepresent it.
+- **raw** — the JSON document directly.
+
+Both are views of the same document, so switching carries the value across. Across the 215
+published schemas, 1,142 of 1,152 declared properties render as controls and 10 fall back to raw.
+
+The schemas come from `npm run publish:contracts`, which reads each capability's root-scenario
+input contract and the retained JSON Schema it references from one pinned generation into
+`generated/input-contracts.json` — 216 of 218 capabilities declare one. A capability with no
+declared contract gets raw input and no claimed shape.
+
+Where the estate workspace publishes example requests, `SIDEFX_CAPABILITY_EXAMPLES` seeds the
+form with one. Examples are matched by the `contractId` the example itself declares against the
+contract the capability declares — never by filename, which is not evidence of applicability.
+Examples are read while pages are prerendered, so the variable belongs to the build, unlike
+`SIDEFX_INVOCATION_ENDPOINT`, which is read per request.
+
+The form does not validate. Admission belongs to the capability's contract, and its refusal is a
+real result the page shows.
+
+### What a run reports
+
+The page renders what the estate returned and nothing else:
+
+| State | Meaning |
+| --- | --- |
+| `terminated` | The capability executed and produced its outcome |
+| `rejected` | The capability's own contract refused the input, or its outcome; a real execution with its own kernel testimony |
+| `failed` | The event executed and threw |
+| `CAPABILITY_PREPARATION_REQUIRED` | No preparation is retained for the current estate generation, so it cannot execute yet |
+| `CAPABILITY_PREPARATION_STALE` | A preparation exists but was made against a different generation or toolchain |
+| `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
+| `NOT_CONFIGURED` / `UNREACHABLE` | The site could not reach the estate; the only states the website itself authors |
+
+A refusal is never filled in with another capability's result, and a rejected input is reported
+as rejected rather than corrected. Execution is an explicit user action: opening a capability,
+inspecting its circuit or playing its flow invokes nothing (§13.1).
+
+### Preparation is what gates coverage
+
+A capability is executable once the estate has resolved its bindings and proved its retained
+fixtures into `runtime.capability_preparation`. Of the current generation's 219 capabilities,
+**94 are prepared and 125 are held**, each with a declared reason. The site cannot prepare a
+capability — only invoke one that is prepared — and reports the estate's own refusal when it is
+not.
+
+A completed execution is not managed admission and not a conformance result; both remain
+separately unevaluated (§1.7).
+
+Coverage, the refusal vocabulary, the schema-driven form, operations and the open gaps —
+including that the command API is unauthenticated and not yet deployed — are documented in
+[`docs/capability-execution.md`](docs/capability-execution.md).
 
 ### Contracts
 
@@ -122,6 +212,9 @@ test enforces this.
 - **Boundary-view fidelity**: the current generation's blueprints carry nodes and no normalized
   edges, so circuits render the source-backed Input → Event → Responsibility → Outcome boundary
   with unresolved members shown as unresolved. Nothing is inferred to fill a gap.
+- **Capability execution** (§13.1): every capability page can run its capability through the
+  estate command surface, reporting the kernel's own disposition or the estate's own refusal.
+  See [Executing a capability](#executing-a-capability).
 - **Contact** with a server action: validation, rate limiting, honeypot, and preserved values plus
   a focused error summary. Hosted submissions report unavailable until durable delivery exists;
   development-only receipts support an idempotency key and temporary reference.
@@ -145,6 +238,9 @@ otherwise imply it works:
 | Capability export adapter; verified SDA release; own-architecture example | No download is offered anywhere. `/docs/ownership` documents the contract instead. |
 | Nano Banana production and the SQL media service (§11.5) | Every capability, mechanic and provider carries an open visual requirement; no placeholder stands in for a missing image. |
 | Target requirement/readiness records | No capability claims a target. Absence is shown as undeclared, not as "unsupported". |
+| Preparation coverage across the estate | 94 of 219 capabilities are prepared; the rest report their declared reason when run and are never presented as executable. |
+| Capability command API authorization and deployment | The API is unauthenticated and runs only locally; no hosted environment configures it, so hosted builds report execution unavailable. |
+| Conformance and managed admission for executed capabilities | Results are reported as execution only; both remain separately unevaluated. |
 | Authenticated workspace | `/workspace/*` and `/sign-in` are registered as unavailable and are unlinked and noindex. |
 | Legal entity identity and approved copy | `/legal/*` describe implemented behavior and state plainly that they are not yet in force. |
 | Durable inquiry store and mail worker | Hosted builds reject submissions with values preserved. Development receipt is process-local only. Environment variables alone do not enable delivery. |
@@ -162,6 +258,9 @@ quietly replaced or a draft presented as live authoring.
 | `SIDEFX_INDEXING` | Runtime slot setting; `disabled` applies noindex headers to every response and disallows all robots |
 | `SIDEFX_ESTATE_SOURCE` | Path to the estate inventory read by the publication service |
 | `SIDEFX_MAX_PUBLICATION_AGE_DAYS` | Age after which the site shows its stale-publication notice (default 30) |
+| `SIDEFX_INVOCATION_ENDPOINT` | Capability command service; without it the site reports execution unavailable |
+| `SIDEFX_INVOCATION_TIMEOUT_MS` | Bound on one invocation (default 30000) |
+| `SIDEFX_CAPABILITY_EXAMPLES` | Build-time directory of example requests, matched to capabilities by their declared `contractId` |
 | `SIDEFX_INQUIRY_RECIPIENT`, `SIDEFX_MAIL_API_KEY` | Reserved for the future delivery adapter; not sufficient to enable contact submission |
 
 ## Azure container delivery

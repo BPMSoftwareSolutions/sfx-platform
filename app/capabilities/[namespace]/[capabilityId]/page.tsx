@@ -4,9 +4,13 @@ import { CapabilityCircuitPanel } from '@/components/estate/capability-circuit-p
 import { EntityArt } from '@/components/estate/entity-art';
 import { EditionCircuit, EditionFilm } from '@/components/estate/visual-edition';
 import { StoredCircuitPanel } from '@/components/estate/stored-circuit-panel';
+import { CapabilityRun } from '@/components/estate/capability-run';
 import { findCapability, getCapabilities, getCircuitsForCapability } from '@/lib/estate';
 import { getEdition, getStoredCircuits } from '@/lib/visuals';
 import { pageMetadata } from '@/lib/seo';
+import { getCapabilityExample } from '@/lib/capability-examples';
+import { getInputContract } from '@/lib/input-contracts';
+import { runCapability } from './actions';
 interface Params { params: Promise<{namespace:string;capabilityId:string}> }
 export async function generateMetadata({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
@@ -18,7 +22,7 @@ export function generateStaticParams(){return getCapabilities().map(c=>({namespa
 export default async function CapabilityDetailPage({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
  if(!capability)notFound();
- const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),storedCircuits=getStoredCircuits(capability.semanticObjectDefinitionPk);
+ const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),storedCircuits=getStoredCircuits(capability.semanticObjectDefinitionPk),example=getCapabilityExample(capability.entityId),contract=getInputContract(capability.entityId);
  return <>
   <section className="capability-hero page-width">
    <div><Link className="kicker" href="/capabilities">The capability estate / {capability.title}</Link>
@@ -43,6 +47,7 @@ export default async function CapabilityDetailPage({params}:Params){
     <div><h3>{s.scenarioId.replaceAll('-',' ')}</h3><p>{s.responsibility}</p><a className="text-link" href={'?scenario='+encodeURIComponent(s.scenarioId)+'#circuit'}>Inspect this scenario ↗</a></div>
    </article>)}</div>
   </section>
+  <CapabilityRun capability={capability} contract={contract} example={example} run={runCapability}/>
   <section className="page-width editorial-section">
    <details className="border-t border-grid-line pt-6"><summary className="cursor-pointer text-sm">Source, availability and exact identity</summary><dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
     <div><dt className="kicker">Identity</dt><dd className="mt-2 break-all">{capability.entityId}</dd></div>

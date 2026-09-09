@@ -2,12 +2,13 @@
   "name": "sfx-platform",
   "version": "0.1.0",
   "private": true,
-  "description": "SideFX website — capability management and engineering platform (www.sidefx.io)",
+  "description": "SideFX website \u2014 capability management and engineering platform (www.sidefx.io)",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "publish:estate": "node scripts/publish-estate.mjs",
+    "publish:contracts": "node scripts/publish-input-contracts.mjs",
     "restore:media": "node scripts/restore-media.mjs",
     "dev": "next dev",
     "validate:media": "tsx scripts/validate-media.ts",

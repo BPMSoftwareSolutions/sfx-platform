@@ -21,7 +21,9 @@ The [visual integration audit](visual-integration-audit.md) records the implemen
 
 ### 1.1 Elevator pitch
 
-SideFX lets people describe the capability they need, inspect its visual circuit, and build it in an intent-driven environment. They can download the capability's semantic authority and available embodiments, then manage, invoke, and use it with the open-source SDA architecture or their own architecture.
+SideFX is a capability workbench: people assemble deterministic, production-grade solutions out of capabilities — describing what they need, composing the circuit, plugging in providers, and executing it — in minutes rather than sprints. They can download the capability's semantic authority and available embodiments, then manage, invoke, and use it with the open-source SDA architecture or their own architecture.
+
+The **Capability Workbench** (§5.0) is the product surface and the centre of gravity. Every other surface exists to feed it, and the platform is judged by what a person can build and run there.
 
 **SideFX stands for Semantic Intent-Driven Engineering Effects.** The product story follows that sequence: intent expresses the need, engineering makes the capability inspectable and executable, and effects deliver the intended experience.
 
@@ -30,12 +32,14 @@ SideFX lets people describe the capability they need, inspect its visual circuit
 - BPM Intelligence positions itself as a **Managed Capability Provider**: customers own the capability authority and choose who operates it. This is SideFX's category thesis. A public first-mover claim requires the evidence record in §1.7.
 - The SaaS era outsourced capabilities. The generative AI agency era inverts that: companies want **capability sovereignty** — capabilities they own — and the freedom to switch providers as quickly as conditions change.
 - AI coding platforms produce sprawl. Sprawl is a governance liability, a cost-of-ownership trap, and a lock-in vector. Managing, inspecting, and governing AI sprawl is the problem companies are trying to solve today without acceptable cost or lock-in.
-- SideFX answers with a capability estate built on executable meaning, an IDE for authoring capabilities, and downloadable authority and embodiments.
+- SideFX answers with a capability estate built on executable meaning, a workbench for composing and running capabilities, and downloadable authority and embodiments.
+- **Agentic engineering is capability engineering.** Agents act by exercising capabilities; making capabilities declared, composable, executable and owned is therefore the substrate that agentic systems need. The capability estate is where SideFX starts because it is the foundation the rest stands on, not a detour from it.
 
 ### 1.3 Core differentiators (must appear on Home)
 
 | Differentiator | Plain-language claim |
 | --- | --- |
+| Compose and run in the workbench | Assemble capabilities on a canvas, plug in providers, and execute the result — deterministic solutions in minutes |
 | Intent-driven authoring | Speak or type what you need; inspect and refine the candidate circuit in the SideFX IDE |
 | Executable meaning | Download the semantic authority that defines the capability's behavior |
 | Capability ownership | Download your authority and available embodiments; manage, invoke, and use them with open-source SDA or your own architecture |
@@ -142,6 +146,7 @@ The five product audiences have `/solutions/*` pages, following problem → mech
 
 | Label | Destination | Completion |
 | --- | --- | --- |
+| Open the workbench | `/workbench` | A capability is on the canvas, inspectable, and executable where the estate has prepared it (§5.0) |
 | Build a capability | `/build` | Intent submitted, candidate circuit shown, draft retained (§13) |
 | Explore capabilities | `/capabilities` | Search/filter and open a capability circuit |
 | Use this as a starting point | `/build?from={publicCapabilityKey}` | Create a separate draft with source lineage; preserve the source capability |
@@ -171,6 +176,7 @@ Next.js App Router route table. Routes marked **P1** ship in the launch site; **
 | `/platform/knowledge` | Governed RAG knowledge | P2 |
 | `/managed-capability-provider` | Managed Capability Provider — the category | P1 |
 | `/mcp` | Permanent redirect to `/managed-capability-provider` | P1 |
+| `/workbench` | Capability Workbench — compose, inspect and run capabilities | P1 |
 | `/capabilities` | Searchable capability estate | P1 |
 | `/capabilities/[namespace]/[capabilityId]` | Estate-driven capability detail and visual circuit | P1 |
 | `/mechanics` | Searchable mechanic library | P1 |
@@ -205,7 +211,7 @@ Next.js App Router route table. Routes marked **P1** ship in the launch site; **
 | `/docs/glossary` | Plain-language definitions linked from product pages | P1 |
 | `/legal/privacy`, `/legal/terms` | Legal | P1 |
 
-P1 global nav: **Explore ▾ · Platform ▾ · Solutions ▾ · Docs · About** + primary **Build a capability**, secondary **Talk to us**. Explore contains Capabilities, Mechanics and Providers. Ecosystem and the full Managed Capability Provider name appear in the Platform menu and footer. Signed-in users can return to their workspace.
+P1 global nav: **Workbench · Explore ▾ · Platform ▾ · Solutions ▾ · Docs · About** + primary **Open the workbench**, secondary **Talk to us**. `Build a capability` remains the CTA on intent-led surfaces. While the workbench is unavailable (§5.0), it is unlinked and the primary CTA falls back to `Build a capability` — the registry decides, and no nav entry points at an unavailable route (§4 phase rule). Explore contains Capabilities, Mechanics and Providers. Ecosystem and the full Managed Capability Provider name appear in the Platform menu and footer. Signed-in users can return to their workspace.
 
 Footer: available platform/solution pages, Capabilities, Mechanics, Providers, Docs, Ecosystem, category page, About, Contact, Legal, BPM Intelligence attribution, and verified social destinations. Add Training and Latest only after their pages ship.
 
@@ -217,27 +223,63 @@ Footer: available platform/solution pages, Capabilities, Mechanics, Providers, D
 
 Each page spec lists: purpose, hero (H1 + subhead + CTA), section blocks with direction (real copy sketches where stable), SEO meta direction, and links.
 
+### 5.0 `/workbench` — the Capability Workbench (P1)
+
+**Purpose:** where a person assembles deterministic, production-grade solutions out of capabilities, in minutes. It is listed first because it is the platform's centre of gravity: every other page feeds it. The catalogs supply the parts, the circuits explain them, the docs teach them, the estate proves them, and the training records them being used.
+
+**The job it accelerates:** a builder has a business outcome and wants an automated, inspectable solution today — not a sprawl of generated code whose behaviour nobody can state. The workbench answers by making the solution a circuit of declared capabilities that can be executed and owned.
+
+**Layout — three regions**
+
+| Region | Contents |
+| --- | --- |
+| **Palette** (left) | The estate: capabilities, mechanics and providers, searchable and filterable. Each entry shows what it declares and whether it can execute. Marketplace discovery appears here as a separate, clearly labelled source (§5.13) |
+| **Canvas** (centre) | The integrated circuit. A capability dragged onto the canvas becomes a cell showing its declared input, event, responsibility and outcome. Wiring an outcome to the next input composes the solution. The canvas *is* the program |
+| **Inspector and run** (right) | The selected cell's declared meaning, contracts, provider slots and evidence — and its run surface: input composed as a form generated from the declared contract, or as raw JSON, then executed |
+
+**Composition rules.** These are the §12.2–12.3 laws applied to authoring:
+
+- A connection is admissible only where the declared contracts permit it. An incompatible wire is refused **with its reason**, never coerced into working.
+- An unresolved provider slot is shown as unresolved. No provider is selected silently, and no default stands in for a declared choice.
+- The canvas never invents topology. A composition that cannot be qualified renders its boundary with unresolved members, exactly as an inspected circuit does.
+- Arranging, wiring or playing a circuit **invokes nothing**. Execution is always an explicit act (§13.1).
+
+**Provider slots and marketplaces.** Slots are filled from declared estate providers and from discovery sources — RapidAPI, `landscape.cncf.io` — under §5.13 and §13.4. Discovery is not integration: a listing establishes neither access nor a working binding. The workbench must show which state a slot is in — *discovered*, *candidate*, *bound*, *verified* — and never let a later state be inferred from an earlier one. Credentials are supplied in the user's environment and never appear in the canvas, a saved draft or an export (§1.6).
+
+**Execution.** Any prepared capability runs from the workbench; a composed solution runs when each of its cells can. Results carry the kernel's own disposition, outcome and testimony, and a contract rejection is reported as an execution rather than an error. A capability the estate has not prepared says so in its own words. The execution surface, its refusal vocabulary and its coverage are specified in [`docs/capability-execution.md`](capability-execution.md).
+
+**Ownership.** A composed solution is a capability draft with lineage: saved to the authenticated workspace, revisioned, and exported as authority and available embodiments under the §1.6 contract. Public publication remains a separate explicit action.
+
+**Demonstrability is a design requirement, not a nicety.** The workbench is the platform's primary teaching surface: recorded scenario walkthroughs feed the YouTube channel and the §5.12 courses, and they are how most users will first understand the product. The surface must therefore be reproducibly automatable — stable identifiers on every control, canvas and selection state addressable by URL, a pinned estate generation for a recorded scenario, no state reachable only through timing or animation, and reduced-motion parity for every demonstrated interaction. **A scenario that cannot be recorded reproducibly is a workbench defect, not a recording problem.**
+
+**Explicit states:** empty canvas; estate unavailable; execution unavailable in this deployment; capability not prepared; provider slot unresolved; connection refused by contract; draft unsaved. Each is stated in words, never implied by an absent control.
+
+**Current state (P1 gap).** Today the pieces exist separately and the workbench does not: `/capabilities` supplies the palette's data, the compiled circuit workbench provides read-only inspection with component search and route tracing, and capability execution runs a single prepared capability from its detail page. Canvas composition, wiring, marketplace slot filling and solution-level execution are unbuilt. Until they ship, `/workbench` is registered unavailable and unlinked per §4; no page implies the composition surface exists.
+
+**SEO:** title `Capability Workbench — SideFX`, description from the differentiator in §1.3.
+
 ### 5.1 Home (`/`)
 
-**Purpose:** Show a builder what they can create, inspect, and take into use; demonstrate the ownership promise with an estate-backed example.
+**Purpose:** Show a builder what they can compose, run, and take into use; demonstrate the ownership promise with an estate-backed example they can execute.
 
 **Hero**
 - Eyebrow: `The SideFX intent-driven environment` (linked to `/build`)
 - H1: `Own your capabilities.`
 - Subhead: `Describe what you need. See the capability as a circuit. Download its semantic authority and available embodiments to use with open-source SDA or your own architecture.`
-- CTA primary: `Build a capability` → `/build` · secondary: `Explore capabilities` → `/capabilities`
+- CTA primary: `Open the workbench` → `/workbench` · secondary: `Explore capabilities` → `/capabilities`. While the workbench is unavailable, the primary falls back to `Build a capability` → `/build` through the route registry — never a dead or silently substituted CTA (§9)
 - Visual: a real, selected capability's SCL circuit and reviewed Nano Banana image. Begin with its input, action, and outcome; offer scenario drill-down and opt-in flow. Clearly label a draft or illustrative example. Target badges reflect that capability's artifact and evidence records.
 
 **Blocks**
-1. **Try an intent** — editable typed/voice prompt leading to `/build`; the same transcript and provider context carry into the IDE. Use the quote-retrieval and CNCF examples in §13.4.
-2. **See the circuit** — one source-bound example: need → input/event/outcome → provider responsibility → expected experience. Link to its actual capability detail page.
-3. **Take it with you** — show the authority and embodiment bundle, supported targets, and the independent-use quickstart. Link `/docs/ownership`.
-4. **Explore the estate** — featured capability images, promises, scenarios, and availability queried from the published estate projection. Every capability card opens its circuit. Related mechanic/provider cards show the reusable parts and declared implementers, linking to their own images and detail pages.
-5. **How SideFX works** — IDE, executable meaning, SCL, and the five P1 platform pillars (estate, circuits, projections, blueprints, governance). Knowledge joins the linked set in P2.
-6. **Why ownership matters** — explain inspection, export, and provider choice through their concrete mechanisms. Link `/managed-capability-provider` for the category thesis.
-7. **Audience and ecosystem** — compact audience links and source-bound provider examples, with `/ecosystem` for detail. Marketplace references identify discovery sources; they do not imply a working integration or partnership.
-8. **Learn the method** — P1 quickstart/SCL links and a YouTube feature only when a reviewed video and channel URL are available. P2 adds the four-course rail.
-9. **Final CTA** — `Build a capability` → `/build`; `Talk to us` → `/contact?intent=enterprise`.
+1. **Run a real capability** — a prepared capability from the estate with its declared input, executed live from Home into its actual result. This is the shortest path from arriving to seeing the platform do something real, and it is the block that must never be simulated: if execution is unavailable in this deployment, the block says so and offers inspection instead (§5.0, `docs/capability-execution.md`).
+2. **Try an intent** — editable typed/voice prompt leading to `/build`; the same transcript and provider context carry into the IDE. Use the quote-retrieval and CNCF examples in §13.4.
+3. **See the circuit** — one source-bound example: need → input/event/outcome → provider responsibility → expected experience. Link to its actual capability detail page.
+4. **Take it with you** — show the authority and embodiment bundle, supported targets, and the independent-use quickstart. Link `/docs/ownership`.
+5. **Explore the estate** — featured capability images, promises, scenarios, and availability queried from the published estate projection. Every capability card opens its circuit. Related mechanic/provider cards show the reusable parts and declared implementers, linking to their own images and detail pages.
+6. **How SideFX works** — IDE, executable meaning, SCL, and the five P1 platform pillars (estate, circuits, projections, blueprints, governance). Knowledge joins the linked set in P2.
+7. **Why ownership matters** — explain inspection, export, and provider choice through their concrete mechanisms. Link `/managed-capability-provider` for the category thesis.
+8. **Audience and ecosystem** — compact audience links and source-bound provider examples, with `/ecosystem` for detail. Marketplace references identify discovery sources; they do not imply a working integration or partnership.
+9. **Learn the method** — P1 quickstart/SCL links and a YouTube feature only when a reviewed video and channel URL are available. P2 adds the four-course rail.
+10. **Final CTA** — `Open the workbench` → `/workbench`, falling back to `Build a capability` → `/build` while it is unavailable; `Talk to us` → `/contact?intent=enterprise`.
 
 **SEO:** title `SideFX — Capability Management & Engineering Platform`, meta description using tagline 1 + differentiator 3.
 
@@ -308,6 +350,8 @@ Every solution page selects real published capability examples by identity and a
 
 Hub: four course cards (agentic engineering, platform engineering, capability engineering, AI governance) with level, duration, outcome, enroll CTA.
 Course page skeleton: who it's for → curriculum → estate-backed capability exercise → assessment and completion credential → enroll. A course completion credential is separate from capability conformance evidence.
+Course material is recorded **from the workbench** (§5.0): each lesson is a reproducible scenario driven through the real product against a pinned estate generation, not a slideshow or a reconstruction. The same recordings feed the YouTube channel, so a scenario is authored once and serves both. This is why demonstrability is a workbench design requirement rather than a production concern — a lesson that cannot be re-recorded on a later generation is a defect in the surface, and a recorded run must show the estate's real result, including a refusal.
+
 Messaging: `Learn to turn intent into capabilities you own.` Teach IDE authoring, SCL, authority, embodiments, and evidence using the same capability IDs and visual system as the product. Publish enrollment only with an operating checkout, price, curriculum, and confirmation path.
 
 ### 5.13 `/ecosystem`
@@ -620,7 +664,7 @@ Website launch depends on the documented integration contracts and compatible ru
 
 ## 10. Decisions and Release Dependencies
 
-Settled for this revision: **Own your capabilities** is the primary tagline; **Semantic Intent-Driven Engineering Effects** is the brand expansion; IDE uses **intent-driven environment** with the design variant explained; `/build` is the launch CTA; catalog, circuits, exports and minimum docs are P1; pricing is P3; Plausible is the analytics default; the estate drives capability content; Gemini Pro authors candidate circuits; Nano Banana supplies capability imagery; SCL supplies circuit semantics and deterministic visual projection.
+Settled for this revision: the **Capability Workbench** (§5.0) is the product's centre of gravity and the primary CTA destination once available, with `/build` remaining the intent-led entry; **Own your capabilities** is the primary tagline; **Semantic Intent-Driven Engineering Effects** is the brand expansion; IDE uses **intent-driven environment** with the design variant explained; `/build` is the launch CTA; catalog, circuits, exports and minimum docs are P1; pricing is P3; Plausible is the analytics default; the estate drives capability content; Gemini Pro authors candidate circuits; Nano Banana supplies capability imagery; SCL supplies circuit semantics and deterministic visual projection.
 
 Hosting is settled as **Container + Linux on Azure App Service**, with Next.js standalone output, ACR distribution and one tested image promoted between environments. Semantic authority, durable media and provider configuration retain their distinct identities. Formal admission of a Website Capability and cross-provider Cross-Apply evidence remain future capability work; this hosting decision does not assert those results.
 
@@ -628,6 +672,9 @@ The supplied portal summary establishes the intended existing app: **`sidefx` �
 
 | Remaining dependency | Owner role | Required by |
 | --- | --- | --- |
+| Workbench canvas: composition, contract-checked wiring, provider slot filling and solution-level execution | Product/website engineering | P1 workbench (§5.0) |
+| Capability command service deployment and authorization, so execution works in a hosted environment | Platform engineering | P1 execution on the hosted site |
+| Recorded scenario harness driving the real workbench against a pinned generation | Training/content owner | P2 courses and the YouTube channel (§5.12) |
 | Public capability scope and claim/evidence records, with private fields excluded | Product/content owner | P1 publication |
 | Production estate publication service, artifact store, network access and refresh ownership | Platform engineering | P1 integration |
 | Verify the supplied Azure app/plan binding and container mode; configure ACR, app/slot identities and staging, DNS/HTTPS, health checks, deployment identity and service connectivity | Platform engineering | P1 staging deployment |

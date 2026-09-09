@@ -122,3 +122,24 @@ the staging workflow or by successful ACR publication.
 - [Update slot configuration API](https://learn.microsoft.com/en-us/rest/api/appservice/web-apps/update-configuration-slot?view=rest-appservice-2025-05-01)
 - [GitHub OIDC authentication to Azure](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
 - [ACR image locking](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-image-lock)
+
+## Capability execution is not deployed
+
+The image built here carries the web process only. Capability execution needs the command API
+(`services/capability-api`) running beside it with a database connection, and no environment has
+`SIDEFX_INVOCATION_ENDPOINT` configured. Hosted builds therefore report execution unavailable and
+offer no working run control — the honest state, not a degraded one.
+
+Deploying it is release work with its own prerequisites, none of them satisfied yet:
+
+| Prerequisite | Why |
+| --- | --- |
+| An authorization boundary on the API | It is unauthenticated today; it must not be reachable from the public internet without one |
+| Network path to SQL from the service | The service holds the database boundary the web process must not cross (§11.1) |
+| The `sfx-embody` workspace and its pinned toolchain in the service image | It owns the process binding, the credential reference and the integrity checks |
+| Its own health, restart and capacity policy | Each in-flight command holds a connection and a runtime; the service is not the web process and must not share its lifecycle |
+
+Promotion of the website image is unaffected by any of this: the site runs, and says execution is
+unavailable, wherever the endpoint is absent.
+
+See [capability-execution.md](capability-execution.md).

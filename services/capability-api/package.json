@@ -1,0 +1,16 @@
+{
+  "name": "sidefx-capability-api",
+  "private": true,
+  "type": "module",
+  "description": "HTTP transport over the sfx SDK. Runs beside the web process and owns the database boundary.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "smoke": "node smoke.mjs"
+  },
+  "dependencies": {
+    "sidefx-cli": "file:../../../sidefx-cli"
+  }
+}
