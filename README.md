@@ -168,6 +168,8 @@ separately unevaluated (§1.7).
 Coverage, the refusal vocabulary, the schema-driven form, operations and the open gaps —
 including that the command API is unauthenticated and not yet deployed — are documented in
 [`docs/capability-execution.md`](docs/capability-execution.md).
+[`docs/capability-readiness.md`](docs/capability-readiness.md) records why the held capabilities are
+held, where each fix belongs, and how to rank the work from the database.
 
 ### Contracts
 

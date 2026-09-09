@@ -84,6 +84,10 @@ Held capabilities carry declared reasons, never silence:
 | `CAPABILITY_ROOT_SCENARIO_UNRESOLVED` | 1 |
 | `PATH_ARGUMENT_DOMAIN_NOT_SUPPORTED` | 1 |
 
+What each held reason means, where its fix belongs, and how to rank the work from the database is
+in [capability-readiness.md](capability-readiness.md). The short version: they are four different
+problems, and only some are fixable in the database.
+
 Every capability page offers the run control regardless, because whether one executes is the
 estate's answer at run time, not a claim the page makes in advance. A generation change
 invalidates preparations conservatively — including for an unrelated declaration — and the site
