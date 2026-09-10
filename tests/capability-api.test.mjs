@@ -24,6 +24,17 @@ async function service(t, execute, options = {}) {
   } };
 }
 
+test('configured input authorization fails closed before dispatch', async t => {
+  let calls = 0;
+  for (const authorize of [() => false, () => { throw new Error('policy unavailable'); }, () => Promise.resolve(true)]) {
+    const { post } = await service(t, async () => { calls++; }, { authorize });
+    const response = await post();
+    assert.equal(response.status, 403); assert.equal(response.body.executionState, 'NOT_STARTED');
+  }
+  const { post } = await service(t, async () => { calls++; return {}; }, { authorize: request => request.subject === 'c' });
+  assert.equal((await post()).status, 200); assert.equal(calls, 1);
+});
+
 test('web policy hides and blocks preparation and every unoffered command before dispatch', async t => {
   let calls = 0;
   const { origin, post } = await service(t, async () => { calls++; return {}; });

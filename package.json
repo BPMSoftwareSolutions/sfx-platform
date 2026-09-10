@@ -2,13 +2,15 @@
   "name": "sfx-platform",
   "version": "0.1.0",
   "private": true,
-  "description": "SideFX website \u2014 capability management and engineering platform (www.sidefx.io)",
+  "description": "SideFX website — capability management and engineering platform (www.sidefx.io)",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "publish:estate": "node scripts/publish-estate.mjs",
     "publish:contracts": "node scripts/publish-input-contracts.mjs",
+    "publish:lab": "node --import tsx scripts/publish-lab.ts",
+    "dev:lab": "node --import tsx scripts/start-lab.mjs",
     "restore:media": "node scripts/restore-media.mjs",
     "dev": "next dev",
     "validate:media": "tsx scripts/validate-media.ts",
@@ -24,6 +26,7 @@
     "smoke": "node scripts/smoke-container.mjs"
   },
   "dependencies": {
+    "ajv": "8.20.0",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",

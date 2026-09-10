@@ -61,7 +61,7 @@ export async function invokeCapability(capabilityId: string, input: unknown, nam
   try {
     response = await fetch(new URL('/commands', configured), {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', ...(process.env.SIDEFX_SERVICE_TOKEN ? { authorization: 'Bearer ' + process.env.SIDEFX_SERVICE_TOKEN } : {}) },
       body: JSON.stringify({ object: 'capability', operation: 'invoke', subject: capabilityId, input, ...(namespace === undefined ? {} : { namespace }) }),
       signal: AbortSignal.timeout(timeoutMs()),
       cache: 'no-store',
@@ -75,7 +75,12 @@ export async function invokeCapability(capabilityId: string, input: unknown, nam
     };
   }
 
-  const parsed = CommandResponse.safeParse(await response.json().catch(() => undefined));
+  return commandResponseView(capabilityId, await response.json().catch(() => undefined));
+}
+
+/** Shared response interpretation for synchronous commands and durable runs. */
+export function commandResponseView(capabilityId: string, body: unknown): InvocationView {
+  const parsed = CommandResponse.safeParse(body);
   if (!parsed.success) {
     return {
       status: 'UNKNOWN',
@@ -88,10 +93,14 @@ export async function invokeCapability(capabilityId: string, input: unknown, nam
   if ('error' in parsed.data) {
     const failed = z.object({ result: z.object({ outcome: EstateExecution }) }).safeParse(parsed.data.error.details);
     if (failed.success) return executionView(capabilityId, failed.data.result.outcome, parsed.data.durationMs ?? null);
-    const { code, message } = parsed.data.error;
+    const { code } = parsed.data.error;
+    const providerFailure = z.object({ result: z.object({ error: z.object({ message: z.string() }), evidence: z.object({ providerInput: z.unknown() }) }) }).safeParse(parsed.data.error.details);
+    const message = providerFailure.success ? providerFailure.data.result.error.message : parsed.data.error.message;
     const notStarted = parsed.data.executionState === 'NOT_STARTED' || [
       'CAPABILITY_PREPARATION_REQUIRED', 'CAPABILITY_PREPARATION_STALE', 'CAPABILITY_NOT_FOUND',
       'CAPABILITY_NAMESPACE_AMBIGUOUS', 'CAPABILITY_ROOT_SCENARIO_UNRESOLVED',
+      'INVOCATION_BINDING_REFUSED', 'INVOCATION_BINDING_STALE', 'PROVIDER_CREDENTIAL_UNAVAILABLE',
+      'PROVIDER_THROTTLED', 'PROVIDER_ACCESS_DENIED', 'PROVIDER_RESPONSE_REJECTED', 'PROVIDER_MALFORMED_RESPONSE',
     ].includes(code);
     return { status: notStarted ? 'REFUSED' : 'UNKNOWN', capabilityId, code, message };
   }

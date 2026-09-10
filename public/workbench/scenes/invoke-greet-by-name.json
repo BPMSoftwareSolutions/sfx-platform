@@ -1,0 +1,186 @@
+{
+  "sceneVersion": "circuit-scene.v1",
+  "sceneId": "invoke-greet-by-name",
+  "label": "Personal greeting",
+  "identities": {
+    "capabilityId": "greet-by-name",
+    "viewId": "invoke-greet-by-name",
+    "viewKind": "invocation",
+    "scenarioId": "greet-by-name"
+  },
+  "traceMode": "ILLUSTRATIVE",
+  "graph": {
+    "nodes": [
+      {
+        "id": "i-6fcf8e53d2e827db97a2",
+        "identity": "cell:scenario:greet-by-name:input",
+        "kind": "input",
+        "label": "personal-greeting-request.v1",
+        "detail": "Select to enter capability input.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pointer": "/scenario/greet-by-name"
+        },
+        "facts": {
+          "scenarioId": "greet-by-name"
+        }
+      },
+      {
+        "id": "i-50c9a88ca91a6a8fb752",
+        "identity": "cell:scenario:greet-by-name:event",
+        "kind": "event",
+        "label": "greet-by-name",
+        "detail": "a personalized greeting is requested",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pointer": "/scenario/greet-by-name"
+        },
+        "facts": {
+          "scenarioId": "greet-by-name"
+        }
+      },
+      {
+        "id": "i-7b62c6cfb50bde4a71b0",
+        "identity": "cell:scenario:greet-by-name:outcome",
+        "kind": "outcome",
+        "label": "personal-greeting.v1",
+        "detail": "Select to reopen this run’s outcome.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pointer": "/scenario/greet-by-name"
+        },
+        "facts": {
+          "scenarioId": "greet-by-name"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "r-greet-by-name-0",
+        "identity": "greet-by-name:interface:0",
+        "source": "i-6fcf8e53d2e827db97a2",
+        "target": "i-50c9a88ca91a6a8fb752",
+        "kind": "interface-binding",
+        "label": "scenario interface",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pointer": "/scenario/greet-by-name"
+        }
+      },
+      {
+        "id": "r-greet-by-name-1",
+        "identity": "greet-by-name:interface:1",
+        "source": "i-50c9a88ca91a6a8fb752",
+        "target": "i-7b62c6cfb50bde4a71b0",
+        "kind": "interface-binding",
+        "label": "scenario interface",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pointer": "/scenario/greet-by-name"
+        }
+      }
+    ]
+  },
+  "geometry": {
+    "width": 900,
+    "height": 330,
+    "boxes": {
+      "i-6fcf8e53d2e827db97a2": [
+        40,
+        95,
+        230,
+        125
+      ],
+      "i-50c9a88ca91a6a8fb752": [
+        320,
+        95,
+        230,
+        125
+      ],
+      "i-7b62c6cfb50bde4a71b0": [
+        600,
+        95,
+        230,
+        125
+      ]
+    },
+    "engine": "declared-interface-row"
+  },
+  "coverage": {
+    "nodes": 3,
+    "routes": 2,
+    "omittedSourceNodes": 0,
+    "scope": "Selected scenario input/event/outcome and declared provider binding. Internal mechanics are a separate view."
+  },
+  "topology": {
+    "roots": [
+      "i-6fcf8e53d2e827db97a2"
+    ],
+    "leaves": [
+      "i-7b62c6cfb50bde4a71b0"
+    ]
+  },
+  "findings": [],
+  "materials": [],
+  "hitTargets": [
+    {
+      "targetId": "i-6fcf8e53d2e827db97a2",
+      "entityId": "i-6fcf8e53d2e827db97a2",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-50c9a88ca91a6a8fb752",
+      "entityId": "i-50c9a88ca91a6a8fb752",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-7b62c6cfb50bde4a71b0",
+      "entityId": "i-7b62c6cfb50bde4a71b0",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-greet-by-name-0",
+      "entityId": "r-greet-by-name-0",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-greet-by-name-1",
+      "entityId": "r-greet-by-name-1",
+      "keyboardActivable": true
+    }
+  ],
+  "provenance": {
+    "authority": {
+      "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+      "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+      "scenarioId": "greet-by-name",
+      "identity": {
+        "scenarioDefinitionDigest": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+        "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+        "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+        "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+        "artifactDigest": "sha256:71f77a3826aefd69e59a0e683376256e30eb30898825ffe5f784383e4398bc30"
+      }
+    },
+    "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304"
+  },
+  "invocation": {
+    "subject": "greet-by-name",
+    "inputNode": "i-6fcf8e53d2e827db97a2",
+    "outcomeNode": "i-7b62c6cfb50bde4a71b0",
+    "providerNode": null,
+    "eventNode": "i-50c9a88ca91a6a8fb752",
+    "stepNodes": {
+      "admit-input": "i-6fcf8e53d2e827db97a2",
+      "resolve-event-authority": "i-50c9a88ca91a6a8fb752",
+      "execute-event-authority": "i-50c9a88ca91a6a8fb752",
+      "admit-outcome": "i-7b62c6cfb50bde4a71b0",
+      "resolve-disposition": "i-7b62c6cfb50bde4a71b0"
+    }
+  }
+}

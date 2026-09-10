@@ -52,14 +52,14 @@ export function CapabilityRun({
 
       <Callout tone="limitation" title="What an execution here establishes, and what it does not">
         <p>
-          Execution reads a preparation retained in SQL for the selected estate generation, rebuilds
-          the capability&apos;s body in memory and checks it against the stored proof before running it.
-          Nothing is written to disk and no external provider is invoked.
+          Execution reads the selected authority from SQL, plans the capability&apos;s body in
+          memory and runs it through the Scenario Kernel. Preparation is an optional separate proof.
+          Provider effects depend on the capability&apos;s declared bindings.
         </p>
         <p className="mt-2">
           A completed execution is not managed admission and not a conformance result; those remain
           separately unevaluated (§1.7). A capability whose requirements or bindings do not resolve
-          has no preparation, and says so rather than executing something approximate.
+          reports the missing requirement or binding and does not execute.
         </p>
       </Callout>
     </section>

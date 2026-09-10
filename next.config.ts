@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   typedRoutes: false,
   async redirects() {
     return [
+      ...(process.env.SIDEFX_HF_SPACE === '1' ? [{ source: '/', destination: '/workbench/index.html', permanent: false }] : []),
       // §2.1 / §5.10 — the acronym route is a permanent redirect with no duplicate indexable content.
       { source: '/mcp', destination: '/managed-capability-provider', permanent: true },
     ];
@@ -21,7 +22,9 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'X-Frame-Options', value: 'DENY' },
+          ...(process.env.SIDEFX_HF_SPACE === '1'
+            ? [{ key: 'Content-Security-Policy', value: "frame-ancestors 'self' https://huggingface.co" }]
+            : [{ key: 'X-Frame-Options', value: 'DENY' }]),
         ],
       },
       {

@@ -1,0 +1,115 @@
+{
+  "html": "\n<div class=\"ui-surface\" data-surface-profile=\"window\" style=\"width:560px;height:860px;\">\n  <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:860px;\" data-region-id=\"outcome-dialog\" data-region-path=\"outcome-dialog\" data-role=\"capability-outcome-dialog\" data-tenant-policy=\"single\">\n    <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:84px;\" data-region-id=\"outcome-header\" data-region-path=\"outcome-dialog/outcome-header\" data-role=\"dialog-title\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:16px;width:520px;height:18px;\" data-region-id=\"outcome-eyebrow\" data-region-path=\"outcome-dialog/outcome-header/outcome-eyebrow\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:18px;\" data-component-id=\"outcome-context\"><span data-component-type=\"label\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.context\" data-presentation-intent=\"section-label\" data-realized-via=\"type\" style=\"font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);\">EQUITY-MARKET-PRICE-EVIDENCE.V1</span></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:40px;width:520px;height:28px;\" data-region-id=\"outcome-heading\" data-region-path=\"outcome-dialog/outcome-header/outcome-heading\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:28px;\" data-component-id=\"outcome-title\"><h2 data-component-type=\"heading\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.title\" data-presentation-intent=\"card-title\" data-realized-via=\"type\" style=\"font-size:20px;line-height:1.35;font-weight:500;color:var(--inspect-ink);\">Capability outcome</h2></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:84px;width:560px;height:660px;\" data-region-id=\"outcome-elements\" data-region-path=\"outcome-dialog/outcome-elements\" data-role=\"outcome-layout\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:8px;width:520px;height:130px;\" data-region-id=\"slot-outcome-price-price\" data-region-path=\"outcome-dialog/outcome-elements/slot-outcome-price-price\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:130px;\" data-component-id=\"outcome-price-price\"><output data-component-type=\"value\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.price\" data-presentation-intent=\"prominent-value\" data-realized-via=\"type\" data-bound-state=\"outcome.price.price\" data-binding-direction=\"read\" style=\"font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;\"></output></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:150px;width:520px;height:160px;\" data-region-id=\"slot-outcome-price-quote\" data-region-path=\"outcome-dialog/outcome-elements/slot-outcome-price-quote\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:160px;\" data-component-id=\"outcome-price-quote\"><ul data-component-type=\"collection\" data-semantic-family=\"collection\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.quote\" data-presentation-intent=\"outcome-record\" data-realized-via=\"type\" data-bound-state=\"outcome.price.quote\" data-binding-direction=\"read\" style=\"font-size:12px;\"></ul></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:322px;width:520px;height:88px;\" data-region-id=\"slot-outcome-price-disposition\" data-region-path=\"outcome-dialog/outcome-elements/slot-outcome-price-disposition\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:88px;\" data-component-id=\"outcome-price-disposition\"><output data-component-type=\"value\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.disposition\" data-presentation-intent=\"outcome-disposition\" data-realized-via=\"type\" data-bound-state=\"outcome.price.disposition\" data-binding-direction=\"read\" style=\"font:10px/1.5 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;\"></output></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:422px;width:520px;height:88px;\" data-region-id=\"slot-outcome-price-attribution\" data-region-path=\"outcome-dialog/outcome-elements/slot-outcome-price-attribution\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:88px;\" data-component-id=\"outcome-price-attribution\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.attribution\" data-presentation-intent=\"outcome-text\" data-realized-via=\"type\" data-bound-state=\"outcome.price.attribution\" data-binding-direction=\"read\" style=\"font-size:13px;line-height:1.6;overflow-wrap:anywhere;\"></p></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:522px;width:520px;height:130px;\" data-region-id=\"slot-outcome-price-provider\" data-region-path=\"outcome-dialog/outcome-elements/slot-outcome-price-provider\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:130px;\" data-component-id=\"outcome-price-provider\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.provider\" data-presentation-intent=\"outcome-evidence\" data-realized-via=\"type\" data-bound-state=\"outcome.price.provider\" data-binding-direction=\"read\" style=\"font:10px/1.6 ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere;\"></p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:744px;width:560px;height:56px;\" data-region-id=\"outcome-evidence\" data-region-path=\"outcome-dialog/outcome-evidence\" data-role=\"evidence-note\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:8px;width:520px;height:40px;\" data-region-id=\"outcome-evidence-slot\" data-region-path=\"outcome-dialog/outcome-evidence/outcome-evidence-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:40px;\" data-component-id=\"outcome-evidence-note\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#price.evidence-limit\" data-presentation-intent=\"fine-print\" data-realized-via=\"type\" style=\"font:10px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--inspect-muted);\">This outcome is retained testimony for its run. Its presentation may change; its meaning may not.</p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:800px;width:560px;height:60px;\" data-region-id=\"outcome-footer\" data-region-path=\"outcome-dialog/outcome-footer\" data-role=\"dialog-actions\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:10px;width:388px;height:40px;\" data-region-id=\"outcome-spacer\" data-region-path=\"outcome-dialog/outcome-footer/outcome-spacer\" data-tenant-policy=\"single\">\n      </div>\n      <div class=\"ui-container\" style=\"left:420px;top:10px;width:120px;height:40px;\" data-region-id=\"outcome-close-slot\" data-region-path=\"outcome-dialog/outcome-footer/outcome-close-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:120px;height:40px;\" data-component-id=\"outcome-close\"><button type=\"button\" data-semantic-action=\"dismiss-outcome\" data-action-disposition=\"ADMISSIBLEADMISSIBLE\" data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"resolve-equity-market-price-evidence#dismiss-outcome\" data-presentation-intent=\"secondary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Close</button></div>\n      </div>\n    </div>\n  </div>\n</div>\n",
+  "geometry": {
+    "width": 560.0,
+    "height": 860.0
+  },
+  "interaction": {
+    "planType": "ui-interaction-plan.v1",
+    "surfaceId": "dialog-outcome-live-finance-price",
+    "componentAttribute": "data-component-id",
+    "reflect": {
+      "action": {
+        "controlSelector": "button",
+        "disabledProperty": "disabled",
+        "reasonAttribute": "title",
+        "dispositionAttribute": "data-action-disposition"
+      },
+      "text": {
+        "selector": "[data-component-type]",
+        "property": "textContent"
+      }
+    },
+    "state": [
+      {
+        "stateId": "outcome.price.price",
+        "valueKind": "string",
+        "mutability": "fixed",
+        "initialValue": ""
+      },
+      {
+        "stateId": "outcome.price.quote",
+        "valueKind": "string",
+        "mutability": "fixed",
+        "initialValue": ""
+      },
+      {
+        "stateId": "outcome.price.disposition",
+        "valueKind": "string",
+        "mutability": "fixed",
+        "initialValue": ""
+      },
+      {
+        "stateId": "outcome.price.attribution",
+        "valueKind": "string",
+        "mutability": "fixed",
+        "initialValue": ""
+      },
+      {
+        "stateId": "outcome.price.provider",
+        "valueKind": "string",
+        "mutability": "fixed",
+        "initialValue": ""
+      }
+    ],
+    "validation": [],
+    "bindings": [
+      {
+        "component": "outcome-price-price",
+        "state": "outcome.price.price",
+        "aspect": "value",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null
+      },
+      {
+        "component": "outcome-price-quote",
+        "state": "outcome.price.quote",
+        "aspect": "value",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null
+      },
+      {
+        "component": "outcome-price-disposition",
+        "state": "outcome.price.disposition",
+        "aspect": "value",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null
+      },
+      {
+        "component": "outcome-price-attribution",
+        "state": "outcome.price.attribution",
+        "aspect": "value",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null
+      },
+      {
+        "component": "outcome-price-provider",
+        "state": "outcome.price.provider",
+        "aspect": "value",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null
+      }
+    ],
+    "actions": [
+      {
+        "actionId": "dismiss-outcome",
+        "requiresAdmissible": [],
+        "availability": "available",
+        "scenarioEvent": "workbench.outcome.dismissed",
+        "components": [
+          "outcome-close"
+        ]
+      }
+    ]
+  }
+}

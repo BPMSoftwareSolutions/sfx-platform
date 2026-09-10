@@ -1,0 +1,89 @@
+{
+  "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304",
+  "capabilities": [
+    {
+      "subject": "say-hello-world",
+      "label": "Hello World",
+      "sceneId": "invoke-say-hello-world",
+      "dialog": "dialogs/hello-world.json",
+      "inputAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:say-hello-world:input",
+        "fallback": "viewport-transition"
+      },
+      "outcomeAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:say-hello-world:outcome",
+        "fallback": "viewport-transition"
+      },
+      "motion": {
+        "open": "expand-from-anchor",
+        "close": "collapse-to-anchor",
+        "reducedMotionFallback": "none"
+      }
+    },
+    {
+      "subject": "resolve-equity-market-price-evidence",
+      "label": "Live stock price",
+      "sceneId": "invoke-resolve-equity-market-price-evidence",
+      "dialog": "dialogs/live-finance.json",
+      "inputAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:resolve-equity-market-price-evidence:input",
+        "fallback": "viewport-transition"
+      },
+      "outcomeAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:resolve-equity-market-price-evidence:outcome",
+        "fallback": "viewport-transition"
+      },
+      "motion": {
+        "open": "expand-from-anchor",
+        "close": "collapse-to-anchor",
+        "reducedMotionFallback": "none"
+      }
+    },
+    {
+      "subject": "greet-by-name",
+      "label": "Personal greeting",
+      "sceneId": "invoke-greet-by-name",
+      "dialog": "dialogs/personal-greeting.json",
+      "inputAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:greet-by-name:input",
+        "fallback": "viewport-transition"
+      },
+      "outcomeAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:greet-by-name:outcome",
+        "fallback": "viewport-transition"
+      },
+      "motion": {
+        "open": "expand-from-anchor",
+        "close": "collapse-to-anchor",
+        "reducedMotionFallback": "none"
+      }
+    },
+    {
+      "subject": "resolve-sidefx-eligible-providers",
+      "label": "Provider fixture demonstration",
+      "sceneId": "invoke-resolve-sidefx-eligible-providers",
+      "dialog": "dialogs/provider-resolution.json",
+      "inputAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:resolve-sidefx-eligible-providers:input",
+        "fallback": "viewport-transition"
+      },
+      "outcomeAnchor": {
+        "kind": "scene-node",
+        "nodeIdentity": "cell:scenario:resolve-sidefx-eligible-providers:outcome",
+        "fallback": "viewport-transition"
+      },
+      "motion": {
+        "open": "expand-from-anchor",
+        "close": "collapse-to-anchor",
+        "reducedMotionFallback": "none"
+      }
+    }
+  ]
+}

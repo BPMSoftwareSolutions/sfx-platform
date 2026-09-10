@@ -1,0 +1,238 @@
+{
+  "html": "\n<div class=\"ui-surface\" data-surface-profile=\"window\" style=\"width:560px;height:416px;\">\n  <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:416px;\" data-region-id=\"dialog\" data-region-path=\"dialog\" data-role=\"capability-input-dialog\" data-tenant-policy=\"single\">\n    <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:84px;\" data-region-id=\"dialog-header\" data-region-path=\"dialog/dialog-header\" data-role=\"dialog-title\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:16px;width:520px;height:18px;\" data-region-id=\"dialog-eyebrow\" data-region-path=\"dialog/dialog-header/dialog-eyebrow\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:18px;\" data-component-id=\"dialog-context\"><span data-component-type=\"label\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#context\" data-presentation-intent=\"section-label\" data-realized-via=\"type\" style=\"font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);\">RESOLVE-EQUITY-MARKET-PRICE-EVIDENCE</span></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:40px;width:520px;height:28px;\" data-region-id=\"dialog-heading\" data-region-path=\"dialog/dialog-header/dialog-heading\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:28px;\" data-component-id=\"dialog-title\"><h2 data-component-type=\"heading\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#title\" data-presentation-intent=\"card-title\" data-realized-via=\"type\" style=\"font-size:20px;line-height:1.35;font-weight:500;color:var(--inspect-ink);\">Enter Capability Input</h2></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:84px;width:560px;height:44px;\" data-region-id=\"dialog-description\" data-region-path=\"dialog/dialog-description\" data-role=\"dialog-description\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:0px;width:520px;height:44px;\" data-region-id=\"dialog-description-slot\" data-region-path=\"dialog/dialog-description/dialog-description-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:44px;\" data-component-id=\"dialog-description\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"resolve-equity-market-price-evidence#description\" data-presentation-intent=\"body\" data-realized-via=\"type\" style=\"font-size:13px;line-height:1.6;overflow-wrap:anywhere;color:var(--inspect-ink);\">Enter an uppercase symbol such as AAPL. One request; there is no automatic retry.</p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:128px;width:560px;height:224px;\" data-region-id=\"dialog-fields\" data-region-path=\"dialog/dialog-fields\" data-role=\"dialog-field-group\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:8px;width:520px;height:98px;\" data-region-id=\"slot-field-payload-symbol\" data-region-path=\"dialog/dialog-fields/slot-field-payload-symbol\" data-role=\"dialog-field\" data-tenant-policy=\"single\">\n        <div class=\"ui-container\" style=\"left:0px;top:0px;width:520px;height:72px;\" data-region-id=\"control-field-payload-symbol\" data-region-path=\"dialog/dialog-fields/slot-field-payload-symbol/control-field-payload-symbol\" data-tenant-policy=\"single\">\n          <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:72px;\" data-component-id=\"field-payload-symbol\"><label data-component-type=\"input\" data-semantic-family=\"input\" data-semantic-identity=\"resolve-equity-market-price-evidence/payload/symbol\" data-presentation-intent=\"dialog-field\" data-realized-via=\"type\" data-bound-state=\"input.payload-symbol\" data-binding-direction=\"read-write\" style=\"align-self:stretch;\"><span>Stock symbol</span><input type=\"text\" placeholder=\"AAPL\" value /></label></div>\n        </div>\n        <div class=\"ui-container\" style=\"left:0px;top:76px;width:520px;height:22px;\" data-region-id=\"feedback-field-payload-symbol\" data-region-path=\"dialog/dialog-fields/slot-field-payload-symbol/feedback-field-payload-symbol\" data-tenant-policy=\"single\">\n          <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:22px;\" data-component-id=\"field-payload-symbol-feedback\"><aside data-component-type=\"feedback\" data-semantic-family=\"feedback\" data-semantic-identity=\"resolve-equity-market-price-evidence/payload/symbol#validation\" data-presentation-intent=\"field-feedback\" data-realized-via=\"type\" data-bound-state=\"input.payload-symbol\" data-binding-direction=\"read\">Stock symbol is required.</aside></div>\n        </div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:118px;width:520px;height:98px;\" data-region-id=\"slot-field-payload-region\" data-region-path=\"dialog/dialog-fields/slot-field-payload-region\" data-role=\"dialog-field\" data-tenant-policy=\"single\">\n        <div class=\"ui-container\" style=\"left:0px;top:0px;width:520px;height:72px;\" data-region-id=\"control-field-payload-region\" data-region-path=\"dialog/dialog-fields/slot-field-payload-region/control-field-payload-region\" data-tenant-policy=\"single\">\n          <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:72px;\" data-component-id=\"field-payload-region\"><label data-component-type=\"choice\" data-semantic-family=\"input\" data-semantic-identity=\"resolve-equity-market-price-evidence/payload/region\" data-presentation-intent=\"dialog-field\" data-realized-via=\"type\" data-bound-state=\"input.payload-region\" data-binding-direction=\"read-write\" style=\"align-self:stretch;\"><span>Region</span><select><option value=\"US\">US</option></select></label></div>\n        </div>\n        <div class=\"ui-container\" style=\"left:0px;top:76px;width:520px;height:22px;\" data-region-id=\"feedback-field-payload-region\" data-region-path=\"dialog/dialog-fields/slot-field-payload-region/feedback-field-payload-region\" data-tenant-policy=\"single\">\n          <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:22px;\" data-component-id=\"field-payload-region-feedback\"><aside data-component-type=\"feedback\" data-semantic-family=\"feedback\" data-semantic-identity=\"resolve-equity-market-price-evidence/payload/region#validation\" data-presentation-intent=\"field-feedback\" data-realized-via=\"type\" data-bound-state=\"input.payload-region\" data-binding-direction=\"read\">Region is required.</aside></div>\n        </div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:352px;width:560px;height:64px;\" data-region-id=\"dialog-footer\" data-region-path=\"dialog/dialog-footer\" data-role=\"dialog-actions\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:12px;width:270px;height:40px;\" data-region-id=\"footer-gap\" data-region-path=\"dialog/dialog-footer/footer-gap\" data-role=\"spacer\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:270px;height:40px;\" data-component-id=\"dialog-status\"><aside data-component-type=\"feedback\" data-semantic-family=\"feedback\" data-semantic-identity=\"resolve-equity-market-price-evidence#status\" data-presentation-intent=\"live-status\" data-realized-via=\"type\" style=\"font-size:12px;color:var(--status);\"></aside></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:300px;top:12px;width:110px;height:40px;\" data-region-id=\"slot-cancel\" data-region-path=\"dialog/dialog-footer/slot-cancel\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:110px;height:40px;\" data-component-id=\"dialog-cancel\"><button type=\"button\" data-semantic-action=\"cancel-live-finance\" data-action-disposition=\"ADMISSIBLEADMISSIBLE\" data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"resolve-equity-market-price-evidence#cancel\" data-presentation-intent=\"secondary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Cancel</button></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:420px;top:12px;width:120px;height:40px;\" data-region-id=\"slot-submit\" data-region-path=\"dialog/dialog-footer/slot-submit\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:120px;height:40px;\" data-component-id=\"dialog-submit\"><button type=\"button\" data-semantic-action=\"submit-live-finance\" data-action-disposition=\"NOT_ADMISSIBLENOT_ADMISSIBLE\" title=\"Stock symbol is required.\" disabled data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"resolve-equity-market-price-evidence#submit\" data-presentation-intent=\"primary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Submit</button></div>\n      </div>\n    </div>\n  </div>\n</div>\n",
+  "interaction": {
+    "planType": "ui-interaction-plan.v1",
+    "surfaceId": "dialog-input-live-finance",
+    "componentAttribute": "data-component-id",
+    "reflect": {
+      "action": {
+        "controlSelector": "button",
+        "disabledProperty": "disabled",
+        "reasonAttribute": "title",
+        "dispositionAttribute": "data-action-disposition"
+      },
+      "text": {
+        "selector": "[data-component-type]",
+        "property": "textContent"
+      }
+    },
+    "state": [
+      {
+        "stateId": "input.payload-symbol",
+        "valueKind": "string",
+        "mutability": "mutable",
+        "initialValue": ""
+      },
+      {
+        "stateId": "input.payload-region",
+        "valueKind": "string",
+        "mutability": "mutable",
+        "initialValue": ""
+      }
+    ],
+    "validation": [
+      {
+        "state": "input.payload-symbol",
+        "checks": [
+          {
+            "op": "nonEmpty",
+            "operand": null,
+            "valuePath": null,
+            "message": "Stock symbol is required."
+          },
+          {
+            "op": "minLength",
+            "operand": 1,
+            "valuePath": null,
+            "message": "minLength is None, which the rule bounds at 1"
+          },
+          {
+            "op": "maxLength",
+            "operand": 24,
+            "valuePath": null,
+            "message": "maxLength is None, which the rule bounds at 24"
+          },
+          {
+            "op": "matches",
+            "operand": "^[A-Z0-9.^=-]{1,24}$",
+            "valuePath": null,
+            "message": "Stock symbol does not match its declared form."
+          }
+        ]
+      },
+      {
+        "state": "input.payload-region",
+        "checks": [
+          {
+            "op": "nonEmpty",
+            "operand": null,
+            "valuePath": null,
+            "message": "Region is required."
+          },
+          {
+            "op": "minLength",
+            "operand": 2,
+            "valuePath": null,
+            "message": "minLength is None, which the rule bounds at 2"
+          },
+          {
+            "op": "maxLength",
+            "operand": 2,
+            "valuePath": null,
+            "message": "maxLength is None, which the rule bounds at 2"
+          },
+          {
+            "op": "memberOf",
+            "operand": [
+              "US"
+            ],
+            "valuePath": null,
+            "message": "Choose a declared value."
+          }
+        ]
+      }
+    ],
+    "bindings": [
+      {
+        "component": "field-payload-symbol",
+        "state": "input.payload-symbol",
+        "aspect": "value",
+        "direction": "read-write",
+        "writable": true,
+        "coerce": null,
+        "initialPhysicalValue": "",
+        "accessor": {
+          "selector": "input",
+          "readFrom": "value",
+          "writeTo": "value",
+          "events": [
+            "input"
+          ]
+        },
+        "mutates": {
+          "selector": "input",
+          "property": "value"
+        }
+      },
+      {
+        "component": "field-payload-region",
+        "state": "input.payload-region",
+        "aspect": "value",
+        "direction": "read-write",
+        "writable": true,
+        "coerce": null,
+        "initialPhysicalValue": "",
+        "accessor": {
+          "selector": "select",
+          "readFrom": "value",
+          "writeTo": "value",
+          "events": [
+            "change"
+          ]
+        },
+        "mutates": {
+          "selector": "select",
+          "property": "value"
+        }
+      },
+      {
+        "component": "field-payload-symbol-feedback",
+        "state": "input.payload-symbol",
+        "aspect": "validation",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null,
+        "fallbackText": "",
+        "mutates": {
+          "selector": "[data-component-type]",
+          "property": "textContent"
+        }
+      },
+      {
+        "component": "field-payload-region-feedback",
+        "state": "input.payload-region",
+        "aspect": "validation",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null,
+        "fallbackText": "",
+        "mutates": {
+          "selector": "[data-component-type]",
+          "property": "textContent"
+        }
+      }
+    ],
+    "actions": [
+      {
+        "actionId": "submit-live-finance",
+        "requiresAdmissible": [
+          "input.payload-symbol",
+          "input.payload-region"
+        ],
+        "availability": "available",
+        "scenarioEvent": "workbench.capability.submitted",
+        "components": [
+          "dialog-submit"
+        ]
+      },
+      {
+        "actionId": "cancel-live-finance",
+        "requiresAdmissible": [],
+        "availability": "available",
+        "scenarioEvent": "workbench.capability.cancelled",
+        "components": [
+          "dialog-cancel"
+        ]
+      }
+    ]
+  },
+  "geometry": {
+    "width": 560.0,
+    "height": 416.0
+  },
+  "fields": [
+    {
+      "pointer": "/payload/symbol",
+      "stateId": "input.payload-symbol",
+      "componentId": "field-payload-symbol",
+      "control": "text",
+      "required": true,
+      "constraints": [
+        "maxLength",
+        "minLength",
+        "pattern",
+        "required"
+      ],
+      "visibleWhen": null
+    },
+    {
+      "pointer": "/payload/region",
+      "stateId": "input.payload-region",
+      "componentId": "field-payload-region",
+      "control": "select",
+      "required": true,
+      "constraints": [
+        "maxLength",
+        "minLength",
+        "oneOf",
+        "required"
+      ],
+      "visibleWhen": null
+    }
+  ],
+  "exampleSelector": null,
+  "title": "Enter Capability Input",
+  "description": "Enter an uppercase symbol such as AAPL. One request; there is no automatic retry.",
+  "anchor": {
+    "kind": "scene-node",
+    "nodeIdentity": "cell:scenario:resolve-equity-market-price-evidence:input",
+    "fallback": "viewport-transition"
+  },
+  "motion": {
+    "open": "expand-from-anchor",
+    "close": "collapse-to-anchor",
+    "reducedMotionFallback": "none"
+  }
+}

@@ -1,0 +1,464 @@
+{
+  "recordType": "sidefx-huggingface-deployment-verification.v1",
+  "space": "BPMSoftwareSolutions/SideFX",
+  "private": true,
+  "commit": "764b7eea6c71b9eb0e0301adbed2b4eaa02ca979",
+  "endpoint": "https://bpm-sidefx-lab-api.azurewebsites.net",
+  "origin": "https://bpmsoftwaresolutions-sidefx.hf.space",
+  "observedAt": "2026-09-10T01:49:24.849Z",
+  "estateModel": 33,
+  "serviceImage": "bpmaiengineacr.azurecr.io/sidefx/lab-service@sha256:a8108d3eb3522bcf571415f1597fe1e5a9c8fe1ec79eee3f9369b30a459c115d",
+  "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304",
+  "pilots": [
+    {
+      "subject": "say-hello-world",
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "say-hello-world",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:e50a0e7e3a982c3bfc25e68bf79a0045529181641936813f41ce0ebe1b953645"
+        }
+      },
+      "inputSchemaDigest": "sha256:0cb0cff2850d0636dd684850c859b4216e4b65e3ebb1f646fcb7c34771a08eb0",
+      "outcomeSchemaDigest": "sha256:032a564e36eb1123f46c112386f96eded1a50c074537eb5e0f40c8beb7ba83c8"
+    },
+    {
+      "subject": "greet-by-name",
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "greet-by-name",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:71f77a3826aefd69e59a0e683376256e30eb30898825ffe5f784383e4398bc30"
+        }
+      },
+      "inputSchemaDigest": "sha256:b800857e3c2d721221a37b98ef2fb2daf2e761df365e89a92359b5a6eabee1fb",
+      "outcomeSchemaDigest": "sha256:18489ffe8c38d0181db073af4e471ac1329a76a4441fb53037208800a5439424"
+    },
+    {
+      "subject": "resolve-sidefx-eligible-providers",
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "resolve-sidefx-eligible-providers",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:a18c0e606e1a70c22c5efd173e130016747bbaaf14f3f875bcc6428d9cc6a93f",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:a7335b6046a87c87cb70ed19a7857b0a95823dccadfb3420c1c3883db1570de8"
+        }
+      },
+      "inputSchemaDigest": "sha256:40f6fb9a386c4db5c230acb03293e2d7c129898f689d991eb965b06a572997a2",
+      "outcomeSchemaDigest": "sha256:7e62ab89e4058fc1c550d0e77401db57b463de2294b391d8983c0825993525a9"
+    },
+    {
+      "subject": "resolve-equity-market-price-evidence",
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "resolve-equity-market-price-evidence",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:977fd6183b82e13926ff25d8c3ae3e2105a788caa6a43972a7ba7807e24b945a"
+        }
+      },
+      "inputSchemaDigest": "sha256:97b2f584d847b242202f4c06d90d9051492a47f83293d6f74f0e6be54929d539",
+      "outcomeSchemaDigest": "sha256:7491b5daf9ab87fb56b86a61fe661ad86dc03b305cca97517d3819183d49ca24",
+      "providerInputBindingDigest": "sha256:09ecb038af10e553a16ec517857dc1eaf9efd4a6e1e608bc47fb4ca27e947f9b"
+    }
+  ],
+  "hostedAdapter": {
+    "origin": "https://bpmsoftwaresolutions-sidefx.hf.space",
+    "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304",
+    "observedAt": "2026-09-10T01:46:34.873248+00:00",
+    "checks": [
+      {
+        "subject": "say-hello-world",
+        "passed": true,
+        "outcome": {
+          "contractId": "hello-world-greeting.v1",
+          "payload": {
+            "message": "Hello, World!"
+          }
+        }
+      },
+      {
+        "subject": "greet-by-name",
+        "passed": true,
+        "outcome": {
+          "contractId": "personal-greeting.v1",
+          "payload": {
+            "message": "Hello, Zoë <script>!"
+          }
+        }
+      },
+      {
+        "subject": "resolve-sidefx-eligible-providers",
+        "passed": true,
+        "outcome": {
+          "consideredCount": 2,
+          "disposition": "PROVIDERS_RESOLVED",
+          "eligibleCount": 1,
+          "findings": [],
+          "providers": [
+            {
+              "authorityBindings": [
+                {
+                  "bindingId": "profile",
+                  "sourceRef": "../profiles/sidefx-json-authority-ingestion-profile.v1.json",
+                  "sourceDigest": "sha256:70c9328b32201a6ac86ec14422892057af130f31550757e9d1a465c11efed223"
+                },
+                {
+                  "bindingId": "membership-policy",
+                  "sourceRef": "../policies/sidefx-semantic-corpus-membership-policy.v1.json",
+                  "sourceDigest": "sha256:0b3ff298fd68707b37c6827b4d527bafc05528fa9704a043eadb85ab76316b33"
+                },
+                {
+                  "bindingId": "canonicalization-policy",
+                  "sourceRef": "../policies/sidefx-semantic-canonicalization-policy.v1.json",
+                  "sourceDigest": "sha256:3372aa03fd1f644d626045d469ed228904c97e2a566dd94904942ec7084870c6"
+                },
+                {
+                  "bindingId": "request-contract",
+                  "sourceRef": "../capabilities/ingest-sidefx-json-authority/contracts/sidefx-json-authority-ingestion-request.schema.json",
+                  "sourceDigest": "sha256:bfaeb6b53f9cae6ff74c700e2ecce2b6de61433bb3e53a6e495c155af2ade947"
+                },
+                {
+                  "bindingId": "receipt-contract",
+                  "sourceRef": "../contracts/sidefx-json-authority-ingestion-receipt.schema.json",
+                  "sourceDigest": "sha256:83a28ed29c7735e786493c0e40301b95ecc0171bbc4e31d6d716d4a1a1d95950"
+                },
+                {
+                  "bindingId": "fixture-manifest",
+                  "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.json",
+                  "sourceDigest": "sha256:4d604f6cc7cdbed670a8af3215557a8335e80f5af744e500b5243037a3a3bf54"
+                },
+                {
+                  "bindingId": "fixture-manifest-schema",
+                  "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.schema.json",
+                  "sourceDigest": "sha256:5ab5cde17736cc08f07b8885aee030f6fcc608a981a4a7a212276c9ac5ab5798"
+                },
+                {
+                  "bindingId": "schema-catalog",
+                  "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/declared-schema-catalog.v1.json",
+                  "sourceDigest": "sha256:07f778ea7a72ef7083583bb00ee34a405f72538dd887756ae2aa36f761342b2b"
+                },
+                {
+                  "bindingId": "reference-scope",
+                  "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/content-reference-scope.v1.json",
+                  "sourceDigest": "sha256:3612cf2cfafa0c1a58b4d941d962350009404720d82211ab8cc34fed74675ec4"
+                },
+                {
+                  "bindingId": "version-policy",
+                  "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/version-policy.v1.json",
+                  "sourceDigest": "sha256:5b49ce679fe59c5f98b6a12ffeff7c06235cba053497fa670e8cc8bcf15340f0"
+                }
+              ],
+              "conformanceDisposition": "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+              "conformanceReceiptDigest": "sha256:95fe7e8ddc70cad84a307a6670b455a65e35a2f3d5b3d365d685e6de77bb5502",
+              "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-json-authority-ingestion-conformance/conformance/json-authority-ingestion-provider-conformance.v1.json",
+              "eligibilityDisposition": "ELIGIBLE",
+              "lifecycle": "ADMITTED",
+              "platformCapabilityId": "sda-json-authority-ingestion-port.v1",
+              "providerAuthorityDigest": "sha256:f39fb91732ee448ac56db23b8728add4b1477df2cf27a81740b6058e4c231546",
+              "providerAuthorityId": "profile-governed-json-authority-ingestor.v1",
+              "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-json-authority-ingestion/profile-governed-json-authority-ingestor.authority.json",
+              "providerBindingDigest": "sha256:4cadcff2bf76f5e7d0cb1b7fec511bf6317a37c5a161f9a33e3c197f0c18af22",
+              "providerBindingRef": "authority/sidefx-semantic-brain/platform/json-authority-ingestion-provider.binding.json",
+              "reasonCode": "ADMITTED_CONFORMANT_AND_TARGET_DECLARED"
+            },
+            {
+              "authorityBindings": [
+                {
+                  "bindingId": "profile",
+                  "sourceRef": "../profiles/sidefx-proof-binding-profile.v1.json",
+                  "sourceDigest": "sha256:d0821f66297b53127e5312a4c6de59fb4b31a3e26d641847d6dc6de00e41dd24"
+                },
+                {
+                  "bindingId": "profile-schema",
+                  "sourceRef": "../profiles/sidefx-proof-binding-profile.schema.json",
+                  "sourceDigest": "sha256:837f526277ddbff62ad638353f245674650fbc70fcdfc9044a23717138defac3"
+                },
+                {
+                  "bindingId": "input-contract",
+                  "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/contracts/sidefx-proof-binding-evaluation-input.schema.json",
+                  "sourceDigest": "sha256:ea2e23348d86bf82375f6e716f2e344b902c29b25757b46ec23d43217581a05f"
+                },
+                {
+                  "bindingId": "record-contract",
+                  "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/contracts/sidefx-proof-binding-evaluation-record.schema.json",
+                  "sourceDigest": "sha256:d3506d49a4139ca3f2637b7fbd4e9891c0a77cb4e7a2f6e1cc70847ba045ec7d"
+                },
+                {
+                  "bindingId": "conformance-contract",
+                  "sourceRef": "../contracts/sidefx-proof-binding-conformance.schema.json",
+                  "sourceDigest": "sha256:7daf705aa66e1dcbaad638c9c6d1ecc9a1e5466475de71075670d0192f918613"
+                },
+                {
+                  "bindingId": "common-contract",
+                  "sourceRef": "../contracts/sidefx-semantic-common.schema.json",
+                  "sourceDigest": "sha256:529e7fce98565584097ca9c6dbf6f395c2561123a48da06ec16a0ac9905679c6"
+                },
+                {
+                  "bindingId": "fixture-corpus",
+                  "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/fixtures/proof-binding-evaluation-fixtures.v1.json",
+                  "sourceDigest": "sha256:2ae57d193d679058c86d9232081bdbca35287330834801ae4d58d2443b928bc3"
+                },
+                {
+                  "bindingId": "fixture-corpus-schema",
+                  "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/fixtures/proof-binding-evaluation-fixtures.v1.schema.json",
+                  "sourceDigest": "sha256:ff1e875fc8ecfa0a6fad0f9a77b5e85ed645fc405b71bb0fed7f652363f14d8b"
+                }
+              ],
+              "conformanceDisposition": "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT",
+              "conformanceReceiptDigest": "sha256:c5febeb91935f015fc996ee7bc600ecfaf6c6ff1c681d1505907d0146c4c75da",
+              "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-proof-binding-evaluation-conformance/conformance/proof-binding-evaluation-provider-conformance.v1.json",
+              "eligibilityDisposition": "NOT_APPLICABLE",
+              "lifecycle": "ADMITTED",
+              "platformCapabilityId": "sda-proof-binding-evaluation-port.v1",
+              "providerAuthorityDigest": "sha256:511ad3bba2ba7cabab021ffe6daf10b1b41fc385d0a69e29abdb71b0c0ed240b",
+              "providerAuthorityId": "profile-governed-proof-binding-evaluator.v1",
+              "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-proof-binding-evaluation/profile-governed-proof-binding-evaluator.authority.json",
+              "providerBindingDigest": "sha256:337c815f7981b598cede9bc522d69eea3216b6c73e435418e0405755710222f9",
+              "providerBindingRef": "authority/sidefx-semantic-brain/platform/proof-binding-evaluation-provider.binding.json",
+              "reasonCode": "PLATFORM_CAPABILITY_MISMATCH"
+            }
+          ],
+          "requestedPlatformCapabilityId": "sda-json-authority-ingestion-port.v1",
+          "requestedTarget": "node",
+          "resolutionType": "sidefx-semantic-provider-resolution.v1",
+          "snapshotDigest": "sha256:b1d87d6f3b5969df31c5f2683e606ef8bca64df463abcf2b74f050039d373ff4",
+          "resolutionDigest": "sha256:02d4e6e01b2fe6c49f76d97c8af407dc03b2dbc12cad245b8aaff95b7b810ca5"
+        }
+      },
+      {
+        "subject": "resolve-equity-market-price-evidence",
+        "passed": true,
+        "outcome": {
+          "contractId": "equity-market-price-evidence.v1",
+          "disposition": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+          "payload": {
+            "symbol": "AAPL",
+            "region": "US",
+            "currency": "USD",
+            "observedPrice": 315.34,
+            "observedMarketTime": 1788984001,
+            "marketState": "POSTPOST",
+            "exchange": "NMS",
+            "sourceAttribution": "Nasdaq Real Time Price"
+          },
+          "providerTestimony": {
+            "bindingId": "rapidapi-davethebeast-yahoo-finance166-stock-price.v1",
+            "providerId": "rapidapi/davethebeast/yahoo-finance166",
+            "nativeShape": "quoteSummary.result.0.price"
+          }
+        },
+        "exchange": {
+          "contractId": "governed-http-exchange-evidence.v1",
+          "disposition": "completed",
+          "exchangeKind": "live-provider-input",
+          "transportDisposition": "completed",
+          "httpStatus": 200,
+          "allowedResponseHeaders": {
+            "content-type": "application/json; charset=utf-8"
+          },
+          "boundedBytes": 1815,
+          "requestBodyHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "responseBodyHash": "sha256:54da5b822d5e46435232eb5076aa16e85eb2068790a69eb594d27f3f0ec8d25f",
+          "reachedStage": "response-complete",
+          "exchangeCount": 1,
+          "timing": {
+            "startedAt": "2026-09-10T01:46:46.476Z",
+            "completedAt": "2026-09-10T01:46:46.682Z",
+            "durationMilliseconds": 206
+          },
+          "redactionVerified": true,
+          "lineageId": "d09c5650-db55-49c0-a546-9b1f23868f70",
+          "effectLineage": [
+            "d09c5650-db55-49c0-a546-9b1f23868f70"
+          ]
+        }
+      },
+      {
+        "id": "Space-rejects-provider-testimony-forgery",
+        "passed": true
+      }
+    ]
+  },
+  "remoteService": {
+    "endpoint": "https://bpm-sidefx-lab-api.azurewebsites.net",
+    "observedAt": "2026-09-10T01:41:16.352Z",
+    "checks": [
+      {
+        "id": "say-hello-world",
+        "passed": true,
+        "disposition": "terminated"
+      },
+      {
+        "id": "say-hello-world:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "say-hello-world:forged-input",
+        "passed": true
+      },
+      {
+        "id": "say-hello-world:unauthorized-subject",
+        "passed": true
+      },
+      {
+        "id": "greet-by-name",
+        "passed": true,
+        "disposition": "terminated"
+      },
+      {
+        "id": "greet-by-name:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "greet-by-name:forged-input",
+        "passed": true
+      },
+      {
+        "id": "greet-by-name:unauthorized-subject",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-hold-admitted-providers-that-declare-no-target",
+        "passed": true,
+        "disposition": "NOT_OBSERVABLE"
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-hold-admitted-providers-that-declare-no-target:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-hold-admitted-providers-that-declare-no-target:forged-input",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-hold-admitted-providers-that-declare-no-target:unauthorized-subject",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-admit-provider-once-its-target-is-declared",
+        "passed": true,
+        "disposition": "PROVIDERS_RESOLVED"
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-admit-provider-once-its-target-is-declared:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-admit-provider-once-its-target-is-declared:forged-input",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-admit-provider-once-its-target-is-declared:unauthorized-subject",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-target-the-binding-does-not-declare",
+        "passed": true,
+        "disposition": "NOT_OBSERVABLE"
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-target-the-binding-does-not-declare:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-target-the-binding-does-not-declare:forged-input",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-target-the-binding-does-not-declare:unauthorized-subject",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-unadmitted-and-unconformed-providers",
+        "passed": true,
+        "disposition": "NOT_OBSERVABLE"
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-unadmitted-and-unconformed-providers:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-unadmitted-and-unconformed-providers:forged-input",
+        "passed": true
+      },
+      {
+        "id": "resolve-sidefx-eligible-providers-refuse-unadmitted-and-unconformed-providers:unauthorized-subject",
+        "passed": true
+      },
+      {
+        "id": "resolve-equity-market-price-evidence",
+        "passed": true,
+        "disposition": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+        "price": 315.34,
+        "currency": "USD",
+        "exchange": {
+          "contractId": "governed-http-exchange-evidence.v1",
+          "disposition": "completed",
+          "exchangeKind": "live-provider-input",
+          "transportDisposition": "completed",
+          "httpStatus": 200,
+          "allowedResponseHeaders": {
+            "content-type": "application/json; charset=utf-8"
+          },
+          "boundedBytes": 1817,
+          "requestBodyHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "responseBodyHash": "sha256:0f0f972f779c06192248c2467cc98c1fbb55fbb33269890a2c2bc8bbc5cb3074",
+          "reachedStage": "response-complete",
+          "exchangeCount": 1,
+          "timing": {
+            "startedAt": "2026-09-10T01:41:54.125Z",
+            "completedAt": "2026-09-10T01:41:54.368Z",
+            "durationMilliseconds": 243
+          },
+          "redactionVerified": true,
+          "lineageId": "9d41d893-4199-4080-815f-e4b22cd38d73",
+          "effectLineage": [
+            "9d41d893-4199-4080-815f-e4b22cd38d73"
+          ]
+        }
+      },
+      {
+        "id": "resolve-equity-market-price-evidence:invalid-token",
+        "passed": true
+      },
+      {
+        "id": "resolve-equity-market-price-evidence:forged-input",
+        "passed": true
+      },
+      {
+        "id": "resolve-equity-market-price-evidence:unauthorized-subject",
+        "passed": true
+      }
+    ]
+  },
+  "browser": {
+    "origin": "https://huggingface.co/spaces/BPMSoftwareSolutions/SideFX",
+    "verified": [
+      "Hello, World!",
+      "Hello, Zoë <script>! rendered as text",
+      "PROVIDERS_RESOLVED; considered 2; eligible 1",
+      "AAPL USD 315.34; HTTP 200; retrieved 2026-09-10T01:45:40.930Z",
+      "Invalid symbol produces PROVIDER_UNAVAILABLE and no price"
+    ]
+  },
+  "scope": "Synchronous private pilot; no automatic retries or managed admission"
+}

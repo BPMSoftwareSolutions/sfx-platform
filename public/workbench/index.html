@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SideFX circuit workbench: source inspection</title>
+<meta name="generator" content="sidefx-project-ui-surface" />
+<meta name="sidefx-surface-id" content="source-inspection" />
+<meta name="sidefx-provider" content="html-workbench-dark" />
+<style>:root{--shell:#0a1b28;--circuit:#071722;--ink:#dfebed;--strip:#122939;--panel:#102331;--control:#102332;--control-edge:#48606d;--rule:#304751;--muted:#9ebebf;--status:#acc5c9;--pressed:#dceadc;--pressed-ink:#183a39;--focus:#99f1d5;--complete:#acedd6;--inspect:#f1f0e9;--inspect-ink:#253f43;--inspect-muted:#59706c;--findings:#895621;color-scheme:dark;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--shell);color:var(--ink);font:14px/1.5 Inter,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+.ui-surface{position:relative;margin:0 auto;overflow:auto;background:var(--shell);}
+.ui-container{position:absolute;}
+.ui-component{position:absolute;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+.ui-component>*{margin:0;min-width:0;}
+button,input,select{font:inherit;border:1px solid var(--control-edge);background:var(--control);color:#e3eeee;border-radius:3px;}
+button{font-size:12px;padding:8px 12px;cursor:pointer;}
+button:hover{background:#26434b;}
+button[aria-pressed='true']{background:var(--pressed);color:var(--pressed-ink);}
+button[disabled]{opacity:.45;cursor:not-allowed;}
+button:focus-visible,select:focus-visible,input:focus-visible,[data-entity]:focus-visible,[data-route]:focus-visible{outline:2px solid var(--focus);outline-offset:3px;}
+select{width:100%;max-width:100%;font:13px/1.5 Inter,Arial,sans-serif;padding:10px;}
+input{padding:10px 8px;width:100%;font:12px/1.3 Inter,Arial,sans-serif;}
+output{font-size:11px;min-width:40px;text-align:center;font-variant-numeric:tabular-nums;}
+.ui-component [data-component-type="input"],.ui-component [data-component-type="choice"]{display:flex;flex-direction:column;gap:9px;min-width:0;}
+.ui-component [data-component-type="input"]>span,.ui-component [data-component-type="choice"]>span{font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.ui-component [data-component-type="toggle"]{display:flex;flex-direction:row;align-items:center;gap:6px;font-size:12px;color:#c2d6d9;}
+.ui-component [data-component-type="toggle"] input{width:16px;height:16px;accent-color:#9ce4d1;}
+.ui-component ul{list-style:none;margin:0;padding:0;}
+[data-component-type="circuit"]{position:relative;width:100%;height:100%;overflow:auto;background:var(--circuit);overscroll-behavior:contain;}
+[data-circuit-stage]{min-width:100%;min-height:100%;display:grid;place-items:center;padding:20px;}
+[data-circuit-stage]>svg{display:block;max-width:none;flex:none;}
+[data-circuit-stage] [data-entity],[data-circuit-stage] [data-route]{cursor:pointer;}
+[data-circuit-stage] [data-entity]:hover{filter:brightness(1.4);}
+[data-circuit-stage] .selected{filter:drop-shadow(0 0 6px #afffe3);}
+[data-circuit-stage] .active-route .route-path{stroke:#f7ffff;stroke-width:5;}
+[data-component-type="circuit"].base .material{display:none;}
+[data-circuit-stage] .material{pointer-events:none;}
+.circuit-unsupported{margin:20px;padding:12px 14px;font:12px/1.5 ui-monospace,monospace;color:#ffd9b8;box-shadow:inset 0 0 0 1px #895621;border-radius:4px;}
+.sfx-overlay{position:fixed;z-index:60;width:560px;max-width:calc(100vw - 32px);background:var(--panel);color:var(--ink);border-radius:6px;box-shadow:inset 0 0 0 1px var(--rule),0 18px 48px rgba(0,0,0,.45);will-change:transform,opacity;}
+.sfx-overlay:focus-visible{outline:2px solid var(--focus);outline-offset:3px;}
+.sfx-overlay[data-anchor-strategy='viewport-transition']{box-shadow:inset 0 0 0 1px var(--control-edge),0 18px 48px rgba(0,0,0,.45);}
+.sfx-overlay-anchor-note{margin:0;padding:8px 20px 14px;font:11px/1.5 ui-monospace,monospace;color:var(--muted);}
+.sfx-overlay-scrim{position:fixed;inset:0;z-index:59;background:rgba(4,12,18,.55);}
+@media (prefers-reduced-motion:reduce){.sfx-overlay{transition:none !important;}}
+.sfx-result-component{width:100%;height:100%;overflow:auto;padding:4px 0;font-size:13px;}
+.sfx-result-component h3{font:10px/1.5 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
+.sfx-result-component p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
+.sfx-result-component .sfx-result-metric{font-size:36px;font-weight:600;color:#a2edcc;letter-spacing:-.03em;}
+.sfx-result-meta{font-size:11px;color:var(--muted);}
+.sfx-result-fields{display:grid;grid-template-columns:minmax(100px,1fr) minmax(0,2fr);gap:5px 14px;margin:0;}
+.sfx-result-fields dt{color:var(--muted);text-transform:capitalize;}
+.sfx-result-fields dd{margin:0;overflow-wrap:anywhere;}
+.sfx-result-row{padding:8px 0;border-bottom:1px solid var(--rule);}
+.sfx-delivery-status{padding:24px;min-height:180px;}
+.sfx-dialog-content>.ui-surface{margin:0;background:var(--panel);}
+.sfx-dialog-content [data-component-id=dialog-status]{font-size:11px;overflow:auto;}
+.sfx-overlay [data-component-id=dialog-title],.sfx-overlay [data-component-id=outcome-title]{font-size:20px;}
+.sfx-overlay [data-component-id$=-feedback]{font-size:11px;color:#efbc98;}
+[data-circuit-stage] .live-active{filter:drop-shadow(0 0 9px #b5f4e1);}
+[data-circuit-stage] .live-observed .route-path{stroke:#a7efce;stroke-width:4;}
+[data-circuit-stage] .live-result{filter:drop-shadow(0 0 8px #72e1ad);}
+[data-circuit-stage] .live-uncertain{filter:drop-shadow(0 0 8px #e0b56f);}
+.sfx-overlay{overscroll-behavior:contain;}
+
+.sfx-overlay{--inspect-ink:var(--ink);--inspect-muted:var(--muted);}
+
+[data-component-id="component-outline"] li{margin:0 0 5px;}
+[data-component-id="component-outline"] li button{width:100%;text-align:left;min-height:50px;padding:9px;border-color:var(--rule);line-height:1.35;}
+[data-component-id="component-outline"] li small{display:block;margin-bottom:5px;font:8px/1.3 ui-monospace,monospace;text-transform:uppercase;color:var(--muted);}
+</style>
+<link rel="stylesheet" href="viewport.css" /></head>
+<body>
+<div class="ui-surface" data-surface-profile="viewport" style="width:1220px;height:1180px;">
+  <div class="ui-container" style="left:0px;top:0px;width:1220px;height:1180px;overflow:hidden;" data-region-id="root" data-region-path="root" data-role="workbench-shell" data-tenant-policy="single">
+    <div class="ui-container" style="left:0px;top:0px;width:1220px;height:96px;box-shadow:inset 0 -1px 0 var(--rule);" data-region-id="header" data-region-path="root/header" data-role="workbench-header" data-tenant-policy="single">
+      <div class="ui-container" style="left:26px;top:24px;width:612px;height:48px;" data-region-id="title-block" data-region-path="root/header/title-block" data-role="capability-identity" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:612px;height:16px;" data-region-id="eyebrow-slot" data-region-path="root/header/title-block/eyebrow-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:612px;height:16px;" data-component-id="workbench-eyebrow"><span data-component-type="label" data-semantic-family="information" data-semantic-identity="workbench-identity" data-presentation-intent="section-label" data-realized-via="type" style="font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">SIDEFX / CIRCUIT WORKBENCH</span></div>
+        </div>
+        <div class="ui-container" style="left:0px;top:22px;width:612px;height:26px;" data-region-id="title-slot" data-region-path="root/header/title-block/title-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:612px;height:26px;" data-component-id="capability-title"><h2 data-component-type="heading" data-semantic-family="information" data-semantic-identity="capability-title" data-presentation-intent="brand" data-realized-via="type" data-bound-state="capability.title" data-binding-direction="read" style="font-size:19px;font-weight:500;line-height:1.35;max-width:600px;color:var(--ink);">Convergently author an SDA capability candidate from canonical source authority</h2></div>
+        </div>
+      </div>
+      <div class="ui-container" style="left:662px;top:24px;width:532px;height:48px;" data-region-id="view-slot" data-region-path="root/header/view-slot" data-role="source-view-selection" data-tenant-policy="single">
+        <div class="ui-component" style="left:0px;top:0px;width:532px;height:48px;" data-component-id="source-view"><label data-component-type="choice" data-semantic-family="input" data-semantic-identity="selected-source-view" data-presentation-intent="view-selector" data-realized-via="type" data-bound-state="view.selected" data-binding-direction="read-write" data-action-disposition="ADMISSIBLE" style="align-self:stretch;"><span>Source view</span><select><option value="n-69b6853533ab1d663473efb6">Capability blueprint Â· 30 components / 45 routes</option><option value="n-0bdad09bdc9fab51e42f65dd">Execution Â· Admit the capability authoring context Â· 10 components / 9 routes</option></select></label></div>
+      </div>
+    </div>
+    <div class="ui-container" style="left:0px;top:96px;width:1220px;height:42px;background:var(--strip);" data-region-id="summary" data-region-path="root/summary" data-role="authority-coverage-strip" data-tenant-policy="single">
+      <div class="ui-container" style="left:26px;top:12px;width:632px;height:18px;" data-region-id="scope-slot" data-region-path="root/summary/scope-slot" data-tenant-policy="single">
+        <div class="ui-component" style="left:0px;top:0px;width:632px;height:18px;" data-component-id="view-scope"><output data-component-type="value" data-semantic-family="information" data-semantic-identity="source-view-kind" data-presentation-intent="section-label" data-realized-via="type" data-bound-state="view.scope" data-binding-direction="read" style="font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Blueprint authority</output></div>
+      </div>
+      <div class="ui-container" style="left:674px;top:12px;width:520px;height:18px;" data-region-id="coverage-slot" data-region-path="root/summary/coverage-slot" data-tenant-policy="single">
+        <div class="ui-component" style="left:0px;top:0px;width:520px;height:18px;" data-component-id="view-coverage"><output data-component-type="value" data-semantic-family="information" data-semantic-identity="source-coverage" data-presentation-intent="coverage-readout" data-realized-via="type" data-bound-state="view.coverage" data-binding-direction="read" style="font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right;min-width:0;">30 components Â· 45 routes Â· 0 source components omitted</output></div>
+      </div>
+    </div>
+    <div class="ui-container" style="left:0px;top:138px;width:1220px;height:46px;box-shadow:inset 0 -1px 0 var(--rule);" data-region-id="toolbar" data-region-path="root/toolbar" data-role="workbench-toolbar" data-tenant-policy="single">
+      <div class="ui-container" style="left:20px;top:6px;width:200px;height:34px;" data-region-id="presentation-group" data-region-path="root/toolbar/presentation-group" data-role="material-presentation" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:94px;height:34px;" data-region-id="material-slot" data-region-path="root/toolbar/presentation-group/material-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:94px;height:34px;" data-component-id="show-material"><button type="button" data-semantic-action="show-material" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="present-material" data-presentation-intent="toggle-action" data-realized-via="type" style="align-self:stretch;">Material</button></div>
+        </div>
+        <div class="ui-container" style="left:102px;top:0px;width:98px;height:34px;" data-region-id="base-slot" data-region-path="root/toolbar/presentation-group/base-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:98px;height:34px;" data-component-id="show-base-svg"><button type="button" data-semantic-action="show-base-svg" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="present-base-svg" data-presentation-intent="toggle-action" data-realized-via="type" style="align-self:stretch;">Base SVG</button></div>
+        </div>
+      </div>
+      <div class="ui-container" style="left:640px;top:6px;width:560px;height:34px;" data-region-id="camera-group" data-region-path="root/toolbar/camera-group" data-role="camera-controls" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:100px;height:34px;" data-region-id="fit-slot" data-region-path="root/toolbar/camera-group/fit-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:100px;height:34px;" data-component-id="fit-diagram"><button type="button" data-semantic-action="fit-diagram" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="fit-circuit-to-viewport" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">Fit diagram</button></div>
+        </div>
+        <div class="ui-container" style="left:108px;top:0px;width:116px;height:34px;" data-region-id="read-slot" data-region-path="root/toolbar/camera-group/read-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:116px;height:34px;" data-component-id="read-at-100"><button type="button" data-semantic-action="read-at-100" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="read-circuit-at-full-scale" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">Read at 100%</button></div>
+        </div>
+        <div class="ui-container" style="left:232px;top:0px;width:38px;height:34px;" data-region-id="zoom-out-slot" data-region-path="root/toolbar/camera-group/zoom-out-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:38px;height:34px;" data-component-id="zoom-out"><button type="button" data-semantic-action="zoom-out" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="reduce-camera-scale" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">−</button></div>
+        </div>
+        <div class="ui-container" style="left:278px;top:0px;width:56px;height:34px;" data-region-id="zoom-readout-slot" data-region-path="root/toolbar/camera-group/zoom-readout-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:56px;height:34px;" data-component-id="zoom-readout"><output data-component-type="value" data-semantic-family="information" data-semantic-identity="camera-scale" data-presentation-intent="zoom-readout" data-realized-via="type" data-bound-state="camera.zoom-label" data-binding-direction="read" style="font-size:11px;text-align:center;color:var(--ink);">15%</output></div>
+        </div>
+        <div class="ui-container" style="left:342px;top:0px;width:38px;height:34px;" data-region-id="zoom-in-slot" data-region-path="root/toolbar/camera-group/zoom-in-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:38px;height:34px;" data-component-id="zoom-in"><button type="button" data-semantic-action="zoom-in" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="raise-camera-scale" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">+</button></div>
+        </div>
+        <div class="ui-container" style="left:388px;top:0px;width:172px;height:34px;" data-region-id="download-slot" data-region-path="root/toolbar/camera-group/download-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:172px;height:34px;" data-component-id="download-svg"><button type="button" data-semantic-action="download-svg" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="export-base-scene" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">Download SVG</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui-container" style="left:0px;top:184px;width:1220px;height:630px;" data-region-id="main" data-region-path="root/main" data-role="circuit-and-outline" data-tenant-policy="single">
+      <div class="ui-container" style="left:0px;top:0px;width:975px;height:630px;background:var(--circuit);" data-region-id="drawing" data-region-path="root/main/drawing" data-role="circuit-viewport" data-tenant-policy="single">
+        <div class="ui-component" style="left:0px;top:0px;width:975px;height:630px;" data-component-id="circuit"><div role="application" tabindex="0" aria-label="Scrollable source diagram" data-scene-contract="circuit-scene.v1" data-scene="fixtures/scenes/blueprint-authority.scene.json" data-trace-mode="ILLUSTRATIVE" data-semantic-action="select-circuit-entity" data-component-type="circuit" data-semantic-identity="capability-circuit" data-presentation-intent="circuit-scene" data-realized-via="type" data-action-disposition="ADMISSIBLE" style="position:absolute;inset:0;"><div data-circuit-stage="true"></div></div></div>
+      </div>
+      <div class="ui-container" style="left:975px;top:0px;width:245px;height:630px;background:var(--panel);box-shadow:inset 1px 0 0 var(--rule);" data-region-id="aside" data-region-path="root/main/aside" data-role="component-outline" data-tenant-policy="single">
+        <div class="ui-container" style="left:10px;top:16px;width:225px;height:62px;" data-region-id="search-slot" data-region-path="root/main/aside/search-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:225px;height:62px;" data-component-id="component-search"><label data-component-type="input" data-semantic-family="input" data-semantic-identity="outline-search-query" data-presentation-intent="search-field" data-realized-via="type" data-bound-state="search.query" data-binding-direction="read-write" data-action-disposition="ADMISSIBLE" style="align-self:stretch;"><span>Find a component</span><input type="text" placeholder="Identity, mechanic, or responsibility" value /></label></div>
+        </div>
+        <div class="ui-container" style="left:10px;top:88px;width:225px;height:526px;" data-region-id="outline-slot" data-region-path="root/main/aside/outline-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:225px;height:526px;" data-component-id="component-outline"><ul data-component-type="collection" data-semantic-family="collection" data-semantic-identity="circuit-component-outline" data-presentation-intent="vertical-list" data-realized-via="type" data-bound-state="outline.items" data-binding-direction="read" data-action-disposition="ADMISSIBLE" style="display:flex;flex-direction:column;gap:0;align-items:stretch;overflow:auto;"></ul></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui-container" style="left:0px;top:814px;width:1220px;height:88px;box-shadow:inset 0 1px 0 var(--rule);" data-region-id="flow" data-region-path="root/flow" data-role="illustrative-trace-controls" data-tenant-policy="single">
+      <div class="ui-container" style="left:20px;top:12px;width:1180px;height:32px;" data-region-id="flow-buttons" data-region-path="root/flow/flow-buttons" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:100px;height:32px;" data-region-id="play-slot" data-region-path="root/flow/flow-buttons/play-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:100px;height:32px;" data-component-id="play-trace"><button type="button" data-semantic-action="play-trace" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="illustrative-trace-playback" data-presentation-intent="primary-action" data-realized-via="type" style="align-self:stretch;">Trace flow</button></div>
+        </div>
+        <div class="ui-container" style="left:108px;top:0px;width:96px;height:32px;" data-region-id="next-slot" data-region-path="root/flow/flow-buttons/next-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:96px;height:32px;" data-component-id="next-trace-step"><button type="button" data-semantic-action="next-trace-step" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="illustrative-trace-advance" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">Next step</button></div>
+        </div>
+        <div class="ui-container" style="left:212px;top:0px;width:78px;height:32px;" data-region-id="reset-slot" data-region-path="root/flow/flow-buttons/reset-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:78px;height:32px;" data-component-id="reset-trace"><button type="button" data-semantic-action="reset-trace" data-action-disposition="ADMISSIBLEADMISSIBLE" data-component-type="action" data-semantic-family="action" data-semantic-identity="illustrative-trace-reset" data-presentation-intent="secondary-action" data-realized-via="type" style="align-self:stretch;">Reset</button></div>
+        </div>
+        <div class="ui-container" style="left:298px;top:0px;width:132px;height:32px;" data-region-id="speed-slot" data-region-path="root/flow/flow-buttons/speed-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:132px;height:32px;" data-component-id="trace-speed"><label data-component-type="choice" data-semantic-family="input" data-semantic-identity="illustrative-trace-speed" data-presentation-intent="inline-choice" data-realized-via="type" data-bound-state="trace.speed" data-binding-direction="read-write" data-action-disposition="ADMISSIBLE" style="display:flex;flex-direction:row;align-items:center;gap:6px;font-size:12px;color:#c2d6d9;"><span>Speed</span><select><option value="1">1Ã—</option><option value="4">4Ã—</option><option value="16">16Ã—</option><option value="64">64Ã—</option></select></label></div>
+        </div>
+        <div class="ui-container" style="left:438px;top:0px;width:742px;height:32px;" data-region-id="follow-slot" data-region-path="root/flow/flow-buttons/follow-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:742px;height:32px;" data-component-id="trace-follow"><label data-component-type="toggle" data-semantic-family="input" data-semantic-identity="illustrative-trace-follow" data-presentation-intent="inline-toggle" data-realized-via="type" data-bound-state="trace.follow" data-binding-direction="read-write" data-action-disposition="ADMISSIBLE" style="display:flex;flex-direction:row;align-items:center;gap:6px;font-size:12px;color:#c2d6d9;"><input type="checkbox" checked /><span>Follow flow</span></label></div>
+        </div>
+      </div>
+      <div class="ui-container" style="left:20px;top:52px;width:1180px;height:24px;" data-region-id="flow-status-row" data-region-path="root/flow/flow-status-row" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:1000px;height:24px;" data-region-id="flow-status-slot" data-region-path="root/flow/flow-status-row/flow-status-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:1000px;height:24px;" data-component-id="flow-status"><aside data-component-type="feedback" data-semantic-family="feedback" data-semantic-identity="illustrative-trace-status" data-presentation-intent="live-status" data-realized-via="type" data-bound-state="trace.status" data-binding-direction="read" style="font-size:12px;color:var(--status);">Select a component, then follow its declared routes.</aside></div>
+        </div>
+        <div class="ui-container" style="left:1012px;top:0px;width:168px;height:24px;display:flex;align-items:center;justify-content:flex-end;" data-region-id="trace-mode-slot" data-region-path="root/flow/flow-status-row/trace-mode-slot" data-role="trace-mode-declaration" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:168px;height:24px;" data-component-id="trace-mode-readout"><output data-component-type="value" data-semantic-family="information" data-semantic-identity="declared-trace-mode" data-presentation-intent="trace-mode-badge" data-realized-via="type" data-bound-state="trace.mode" data-binding-direction="read" style="font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--complete);text-align:right;">ILLUSTRATIVE</output></div>
+        </div>
+      </div>
+    </div>
+    <div class="ui-container" style="left:0px;top:902px;width:1220px;height:72px;" data-region-id="routes" data-region-path="root/routes" data-role="outgoing-routes" data-tenant-policy="single">
+      <div class="ui-component" style="left:20px;top:0px;width:1180px;height:72px;" data-component-id="outgoing-routes"><ul data-component-type="collection" data-semantic-family="collection" data-semantic-identity="selected-entity-outgoing-routes" data-presentation-intent="horizontal-inline" data-realized-via="type" data-bound-state="routes.items" data-binding-direction="read" data-action-disposition="ADMISSIBLE" style="display:flex;flex-direction:row;gap:8px;flex-wrap:wrap;align-items:center;"></ul></div>
+    </div>
+    <div class="ui-container" style="left:0px;top:974px;width:1220px;height:206px;background:var(--inspect);color:var(--inspect-ink);" data-region-id="inspection" data-region-path="root/inspection" data-role="source-inspection" data-tenant-policy="single">
+      <div class="ui-container" style="left:26px;top:24px;width:571px;height:158px;" data-region-id="inspection-primary" data-region-path="root/inspection/inspection-primary" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:571px;height:16px;" data-region-id="inspect-kind-slot" data-region-path="root/inspection/inspection-primary/inspect-kind-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:16px;" data-component-id="inspect-kind"><output data-component-type="value" data-semantic-family="information" data-semantic-identity="selected-entity-kind" data-presentation-intent="section-label" data-realized-via="type" data-bound-state="selection.kind" data-binding-direction="read" style="font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">INSPECT THE SOURCE</output></div>
+        </div>
+        <div class="ui-container" style="left:0px;top:24px;width:571px;height:56px;" data-region-id="inspect-title-slot" data-region-path="root/inspection/inspection-primary/inspect-title-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:56px;" data-component-id="inspect-title"><h2 data-component-type="heading" data-semantic-family="information" data-semantic-identity="selected-entity-label" data-presentation-intent="card-title" data-realized-via="type" data-bound-state="selection.title" data-binding-direction="read" style="font-size:20px;line-height:1.35;font-weight:500;color:var(--inspect-ink);">Every component keeps its identity.</h2></div>
+        </div>
+        <div class="ui-container" style="left:0px;top:88px;width:571px;height:70px;" data-region-id="inspect-detail-slot" data-region-path="root/inspection/inspection-primary/inspect-detail-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:70px;" data-component-id="inspect-detail"><p data-component-type="text" data-semantic-family="information" data-semantic-identity="selected-entity-responsibility" data-presentation-intent="body" data-realized-via="type" data-bound-state="selection.detail" data-binding-direction="read" style="font-size:13px;line-height:1.6;overflow-wrap:anywhere;color:var(--inspect-ink);">Select a shape or route to inspect its responsibility, contracts and exact source.</p></div>
+        </div>
+      </div>
+      <div class="ui-container" style="left:623px;top:24px;width:571px;height:158px;" data-region-id="inspection-evidence" data-region-path="root/inspection/inspection-evidence" data-tenant-policy="single">
+        <div class="ui-container" style="left:0px;top:0px;width:571px;height:34px;" data-region-id="inspect-facts-slot" data-region-path="root/inspection/inspection-evidence/inspect-facts-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:34px;" data-component-id="inspect-facts"><p data-component-type="text" data-semantic-family="information" data-semantic-identity="selected-entity-facts" data-presentation-intent="code-block" data-realized-via="type" data-bound-state="selection.facts" data-binding-direction="read" style="font:11px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;overflow:auto;color:var(--inspect-ink);"></p></div>
+        </div>
+        <div class="ui-container" style="left:0px;top:42px;width:571px;height:34px;" data-region-id="inspect-source-slot" data-region-path="root/inspection/inspection-evidence/inspect-source-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:34px;" data-component-id="inspect-source"><p data-component-type="text" data-semantic-family="information" data-semantic-identity="selected-entity-source-pointer" data-presentation-intent="fine-print" data-realized-via="type" data-bound-state="selection.source" data-binding-direction="read" style="font:10px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--inspect-muted);"></p></div>
+        </div>
+        <div class="ui-container" style="left:0px;top:84px;width:571px;height:26px;" data-region-id="inspect-findings-slot" data-region-path="root/inspection/inspection-evidence/inspect-findings-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:26px;" data-component-id="inspect-findings"><p data-component-type="text" data-semantic-family="information" data-semantic-identity="selected-view-findings" data-presentation-intent="fine-print" data-realized-via="type" data-bound-state="view.findings" data-binding-direction="read" style="font:10px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--inspect-muted);"></p></div>
+        </div>
+        <div class="ui-container" style="left:0px;top:118px;width:571px;height:40px;" data-region-id="evidence-slot" data-region-path="root/inspection/inspection-evidence/evidence-slot" data-tenant-policy="single">
+          <div class="ui-component" style="left:0px;top:0px;width:571px;height:40px;" data-component-id="evidence-limit"><p data-component-type="callout" data-semantic-family="information" data-semantic-identity="trace-evidence-limit" data-presentation-intent="fine-print" data-realized-via="family" data-bound-state="experience.limit" data-binding-direction="read" style="font:10px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--inspect-muted);">Declared topology. Tracing illustrates source relationships; it does not run providers or establish execution evidence.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="sidefx-ui-plan">
+{"planType":"ui-interaction-plan.v1","surfaceId":"source-inspection","componentAttribute":"data-component-id","reflect":{"action":{"controlSelector":"button","disabledProperty":"disabled","reasonAttribute":"title","dispositionAttribute":"data-action-disposition"},"text":{"selector":"[data-component-type]","property":"textContent"}},"state":[{"stateId":"view.selected","valueKind":"string","mutability":"mutable","initialValue":"n-69b6853533ab1d663473efb6"},{"stateId":"view.scope","valueKind":"string","mutability":"fixed","initialValue":"Blueprint authority"},{"stateId":"view.coverage","valueKind":"string","mutability":"fixed","initialValue":"30 components \u00c2\u00b7 45 routes \u00c2\u00b7 0 source components omitted"},{"stateId":"view.findings","valueKind":"string","mutability":"fixed","initialValue":""},{"stateId":"presentation.mode","valueKind":"string","mutability":"mutable","initialValue":"material"},{"stateId":"camera.scale","valueKind":"number","mutability":"mutable","initialValue":0.15},{"stateId":"camera.zoom-label","valueKind":"string","mutability":"fixed","initialValue":"15%"},{"stateId":"search.query","valueKind":"string","mutability":"mutable","initialValue":""},{"stateId":"outline.items","valueKind":"array","mutability":"fixed","initialValue":[]},{"stateId":"routes.items","valueKind":"array","mutability":"fixed","initialValue":[]},{"stateId":"selection.entity-id","valueKind":"string","mutability":"mutable","initialValue":""},{"stateId":"selection.kind","valueKind":"string","mutability":"fixed","initialValue":"INSPECT THE SOURCE"},{"stateId":"selection.title","valueKind":"string","mutability":"fixed","initialValue":"Every component keeps its identity."},{"stateId":"selection.detail","valueKind":"string","mutability":"fixed","initialValue":"Select a shape or route to inspect its responsibility, contracts and exact source."},{"stateId":"selection.facts","valueKind":"string","mutability":"fixed","initialValue":""},{"stateId":"selection.source","valueKind":"string","mutability":"fixed","initialValue":""},{"stateId":"trace.mode","valueKind":"string","mutability":"fixed","initialValue":"ILLUSTRATIVE"},{"stateId":"trace.status","valueKind":"string","mutability":"fixed","initialValue":"Select a component, then follow its declared routes."},{"stateId":"trace.play-label","valueKind":"string","mutability":"fixed","initialValue":"Trace flow"},{"stateId":"trace.speed","valueKind":"string","mutability":"mutable","initialValue":"1"},{"stateId":"trace.follow","valueKind":"boolean","mutability":"mutable","initialValue":true},{"stateId":"capability.title","valueKind":"string","mutability":"fixed","initialValue":"Convergently author an SDA capability candidate from canonical source authority"},{"stateId":"experience.limit","valueKind":"string","mutability":"fixed","initialValue":"Declared topology. Illustrative playback does not execute a capability."}],"validation":[{"state":"view.selected","checks":[{"op":"nonEmpty","operand":null,"valuePath":null,"message":"A source view must be selected."},{"op":"memberOf","operand":["n-69b6853533ab1d663473efb6","n-0bdad09bdc9fab51e42f65dd"],"valuePath":null,"message":"That source view is not published for this capability."}]},{"state":"presentation.mode","checks":[{"op":"memberOf","operand":["material","base"],"valuePath":null,"message":"Choose material or base presentation."}]},{"state":"camera.scale","checks":[{"op":"nonEmpty","operand":null,"valuePath":null,"message":"a value is required"},{"op":"atLeast","operand":0.01,"valuePath":null,"message":"The camera does not scale below 1%."},{"op":"atMost","operand":2,"valuePath":null,"message":"The camera does not scale above 200%."}]},{"state":"trace.speed","checks":[{"op":"memberOf","operand":["1","4","16","64"],"valuePath":null,"message":"Choose a declared playback speed."}]},{"state":"trace.mode","checks":[{"op":"memberOf","operand":["ILLUSTRATIVE","OBSERVED_REPLAY","LIVE_EXECUTION"],"valuePath":null,"message":"Trace mode must be one of the three declared modes."}]}],"bindings":[{"component":"source-view","state":"view.selected","aspect":"value","direction":"read-write","writable":true,"coerce":null,"initialPhysicalValue":"n-69b6853533ab1d663473efb6","accessor":{"selector":"select","readFrom":"value","writeTo":"value","events":["change"]},"mutates":{"selector":"select","property":"value"}},{"component":"view-scope","state":"view.scope","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"view-coverage","state":"view.coverage","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"inspect-findings","state":"view.findings","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"zoom-readout","state":"camera.zoom-label","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"component-search","state":"search.query","aspect":"value","direction":"read-write","writable":true,"coerce":null,"initialPhysicalValue":"","accessor":{"selector":"input","readFrom":"value","writeTo":"value","events":["input"]},"mutates":{"selector":"input","property":"value"}},{"component":"component-outline","state":"outline.items","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"outgoing-routes","state":"routes.items","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"inspect-kind","state":"selection.kind","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"inspect-title","state":"selection.title","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"inspect-detail","state":"selection.detail","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"inspect-facts","state":"selection.facts","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"inspect-source","state":"selection.source","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"flow-status","state":"trace.status","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"trace-mode-readout","state":"trace.mode","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"trace-speed","state":"trace.speed","aspect":"value","direction":"read-write","writable":true,"coerce":null,"initialPhysicalValue":"1","accessor":{"selector":"select","readFrom":"value","writeTo":"value","events":["change"]},"mutates":{"selector":"select","property":"value"}},{"component":"trace-follow","state":"trace.follow","aspect":"value","direction":"read-write","writable":true,"coerce":null,"initialPhysicalValue":true,"accessor":{"selector":"input","readFrom":"checked","writeTo":"checked","events":["change"]},"mutates":{"selector":"input","property":"checked"}},{"component":"capability-title","state":"capability.title","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null},{"component":"evidence-limit","state":"experience.limit","aspect":"value","direction":"read","writable":false,"coerce":null,"initialPhysicalValue":null}],"actions":[{"actionId":"select-source-view","requiresAdmissible":["view.selected"],"availability":"available","scenarioEvent":"workbench.source-view.selected","components":["source-view"]},{"actionId":"show-material","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.presentation.material-selected","components":["show-material"]},{"actionId":"show-base-svg","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.presentation.base-selected","components":["show-base-svg"]},{"actionId":"fit-diagram","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.camera.fitted","components":["fit-diagram"]},{"actionId":"read-at-100","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.camera.reading-scale-set","components":["read-at-100"]},{"actionId":"zoom-in","requiresAdmissible":["camera.scale"],"availability":"available","scenarioEvent":"workbench.camera.scale-raised","components":["zoom-in"]},{"actionId":"zoom-out","requiresAdmissible":["camera.scale"],"availability":"available","scenarioEvent":"workbench.camera.scale-reduced","components":["zoom-out"]},{"actionId":"download-svg","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.scene.exported","components":["download-svg"]},{"actionId":"search-components","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.outline.searched","components":["component-search"]},{"actionId":"select-component","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.entity.selected","components":["component-outline"]},{"actionId":"select-circuit-entity","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.entity.selected","components":["circuit"]},{"actionId":"follow-route","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.route.followed","components":["outgoing-routes"]},{"actionId":"play-trace","requiresAdmissible":["trace.speed"],"availability":"available","scenarioEvent":"workbench.illustrative-trace.toggled","components":["play-trace"]},{"actionId":"next-trace-step","requiresAdmissible":["trace.speed"],"availability":"available","scenarioEvent":"workbench.illustrative-trace.advanced","components":["next-trace-step"]},{"actionId":"reset-trace","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.illustrative-trace.reset","components":["reset-trace"]},{"actionId":"set-trace-speed","requiresAdmissible":["trace.speed"],"availability":"available","scenarioEvent":"workbench.illustrative-trace.speed-set","components":["trace-speed"]},{"actionId":"toggle-trace-follow","requiresAdmissible":[],"availability":"available","scenarioEvent":"workbench.illustrative-trace.follow-toggled","components":["trace-follow"]}]}
+</script>
+<script>
+/* SideFX.UI HTML interaction runtime — provider mechanic.
+ *
+ * Executes an already-resolved interaction plan inside a browser. It carries
+ * authority; it does not reconstruct authority.
+ *
+ * What this file knows: DOM events, element lookup, reading a value off an
+ * input, toggling disabled, writing textContent. Provider mechanics.
+ *
+ * It does receive semantic FACTS - state ids, action ids, a scenario event
+ * name, the message a validator chose. What it must never receive is authority
+ * to reinterpret any of them: what `required` means, which rules apply to which
+ * state, what a semantic action requires, how money should read, which scenario
+ * to run. Every such decision was made before the page was built and arrives
+ * already resolved.
+ *
+ * Each binding also declares the physical region it owns, and this file writes
+ * nothing outside it.
+ *
+ * The op vocabulary below is deliberately mechanical. `nonEmpty` is not
+ * `required`; it is what `required` was reduced to by validate-ui-state. Adding
+ * a rule kind does not change this file — it changes the reduction, and an op
+ * this runtime cannot execute is reported at realization time rather than
+ * guessed at here.
+ */
+(function (global) {
+  "use strict";
+
+  // A dialog and its host are independent resolved surfaces. Each mount owns
+  // only its subtree; the same lowered mechanics serve both surfaces.
+  function mount(root, plan, initialValues) {
+
+  var state = {};
+  plan.state.forEach(function (item) { state[item.stateId] = initialValues && Object.prototype.hasOwnProperty.call(initialValues, item.stateId)
+    ? initialValues[item.stateId] : item.initialValue; });
+
+  function el(componentId) {
+    return root.querySelector("[" + plan.componentAttribute + "=\"" + componentId + "\"]");
+  }
+
+  /* --- mechanic ops. No semantic name appears here. -------------------- */
+  var OPS = {
+    nonEmpty: function (v) {
+      if (v === null || v === undefined || v === "") { return false; }
+      if (Array.isArray(v)) { return v.length > 0; }
+      if (typeof v === "object") { return Object.keys(v).length > 0; }
+      return true;
+    },
+    atLeast:   function (v, n) { return v >= n; },
+    atMost:    function (v, n) { return v <= n; },
+    minLength: function (v, n) { return (typeof v === "string" ? Array.from(v).length : v.length) >= n; },
+    maxLength: function (v, n) { return (typeof v === "string" ? Array.from(v).length : v.length) <= n; },
+    matches:   function (v, p) { return new RegExp(p).test(String(v)); },
+    memberOf:  function (v, s) { return s.indexOf(v) !== -1; }
+  };
+
+  function reach(value, path) {
+    if (!path) { return value; }
+    return path.split(".").reduce(function (acc, part) {
+      return (acc && typeof acc === "object" && part in acc) ? acc[part] : null;
+    }, value);
+  }
+
+  /* Absence is the business of nonEmpty alone — the same rule the semantic
+   * capability holds, carried here rather than re-decided. */
+  function evaluate(stateId) {
+    var declared = plan.validation.filter(function (v) { return v.state === stateId; })[0];
+    if (!declared) { return { admissible: true, message: null, violations: [] }; }
+    var violations = [];
+    declared.checks.forEach(function (check) {
+      var target = reach(state[stateId], check.valuePath);
+      if (check.op !== "nonEmpty" && (target === null || target === undefined)) { return; }
+      var op = OPS[check.op];
+      if (!op) { return; }
+      if (!op(target, check.operand)) { violations.push(check.message); }
+    });
+    return {
+      admissible: violations.length === 0,
+      message: violations.length ? violations[0] : null,
+      violations: violations
+    };
+  }
+
+  function dispositions() {
+    var out = {};
+    plan.validation.forEach(function (v) { out[v.state] = evaluate(v.state); });
+    return out;
+  }
+
+  /* --- reflection: physical DOM realization of resolved outcomes ------- */
+  function reflect() {
+    var judged = dispositions();
+    plan.bindings.filter(function (b) { return b.writable; }).forEach(function (b) {
+      var node = el(b.component), control = node && node.querySelector(b.accessor.selector);
+      if (control && judged[b.state]) control.setAttribute('aria-invalid', String(!judged[b.state].admissible));
+    });
+
+    plan.bindings.filter(function (b) { return b.aspect === "validation"; })
+      .forEach(function (b) {
+        var node = el(b.component);
+        if (!node) { return; }
+        var judgement = judged[b.state];
+        /* Only the physical region this binding declares it owns. Writing
+         * outside it rewrites structure the projection built, which is a
+         * higher-altitude realization this mechanic does not own. */
+        var target = node.querySelector(b.mutates.selector);
+        if (!target) { return; }
+        target[b.mutates.property] =
+          (judgement && judgement.message) || b.fallbackText || "";
+      });
+
+    plan.actions.forEach(function (action) {
+      var unmet = action.requiresAdmissible.filter(function (stateId) {
+        var judgement = judged[stateId];
+        return !judgement || !judgement.admissible;
+      });
+      var admissible = action.availability === "available" && unmet.length === 0;
+      var reason = admissible ? null
+        : (unmet.length ? (judged[unmet[0]] && judged[unmet[0]].message)
+                        : "this action is currently unavailable");
+      action.components.forEach(function (componentId) {
+        var node = el(componentId);
+        if (!node) { return; }
+        var control = node.querySelector("[" + plan.reflect.action.dispositionAttribute + "]") || node;
+        control[plan.reflect.action.disabledProperty] = !admissible;
+        control.setAttribute(plan.reflect.action.dispositionAttribute,
+          admissible ? "ADMISSIBLE" : (action.availability === "available"
+            ? "NOT_ADMISSIBLE" : "UNAVAILABLE"));
+        if (reason) { control.setAttribute(plan.reflect.action.reasonAttribute, reason); }
+        else { control.removeAttribute(plan.reflect.action.reasonAttribute); }
+      });
+    });
+
+    /* Testimony, so an observer can read current interaction reality off the
+     * document rather than inferring it from pixels. */
+    root.setAttribute("data-sidefx-state", JSON.stringify(state));
+    root.setAttribute("data-sidefx-admissibility", JSON.stringify(
+      Object.keys(judged).reduce(function (acc, k) {
+        acc[k] = judged[k].admissible; return acc;
+      }, {})));
+  }
+
+  /* --- physical input observation ------------------------------------- */
+  plan.bindings.filter(function (b) { return b.writable; }).forEach(function (b) {
+    var node = el(b.component);
+    if (!node) { return; }
+    var control = node.querySelector(b.accessor.selector);
+    if (!control) { return; }
+    b.accessor.events.forEach(function (eventName) {
+      control.addEventListener(eventName, function () {
+        var raw = control[b.accessor.readFrom];
+        state[b.state] = (b.coerce === "number") ? Number(raw) : raw;
+        reflect();
+      });
+    });
+    /* Initial physical value comes from resolved state, once. */
+    if (state[b.state] !== null && state[b.state] !== undefined) {
+      control[b.accessor.writeTo] = state[b.state];
+    }
+  });
+
+  /* --- the SDA boundary ------------------------------------------------ */
+  plan.actions.forEach(function (action) {
+    action.components.forEach(function (componentId) {
+      var node = el(componentId);
+      if (!node) { return; }
+      /* The wrapper is never disabled, so the runtime always gets to decide.
+       * A listener on the control itself would never fire while disabled, and
+       * the disabled attribute would become the enforcement rather than a
+       * drawing of it. */
+      node.addEventListener("click", function () {
+        var judged = dispositions();
+        var unmet = action.requiresAdmissible.filter(function (stateId) {
+          return !judged[stateId] || !judged[stateId].admissible;
+        });
+        if (action.availability !== "available" || unmet.length) {
+          /* NOT_ADMISSIBLE terminates inside the UI circuit. */
+          root.setAttribute("data-sidefx-last-dispatch",
+            JSON.stringify({ actionId: action.actionId, disposition: "NOT_ADMISSIBLE" }));
+          root.dispatchEvent(new CustomEvent("sidefx-ui-action", { detail: { actionId: action.actionId, disposition: "NOT_ADMISSIBLE" } }));
+          return;
+        }
+        /* ADMISSIBLE reaches the port and stops. This runtime realizes
+         * interaction; it does not realize the business event. Crossing needs
+         * execute-scenario-event, which this estate does not have. */
+        var dispatch = {
+          actionId: action.actionId,
+          disposition: "DISPATCHED",
+          scenarioEvent: action.scenarioEvent,
+          execution: { state: "NOT_ATTEMPTED",
+                       providerCapability: "execute-scenario-event",
+                       providerStatus: "unavailable" }
+        };
+        root.setAttribute("data-sidefx-last-dispatch", JSON.stringify(dispatch));
+        root.dispatchEvent(new CustomEvent("sidefx-ui-action", { detail: dispatch }));
+      });
+    });
+  });
+
+  reflect();
+  return { state: function () { return Object.assign({}, state); }, judgements: dispositions };
+  }
+  global.SidefxUIRuntime = { mount: mount };
+  var planNode = typeof document !== "undefined" && document.getElementById("sidefx-ui-plan");
+  if (planNode) mount(document.documentElement, JSON.parse(planNode.textContent));
+})(globalThis);
+
+</script>
+<script type="application/json" id="sfx-workbench-config">{"experienceId": "source-inspection", "surfaceId": "source-inspection", "initialViewId": "n-69b6853533ab1d663473efb6", "viewKindNames": {"blueprint": "Blueprint authority", "operations": "Declared operation flow", "native": "Native execution graph", "expression": "Mechanic dependencies", "invocation": "Executable scenario interface"}, "scenes": [{"fixtureId": "blueprint-authority", "viewId": "n-69b6853533ab1d663473efb6", "viewKind": "blueprint", "label": "Capability blueprint", "scene": "scenes/blueprint-authority.scene.json", "artifact": "scenes/blueprint-authority.svg", "sha256": "ff469800662a7794ce56f48c497de380c1b70d558f0a741e333970dff2964af9"}, {"fixtureId": "native-execution", "viewId": "n-0bdad09bdc9fab51e42f65dd", "viewKind": "native", "label": "Execution \u00b7 Admit the capability authoring context", "scene": "scenes/native-execution.scene.json", "artifact": "scenes/native-execution.svg", "sha256": "c64182e3018eff5331f3eeb47555624aab725b0cc002597d1dc653795d3a8457"}, {"viewId": "invoke-say-hello-world", "viewKind": "invocation", "label": "Hello World \u00b7 Run capability", "scene": "scenes/invoke-say-hello-world.json", "artifact": "scenes/invoke-say-hello-world.svg", "sha256": "sha256:f4315958e6d2d27c3116d798da93ccd75780f334538aa310811920cf23f60679"}, {"viewId": "invoke-resolve-equity-market-price-evidence", "viewKind": "invocation", "label": "Live stock price \u00b7 Run capability", "scene": "scenes/invoke-resolve-equity-market-price-evidence.json", "artifact": "scenes/invoke-resolve-equity-market-price-evidence.svg", "sha256": "sha256:e44568fb711e30a76b1dfa811d9a46369344e912c288f97449831b6388b899e3"}, {"viewId": "invoke-greet-by-name", "viewKind": "invocation", "label": "Personal greeting \u00b7 Run capability", "scene": "scenes/invoke-greet-by-name.json", "artifact": "scenes/invoke-greet-by-name.svg", "sha256": "sha256:ec6a7dbf6a34695c52a2374a72efd0e7d199d1ba5e8de361cf7d3d375b49c62b"}, {"viewId": "invoke-resolve-sidefx-eligible-providers", "viewKind": "invocation", "label": "Provider fixture demonstration \u00b7 Run capability", "scene": "scenes/invoke-resolve-sidefx-eligible-providers.json", "artifact": "scenes/invoke-resolve-sidefx-eligible-providers.svg", "sha256": "sha256:1dcc432c0b8c4bd33315f19fa92c38304c1e005bfda765a1149d9d9c61d6bd3a"}], "requiredProviderFeatures": ["scene-payload", "node-selection", "route-selection", "keyboard-activation", "camera-transform", "material-presentation", "trace-overlay", "vector-export"], "traceMode": "ILLUSTRATIVE", "embed": {"reportHeight": false, "commandChannel": false}, "overlay": {"widthPx": 560, "viewportMarginPx": 16, "anchorOffsetPx": 12, "motionDurationMs": 160, "motionEasing": "cubic-bezier(.2,.7,.3,1)", "reducedMotionDurationMs": 0, "scrim": "rgba(4,12,18,.55)", "note": "Duration and easing belong to the shared presentation profile, not to the dialog declaration: a capability declares the motion intent, and the profile decides how long it takes. Under reduced motion the declared fallback is substituted and the transition is suppressed entirely."}, "evidenceLimit": "Declared topology. This experience invokes no capability and establishes no execution evidence.", "invocationManifest": "invocation.json", "viewport": {"inspection": {"label": "Component details and routes", "regions": ["routes", "inspection"], "rows": ["64px", "208px"], "maxHeight": "32dvh"}}}</script>
+<script src="illustrative-trace.js"></script>
+<script src="overlay-anchor.js"></script>
+<script src="dialog-lifecycle.js"></script>
+<script src="focus-containment.js"></script>
+<script src="overlay-provider.js"></script>
+<script src="viewport-runtime.js"></script><script src="workbench-runtime.js"></script>
+<script src="outcome-components.js"></script><script src="invocation-runtime.js"></script></body>
+</html>

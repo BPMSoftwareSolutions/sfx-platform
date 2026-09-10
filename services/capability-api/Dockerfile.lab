@@ -1,0 +1,15 @@
+FROM node:24.20.0-bookworm-slim@sha256:6642ef280aebc09c4541bee0b15c9f89f0f3f3c247ddee79ae1d37eddfdcbbaa
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace
+COPY . .
+RUN cd repos/sfx-embody && npm ci --omit=dev && \
+    cd /workspace/sidefx-database && npm ci --omit=dev && \
+    cd /workspace/repos/scenario-driven-architecture && npm ci --omit=dev && \
+    cd /workspace/repos/sidefx-cli && npm ci --omit=dev && \
+    cd /workspace/repos/sfx-platform && npm install --package-lock-only && npm ci && \
+    cd services/capability-api && npm ci --omit=dev && \
+    chown -R node:node /workspace
+ENV NODE_ENV=production PORT=8080 SIDEFX_PROJECT_DIR=/workspace/repos/sfx-embody SIDEFX_RUN_DIRECTORY=/home/sidefx-runs
+WORKDIR /workspace/repos/sfx-platform
+EXPOSE 8080
+CMD ["sh", "scripts/start-remote-container.sh"]

@@ -29,7 +29,7 @@ curl -X POST http://127.0.0.1:8787/commands -H 'content-type: application/json' 
 
 A successful command returns `{ result, durationMs }`. An estate refusal returns
 `{ error: { code, message, details } }` with the estate's own code intact —
-`CAPABILITY_PREPARATION_REQUIRED`, `CAPABILITY_PREPARATION_STALE`, `CAPABILITY_NOT_FOUND` —
+`PORT_IMPLEMENTATION_NOT_RESOLVED`, `NATIVE_TRANSITION_TRANSLATION_NOT_AVAILABLE`, `CAPABILITY_NOT_FOUND` —
 because a refusal is a real answer about that capability, not a transport failure. A domain
 rejection is carried through as a completed command whose kernel disposition is `rejected`.
 SDK failures retain `details`, including a kernel execution at `details.result.outcome` when
@@ -66,13 +66,16 @@ dispatch. It is released when dispatch settles, including errors; a disconnected
 not free capacity while its command is still running. The website response deadline defaults
 to 630000 ms. Keep it longer than the command deadline when changing these settings.
 
-This service remains unauthenticated and is not deployed. Loopback is the default listener;
-remote deployment needs an authorization boundary. Its SDK dependency currently uses the
-local sibling checkout (`file:../../../sidefx-cli`), so a standalone clone is not sufficient.
+The generic `server.mjs` entry point remains a loopback development server. The private Lab's
+`scripts/start-remote-lab.mjs` entry point supplies bearer authentication, published-input
+authorization, concurrency limits and a bounded rate. It is deployed to Azure; see
+[deployment and evidence](../../docs/live-finance-deployment.md). The runtime image packages
+the SDK sibling dependency (`file:../../../sidefx-cli`) and the database/SDA dependency closure.
 
 ## What it is not
 
 This is a transport. It performs no capability-specific dispatch, interprets no canonical input
 and owns no capability admission policy — the estate owns all of that. Its web command policy
-only limits exposed operations. It does not make a capability
-executable: preparation does, and a capability without one is reported as requiring it.
+only limits exposed operations. The current database provider reads selected authority,
+plans the native body and executes it directly. Preparation is an optional, separate proof
+and is not consumed by invocation. Missing authority or unsupported bindings remain holds.

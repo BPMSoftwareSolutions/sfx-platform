@@ -1,0 +1,144 @@
+{
+  "html": "\n<div class=\"ui-surface\" data-surface-profile=\"window\" style=\"width:560px;height:306px;\">\n  <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:306px;\" data-region-id=\"dialog\" data-region-path=\"dialog\" data-role=\"capability-input-dialog\" data-tenant-policy=\"single\">\n    <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:84px;\" data-region-id=\"dialog-header\" data-region-path=\"dialog/dialog-header\" data-role=\"dialog-title\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:16px;width:520px;height:18px;\" data-region-id=\"dialog-eyebrow\" data-region-path=\"dialog/dialog-header/dialog-eyebrow\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:18px;\" data-component-id=\"dialog-context\"><span data-component-type=\"label\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#context\" data-presentation-intent=\"section-label\" data-realized-via=\"type\" style=\"font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);\">GREET-BY-NAME</span></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:40px;width:520px;height:28px;\" data-region-id=\"dialog-heading\" data-region-path=\"dialog/dialog-header/dialog-heading\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:28px;\" data-component-id=\"dialog-title\"><h2 data-component-type=\"heading\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#title\" data-presentation-intent=\"card-title\" data-realized-via=\"type\" style=\"font-size:20px;line-height:1.35;font-weight:500;color:var(--inspect-ink);\">Enter Capability Input</h2></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:84px;width:560px;height:44px;\" data-region-id=\"dialog-description\" data-region-path=\"dialog/dialog-description\" data-role=\"dialog-description\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:0px;width:520px;height:44px;\" data-region-id=\"dialog-description-slot\" data-region-path=\"dialog/dialog-description/dialog-description-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:44px;\" data-component-id=\"dialog-description\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#description\" data-presentation-intent=\"body\" data-realized-via=\"type\" style=\"font-size:13px;line-height:1.6;overflow-wrap:anywhere;color:var(--inspect-ink);\">Enter a name. It is preserved exactly as you supply it.</p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:128px;width:560px;height:114px;\" data-region-id=\"dialog-fields\" data-region-path=\"dialog/dialog-fields\" data-role=\"dialog-field-group\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:8px;width:520px;height:98px;\" data-region-id=\"slot-field-payload-name\" data-region-path=\"dialog/dialog-fields/slot-field-payload-name\" data-role=\"dialog-field\" data-tenant-policy=\"single\">\n        <div class=\"ui-container\" style=\"left:0px;top:0px;width:520px;height:72px;\" data-region-id=\"control-field-payload-name\" data-region-path=\"dialog/dialog-fields/slot-field-payload-name/control-field-payload-name\" data-tenant-policy=\"single\">\n          <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:72px;\" data-component-id=\"field-payload-name\"><label data-component-type=\"input\" data-semantic-family=\"input\" data-semantic-identity=\"greet-by-name/payload/name\" data-presentation-intent=\"dialog-field\" data-realized-via=\"type\" data-bound-state=\"input.payload-name\" data-binding-direction=\"read-write\" style=\"align-self:stretch;\"><span>Name</span><input type=\"text\" value /></label></div>\n        </div>\n        <div class=\"ui-container\" style=\"left:0px;top:76px;width:520px;height:22px;\" data-region-id=\"feedback-field-payload-name\" data-region-path=\"dialog/dialog-fields/slot-field-payload-name/feedback-field-payload-name\" data-tenant-policy=\"single\">\n          <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:22px;\" data-component-id=\"field-payload-name-feedback\"><aside data-component-type=\"feedback\" data-semantic-family=\"feedback\" data-semantic-identity=\"greet-by-name/payload/name#validation\" data-presentation-intent=\"field-feedback\" data-realized-via=\"type\" data-bound-state=\"input.payload-name\" data-binding-direction=\"read\">Name is required.</aside></div>\n        </div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:242px;width:560px;height:64px;\" data-region-id=\"dialog-footer\" data-region-path=\"dialog/dialog-footer\" data-role=\"dialog-actions\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:12px;width:270px;height:40px;\" data-region-id=\"footer-gap\" data-region-path=\"dialog/dialog-footer/footer-gap\" data-role=\"spacer\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:270px;height:40px;\" data-component-id=\"dialog-status\"><aside data-component-type=\"feedback\" data-semantic-family=\"feedback\" data-semantic-identity=\"greet-by-name#status\" data-presentation-intent=\"live-status\" data-realized-via=\"type\" style=\"font-size:12px;color:var(--status);\"></aside></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:300px;top:12px;width:110px;height:40px;\" data-region-id=\"slot-cancel\" data-region-path=\"dialog/dialog-footer/slot-cancel\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:110px;height:40px;\" data-component-id=\"dialog-cancel\"><button type=\"button\" data-semantic-action=\"cancel-personal-greeting\" data-action-disposition=\"ADMISSIBLEADMISSIBLE\" data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"greet-by-name#cancel\" data-presentation-intent=\"secondary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Cancel</button></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:420px;top:12px;width:120px;height:40px;\" data-region-id=\"slot-submit\" data-region-path=\"dialog/dialog-footer/slot-submit\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:120px;height:40px;\" data-component-id=\"dialog-submit\"><button type=\"button\" data-semantic-action=\"submit-personal-greeting\" data-action-disposition=\"NOT_ADMISSIBLENOT_ADMISSIBLE\" title=\"Name is required.\" disabled data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"greet-by-name#submit\" data-presentation-intent=\"primary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Submit</button></div>\n      </div>\n    </div>\n  </div>\n</div>\n",
+  "interaction": {
+    "planType": "ui-interaction-plan.v1",
+    "surfaceId": "dialog-input-personal-greeting",
+    "componentAttribute": "data-component-id",
+    "reflect": {
+      "action": {
+        "controlSelector": "button",
+        "disabledProperty": "disabled",
+        "reasonAttribute": "title",
+        "dispositionAttribute": "data-action-disposition"
+      },
+      "text": {
+        "selector": "[data-component-type]",
+        "property": "textContent"
+      }
+    },
+    "state": [
+      {
+        "stateId": "input.payload-name",
+        "valueKind": "string",
+        "mutability": "mutable",
+        "initialValue": ""
+      }
+    ],
+    "validation": [
+      {
+        "state": "input.payload-name",
+        "checks": [
+          {
+            "op": "nonEmpty",
+            "operand": null,
+            "valuePath": null,
+            "message": "Name is required."
+          },
+          {
+            "op": "minLength",
+            "operand": 1,
+            "valuePath": null,
+            "message": "minLength is None, which the rule bounds at 1"
+          },
+          {
+            "op": "maxLength",
+            "operand": 100,
+            "valuePath": null,
+            "message": "maxLength is None, which the rule bounds at 100"
+          }
+        ]
+      }
+    ],
+    "bindings": [
+      {
+        "component": "field-payload-name",
+        "state": "input.payload-name",
+        "aspect": "value",
+        "direction": "read-write",
+        "writable": true,
+        "coerce": null,
+        "initialPhysicalValue": "",
+        "accessor": {
+          "selector": "input",
+          "readFrom": "value",
+          "writeTo": "value",
+          "events": [
+            "input"
+          ]
+        },
+        "mutates": {
+          "selector": "input",
+          "property": "value"
+        }
+      },
+      {
+        "component": "field-payload-name-feedback",
+        "state": "input.payload-name",
+        "aspect": "validation",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null,
+        "fallbackText": "",
+        "mutates": {
+          "selector": "[data-component-type]",
+          "property": "textContent"
+        }
+      }
+    ],
+    "actions": [
+      {
+        "actionId": "submit-personal-greeting",
+        "requiresAdmissible": [
+          "input.payload-name"
+        ],
+        "availability": "available",
+        "scenarioEvent": "workbench.capability.submitted",
+        "components": [
+          "dialog-submit"
+        ]
+      },
+      {
+        "actionId": "cancel-personal-greeting",
+        "requiresAdmissible": [],
+        "availability": "available",
+        "scenarioEvent": "workbench.capability.cancelled",
+        "components": [
+          "dialog-cancel"
+        ]
+      }
+    ]
+  },
+  "geometry": {
+    "width": 560.0,
+    "height": 306.0
+  },
+  "fields": [
+    {
+      "pointer": "/payload/name",
+      "stateId": "input.payload-name",
+      "componentId": "field-payload-name",
+      "control": "text",
+      "required": true,
+      "constraints": [
+        "maxLength",
+        "minLength",
+        "required"
+      ],
+      "visibleWhen": null
+    }
+  ],
+  "exampleSelector": null,
+  "title": "Enter Capability Input",
+  "description": "Enter a name. It is preserved exactly as you supply it.",
+  "anchor": {
+    "kind": "scene-node",
+    "nodeIdentity": "cell:scenario:greet-by-name:input",
+    "fallback": "viewport-transition"
+  },
+  "motion": {
+    "open": "expand-from-anchor",
+    "close": "collapse-to-anchor",
+    "reducedMotionFallback": "none"
+  }
+}

@@ -1,0 +1,1463 @@
+{
+  "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304",
+  "compiler": "sidefx-lab-profile-compiler.v1",
+  "pilots": [
+    {
+      "profile": {
+        "subject": "say-hello-world",
+        "namespace": "sidefx:capabilities",
+        "inputContract": "hello-world-request.v1",
+        "inputSchemaDigest": "sha256:0cb0cff2850d0636dd684850c859b4216e4b65e3ebb1f646fcb7c34771a08eb0",
+        "interaction": "action",
+        "inputs": [
+          {
+            "pointer": "/contractId",
+            "ownership": "fixed",
+            "value": "hello-world-request.v1"
+          },
+          {
+            "pointer": "/payload",
+            "ownership": "fixed",
+            "value": {}
+          }
+        ],
+        "outcome": {
+          "contract": "hello-world-greeting.v1",
+          "view": "text",
+          "pointer": "/payload/message",
+          "schemaDigest": "sha256:032a564e36eb1123f46c112386f96eded1a50c074537eb5e0f40c8beb7ba83c8"
+        },
+        "label": "Hello World",
+        "description": "Request the canonical greeting with one explicit action."
+      },
+      "resources": [
+        {
+          "sourcePath": "capabilities/say-hello-world/contracts/input.schema.json",
+          "digest": "sha256:0cb0cff2850d0636dd684850c859b4216e4b65e3ebb1f646fcb7c34771a08eb0",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/hello-world-request.v1.schema.json\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"contractId\",\n    \"payload\"\n  ],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"hello-world-request.v1\"\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false\n    }\n  }\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/say-hello-world/contracts/outcome.schema.json",
+          "digest": "sha256:032a564e36eb1123f46c112386f96eded1a50c074537eb5e0f40c8beb7ba83c8",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/hello-world-greeting.v1.schema.json\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"contractId\",\n    \"payload\"\n  ],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"hello-world-greeting.v1\"\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\n        \"message\"\n      ],\n      \"properties\": {\n        \"message\": {\n          \"const\": \"Hello, World!\"\n        }\n      }\n    }\n  }\n}\n"
+        }
+      ],
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.agentic-harness.local/contracts/hello-world-request.v1.schema.json",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "payload"
+        ],
+        "properties": {
+          "contractId": {
+            "const": "hello-world-request.v1"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false
+          }
+        }
+      },
+      "outcomeSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.agentic-harness.local/contracts/hello-world-greeting.v1.schema.json",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "payload"
+        ],
+        "properties": {
+          "contractId": {
+            "const": "hello-world-greeting.v1"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "const": "Hello, World!"
+              }
+            }
+          }
+        }
+      },
+      "examples": [],
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "say-hello-world",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:e50a0e7e3a982c3bfc25e68bf79a0045529181641936813f41ce0ebe1b953645"
+        }
+      }
+    },
+    {
+      "profile": {
+        "subject": "greet-by-name",
+        "namespace": "sidefx:capabilities",
+        "inputContract": "personal-greeting-request.v1",
+        "inputSchemaDigest": "sha256:b800857e3c2d721221a37b98ef2fb2daf2e761df365e89a92359b5a6eabee1fb",
+        "interaction": "form",
+        "inputs": [
+          {
+            "pointer": "/contractId",
+            "ownership": "fixed",
+            "value": "personal-greeting-request.v1"
+          },
+          {
+            "pointer": "/payload",
+            "ownership": "derived",
+            "construction": "object-from-declared-children"
+          },
+          {
+            "pointer": "/payload/name",
+            "ownership": "editable",
+            "control": "text",
+            "label": "Name",
+            "required": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "trim": false,
+            "unicodeNormalization": "none",
+            "emptyHandling": "refuse",
+            "missingHandling": "refuse",
+            "nullHandling": "refuse"
+          }
+        ],
+        "outcome": {
+          "contract": "personal-greeting.v1",
+          "view": "text",
+          "pointer": "/payload/message",
+          "schemaDigest": "sha256:18489ffe8c38d0181db073af4e471ac1329a76a4441fb53037208800a5439424"
+        },
+        "label": "Personal greeting",
+        "description": "Enter a name to receive a greeting. Your name is preserved exactly as supplied."
+      },
+      "resources": [
+        {
+          "sourcePath": "capabilities/greet-by-name/contracts/input.schema.json",
+          "digest": "sha256:b800857e3c2d721221a37b98ef2fb2daf2e761df365e89a92359b5a6eabee1fb",
+          "text": "{\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/personal-greeting-request.v1.schema.json\",\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"personal-greeting-request.v1\"\n    },\n    \"payload\": {\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"name\": {\n          \"maxLength\": 100,\n          \"minLength\": 1,\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"name\"\n      ],\n      \"type\": \"object\"\n    }\n  },\n  \"required\": [\n    \"contractId\",\n    \"payload\"\n  ],\n  \"type\": \"object\"\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/greet-by-name/contracts/outcome.schema.json",
+          "digest": "sha256:18489ffe8c38d0181db073af4e471ac1329a76a4441fb53037208800a5439424",
+          "text": "{\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/personal-greeting.v1.schema.json\",\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"personal-greeting.v1\"\n    },\n    \"payload\": {\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"message\": {\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"message\"\n      ],\n      \"type\": \"object\"\n    }\n  },\n  \"required\": [\n    \"contractId\",\n    \"payload\"\n  ],\n  \"type\": \"object\"\n}\n"
+        }
+      ],
+      "inputSchema": {
+        "$id": "https://schemas.agentic-harness.local/contracts/personal-greeting-request.v1.schema.json",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "const": "personal-greeting-request.v1"
+          },
+          "payload": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "contractId",
+          "payload"
+        ],
+        "type": "object"
+      },
+      "outcomeSchema": {
+        "$id": "https://schemas.agentic-harness.local/contracts/personal-greeting.v1.schema.json",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "const": "personal-greeting.v1"
+          },
+          "payload": {
+            "additionalProperties": false,
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "message"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "contractId",
+          "payload"
+        ],
+        "type": "object"
+      },
+      "examples": [],
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "greet-by-name",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:71f77a3826aefd69e59a0e683376256e30eb30898825ffe5f784383e4398bc30"
+        }
+      }
+    },
+    {
+      "profile": {
+        "subject": "resolve-sidefx-eligible-providers",
+        "namespace": "sidefx:capabilities",
+        "inputContract": "sidefx-provider-resolution-request.v1",
+        "inputSchemaDigest": "sha256:40f6fb9a386c4db5c230acb03293e2d7c129898f689d991eb965b06a572997a2",
+        "interaction": "retained-example-selection",
+        "label": "Provider fixture demonstration",
+        "inputs": [
+          {
+            "pointer": "/contractId",
+            "ownership": "fixed",
+            "value": "sidefx-provider-resolution-request.v1"
+          },
+          {
+            "pointer": "/evaluationBoundary",
+            "ownership": "fixed",
+            "value": "NON_PRODUCTION_WAVE3_SPECIALIST_ASK"
+          },
+          {
+            "pointer": "/snapshotDigest",
+            "ownership": "system-bound",
+            "source": "selected-retained-fixture"
+          },
+          {
+            "pointer": "/requestedPlatformCapabilityId",
+            "ownership": "system-bound",
+            "source": "selected-retained-fixture"
+          },
+          {
+            "pointer": "/requestedTarget",
+            "ownership": "system-bound",
+            "source": "selected-retained-fixture"
+          },
+          {
+            "pointer": "/conformantDispositions",
+            "ownership": "system-bound",
+            "source": "selected-retained-fixture"
+          },
+          {
+            "pointer": "/providerBindings",
+            "ownership": "system-bound",
+            "includesDescendants": true,
+            "source": "selected-retained-fixture"
+          }
+        ],
+        "exampleSource": {
+          "sourcePath": "capabilities/resolve-sidefx-eligible-providers/fixtures.authority.json",
+          "digest": "sha256:9bd371348cf4cf93a40d503849d0f913d7b750403e24d81dbfc84ae17a413c71",
+          "allowedFixtureIds": [
+            "hold-admitted-providers-that-declare-no-target",
+            "admit-provider-once-its-target-is-declared",
+            "refuse-target-the-binding-does-not-declare",
+            "refuse-unadmitted-and-unconformed-providers"
+          ]
+        },
+        "outcome": {
+          "contract": "sidefx-semantic-provider-resolution.v1",
+          "view": "structured-result",
+          "summaryPointers": [
+            "/disposition",
+            "/consideredCount",
+            "/eligibleCount"
+          ],
+          "collectionPointers": [
+            "/providers",
+            "/findings"
+          ],
+          "tracePointers": [
+            "/snapshotDigest",
+            "/resolutionDigest"
+          ],
+          "domainLabels": {
+            "PROVIDERS_RESOLVED": "Eligible providers found in this fixture",
+            "NOT_OBSERVABLE": "Eligibility is not established for this fixture"
+          },
+          "managedAdmission": "NOT_REQUESTED",
+          "externalProviderInvoked": false,
+          "schemaDigest": "sha256:7e62ab89e4058fc1c550d0e77401db57b463de2294b391d8983c0825993525a9",
+          "collectionFields": {
+            "/providers": [
+              "providerAuthorityId",
+              "eligibilityDisposition",
+              "reasonCode"
+            ],
+            "/findings": [
+              "code",
+              "message",
+              "severity"
+            ]
+          }
+        },
+        "description": "Explore how target declarations and assurance evidence affect provider eligibility.",
+        "exampleLabels": {
+          "hold-admitted-providers-that-declare-no-target": "No target declared — eligibility held",
+          "admit-provider-once-its-target-is-declared": "Matching target declared — eligible provider",
+          "refuse-target-the-binding-does-not-declare": "Different target requested — eligibility held",
+          "refuse-unadmitted-and-unconformed-providers": "Admission or conformance missing — eligibility held"
+        }
+      },
+      "resources": [
+        {
+          "sourcePath": "authority/sidefx-semantic-brain/capabilities/resolve-sidefx-eligible-providers/contracts/sidefx-provider-resolution-request.schema.json",
+          "digest": "sha256:40f6fb9a386c4db5c230acb03293e2d7c129898f689d991eb965b06a572997a2",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/sidefx/sidefx-provider-resolution-request.schema.json\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"contractId\", \"evaluationBoundary\", \"snapshotDigest\", \"requestedPlatformCapabilityId\", \"requestedTarget\", \"conformantDispositions\", \"providerBindings\"],\n  \"properties\": {\n    \"contractId\": {\"const\": \"sidefx-provider-resolution-request.v1\"},\n    \"evaluationBoundary\": {\"const\": \"NON_PRODUCTION_WAVE3_SPECIALIST_ASK\"},\n    \"snapshotDigest\": {\"$ref\": \"#/$defs/digest\"},\n    \"requestedPlatformCapabilityId\": {\"type\": \"string\", \"minLength\": 1},\n    \"requestedTarget\": {\"type\": \"string\", \"minLength\": 1},\n    \"conformantDispositions\": {\"type\": \"array\", \"minItems\": 1, \"items\": {\"type\": \"string\", \"minLength\": 1}},\n    \"providerBindings\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\"providerBindingRef\", \"providerBindingDigest\", \"providerAuthorityId\", \"providerAuthorityRef\", \"providerAuthorityDigest\", \"platformCapabilityId\", \"lifecycle\", \"conformanceDisposition\", \"conformanceReceiptRef\", \"conformanceReceiptDigest\", \"authorityBindings\", \"declaredTargets\"],\n        \"properties\": {\n          \"providerBindingRef\": {\"type\": \"string\", \"minLength\": 1},\n          \"providerBindingDigest\": {\"$ref\": \"#/$defs/digest\"},\n          \"providerAuthorityId\": {\"type\": \"string\", \"minLength\": 1},\n          \"providerAuthorityRef\": {\"type\": \"string\", \"minLength\": 1},\n          \"providerAuthorityDigest\": {\"type\": \"string\", \"minLength\": 1},\n          \"platformCapabilityId\": {\"type\": \"string\", \"minLength\": 1},\n          \"lifecycle\": {\"type\": \"string\", \"minLength\": 1},\n          \"conformanceDisposition\": {\"type\": \"string\"},\n          \"conformanceReceiptRef\": {\"type\": \"string\"},\n          \"conformanceReceiptDigest\": {\"type\": \"string\"},\n          \"authorityBindings\": {\n            \"type\": \"array\",\n            \"minItems\": 1,\n            \"items\": {\n              \"type\": \"object\",\n              \"additionalProperties\": false,\n              \"required\": [\"bindingId\", \"sourceRef\", \"sourceDigest\"],\n              \"properties\": {\n                \"bindingId\": {\"type\": \"string\", \"minLength\": 1},\n                \"sourceRef\": {\"type\": \"string\", \"minLength\": 1},\n                \"sourceDigest\": {\"$ref\": \"#/$defs/digest\"}\n              }\n            }\n          },\n          \"declaredTargets\": {\"type\": \"array\", \"items\": {\"type\": \"string\", \"minLength\": 1}}\n        }\n      }\n    }\n  },\n  \"$defs\": {\"digest\": {\"type\": \"string\", \"pattern\": \"^sha256:[a-f0-9]{64}$\"}}\n}\n"
+        },
+        {
+          "sourcePath": "authority/sidefx-semantic-brain/contracts/sidefx-semantic-provider-resolution.schema.json",
+          "digest": "sha256:7e62ab89e4058fc1c550d0e77401db57b463de2294b391d8983c0825993525a9",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/sidefx/sidefx-semantic-provider-resolution.schema.json\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"resolutionType\", \"disposition\", \"snapshotDigest\", \"requestedPlatformCapabilityId\", \"requestedTarget\", \"providers\", \"consideredCount\", \"eligibleCount\", \"findings\", \"resolutionDigest\"],\n  \"properties\": {\n    \"resolutionType\": {\"const\": \"sidefx-semantic-provider-resolution.v1\"},\n    \"disposition\": {\"enum\": [\"PROVIDERS_RESOLVED\", \"NOT_OBSERVABLE\"]},\n    \"snapshotDigest\": {\"$ref\": \"sidefx-semantic-common.schema.json#/$defs/digest\"},\n    \"requestedPlatformCapabilityId\": {\"type\": \"string\", \"minLength\": 1},\n    \"requestedTarget\": {\"type\": \"string\", \"minLength\": 1},\n    \"providers\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\"providerBindingRef\", \"providerBindingDigest\", \"providerAuthorityId\", \"providerAuthorityRef\", \"providerAuthorityDigest\", \"platformCapabilityId\", \"lifecycle\", \"conformanceDisposition\", \"conformanceReceiptRef\", \"conformanceReceiptDigest\", \"authorityBindings\", \"eligibilityDisposition\", \"reasonCode\"],\n        \"properties\": {\n          \"providerBindingRef\": {\"type\": \"string\", \"minLength\": 1},\n          \"providerBindingDigest\": {\"$ref\": \"sidefx-semantic-common.schema.json#/$defs/digest\"},\n          \"providerAuthorityId\": {\"type\": \"string\", \"minLength\": 1},\n          \"providerAuthorityRef\": {\"type\": \"string\", \"minLength\": 1},\n          \"providerAuthorityDigest\": {\"type\": \"string\", \"minLength\": 1},\n          \"platformCapabilityId\": {\"type\": \"string\", \"minLength\": 1},\n          \"lifecycle\": {\"type\": \"string\", \"minLength\": 1},\n          \"conformanceDisposition\": {\"type\": \"string\"},\n          \"conformanceReceiptRef\": {\"type\": \"string\"},\n          \"conformanceReceiptDigest\": {\"type\": \"string\"},\n          \"authorityBindings\": {\n            \"type\": \"array\",\n            \"minItems\": 1,\n            \"items\": {\n              \"type\": \"object\",\n              \"additionalProperties\": false,\n              \"required\": [\"bindingId\", \"sourceRef\", \"sourceDigest\"],\n              \"properties\": {\n                \"bindingId\": {\"type\": \"string\", \"minLength\": 1},\n                \"sourceRef\": {\"type\": \"string\", \"minLength\": 1},\n                \"sourceDigest\": {\"$ref\": \"sidefx-semantic-common.schema.json#/$defs/digest\"}\n              }\n            }\n          },\n          \"eligibilityDisposition\": {\"enum\": [\"ELIGIBLE\", \"INELIGIBLE\", \"NOT_OBSERVABLE\", \"NOT_APPLICABLE\"]},\n          \"reasonCode\": {\"type\": \"string\", \"minLength\": 1}\n        }\n      }\n    },\n    \"consideredCount\": {\"type\": \"integer\", \"minimum\": 0},\n    \"eligibleCount\": {\"type\": \"integer\", \"minimum\": 0},\n    \"findings\": {\"type\": \"array\", \"items\": {\"$ref\": \"sidefx-semantic-common.schema.json#/$defs/finding\"}},\n    \"resolutionDigest\": {\"$ref\": \"sidefx-semantic-common.schema.json#/$defs/digest\"}\n  }\n}\n"
+        },
+        {
+          "sourcePath": "authority/sidefx-semantic-brain/contracts/sidefx-semantic-common.schema.json",
+          "digest": "sha256:529e7fce98565584097ca9c6dbf6f395c2561123a48da06ec16a0ac9905679c6",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/sidefx/sidefx-semantic-common.schema.json\",\n  \"$defs\": {\n    \"digest\": {\n      \"type\": \"string\",\n      \"pattern\": \"^sha256:[a-f0-9]{64}$\"\n    },\n    \"nonEmptyString\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"sourceClass\": {\n      \"enum\": [\n        \"CANONICAL_AUTHORITY\",\n        \"ADMITTED_EVIDENCE\",\n        \"PROJECTION_EVIDENCE\",\n        \"MODEL_TESTIMONY\",\n        \"DUPLICATE_OR_SUPERSEDED\",\n        \"UNSUPPORTED\",\n        \"EXCLUDED\"\n      ]\n    },\n    \"objectKind\": {\n      \"enum\": [\n        \"CAPABILITY\",\n        \"PROMISED_EXPERIENCE\",\n        \"OBSERVABLE_CONDITION\",\n        \"SCENARIO\",\n        \"INPUT\",\n        \"EVENT\",\n        \"OUTCOME\",\n        \"INPUT_CONTRACT\",\n        \"OUTCOME_CONTRACT\",\n        \"SCHEMA\",\n        \"TRANSITION\",\n        \"EXECUTION_AUTHORITY\",\n        \"EXECUTION_OPERATION\",\n        \"INTERFACE\",\n        \"PORT\",\n        \"PROJECTION_BINDING\",\n        \"PLATFORM_CAPABILITY\",\n        \"FIXTURE\",\n        \"PROJECTED_TEST\",\n        \"PROOF_OBLIGATION\",\n        \"PROJECTION_TARGET\",\n        \"CONFORMANCE_EVIDENCE\",\n        \"ARTIFACT\",\n        \"POLICY\"\n      ]\n    },\n    \"relationshipKind\": {\n      \"enum\": [\n        \"CAPABILITY_PROMISES_EXPERIENCE\",\n        \"EXPERIENCE_REQUIRES_CONDITION\",\n        \"CAPABILITY_HAS_SCENARIO\",\n        \"SCENARIO_ACCEPTS_INPUT\",\n        \"SCENARIO_HANDLES_EVENT\",\n        \"SCENARIO_PRODUCES_OUTCOME\",\n        \"EVENT_GOVERNED_BY_EXECUTION_AUTHORITY\",\n        \"SCENARIO_TRANSITIONS_TO_SCENARIO\",\n        \"EXECUTION_AUTHORITY_INVOKES_PORT\",\n        \"EXECUTION_AUTHORITY_INVOKES_SCENARIO\",\n        \"INTERFACE_EXPOSES_SCENARIO\",\n        \"PORT_BOUND_TO_PLATFORM_CAPABILITY\",\n        \"PROJECTION_BOUND_TO_PLATFORM_CAPABILITY\",\n        \"CONTRACT_CATALOG_DECLARES_CONTRACT\",\n        \"CONTRACT_VALIDATED_BY_SCHEMA\",\n        \"FIXTURE_EXERCISES_SCENARIO\",\n        \"FIXTURE_EXECUTED_AS_PROJECTED_TEST\",\n        \"EVIDENCE_PROVES_SUBJECT\",\n        \"PROJECTION_EMBODIES_CAPABILITY_ON_TARGET\",\n        \"ARTIFACT_DERIVED_FROM_AUTHORITY\"\n      ]\n    },\n    \"sourceLocator\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\n        \"sourceRef\",\n        \"sourcePointer\",\n        \"sourceDigest\"\n      ],\n      \"properties\": {\n        \"sourceRef\": {\n          \"$ref\": \"#/$defs/nonEmptyString\"\n        },\n        \"sourcePointer\": {\n          \"type\": \"string\"\n        },\n        \"sourceDigest\": {\n          \"$ref\": \"#/$defs/digest\"\n        },\n        \"start\": {\n          \"$ref\": \"#/$defs/sourcePosition\"\n        },\n        \"end\": {\n          \"$ref\": \"#/$defs/sourcePosition\"\n        }\n      }\n    },\n    \"sourcePosition\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\"line\", \"column\", \"byteOffset\"],\n      \"properties\": {\n        \"line\": {\"type\": \"integer\", \"minimum\": 1},\n        \"column\": {\"type\": \"integer\", \"minimum\": 1},\n        \"byteOffset\": {\"type\": \"integer\", \"minimum\": 0}\n      }\n    },\n    \"finding\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\"code\", \"severity\", \"message\", \"sourceRef\", \"sourcePointer\"],\n      \"properties\": {\n        \"code\": {\"$ref\": \"#/$defs/nonEmptyString\"},\n        \"severity\": {\"enum\": [\"INFO\", \"WARNING\", \"ERROR\", \"FATAL\"]},\n        \"message\": {\"$ref\": \"#/$defs/nonEmptyString\"},\n        \"ruleId\": {\"type\": \"string\"},\n        \"sourceRef\": {\"$ref\": \"#/$defs/nonEmptyString\"},\n        \"sourcePointer\": {\"type\": \"string\"},\n        \"start\": {\"$ref\": \"#/$defs/sourcePosition\"},\n        \"end\": {\"$ref\": \"#/$defs/sourcePosition\"},\n        \"relatedSourcePointers\": {\n          \"type\": \"array\",\n          \"items\": {\"type\": \"string\"}\n        }\n      }\n    }\n  }\n}\n"
+        }
+      ],
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.agentic-harness.local/sidefx/sidefx-provider-resolution-request.schema.json",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "evaluationBoundary",
+          "snapshotDigest",
+          "requestedPlatformCapabilityId",
+          "requestedTarget",
+          "conformantDispositions",
+          "providerBindings"
+        ],
+        "properties": {
+          "contractId": {
+            "const": "sidefx-provider-resolution-request.v1"
+          },
+          "evaluationBoundary": {
+            "const": "NON_PRODUCTION_WAVE3_SPECIALIST_ASK"
+          },
+          "snapshotDigest": {
+            "$ref": "#/$defs/digest"
+          },
+          "requestedPlatformCapabilityId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requestedTarget": {
+            "type": "string",
+            "minLength": 1
+          },
+          "conformantDispositions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "providerBindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "providerBindingRef",
+                "providerBindingDigest",
+                "providerAuthorityId",
+                "providerAuthorityRef",
+                "providerAuthorityDigest",
+                "platformCapabilityId",
+                "lifecycle",
+                "conformanceDisposition",
+                "conformanceReceiptRef",
+                "conformanceReceiptDigest",
+                "authorityBindings",
+                "declaredTargets"
+              ],
+              "properties": {
+                "providerBindingRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "providerBindingDigest": {
+                  "$ref": "#/$defs/digest"
+                },
+                "providerAuthorityId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "providerAuthorityRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "providerAuthorityDigest": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "platformCapabilityId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "lifecycle": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "conformanceDisposition": {
+                  "type": "string"
+                },
+                "conformanceReceiptRef": {
+                  "type": "string"
+                },
+                "conformanceReceiptDigest": {
+                  "type": "string"
+                },
+                "authorityBindings": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "bindingId",
+                      "sourceRef",
+                      "sourceDigest"
+                    ],
+                    "properties": {
+                      "bindingId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "sourceRef": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "sourceDigest": {
+                        "$ref": "#/$defs/digest"
+                      }
+                    }
+                  }
+                },
+                "declaredTargets": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "$defs": {
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      },
+      "outcomeSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.agentic-harness.local/sidefx/sidefx-semantic-provider-resolution.schema.json",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "resolutionType",
+          "disposition",
+          "snapshotDigest",
+          "requestedPlatformCapabilityId",
+          "requestedTarget",
+          "providers",
+          "consideredCount",
+          "eligibleCount",
+          "findings",
+          "resolutionDigest"
+        ],
+        "properties": {
+          "resolutionType": {
+            "const": "sidefx-semantic-provider-resolution.v1"
+          },
+          "disposition": {
+            "enum": [
+              "PROVIDERS_RESOLVED",
+              "NOT_OBSERVABLE"
+            ]
+          },
+          "snapshotDigest": {
+            "$ref": "sidefx-semantic-common.schema.json#/$defs/digest"
+          },
+          "requestedPlatformCapabilityId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requestedTarget": {
+            "type": "string",
+            "minLength": 1
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "providerBindingRef",
+                "providerBindingDigest",
+                "providerAuthorityId",
+                "providerAuthorityRef",
+                "providerAuthorityDigest",
+                "platformCapabilityId",
+                "lifecycle",
+                "conformanceDisposition",
+                "conformanceReceiptRef",
+                "conformanceReceiptDigest",
+                "authorityBindings",
+                "eligibilityDisposition",
+                "reasonCode"
+              ],
+              "properties": {
+                "providerBindingRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "providerBindingDigest": {
+                  "$ref": "sidefx-semantic-common.schema.json#/$defs/digest"
+                },
+                "providerAuthorityId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "providerAuthorityRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "providerAuthorityDigest": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "platformCapabilityId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "lifecycle": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "conformanceDisposition": {
+                  "type": "string"
+                },
+                "conformanceReceiptRef": {
+                  "type": "string"
+                },
+                "conformanceReceiptDigest": {
+                  "type": "string"
+                },
+                "authorityBindings": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "bindingId",
+                      "sourceRef",
+                      "sourceDigest"
+                    ],
+                    "properties": {
+                      "bindingId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "sourceRef": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "sourceDigest": {
+                        "$ref": "sidefx-semantic-common.schema.json#/$defs/digest"
+                      }
+                    }
+                  }
+                },
+                "eligibilityDisposition": {
+                  "enum": [
+                    "ELIGIBLE",
+                    "INELIGIBLE",
+                    "NOT_OBSERVABLE",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "consideredCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "eligibleCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "$ref": "sidefx-semantic-common.schema.json#/$defs/finding"
+            }
+          },
+          "resolutionDigest": {
+            "$ref": "sidefx-semantic-common.schema.json#/$defs/digest"
+          }
+        }
+      },
+      "examples": [
+        {
+          "id": "hold-admitted-providers-that-declare-no-target",
+          "label": "No target declared — eligibility held",
+          "input": {
+            "contractId": "sidefx-provider-resolution-request.v1",
+            "evaluationBoundary": "NON_PRODUCTION_WAVE3_SPECIALIST_ASK",
+            "snapshotDigest": "sha256:b1d87d6f3b5969df31c5f2683e606ef8bca64df463abcf2b74f050039d373ff4",
+            "requestedPlatformCapabilityId": "sda-json-authority-ingestion-port.v1",
+            "requestedTarget": "node",
+            "conformantDispositions": [
+              "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+              "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT"
+            ],
+            "providerBindings": [
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-json-authority-ingestion-profile.v1.json",
+                    "sourceDigest": "sha256:70c9328b32201a6ac86ec14422892057af130f31550757e9d1a465c11efed223"
+                  },
+                  {
+                    "bindingId": "membership-policy",
+                    "sourceRef": "../policies/sidefx-semantic-corpus-membership-policy.v1.json",
+                    "sourceDigest": "sha256:0b3ff298fd68707b37c6827b4d527bafc05528fa9704a043eadb85ab76316b33"
+                  },
+                  {
+                    "bindingId": "canonicalization-policy",
+                    "sourceRef": "../policies/sidefx-semantic-canonicalization-policy.v1.json",
+                    "sourceDigest": "sha256:3372aa03fd1f644d626045d469ed228904c97e2a566dd94904942ec7084870c6"
+                  },
+                  {
+                    "bindingId": "request-contract",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/contracts/sidefx-json-authority-ingestion-request.schema.json",
+                    "sourceDigest": "sha256:bfaeb6b53f9cae6ff74c700e2ecce2b6de61433bb3e53a6e495c155af2ade947"
+                  },
+                  {
+                    "bindingId": "receipt-contract",
+                    "sourceRef": "../contracts/sidefx-json-authority-ingestion-receipt.schema.json",
+                    "sourceDigest": "sha256:83a28ed29c7735e786493c0e40301b95ecc0171bbc4e31d6d716d4a1a1d95950"
+                  },
+                  {
+                    "bindingId": "fixture-manifest",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.json",
+                    "sourceDigest": "sha256:4d604f6cc7cdbed670a8af3215557a8335e80f5af744e500b5243037a3a3bf54"
+                  },
+                  {
+                    "bindingId": "fixture-manifest-schema",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.schema.json",
+                    "sourceDigest": "sha256:5ab5cde17736cc08f07b8885aee030f6fcc608a981a4a7a212276c9ac5ab5798"
+                  },
+                  {
+                    "bindingId": "schema-catalog",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/declared-schema-catalog.v1.json",
+                    "sourceDigest": "sha256:07f778ea7a72ef7083583bb00ee34a405f72538dd887756ae2aa36f761342b2b"
+                  },
+                  {
+                    "bindingId": "reference-scope",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/content-reference-scope.v1.json",
+                    "sourceDigest": "sha256:3612cf2cfafa0c1a58b4d941d962350009404720d82211ab8cc34fed74675ec4"
+                  },
+                  {
+                    "bindingId": "version-policy",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/version-policy.v1.json",
+                    "sourceDigest": "sha256:5b49ce679fe59c5f98b6a12ffeff7c06235cba053497fa670e8cc8bcf15340f0"
+                  }
+                ],
+                "conformanceDisposition": "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+                "conformanceReceiptDigest": "sha256:95fe7e8ddc70cad84a307a6670b455a65e35a2f3d5b3d365d685e6de77bb5502",
+                "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-json-authority-ingestion-conformance/conformance/json-authority-ingestion-provider-conformance.v1.json",
+                "declaredTargets": [],
+                "lifecycle": "ADMITTED",
+                "platformCapabilityId": "sda-json-authority-ingestion-port.v1",
+                "providerAuthorityDigest": "sha256:f39fb91732ee448ac56db23b8728add4b1477df2cf27a81740b6058e4c231546",
+                "providerAuthorityId": "profile-governed-json-authority-ingestor.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-json-authority-ingestion/profile-governed-json-authority-ingestor.authority.json",
+                "providerBindingDigest": "sha256:4cadcff2bf76f5e7d0cb1b7fec511bf6317a37c5a161f9a33e3c197f0c18af22",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/json-authority-ingestion-provider.binding.json"
+              },
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-proof-binding-profile.v1.json",
+                    "sourceDigest": "sha256:d0821f66297b53127e5312a4c6de59fb4b31a3e26d641847d6dc6de00e41dd24"
+                  },
+                  {
+                    "bindingId": "profile-schema",
+                    "sourceRef": "../profiles/sidefx-proof-binding-profile.schema.json",
+                    "sourceDigest": "sha256:837f526277ddbff62ad638353f245674650fbc70fcdfc9044a23717138defac3"
+                  },
+                  {
+                    "bindingId": "input-contract",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/contracts/sidefx-proof-binding-evaluation-input.schema.json",
+                    "sourceDigest": "sha256:ea2e23348d86bf82375f6e716f2e344b902c29b25757b46ec23d43217581a05f"
+                  },
+                  {
+                    "bindingId": "record-contract",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/contracts/sidefx-proof-binding-evaluation-record.schema.json",
+                    "sourceDigest": "sha256:d3506d49a4139ca3f2637b7fbd4e9891c0a77cb4e7a2f6e1cc70847ba045ec7d"
+                  },
+                  {
+                    "bindingId": "conformance-contract",
+                    "sourceRef": "../contracts/sidefx-proof-binding-conformance.schema.json",
+                    "sourceDigest": "sha256:7daf705aa66e1dcbaad638c9c6d1ecc9a1e5466475de71075670d0192f918613"
+                  },
+                  {
+                    "bindingId": "common-contract",
+                    "sourceRef": "../contracts/sidefx-semantic-common.schema.json",
+                    "sourceDigest": "sha256:529e7fce98565584097ca9c6dbf6f395c2561123a48da06ec16a0ac9905679c6"
+                  },
+                  {
+                    "bindingId": "fixture-corpus",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/fixtures/proof-binding-evaluation-fixtures.v1.json",
+                    "sourceDigest": "sha256:2ae57d193d679058c86d9232081bdbca35287330834801ae4d58d2443b928bc3"
+                  },
+                  {
+                    "bindingId": "fixture-corpus-schema",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/fixtures/proof-binding-evaluation-fixtures.v1.schema.json",
+                    "sourceDigest": "sha256:ff1e875fc8ecfa0a6fad0f9a77b5e85ed645fc405b71bb0fed7f652363f14d8b"
+                  }
+                ],
+                "conformanceDisposition": "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT",
+                "conformanceReceiptDigest": "sha256:c5febeb91935f015fc996ee7bc600ecfaf6c6ff1c681d1505907d0146c4c75da",
+                "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-proof-binding-evaluation-conformance/conformance/proof-binding-evaluation-provider-conformance.v1.json",
+                "declaredTargets": [],
+                "lifecycle": "ADMITTED",
+                "platformCapabilityId": "sda-proof-binding-evaluation-port.v1",
+                "providerAuthorityDigest": "sha256:511ad3bba2ba7cabab021ffe6daf10b1b41fc385d0a69e29abdb71b0c0ed240b",
+                "providerAuthorityId": "profile-governed-proof-binding-evaluator.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-proof-binding-evaluation/profile-governed-proof-binding-evaluator.authority.json",
+                "providerBindingDigest": "sha256:337c815f7981b598cede9bc522d69eea3216b6c73e435418e0405755710222f9",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/proof-binding-evaluation-provider.binding.json"
+              }
+            ]
+          }
+        },
+        {
+          "id": "admit-provider-once-its-target-is-declared",
+          "label": "Matching target declared — eligible provider",
+          "input": {
+            "contractId": "sidefx-provider-resolution-request.v1",
+            "evaluationBoundary": "NON_PRODUCTION_WAVE3_SPECIALIST_ASK",
+            "snapshotDigest": "sha256:b1d87d6f3b5969df31c5f2683e606ef8bca64df463abcf2b74f050039d373ff4",
+            "requestedPlatformCapabilityId": "sda-json-authority-ingestion-port.v1",
+            "requestedTarget": "node",
+            "conformantDispositions": [
+              "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+              "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT"
+            ],
+            "providerBindings": [
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-json-authority-ingestion-profile.v1.json",
+                    "sourceDigest": "sha256:70c9328b32201a6ac86ec14422892057af130f31550757e9d1a465c11efed223"
+                  },
+                  {
+                    "bindingId": "membership-policy",
+                    "sourceRef": "../policies/sidefx-semantic-corpus-membership-policy.v1.json",
+                    "sourceDigest": "sha256:0b3ff298fd68707b37c6827b4d527bafc05528fa9704a043eadb85ab76316b33"
+                  },
+                  {
+                    "bindingId": "canonicalization-policy",
+                    "sourceRef": "../policies/sidefx-semantic-canonicalization-policy.v1.json",
+                    "sourceDigest": "sha256:3372aa03fd1f644d626045d469ed228904c97e2a566dd94904942ec7084870c6"
+                  },
+                  {
+                    "bindingId": "request-contract",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/contracts/sidefx-json-authority-ingestion-request.schema.json",
+                    "sourceDigest": "sha256:bfaeb6b53f9cae6ff74c700e2ecce2b6de61433bb3e53a6e495c155af2ade947"
+                  },
+                  {
+                    "bindingId": "receipt-contract",
+                    "sourceRef": "../contracts/sidefx-json-authority-ingestion-receipt.schema.json",
+                    "sourceDigest": "sha256:83a28ed29c7735e786493c0e40301b95ecc0171bbc4e31d6d716d4a1a1d95950"
+                  },
+                  {
+                    "bindingId": "fixture-manifest",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.json",
+                    "sourceDigest": "sha256:4d604f6cc7cdbed670a8af3215557a8335e80f5af744e500b5243037a3a3bf54"
+                  },
+                  {
+                    "bindingId": "fixture-manifest-schema",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.schema.json",
+                    "sourceDigest": "sha256:5ab5cde17736cc08f07b8885aee030f6fcc608a981a4a7a212276c9ac5ab5798"
+                  },
+                  {
+                    "bindingId": "schema-catalog",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/declared-schema-catalog.v1.json",
+                    "sourceDigest": "sha256:07f778ea7a72ef7083583bb00ee34a405f72538dd887756ae2aa36f761342b2b"
+                  },
+                  {
+                    "bindingId": "reference-scope",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/content-reference-scope.v1.json",
+                    "sourceDigest": "sha256:3612cf2cfafa0c1a58b4d941d962350009404720d82211ab8cc34fed74675ec4"
+                  },
+                  {
+                    "bindingId": "version-policy",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/version-policy.v1.json",
+                    "sourceDigest": "sha256:5b49ce679fe59c5f98b6a12ffeff7c06235cba053497fa670e8cc8bcf15340f0"
+                  }
+                ],
+                "conformanceDisposition": "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+                "conformanceReceiptDigest": "sha256:95fe7e8ddc70cad84a307a6670b455a65e35a2f3d5b3d365d685e6de77bb5502",
+                "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-json-authority-ingestion-conformance/conformance/json-authority-ingestion-provider-conformance.v1.json",
+                "declaredTargets": [
+                  "node"
+                ],
+                "lifecycle": "ADMITTED",
+                "platformCapabilityId": "sda-json-authority-ingestion-port.v1",
+                "providerAuthorityDigest": "sha256:f39fb91732ee448ac56db23b8728add4b1477df2cf27a81740b6058e4c231546",
+                "providerAuthorityId": "profile-governed-json-authority-ingestor.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-json-authority-ingestion/profile-governed-json-authority-ingestor.authority.json",
+                "providerBindingDigest": "sha256:4cadcff2bf76f5e7d0cb1b7fec511bf6317a37c5a161f9a33e3c197f0c18af22",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/json-authority-ingestion-provider.binding.json"
+              },
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-proof-binding-profile.v1.json",
+                    "sourceDigest": "sha256:d0821f66297b53127e5312a4c6de59fb4b31a3e26d641847d6dc6de00e41dd24"
+                  },
+                  {
+                    "bindingId": "profile-schema",
+                    "sourceRef": "../profiles/sidefx-proof-binding-profile.schema.json",
+                    "sourceDigest": "sha256:837f526277ddbff62ad638353f245674650fbc70fcdfc9044a23717138defac3"
+                  },
+                  {
+                    "bindingId": "input-contract",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/contracts/sidefx-proof-binding-evaluation-input.schema.json",
+                    "sourceDigest": "sha256:ea2e23348d86bf82375f6e716f2e344b902c29b25757b46ec23d43217581a05f"
+                  },
+                  {
+                    "bindingId": "record-contract",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/contracts/sidefx-proof-binding-evaluation-record.schema.json",
+                    "sourceDigest": "sha256:d3506d49a4139ca3f2637b7fbd4e9891c0a77cb4e7a2f6e1cc70847ba045ec7d"
+                  },
+                  {
+                    "bindingId": "conformance-contract",
+                    "sourceRef": "../contracts/sidefx-proof-binding-conformance.schema.json",
+                    "sourceDigest": "sha256:7daf705aa66e1dcbaad638c9c6d1ecc9a1e5466475de71075670d0192f918613"
+                  },
+                  {
+                    "bindingId": "common-contract",
+                    "sourceRef": "../contracts/sidefx-semantic-common.schema.json",
+                    "sourceDigest": "sha256:529e7fce98565584097ca9c6dbf6f395c2561123a48da06ec16a0ac9905679c6"
+                  },
+                  {
+                    "bindingId": "fixture-corpus",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/fixtures/proof-binding-evaluation-fixtures.v1.json",
+                    "sourceDigest": "sha256:2ae57d193d679058c86d9232081bdbca35287330834801ae4d58d2443b928bc3"
+                  },
+                  {
+                    "bindingId": "fixture-corpus-schema",
+                    "sourceRef": "../capabilities/evaluate-sidefx-proof-binding/fixtures/proof-binding-evaluation-fixtures.v1.schema.json",
+                    "sourceDigest": "sha256:ff1e875fc8ecfa0a6fad0f9a77b5e85ed645fc405b71bb0fed7f652363f14d8b"
+                  }
+                ],
+                "conformanceDisposition": "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT",
+                "conformanceReceiptDigest": "sha256:c5febeb91935f015fc996ee7bc600ecfaf6c6ff1c681d1505907d0146c4c75da",
+                "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-proof-binding-evaluation-conformance/conformance/proof-binding-evaluation-provider-conformance.v1.json",
+                "declaredTargets": [],
+                "lifecycle": "ADMITTED",
+                "platformCapabilityId": "sda-proof-binding-evaluation-port.v1",
+                "providerAuthorityDigest": "sha256:511ad3bba2ba7cabab021ffe6daf10b1b41fc385d0a69e29abdb71b0c0ed240b",
+                "providerAuthorityId": "profile-governed-proof-binding-evaluator.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-proof-binding-evaluation/profile-governed-proof-binding-evaluator.authority.json",
+                "providerBindingDigest": "sha256:337c815f7981b598cede9bc522d69eea3216b6c73e435418e0405755710222f9",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/proof-binding-evaluation-provider.binding.json"
+              }
+            ]
+          }
+        },
+        {
+          "id": "refuse-target-the-binding-does-not-declare",
+          "label": "Different target requested — eligibility held",
+          "input": {
+            "contractId": "sidefx-provider-resolution-request.v1",
+            "evaluationBoundary": "NON_PRODUCTION_WAVE3_SPECIALIST_ASK",
+            "snapshotDigest": "sha256:b1d87d6f3b5969df31c5f2683e606ef8bca64df463abcf2b74f050039d373ff4",
+            "requestedPlatformCapabilityId": "sda-json-authority-ingestion-port.v1",
+            "requestedTarget": "csharp",
+            "conformantDispositions": [
+              "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+              "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT"
+            ],
+            "providerBindings": [
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-json-authority-ingestion-profile.v1.json",
+                    "sourceDigest": "sha256:70c9328b32201a6ac86ec14422892057af130f31550757e9d1a465c11efed223"
+                  },
+                  {
+                    "bindingId": "membership-policy",
+                    "sourceRef": "../policies/sidefx-semantic-corpus-membership-policy.v1.json",
+                    "sourceDigest": "sha256:0b3ff298fd68707b37c6827b4d527bafc05528fa9704a043eadb85ab76316b33"
+                  },
+                  {
+                    "bindingId": "canonicalization-policy",
+                    "sourceRef": "../policies/sidefx-semantic-canonicalization-policy.v1.json",
+                    "sourceDigest": "sha256:3372aa03fd1f644d626045d469ed228904c97e2a566dd94904942ec7084870c6"
+                  },
+                  {
+                    "bindingId": "request-contract",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/contracts/sidefx-json-authority-ingestion-request.schema.json",
+                    "sourceDigest": "sha256:bfaeb6b53f9cae6ff74c700e2ecce2b6de61433bb3e53a6e495c155af2ade947"
+                  },
+                  {
+                    "bindingId": "receipt-contract",
+                    "sourceRef": "../contracts/sidefx-json-authority-ingestion-receipt.schema.json",
+                    "sourceDigest": "sha256:83a28ed29c7735e786493c0e40301b95ecc0171bbc4e31d6d716d4a1a1d95950"
+                  },
+                  {
+                    "bindingId": "fixture-manifest",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.json",
+                    "sourceDigest": "sha256:4d604f6cc7cdbed670a8af3215557a8335e80f5af744e500b5243037a3a3bf54"
+                  },
+                  {
+                    "bindingId": "fixture-manifest-schema",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.schema.json",
+                    "sourceDigest": "sha256:5ab5cde17736cc08f07b8885aee030f6fcc608a981a4a7a212276c9ac5ab5798"
+                  },
+                  {
+                    "bindingId": "schema-catalog",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/declared-schema-catalog.v1.json",
+                    "sourceDigest": "sha256:07f778ea7a72ef7083583bb00ee34a405f72538dd887756ae2aa36f761342b2b"
+                  },
+                  {
+                    "bindingId": "reference-scope",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/content-reference-scope.v1.json",
+                    "sourceDigest": "sha256:3612cf2cfafa0c1a58b4d941d962350009404720d82211ab8cc34fed74675ec4"
+                  },
+                  {
+                    "bindingId": "version-policy",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/version-policy.v1.json",
+                    "sourceDigest": "sha256:5b49ce679fe59c5f98b6a12ffeff7c06235cba053497fa670e8cc8bcf15340f0"
+                  }
+                ],
+                "conformanceDisposition": "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+                "conformanceReceiptDigest": "sha256:95fe7e8ddc70cad84a307a6670b455a65e35a2f3d5b3d365d685e6de77bb5502",
+                "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-json-authority-ingestion-conformance/conformance/json-authority-ingestion-provider-conformance.v1.json",
+                "declaredTargets": [
+                  "node"
+                ],
+                "lifecycle": "ADMITTED",
+                "platformCapabilityId": "sda-json-authority-ingestion-port.v1",
+                "providerAuthorityDigest": "sha256:f39fb91732ee448ac56db23b8728add4b1477df2cf27a81740b6058e4c231546",
+                "providerAuthorityId": "profile-governed-json-authority-ingestor.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-json-authority-ingestion/profile-governed-json-authority-ingestor.authority.json",
+                "providerBindingDigest": "sha256:4cadcff2bf76f5e7d0cb1b7fec511bf6317a37c5a161f9a33e3c197f0c18af22",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/json-authority-ingestion-provider.binding.json"
+              }
+            ]
+          }
+        },
+        {
+          "id": "refuse-unadmitted-and-unconformed-providers",
+          "label": "Admission or conformance missing — eligibility held",
+          "input": {
+            "contractId": "sidefx-provider-resolution-request.v1",
+            "evaluationBoundary": "NON_PRODUCTION_WAVE3_SPECIALIST_ASK",
+            "snapshotDigest": "sha256:b1d87d6f3b5969df31c5f2683e606ef8bca64df463abcf2b74f050039d373ff4",
+            "requestedPlatformCapabilityId": "sda-json-authority-ingestion-port.v1",
+            "requestedTarget": "node",
+            "conformantDispositions": [
+              "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+              "SDA_PROOF_BINDING_EVALUATION_PROVIDER_CONFORMANT"
+            ],
+            "providerBindings": [
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-json-authority-ingestion-profile.v1.json",
+                    "sourceDigest": "sha256:70c9328b32201a6ac86ec14422892057af130f31550757e9d1a465c11efed223"
+                  },
+                  {
+                    "bindingId": "membership-policy",
+                    "sourceRef": "../policies/sidefx-semantic-corpus-membership-policy.v1.json",
+                    "sourceDigest": "sha256:0b3ff298fd68707b37c6827b4d527bafc05528fa9704a043eadb85ab76316b33"
+                  },
+                  {
+                    "bindingId": "canonicalization-policy",
+                    "sourceRef": "../policies/sidefx-semantic-canonicalization-policy.v1.json",
+                    "sourceDigest": "sha256:3372aa03fd1f644d626045d469ed228904c97e2a566dd94904942ec7084870c6"
+                  },
+                  {
+                    "bindingId": "request-contract",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/contracts/sidefx-json-authority-ingestion-request.schema.json",
+                    "sourceDigest": "sha256:bfaeb6b53f9cae6ff74c700e2ecce2b6de61433bb3e53a6e495c155af2ade947"
+                  },
+                  {
+                    "bindingId": "receipt-contract",
+                    "sourceRef": "../contracts/sidefx-json-authority-ingestion-receipt.schema.json",
+                    "sourceDigest": "sha256:83a28ed29c7735e786493c0e40301b95ecc0171bbc4e31d6d716d4a1a1d95950"
+                  },
+                  {
+                    "bindingId": "fixture-manifest",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.json",
+                    "sourceDigest": "sha256:4d604f6cc7cdbed670a8af3215557a8335e80f5af744e500b5243037a3a3bf54"
+                  },
+                  {
+                    "bindingId": "fixture-manifest-schema",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.schema.json",
+                    "sourceDigest": "sha256:5ab5cde17736cc08f07b8885aee030f6fcc608a981a4a7a212276c9ac5ab5798"
+                  },
+                  {
+                    "bindingId": "schema-catalog",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/declared-schema-catalog.v1.json",
+                    "sourceDigest": "sha256:07f778ea7a72ef7083583bb00ee34a405f72538dd887756ae2aa36f761342b2b"
+                  },
+                  {
+                    "bindingId": "reference-scope",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/content-reference-scope.v1.json",
+                    "sourceDigest": "sha256:3612cf2cfafa0c1a58b4d941d962350009404720d82211ab8cc34fed74675ec4"
+                  },
+                  {
+                    "bindingId": "version-policy",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/version-policy.v1.json",
+                    "sourceDigest": "sha256:5b49ce679fe59c5f98b6a12ffeff7c06235cba053497fa670e8cc8bcf15340f0"
+                  }
+                ],
+                "conformanceDisposition": "SDA_JSON_AUTHORITY_INGESTION_PROVIDER_CONFORMANT",
+                "conformanceReceiptDigest": "sha256:95fe7e8ddc70cad84a307a6670b455a65e35a2f3d5b3d365d685e6de77bb5502",
+                "conformanceReceiptRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/verify-json-authority-ingestion-conformance/conformance/json-authority-ingestion-provider-conformance.v1.json",
+                "declaredTargets": [
+                  "node"
+                ],
+                "lifecycle": "PROPOSED",
+                "platformCapabilityId": "sda-json-authority-ingestion-port.v1",
+                "providerAuthorityDigest": "sha256:f39fb91732ee448ac56db23b8728add4b1477df2cf27a81740b6058e4c231546",
+                "providerAuthorityId": "proposed-provider.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-json-authority-ingestion/profile-governed-json-authority-ingestor.authority.json",
+                "providerBindingDigest": "sha256:4cadcff2bf76f5e7d0cb1b7fec511bf6317a37c5a161f9a33e3c197f0c18af22",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/json-authority-ingestion-provider.binding.json"
+              },
+              {
+                "authorityBindings": [
+                  {
+                    "bindingId": "profile",
+                    "sourceRef": "../profiles/sidefx-json-authority-ingestion-profile.v1.json",
+                    "sourceDigest": "sha256:70c9328b32201a6ac86ec14422892057af130f31550757e9d1a465c11efed223"
+                  },
+                  {
+                    "bindingId": "membership-policy",
+                    "sourceRef": "../policies/sidefx-semantic-corpus-membership-policy.v1.json",
+                    "sourceDigest": "sha256:0b3ff298fd68707b37c6827b4d527bafc05528fa9704a043eadb85ab76316b33"
+                  },
+                  {
+                    "bindingId": "canonicalization-policy",
+                    "sourceRef": "../policies/sidefx-semantic-canonicalization-policy.v1.json",
+                    "sourceDigest": "sha256:3372aa03fd1f644d626045d469ed228904c97e2a566dd94904942ec7084870c6"
+                  },
+                  {
+                    "bindingId": "request-contract",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/contracts/sidefx-json-authority-ingestion-request.schema.json",
+                    "sourceDigest": "sha256:bfaeb6b53f9cae6ff74c700e2ecce2b6de61433bb3e53a6e495c155af2ade947"
+                  },
+                  {
+                    "bindingId": "receipt-contract",
+                    "sourceRef": "../contracts/sidefx-json-authority-ingestion-receipt.schema.json",
+                    "sourceDigest": "sha256:83a28ed29c7735e786493c0e40301b95ecc0171bbc4e31d6d716d4a1a1d95950"
+                  },
+                  {
+                    "bindingId": "fixture-manifest",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.json",
+                    "sourceDigest": "sha256:4d604f6cc7cdbed670a8af3215557a8335e80f5af744e500b5243037a3a3bf54"
+                  },
+                  {
+                    "bindingId": "fixture-manifest-schema",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/fixtures/fixture-manifest.authority.schema.json",
+                    "sourceDigest": "sha256:5ab5cde17736cc08f07b8885aee030f6fcc608a981a4a7a212276c9ac5ab5798"
+                  },
+                  {
+                    "bindingId": "schema-catalog",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/declared-schema-catalog.v1.json",
+                    "sourceDigest": "sha256:07f778ea7a72ef7083583bb00ee34a405f72538dd887756ae2aa36f761342b2b"
+                  },
+                  {
+                    "bindingId": "reference-scope",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/content-reference-scope.v1.json",
+                    "sourceDigest": "sha256:3612cf2cfafa0c1a58b4d941d962350009404720d82211ab8cc34fed74675ec4"
+                  },
+                  {
+                    "bindingId": "version-policy",
+                    "sourceRef": "../capabilities/ingest-sidefx-json-authority/authorities/version-policy.v1.json",
+                    "sourceDigest": "sha256:5b49ce679fe59c5f98b6a12ffeff7c06235cba053497fa670e8cc8bcf15340f0"
+                  }
+                ],
+                "conformanceDisposition": "",
+                "conformanceReceiptDigest": "",
+                "conformanceReceiptRef": "",
+                "declaredTargets": [
+                  "node"
+                ],
+                "lifecycle": "ADMITTED",
+                "platformCapabilityId": "sda-json-authority-ingestion-port.v1",
+                "providerAuthorityDigest": "sha256:f39fb91732ee448ac56db23b8728add4b1477df2cf27a81740b6058e4c231546",
+                "providerAuthorityId": "unconformed-provider.v1",
+                "providerAuthorityRef": "../../../../scenario-driven-architecture/capabilities/sda-platform/bind-profile-governed-json-authority-ingestion/profile-governed-json-authority-ingestor.authority.json",
+                "providerBindingDigest": "sha256:4cadcff2bf76f5e7d0cb1b7fec511bf6317a37c5a161f9a33e3c197f0c18af22",
+                "providerBindingRef": "authority/sidefx-semantic-brain/platform/json-authority-ingestion-provider.binding.json"
+              }
+            ]
+          }
+        }
+      ],
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "resolve-sidefx-eligible-providers",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:a18c0e606e1a70c22c5efd173e130016747bbaaf14f3f875bcc6428d9cc6a93f",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:a7335b6046a87c87cb70ed19a7857b0a95823dccadfb3420c1c3883db1570de8"
+        }
+      }
+    },
+    {
+      "profile": {
+        "subject": "resolve-equity-market-price-evidence",
+        "namespace": "sidefx:capabilities",
+        "label": "Live stock price",
+        "description": "Retrieve an actual quote from the configured RapidAPI provider, then run the database-selected capability to produce canonical price evidence. Enter an uppercase symbol such as AAPL. One request; no automatic retry.",
+        "inputContract": "live-equity-price-request.v1",
+        "inputSchemaDigest": "sha256:97b2f584d847b242202f4c06d90d9051492a47f83293d6f74f0e6be54929d539",
+        "providerInputBindingDigest": "sha256:09ecb038af10e553a16ec517857dc1eaf9efd4a6e1e608bc47fb4ca27e947f9b",
+        "interaction": "form",
+        "inputs": [
+          {
+            "pointer": "/contractId",
+            "ownership": "fixed",
+            "value": "live-equity-price-request.v1"
+          },
+          {
+            "pointer": "/payload",
+            "ownership": "derived",
+            "construction": "object-from-declared-children"
+          },
+          {
+            "pointer": "/payload/symbol",
+            "ownership": "editable",
+            "control": "text",
+            "label": "Stock symbol",
+            "required": true,
+            "minLength": 1,
+            "maxLength": 24,
+            "pattern": "^[A-Z0-9.^=-]{1,24}$",
+            "trim": false,
+            "unicodeNormalization": "none"
+          },
+          {
+            "pointer": "/payload/region",
+            "ownership": "editable",
+            "control": "select",
+            "label": "Region",
+            "required": true,
+            "minLength": 2,
+            "maxLength": 2,
+            "enum": [
+              "US"
+            ],
+            "trim": false,
+            "unicodeNormalization": "none"
+          }
+        ],
+        "outcome": {
+          "contract": "equity-market-price-evidence.v1",
+          "schemaDigest": "sha256:7491b5daf9ab87fb56b86a61fe661ad86dc03b305cca97517d3819183d49ca24",
+          "view": "structured-result",
+          "summaryPointers": [
+            "/disposition",
+            "/payload/symbol",
+            "/payload/region",
+            "/payload/observedPrice",
+            "/payload/currency",
+            "/payload/observedMarketTime",
+            "/payload/marketState",
+            "/payload/exchange",
+            "/payload/sourceAttribution"
+          ],
+          "collectionPointers": [],
+          "tracePointers": [],
+          "externalProviderInvoked": true
+        }
+      },
+      "resources": [
+        {
+          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/live-request.schema.json",
+          "digest": "sha256:97b2f584d847b242202f4c06d90d9051492a47f83293d6f74f0e6be54929d539",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.sidefx.local/contracts/live-equity-price-request.v1.schema.json\",\n  \"title\": \"Live equity price request\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"contractId\",\n    \"payload\"\n  ],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"live-equity-price-request.v1\"\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\n        \"symbol\",\n        \"region\"\n      ],\n      \"properties\": {\n        \"symbol\": {\n          \"type\": \"string\",\n          \"minLength\": 1,\n          \"maxLength\": 24,\n          \"pattern\": \"^[A-Z0-9.^=-]{1,24}$\"\n        },\n        \"region\": {\n          \"type\": \"string\",\n          \"minLength\": 2,\n          \"maxLength\": 2,\n          \"enum\": [\n            \"US\"\n          ]\n        }\n      }\n    }\n  }\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/input.schema.json",
+          "digest": "sha256:f6a05f620b86855b6f43c9e2964215226a771afb8bfc63bd05e3f6e535990cde",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-evidence-request.v1.schema.json\",\n  \"title\": \"Equity market price evidence request\",\n  \"description\": \"One canonical request for provider-neutral equity market price evidence. The native provider testimony, provider binding and credential realization remain outside the capability's semantic identity.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"payload\"],\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"equity-market-price-evidence-request.v1\"\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"required\": [\"nativeTestimony\", \"region\", \"providerBinding\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"nativeTestimony\": {\n          \"type\": \"object\",\n          \"description\": \"The raw supplier payload. Its shape is selected by presence, never by provider identity.\"\n        },\n        \"region\": {\n          \"type\": \"string\",\n          \"minLength\": 1\n        },\n        \"providerBinding\": {\n          \"type\": \"object\",\n          \"required\": [\"bindingId\", \"providerId\"],\n          \"additionalProperties\": false,\n          \"properties\": {\n            \"bindingId\": { \"type\": \"string\", \"minLength\": 1 },\n            \"providerId\": { \"type\": \"string\", \"minLength\": 1 }\n          }\n        }\n      }\n    }\n  }\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/testimony.schema.json",
+          "digest": "sha256:00ec143466f6e349946a394f6b757978e6aebfa06b145fbc8bf0b8cb2a8a4a68",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/native-equity-market-price-testimony.v1.schema.json\",\n  \"title\": \"Native equity market price testimony\",\n  \"description\": \"The raw supplier payload admitted at the native testimony boundary. Its shape is selected by presence, never by provider identity; the canonical mapping reads either declared native shape.\",\n  \"type\": \"object\"\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/evidence.schema.json",
+          "digest": "sha256:7491b5daf9ab87fb56b86a61fe661ad86dc03b305cca97517d3819183d49ca24",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-evidence.v1.schema.json\",\n  \"title\": \"Equity market price evidence\",\n  \"description\": \"One canonical outcome for provider-neutral equity market price evidence: either the resolved evidence or an explicit native-testimony rejection. An observed price is attributable provider testimony, not an assertion of intrinsic value or cross-provider equivalence.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\", \"providerTestimony\"],\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"equity-market-price-evidence.v1\"\n    },\n    \"disposition\": {\n      \"enum\": [\n        \"EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED\",\n        \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\"\n      ]\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"required\": [\"symbol\", \"region\", \"currency\", \"observedPrice\", \"observedMarketTime\", \"marketState\", \"exchange\", \"sourceAttribution\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"symbol\": { \"type\": \"string\", \"minLength\": 1 },\n        \"region\": { \"type\": \"string\", \"minLength\": 1 },\n        \"currency\": { \"type\": \"string\", \"minLength\": 1 },\n        \"observedPrice\": { \"type\": \"number\" },\n        \"observedMarketTime\": { \"type\": \"integer\", \"minimum\": 0 },\n        \"marketState\": { \"type\": \"string\", \"minLength\": 1 },\n        \"exchange\": { \"type\": \"string\", \"minLength\": 1 },\n        \"sourceAttribution\": { \"type\": \"string\", \"minLength\": 1 }\n      }\n    },\n    \"reasonCode\": {\n      \"const\": \"REQUIRED_NATIVE_FIELDS_ABSENT\"\n    },\n    \"absentFieldCount\": {\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"providerTestimony\": {\n      \"type\": \"object\",\n      \"required\": [\"bindingId\", \"providerId\", \"nativeShape\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"bindingId\": { \"type\": \"string\", \"minLength\": 1 },\n        \"providerId\": { \"type\": \"string\", \"minLength\": 1 },\n        \"nativeShape\": {\n          \"enum\": [\n            \"quoteSummary.result.0.price\",\n            \"quoteResponse.result.0\"\n          ]\n        }\n      }\n    }\n  },\n  \"allOf\": [\n    {\n      \"if\": {\n        \"properties\": { \"disposition\": { \"const\": \"EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED\" } }\n      },\n      \"then\": {\n        \"required\": [\"payload\"],\n        \"properties\": {\n          \"reasonCode\": false,\n          \"absentFieldCount\": false\n        }\n      }\n    },\n    {\n      \"if\": {\n        \"properties\": { \"disposition\": { \"const\": \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\" } }\n      },\n      \"then\": {\n        \"required\": [\"reasonCode\", \"absentFieldCount\"],\n        \"properties\": {\n          \"payload\": false\n        }\n      }\n    }\n  ]\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/provider-unavailable.schema.json",
+          "digest": "sha256:5071fc7519708c6bf3bbec38eea0d7126b706e3cf548e777544b2b9facd5c6b6",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-provider-unavailable.v1.schema.json\",\n  \"title\": \"Equity market price provider unavailable\",\n  \"description\": \"Resolution is held with attributable provider attempt evidence and no price evidence is invented.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\"],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"equity-market-price-provider-unavailable.v1\"\n    },\n    \"disposition\": {\n      \"const\": \"EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE\"\n    },\n    \"providerAttemptEvidence\": {\n      \"type\": \"object\"\n    }\n  }\n}\n"
+        },
+        {
+          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/testimony-rejection.schema.json",
+          "digest": "sha256:e03692ae347f4cbbc70d6dd6850198d6a7d30f1edaf99da04d3cdcf55db3a37a",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/native-equity-market-price-testimony-rejection.v1.schema.json\",\n  \"title\": \"Native equity market price testimony rejection\",\n  \"description\": \"The native testimony is rejected without widening the mapping or emitting canonical price evidence.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\", \"reasonCode\"],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"native-equity-market-price-testimony-rejection.v1\"\n    },\n    \"disposition\": {\n      \"const\": \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\"\n    },\n    \"reasonCode\": {\n      \"const\": \"REQUIRED_NATIVE_FIELDS_ABSENT\"\n    },\n    \"absentFieldCount\": {\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"providerTestimony\": {\n      \"type\": \"object\"\n    }\n  }\n}\n"
+        }
+      ],
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.sidefx.local/contracts/live-equity-price-request.v1.schema.json",
+        "title": "Live equity price request",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "payload"
+        ],
+        "properties": {
+          "contractId": {
+            "const": "live-equity-price-request.v1"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "symbol",
+              "region"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24,
+                "pattern": "^[A-Z0-9.^=-]{1,24}$"
+              },
+              "region": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 2,
+                "enum": [
+                  "US"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "outcomeSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.agentic-harness.local/contracts/equity-market-price-evidence.v1.schema.json",
+        "title": "Equity market price evidence",
+        "description": "One canonical outcome for provider-neutral equity market price evidence: either the resolved evidence or an explicit native-testimony rejection. An observed price is attributable provider testimony, not an assertion of intrinsic value or cross-provider equivalence.",
+        "type": "object",
+        "required": [
+          "contractId",
+          "disposition",
+          "providerTestimony"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "const": "equity-market-price-evidence.v1"
+          },
+          "disposition": {
+            "enum": [
+              "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+              "NATIVE_MARKET_PRICE_TESTIMONY_REJECTED"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "region",
+              "currency",
+              "observedPrice",
+              "observedMarketTime",
+              "marketState",
+              "exchange",
+              "sourceAttribution"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "minLength": 1
+              },
+              "region": {
+                "type": "string",
+                "minLength": 1
+              },
+              "currency": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observedPrice": {
+                "type": "number"
+              },
+              "observedMarketTime": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "marketState": {
+                "type": "string",
+                "minLength": 1
+              },
+              "exchange": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceAttribution": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "reasonCode": {
+            "const": "REQUIRED_NATIVE_FIELDS_ABSENT"
+          },
+          "absentFieldCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "providerTestimony": {
+            "type": "object",
+            "required": [
+              "bindingId",
+              "providerId",
+              "nativeShape"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "bindingId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "providerId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "nativeShape": {
+                "enum": [
+                  "quoteSummary.result.0.price",
+                  "quoteResponse.result.0"
+                ]
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "disposition": {
+                  "const": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "payload"
+              ],
+              "properties": {
+                "reasonCode": false,
+                "absentFieldCount": false
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "disposition": {
+                  "const": "NATIVE_MARKET_PRICE_TESTIMONY_REJECTED"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "reasonCode",
+                "absentFieldCount"
+              ],
+              "properties": {
+                "payload": false
+              }
+            }
+          }
+        ]
+      },
+      "examples": [],
+      "authority": {
+        "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "scenarioId": "resolve-equity-market-price-evidence",
+        "identity": {
+          "scenarioDefinitionDigest": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+          "artifactDigest": "sha256:977fd6183b82e13926ff25d8c3ae3e2105a788caa6a43972a7ba7807e24b945a"
+        }
+      }
+    }
+  ]
+}

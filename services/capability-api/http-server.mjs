@@ -38,7 +38,7 @@ function readBody(request, maxBytes) {
   });
 }
 
-export function createCommandServer({ mapping, execute, maxConcurrent = 2, maxBodyBytes = 1_048_576, timeoutMs = 600_000 }) {
+export function createCommandServer({ mapping, execute, authenticate = () => true, authorize = () => true, handleRunRequest, maxConcurrent = 2, maxBodyBytes = 1_048_576, timeoutMs = 600_000 }) {
   if (![maxConcurrent, maxBodyBytes, timeoutMs].every(n => Number.isSafeInteger(n) && n > 0)) throw new Error('INVALID_COMMAND_LIMIT');
   let active = 0;
   const refuse = (response, status, code, message) => send(response, status, { error: { code, message }, executionState: 'NOT_STARTED' });
@@ -47,6 +47,16 @@ export function createCommandServer({ mapping, execute, maxConcurrent = 2, maxBo
     try { url = new URL(request.url ?? '/', 'http://localhost'); }
     catch { return refuse(response, 400, 'INVALID_REQUEST', 'Invalid request URL.'); }
     if (request.method === 'GET' && url.pathname === '/healthz') return send(response, 200, { status: 'ok' });
+    try { if (authenticate(request) !== true) return refuse(response, 401, 'UNAUTHORIZED', 'A valid service credential is required.'); }
+    catch { return refuse(response, 401, 'UNAUTHORIZED', 'A valid service credential is required.'); }
+    if (handleRunRequest && url.pathname.startsWith('/runs')) {
+      try {
+        return await handleRunRequest(request, response, {
+          reserve() { if (active >= maxConcurrent) return false; active++; return true; },
+          release() { active--; },
+        });
+      } catch { return refuse(response, 500, 'RUN_SERVICE_UNAVAILABLE', 'Run status is unavailable. Reconcile before resubmitting.'); }
+    }
     if (request.method === 'GET' && url.pathname === '/commands') {
       return send(response, 200, { commands: Object.entries(mapping.commands).flatMap(([object, verbs]) =>
         Object.entries(verbs).map(([operation, spec]) => ({ object, operation, input: Boolean(spec.input), namespace: Boolean(spec.namespace), description: spec.description ?? null }))) });
@@ -67,6 +77,11 @@ export function createCommandServer({ mapping, execute, maxConcurrent = 2, maxBo
     const { object, operation, subject, namespace, input } = envelope;
     if (!Object.hasOwn(mapping.commands, object) || !Object.hasOwn(mapping.commands[object], operation)) {
       return refuse(response, 403, 'COMMAND_NOT_PERMITTED', 'This command is not offered by the website.');
+    }
+    try {
+      if (authorize(envelope) !== true) return refuse(response, 403, 'INPUT_POLICY_REFUSED', 'This subject or input is not offered by the configured policy.');
+    } catch {
+      return refuse(response, 403, 'INPUT_POLICY_REFUSED', 'The configured policy did not authorize this input.');
     }
     if (request.aborted || response.destroyed) return;
     // Reserve without yielding. Pending body reads cannot pass an earlier check

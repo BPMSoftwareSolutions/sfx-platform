@@ -1,0 +1,274 @@
+{
+  "sceneVersion": "circuit-scene.v1",
+  "sceneId": "invoke-resolve-equity-market-price-evidence",
+  "label": "Live stock price",
+  "identities": {
+    "capabilityId": "resolve-equity-market-price-evidence",
+    "viewId": "invoke-resolve-equity-market-price-evidence",
+    "viewKind": "invocation",
+    "scenarioId": "resolve-equity-market-price-evidence"
+  },
+  "traceMode": "ILLUSTRATIVE",
+  "graph": {
+    "nodes": [
+      {
+        "id": "i-c8cb7d46bb2dc5795a4d",
+        "identity": "cell:scenario:resolve-equity-market-price-evidence:input",
+        "kind": "input",
+        "label": "live-equity-price-request.v1",
+        "detail": "Select to enter capability input.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        },
+        "facts": {
+          "scenarioId": "resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "i-1db05d56f0c97a8e9cba",
+        "identity": "cell:scenario:resolve-equity-market-price-evidence:provider-input-binding",
+        "kind": "provider-port",
+        "label": "Provider input binding",
+        "detail": "The declared binding obtains native provider testimony for this scenario.",
+        "source": {
+          "label": "Published provider input binding",
+          "sha256": "sha256:09ecb038af10e553a16ec517857dc1eaf9efd4a6e1e608bc47fb4ca27e947f9b",
+          "pointer": "/providerInputBinding"
+        },
+        "facts": {
+          "scenarioId": "resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "i-168fbf702b3085b0e8f6",
+        "identity": "cell:scenario:resolve-equity-market-price-evidence:native-input",
+        "kind": "input",
+        "label": "equity-market-price-evidence-request",
+        "detail": "Native testimony supplied by the declared binding; read-only.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        },
+        "facts": {
+          "scenarioId": "resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "i-d694ab5cb8f1d828fbee",
+        "identity": "cell:scenario:resolve-equity-market-price-evidence:event",
+        "kind": "event",
+        "label": "equity-market-price-evidence-requested",
+        "detail": "the canonical evidence retains symbol, region, currency, price, market time, market state, exchange, source attribution, and provider testimony identity",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        },
+        "facts": {
+          "scenarioId": "resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "i-11256b52ed6ddeaf9575",
+        "identity": "cell:scenario:resolve-equity-market-price-evidence:outcome",
+        "kind": "outcome",
+        "label": "equity-market-price-evidence.v1",
+        "detail": "Select to reopen this run’s outcome.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        },
+        "facts": {
+          "scenarioId": "resolve-equity-market-price-evidence"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "r-resolve-equity-market-price-evidence-0",
+        "identity": "resolve-equity-market-price-evidence:interface:0",
+        "source": "i-c8cb7d46bb2dc5795a4d",
+        "target": "i-1db05d56f0c97a8e9cba",
+        "kind": "interface-binding",
+        "label": "binding",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "r-resolve-equity-market-price-evidence-1",
+        "identity": "resolve-equity-market-price-evidence:interface:1",
+        "source": "i-1db05d56f0c97a8e9cba",
+        "target": "i-168fbf702b3085b0e8f6",
+        "kind": "interface-binding",
+        "label": "binding",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "r-resolve-equity-market-price-evidence-2",
+        "identity": "resolve-equity-market-price-evidence:interface:2",
+        "source": "i-168fbf702b3085b0e8f6",
+        "target": "i-d694ab5cb8f1d828fbee",
+        "kind": "interface-binding",
+        "label": "scenario interface",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        }
+      },
+      {
+        "id": "r-resolve-equity-market-price-evidence-3",
+        "identity": "resolve-equity-market-price-evidence:interface:3",
+        "source": "i-d694ab5cb8f1d828fbee",
+        "target": "i-11256b52ed6ddeaf9575",
+        "kind": "interface-binding",
+        "label": "scenario interface",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "pointer": "/scenario/resolve-equity-market-price-evidence"
+        }
+      }
+    ]
+  },
+  "geometry": {
+    "width": 1460,
+    "height": 330,
+    "boxes": {
+      "i-c8cb7d46bb2dc5795a4d": [
+        40,
+        95,
+        230,
+        125
+      ],
+      "i-1db05d56f0c97a8e9cba": [
+        320,
+        95,
+        230,
+        125
+      ],
+      "i-168fbf702b3085b0e8f6": [
+        600,
+        95,
+        230,
+        125
+      ],
+      "i-d694ab5cb8f1d828fbee": [
+        880,
+        95,
+        230,
+        125
+      ],
+      "i-11256b52ed6ddeaf9575": [
+        1160,
+        95,
+        230,
+        125
+      ]
+    },
+    "engine": "declared-interface-row"
+  },
+  "coverage": {
+    "nodes": 5,
+    "routes": 4,
+    "omittedSourceNodes": 0,
+    "scope": "Selected scenario input/event/outcome and declared provider binding. Internal mechanics are a separate view."
+  },
+  "topology": {
+    "roots": [
+      "i-c8cb7d46bb2dc5795a4d"
+    ],
+    "leaves": [
+      "i-11256b52ed6ddeaf9575"
+    ]
+  },
+  "findings": [],
+  "materials": [],
+  "hitTargets": [
+    {
+      "targetId": "i-c8cb7d46bb2dc5795a4d",
+      "entityId": "i-c8cb7d46bb2dc5795a4d",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-1db05d56f0c97a8e9cba",
+      "entityId": "i-1db05d56f0c97a8e9cba",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-168fbf702b3085b0e8f6",
+      "entityId": "i-168fbf702b3085b0e8f6",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-d694ab5cb8f1d828fbee",
+      "entityId": "i-d694ab5cb8f1d828fbee",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-11256b52ed6ddeaf9575",
+      "entityId": "i-11256b52ed6ddeaf9575",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-resolve-equity-market-price-evidence-0",
+      "entityId": "r-resolve-equity-market-price-evidence-0",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-resolve-equity-market-price-evidence-1",
+      "entityId": "r-resolve-equity-market-price-evidence-1",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-resolve-equity-market-price-evidence-2",
+      "entityId": "r-resolve-equity-market-price-evidence-2",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-resolve-equity-market-price-evidence-3",
+      "entityId": "r-resolve-equity-market-price-evidence-3",
+      "keyboardActivable": true
+    }
+  ],
+  "provenance": {
+    "authority": {
+      "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+      "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+      "scenarioId": "resolve-equity-market-price-evidence",
+      "identity": {
+        "scenarioDefinitionDigest": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+        "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+        "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+        "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+        "artifactDigest": "sha256:977fd6183b82e13926ff25d8c3ae3e2105a788caa6a43972a7ba7807e24b945a"
+      }
+    },
+    "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304"
+  },
+  "invocation": {
+    "subject": "resolve-equity-market-price-evidence",
+    "inputNode": "i-c8cb7d46bb2dc5795a4d",
+    "outcomeNode": "i-11256b52ed6ddeaf9575",
+    "providerNode": "i-1db05d56f0c97a8e9cba",
+    "eventNode": "i-d694ab5cb8f1d828fbee",
+    "stepNodes": {
+      "admit-input": "i-168fbf702b3085b0e8f6",
+      "resolve-event-authority": "i-d694ab5cb8f1d828fbee",
+      "execute-event-authority": "i-d694ab5cb8f1d828fbee",
+      "admit-outcome": "i-11256b52ed6ddeaf9575",
+      "resolve-disposition": "i-11256b52ed6ddeaf9575"
+    }
+  }
+}

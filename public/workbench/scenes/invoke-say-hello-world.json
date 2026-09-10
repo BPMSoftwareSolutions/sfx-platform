@@ -1,0 +1,186 @@
+{
+  "sceneVersion": "circuit-scene.v1",
+  "sceneId": "invoke-say-hello-world",
+  "label": "Hello World",
+  "identities": {
+    "capabilityId": "say-hello-world",
+    "viewId": "invoke-say-hello-world",
+    "viewKind": "invocation",
+    "scenarioId": "say-hello-world"
+  },
+  "traceMode": "ILLUSTRATIVE",
+  "graph": {
+    "nodes": [
+      {
+        "id": "i-f04368596edf66f7d23d",
+        "identity": "cell:scenario:say-hello-world:input",
+        "kind": "input",
+        "label": "hello-world-request.v1",
+        "detail": "Select to enter capability input.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pointer": "/scenario/say-hello-world"
+        },
+        "facts": {
+          "scenarioId": "say-hello-world"
+        }
+      },
+      {
+        "id": "i-f4389093e308326b27e7",
+        "identity": "cell:scenario:say-hello-world:event",
+        "kind": "event",
+        "label": "say-hello-world",
+        "detail": "the canonical Hello World greeting is requested",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pointer": "/scenario/say-hello-world"
+        },
+        "facts": {
+          "scenarioId": "say-hello-world"
+        }
+      },
+      {
+        "id": "i-483ad672afaf9457ae7e",
+        "identity": "cell:scenario:say-hello-world:outcome",
+        "kind": "outcome",
+        "label": "hello-world-greeting.v1",
+        "detail": "Select to reopen this run’s outcome.",
+        "source": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pointer": "/scenario/say-hello-world"
+        },
+        "facts": {
+          "scenarioId": "say-hello-world"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "id": "r-say-hello-world-0",
+        "identity": "say-hello-world:interface:0",
+        "source": "i-f04368596edf66f7d23d",
+        "target": "i-f4389093e308326b27e7",
+        "kind": "interface-binding",
+        "label": "scenario interface",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pointer": "/scenario/say-hello-world"
+        }
+      },
+      {
+        "id": "r-say-hello-world-1",
+        "identity": "say-hello-world:interface:1",
+        "source": "i-f4389093e308326b27e7",
+        "target": "i-483ad672afaf9457ae7e",
+        "kind": "interface-binding",
+        "label": "scenario interface",
+        "provenance": {
+          "label": "Selected database scenario interface",
+          "sha256": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+          "pointer": "/scenario/say-hello-world"
+        }
+      }
+    ]
+  },
+  "geometry": {
+    "width": 900,
+    "height": 330,
+    "boxes": {
+      "i-f04368596edf66f7d23d": [
+        40,
+        95,
+        230,
+        125
+      ],
+      "i-f4389093e308326b27e7": [
+        320,
+        95,
+        230,
+        125
+      ],
+      "i-483ad672afaf9457ae7e": [
+        600,
+        95,
+        230,
+        125
+      ]
+    },
+    "engine": "declared-interface-row"
+  },
+  "coverage": {
+    "nodes": 3,
+    "routes": 2,
+    "omittedSourceNodes": 0,
+    "scope": "Selected scenario input/event/outcome and declared provider binding. Internal mechanics are a separate view."
+  },
+  "topology": {
+    "roots": [
+      "i-f04368596edf66f7d23d"
+    ],
+    "leaves": [
+      "i-483ad672afaf9457ae7e"
+    ]
+  },
+  "findings": [],
+  "materials": [],
+  "hitTargets": [
+    {
+      "targetId": "i-f04368596edf66f7d23d",
+      "entityId": "i-f04368596edf66f7d23d",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-f4389093e308326b27e7",
+      "entityId": "i-f4389093e308326b27e7",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "i-483ad672afaf9457ae7e",
+      "entityId": "i-483ad672afaf9457ae7e",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-say-hello-world-0",
+      "entityId": "r-say-hello-world-0",
+      "keyboardActivable": true
+    },
+    {
+      "targetId": "r-say-hello-world-1",
+      "entityId": "r-say-hello-world-1",
+      "keyboardActivable": true
+    }
+  ],
+  "provenance": {
+    "authority": {
+      "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
+      "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+      "scenarioId": "say-hello-world",
+      "identity": {
+        "scenarioDefinitionDigest": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
+        "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
+        "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
+        "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
+        "artifactDigest": "sha256:e50a0e7e3a982c3bfc25e68bf79a0045529181641936813f41ce0ebe1b953645"
+      }
+    },
+    "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304"
+  },
+  "invocation": {
+    "subject": "say-hello-world",
+    "inputNode": "i-f04368596edf66f7d23d",
+    "outcomeNode": "i-483ad672afaf9457ae7e",
+    "providerNode": null,
+    "eventNode": "i-f4389093e308326b27e7",
+    "stepNodes": {
+      "admit-input": "i-f04368596edf66f7d23d",
+      "resolve-event-authority": "i-f4389093e308326b27e7",
+      "execute-event-authority": "i-f4389093e308326b27e7",
+      "admit-outcome": "i-483ad672afaf9457ae7e",
+      "resolve-disposition": "i-483ad672afaf9457ae7e"
+    }
+  }
+}

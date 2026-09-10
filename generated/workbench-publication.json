@@ -1,0 +1,383 @@
+{
+  "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304",
+  "capabilities": [
+    {
+      "subject": "say-hello-world",
+      "outcomeContract": "hello-world-greeting.v1",
+      "variants": [
+        {
+          "outcomeId": "greeting",
+          "title": "Capability outcome",
+          "match": {
+            "contractId": "hello-world-greeting.v1"
+          },
+          "anchor": {
+            "kind": "scene-node",
+            "nodeIdentity": "cell:scenario:say-hello-world:outcome",
+            "fallback": "viewport-transition"
+          },
+          "elements": [
+            {
+              "elementId": "message",
+              "pointers": {
+                "value": "/payload/message"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Greeting",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "text"
+            }
+          ],
+          "layout": "dialogs/dialog-outcome-hello-world-greeting.json"
+        }
+      ]
+    },
+    {
+      "subject": "resolve-equity-market-price-evidence",
+      "outcomeContract": "equity-market-price-evidence.v1",
+      "variants": [
+        {
+          "outcomeId": "price",
+          "title": "Capability outcome",
+          "match": {
+            "contractId": "equity-market-price-evidence.v1",
+            "discriminatorPointer": "/disposition",
+            "discriminatorValues": [
+              "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED"
+            ]
+          },
+          "anchor": {
+            "kind": "scene-node",
+            "nodeIdentity": "cell:scenario:resolve-equity-market-price-evidence:outcome",
+            "fallback": "viewport-transition"
+          },
+          "elements": [
+            {
+              "elementId": "price",
+              "pointers": {
+                "amount": "/payload/observedPrice",
+                "currency": "/payload/currency",
+                "timestamp": "/payload/observedMarketTime"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Observed price",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": 2,
+              "op": "number-with-unit"
+            },
+            {
+              "elementId": "quote",
+              "pointers": {},
+              "itemPath": null,
+              "fields": [
+                "/payload/symbol",
+                "/payload/region",
+                "/payload/exchange",
+                "/payload/marketState"
+              ],
+              "label": "Quote",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "key-value"
+            },
+            {
+              "elementId": "disposition",
+              "pointers": {
+                "value": "/disposition"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Domain disposition",
+              "emptyText": null,
+              "dispositionLabels": {
+                "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED": "Canonical price evidence resolved"
+              },
+              "precision": null,
+              "op": "mapped-text"
+            },
+            {
+              "elementId": "attribution",
+              "pointers": {
+                "value": "/payload/sourceAttribution"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Source attribution",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "text"
+            },
+            {
+              "elementId": "provider",
+              "pointers": {
+                "bindingId": "/providerTestimony/bindingId",
+                "providerId": "/providerTestimony/providerId",
+                "nativeShape": "/providerTestimony/nativeShape"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Provider and normalisation",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "key-value"
+            }
+          ],
+          "layout": "dialogs/dialog-outcome-live-finance-price.json"
+        }
+      ]
+    },
+    {
+      "subject": "greet-by-name",
+      "outcomeContract": "personal-greeting.v1",
+      "variants": [
+        {
+          "outcomeId": "greeting",
+          "title": "Capability outcome",
+          "match": {
+            "contractId": "personal-greeting.v1"
+          },
+          "anchor": {
+            "kind": "scene-node",
+            "nodeIdentity": "cell:scenario:greet-by-name:outcome",
+            "fallback": "viewport-transition"
+          },
+          "elements": [
+            {
+              "elementId": "message",
+              "pointers": {
+                "value": "/payload/message"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Greeting",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "text"
+            }
+          ],
+          "layout": "dialogs/dialog-outcome-personal-greeting-greeting.json"
+        }
+      ]
+    },
+    {
+      "subject": "resolve-sidefx-eligible-providers",
+      "outcomeContract": "sidefx-semantic-provider-resolution.v1",
+      "variants": [
+        {
+          "outcomeId": "resolved",
+          "title": "Capability outcome",
+          "match": {
+            "contractId": "sidefx-semantic-provider-resolution.v1",
+            "discriminatorPointer": "/disposition",
+            "discriminatorValues": [
+              "PROVIDERS_RESOLVED"
+            ]
+          },
+          "anchor": {
+            "kind": "scene-node",
+            "nodeIdentity": "cell:scenario:resolve-sidefx-eligible-providers:outcome",
+            "fallback": "viewport-transition"
+          },
+          "elements": [
+            {
+              "elementId": "disposition",
+              "pointers": {
+                "value": "/disposition"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Disposition",
+              "emptyText": null,
+              "dispositionLabels": {
+                "PROVIDERS_RESOLVED": "Eligible providers found in this fixture",
+                "NOT_OBSERVABLE": "Eligibility is not established by this fixture"
+              },
+              "precision": null,
+              "op": "mapped-text"
+            },
+            {
+              "elementId": "considered",
+              "pointers": {
+                "amount": "/consideredCount"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Considered",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "number-with-unit"
+            },
+            {
+              "elementId": "eligible",
+              "pointers": {
+                "amount": "/eligibleCount"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Eligible",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "number-with-unit"
+            },
+            {
+              "elementId": "providers",
+              "pointers": {},
+              "itemPath": "/providers",
+              "fields": [
+                "providerAuthorityId",
+                "eligibilityDisposition",
+                "reasonCode",
+                "lifecycle"
+              ],
+              "label": "Providers",
+              "emptyText": "No providers were reported in this fixture.",
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "rows"
+            },
+            {
+              "elementId": "findings",
+              "pointers": {},
+              "itemPath": "/findings",
+              "fields": null,
+              "label": "Findings",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "rows"
+            },
+            {
+              "elementId": "digests",
+              "pointers": {
+                "snapshot": "/snapshotDigest",
+                "resolution": "/resolutionDigest"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Trace digests",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "key-value"
+            }
+          ],
+          "layout": "dialogs/dialog-outcome-provider-resolution-resolved.json"
+        },
+        {
+          "outcomeId": "not-observable",
+          "title": "Capability outcome",
+          "match": {
+            "contractId": "sidefx-semantic-provider-resolution.v1",
+            "discriminatorPointer": "/disposition",
+            "discriminatorValues": [
+              "NOT_OBSERVABLE"
+            ],
+            "isNegative": true
+          },
+          "anchor": {
+            "kind": "scene-node",
+            "nodeIdentity": "cell:scenario:resolve-sidefx-eligible-providers:outcome",
+            "fallback": "viewport-transition"
+          },
+          "elements": [
+            {
+              "elementId": "disposition",
+              "pointers": {
+                "value": "/disposition"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Disposition",
+              "emptyText": null,
+              "dispositionLabels": {
+                "PROVIDERS_RESOLVED": "Eligible providers found in this fixture",
+                "NOT_OBSERVABLE": "Eligibility is not established by this fixture"
+              },
+              "precision": null,
+              "op": "mapped-text"
+            },
+            {
+              "elementId": "considered",
+              "pointers": {
+                "amount": "/consideredCount"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Considered",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "number-with-unit"
+            },
+            {
+              "elementId": "eligible",
+              "pointers": {
+                "amount": "/eligibleCount"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Eligible",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "number-with-unit"
+            },
+            {
+              "elementId": "providers",
+              "pointers": {},
+              "itemPath": "/providers",
+              "fields": [
+                "providerAuthorityId",
+                "eligibilityDisposition",
+                "reasonCode",
+                "lifecycle"
+              ],
+              "label": "Providers",
+              "emptyText": "No providers were reported in this fixture.",
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "rows"
+            },
+            {
+              "elementId": "findings",
+              "pointers": {},
+              "itemPath": "/findings",
+              "fields": null,
+              "label": "Findings",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "rows"
+            },
+            {
+              "elementId": "digests",
+              "pointers": {
+                "snapshot": "/snapshotDigest",
+                "resolution": "/resolutionDigest"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Trace digests",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "key-value"
+            }
+          ],
+          "layout": "dialogs/dialog-outcome-provider-resolution-not-observable.json"
+        }
+      ]
+    }
+  ]
+}

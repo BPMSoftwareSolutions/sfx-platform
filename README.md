@@ -83,14 +83,18 @@ The current generation publishes **218 capabilities, 824 scenario faces, 191 mec
 providers and 314 declared provider–mechanic relationships**, plus four preserved findings — see
 `/platform/capability-estate`.
 
+## Private capability Lab
+
+The private [Hugging Face SideFX Lab](https://huggingface.co/spaces/BPMSoftwareSolutions/SideFX) runs Hello World, personal greeting, four retained provider examples and a live RapidAPI stock-price capability through the authenticated Azure service. [Deployment and evidence](docs/live-finance-deployment.md) records the verified revisions. `npm run dev:lab` remains the local development entry point.
+
 ## Executing a capability
 
 Every published capability page offers **Run this capability**. The command goes to a capability
-API running beside the web process, which reads the capability's prepared authority from SQL,
-rebuilds its body in memory and executes it there. Typical round trip is about three seconds.
+API running beside the web process, which reads the capability's selected authority from SQL,
+plans its body in memory and executes it there. Preparation is optional and is not consumed by invocation.
 
 ```
-browser  ->  server action  ->  services/capability-api  ->  sfx SDK  ->  SQL preparation
+browser  ->  server action  ->  services/capability-api  ->  sfx SDK  ->  selected SQL authority
                                 (holds the connection)                    -> body in memory
                                                                           -> Scenario Kernel
 ```
@@ -150,8 +154,8 @@ The page renders what the estate returned and nothing else:
 | `terminated` | The capability executed and produced its outcome |
 | `rejected` | The capability's own contract refused the input, or its outcome; a real execution with its own kernel testimony |
 | `failed` | The event executed and threw |
-| `CAPABILITY_PREPARATION_REQUIRED` | No preparation is retained for the current estate generation, so it cannot execute yet |
-| `CAPABILITY_PREPARATION_STALE` | A preparation exists but was made against a different generation or toolchain |
+| `PORT_IMPLEMENTATION_NOT_RESOLVED` | The selected authority does not resolve an executable port implementation |
+| `NATIVE_TRANSITION_TRANSLATION_NOT_AVAILABLE` | The current native provider cannot lower the declared transition topology |
 | `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
 | `NOT_CONFIGURED` / `RATE_LIMITED` / `INVALID_JSON` | The site did not dispatch a request |
 | `UNKNOWN` | Execution could not be confirmed after a timeout, lost/unreadable response or unclassified error. Confirm whether it completed before retrying |
@@ -163,19 +167,22 @@ Failed executions retain their full kernel record even when returned inside an S
 The client defaults to a 630-second response deadline, beyond the API's 600-second command
 deadline; losing the response does not establish cancellation.
 
-### Preparation is what gates coverage
+### Direct invocation and qualification
 
-A capability is executable once the estate has resolved its bindings and proved its retained
-fixtures into `runtime.capability_preparation`. Of the current generation's 219 capabilities,
-**94 are prepared and 125 are held**, each with a declared reason. The site cannot prepare a
-capability — only invoke one that is prepared — and reports the estate's own refusal when it is
-not.
+The current database provider resolves selected authority, plans the native body and invokes
+the Scenario Kernel on each call. Missing bindings and unsupported topology remain explicit
+holds. `sfx capability prepare` is a separate, optional retained proof; invocation neither
+requires nor consumes it. The older 94-prepared / 125-held census describes the preparation
+implementation at that time and is not current invocation coverage.
+
+The Hugging Face pilot qualification in `sfx-embody` exercises three selected roots through
+the installed CLI. It does not establish readiness for every catalog entry or remote deployment.
 
 A completed execution is not managed admission and not a conformance result; both remain
 separately unevaluated (§1.7).
 
 Coverage, the refusal vocabulary, the schema-driven form, operations and the open gaps —
-including that the command API is unauthenticated and not yet deployed — are documented in
+including the distinction between the loopback server and the authenticated deployed Lab service — are documented in
 [`docs/capability-execution.md`](docs/capability-execution.md).
 [`docs/capability-readiness.md`](docs/capability-readiness.md) records why the held capabilities are
 held, where each fix belongs, and how to rank the work from the database.
@@ -249,7 +256,7 @@ otherwise imply it works:
 | Capability export adapter; verified SDA release; own-architecture example | No download is offered anywhere. `/docs/ownership` documents the contract instead. |
 | Nano Banana production and the SQL media service (§11.5) | Every capability, mechanic and provider carries an open visual requirement; no placeholder stands in for a missing image. |
 | Target requirement/readiness records | No capability claims a target. Absence is shown as undeclared, not as "unsupported". |
-| Preparation coverage across the estate | 94 of 219 capabilities are prepared; the rest report their declared reason when run and are never presented as executable. |
+| Current invocation coverage across the estate | The earlier preparation census is historical; each published pilot needs current execution evidence against its exact authority. |
 | Capability command API authorization and deployment | The API is unauthenticated and runs only locally; no hosted environment configures it, so hosted builds report execution unavailable. |
 | Conformance and managed admission for executed capabilities | Results are reported as execution only; both remain separately unevaluated. |
 | Authenticated workspace | `/workspace/*` and `/sign-in` are registered as unavailable and are unlinked and noindex. |

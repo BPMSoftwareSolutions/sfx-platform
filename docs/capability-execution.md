@@ -25,12 +25,13 @@ sfx SDK                            sidefx-cli — validates against the command 
   ▼
 process delivery                   sfx-embody — owns SQL reads, planning and memory loading
   │
-  ├─ one restricted query → runtime.capability_preparation
-  ├─ body rebuilt in memory, checked against the stored proof
+  ├─ restricted reads → selected authority, scenario closure and mechanics
+  ├─ native body planned and loaded in memory
   └─ Scenario Kernel executes the canonical input
 ```
 
-Round trip is roughly three seconds, nearly all of it the prepared-authority read.
+Invocation returns separate timings for authority reads, native planning, loading and execution.
+Use those measurements for the selected workload; the older preparation-read timing is historical.
 
 ## Boundaries this preserves
 
@@ -52,19 +53,15 @@ are refused before dispatch unless deliberately added to the web policy.
 **The estate owns meaning.** This platform forwards a command envelope and renders a result. It
 interprets no canonical input, implements no provider, and holds no admission policy.
 
-## Preparation gates coverage
+## Direct invocation and historical preparation coverage
 
-A capability is executable once `sfx capability prepare` has resolved its requirements and
-bindings and proved its retained fixtures, storing that preparation in
-`runtime.capability_preparation` as an immutable record keyed by the selected model, capability
-and scenario versions, target, and SQL/recipe identity.
+The current `sfx-embody` provider reads selected SQL authority, plans the body and executes
+it in memory on each invocation. `sfx capability prepare` remains an optional separate proof
+stored in `runtime.capability_preparation`; invocation neither requires nor consumes it.
+The website command policy still exposes invocation only.
 
-Preparation is the expensive half — the resolver walk runs there — so invocation does not pay it.
-It is owned by the estate, not by this site: **the website cannot prepare a capability**, only
-invoke one that is prepared.
-
-Coverage of the current generation, from a full pass over all 219 capabilities (median
-preparation 8.0s):
+The following is the retained **historical preparation census**, from a pass over 219
+capabilities (median preparation 8.0s). It is not current invocation coverage:
 
 | | |
 | --- | ---: |
@@ -91,11 +88,15 @@ What each held reason means, where its fix belongs, and how to rank the work fro
 in [capability-readiness.md](capability-readiness.md). The short version: they are four different
 problems, and only some are fixable in the database.
 
-Every capability page offers the run control regardless, because whether one executes is the
-estate's answer at run time, not a claim the page makes in advance. A generation change
-invalidates preparations conservatively — including for an unrelated declaration — and the site
-reports that as `CAPABILITY_PREPARATION_STALE` rather than executing a preparation that no longer
-stands.
+Whether a capability executes is resolved at invocation time. A selected pilot needs fresh
+input/output evidence and exact authority bindings. The Hugging Face qualification runner in
+`sfx-embody` exercises `say-hello-world`, `greet-by-name`, and
+`resolve-sidefx-eligible-providers` through the installed `sfx` command. It is a local execution
+proof, not a remote deployment or a qualification of the entire catalog.
+
+Binding the authority displayed in a web publication to that used by invocation remains a
+separate API design requirement. The current closed command envelope has no expected-revision
+field; a frontend-only comparison would not prevent a selection race.
 
 ## Composing the input
 
@@ -145,8 +146,8 @@ The page renders what the estate returned and nothing else.
 | `terminated` | The capability executed and produced its outcome |
 | `rejected` | The capability's own contract refused the input, or refused the outcome it produced. A real execution, with its own kernel testimony |
 | `failed` | The event executed and threw |
-| `CAPABILITY_PREPARATION_REQUIRED` | No preparation retained for this generation |
-| `CAPABILITY_PREPARATION_STALE` | A preparation exists but was made against a different generation or toolchain |
+| `PORT_IMPLEMENTATION_NOT_RESOLVED` | No executable port implementation resolves for the selected authority |
+| `NATIVE_TRANSITION_TRANSLATION_NOT_AVAILABLE` | The current native provider cannot lower the declared topology |
 | `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
 | `NOT_CONFIGURED`, `RATE_LIMITED`, `INVALID_JSON` | The website did not dispatch a request |
 | `UNKNOWN` (`UNREACHABLE`, `BAD_RESPONSE`, `REQUEST_FAILED`, or an unclassified service error) | Execution is unconfirmed. The command may still be running or may have completed; confirm before retrying |
@@ -165,7 +166,7 @@ Two distinctions the surface must never blur:
 1. **A rejection is an execution.** The kernel ran and refused the value. It is reported with its
    testimony, not as a page error, and never corrected into something admissible.
 2. **An execution is not an admission.** A completed execution is not managed admission and not a
-   conformance result; both remain separately unevaluated (§1.7). Every preparation records
+   conformance result; both remain separately unevaluated (§1.7). Invocation evidence records
    `managedAdmission: NOT_REQUESTED`.
 
 A refusal is never filled in with another capability's result.
@@ -204,15 +205,16 @@ curl -X POST http://127.0.0.1:8787/commands -H 'content-type: application/json' 
 
 | Gap | Effect |
 | --- | --- |
-| **No authentication on the command API** | Loopback is the default; remote deployment requires an authorization boundary |
-| **Preparation coverage** | 94 of 219. The rest report their declared reason when run |
-| **The service is not deployed** | The Azure image carries the web process only; no environment has the endpoint configured, so hosted deployments report execution unavailable |
+| **Generic versus deployed API** | The loopback entry point is unauthenticated; the [deployed private Lab](live-finance-deployment.md) requires a bearer credential and enforces the four-profile input policy |
+| **Current invocation coverage** | The historical preparation census is not a current readiness measure; qualify each selected pilot |
+| **Deployment scope** | The private Hugging Face Lab invokes the separate Azure service. This verifies four published profiles, not the entire catalog |
 | **No preparation from the site** | Preparation is a CLI/estate operation. The site cannot trigger it, and does not offer to |
 | **Conformance and admission** | Separately unevaluated for every executed capability |
 
-## Verified
+## Historical browser verification
 
-Measured against the running stack, not asserted:
+Measured against the earlier running stack. These observations preserve their original scope;
+the new CLI pilot qualification does not rerun this browser suite:
 
 - `resolve-sidefx-eligible-providers`, composed in the generated form from its canonical example
   and run from a browser: `terminated`, outcome `PROVIDERS_RESOLVED`, 2 considered, 1 eligible,

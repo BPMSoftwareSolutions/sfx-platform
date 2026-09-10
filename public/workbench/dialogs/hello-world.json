@@ -1,0 +1,61 @@
+{
+  "html": "\n<div class=\"ui-surface\" data-surface-profile=\"window\" style=\"width:560px;height:192px;\">\n  <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:192px;\" data-region-id=\"dialog\" data-region-path=\"dialog\" data-role=\"capability-input-dialog\" data-tenant-policy=\"single\">\n    <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:84px;\" data-region-id=\"dialog-header\" data-region-path=\"dialog/dialog-header\" data-role=\"dialog-title\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:16px;width:520px;height:18px;\" data-region-id=\"dialog-eyebrow\" data-region-path=\"dialog/dialog-header/dialog-eyebrow\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:18px;\" data-component-id=\"dialog-context\"><span data-component-type=\"label\" data-semantic-family=\"information\" data-semantic-identity=\"say-hello-world#context\" data-presentation-intent=\"section-label\" data-realized-via=\"type\" style=\"font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);\">SAY-HELLO-WORLD</span></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:40px;width:520px;height:28px;\" data-region-id=\"dialog-heading\" data-region-path=\"dialog/dialog-header/dialog-heading\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:28px;\" data-component-id=\"dialog-title\"><h2 data-component-type=\"heading\" data-semantic-family=\"information\" data-semantic-identity=\"say-hello-world#title\" data-presentation-intent=\"card-title\" data-realized-via=\"type\" style=\"font-size:20px;line-height:1.35;font-weight:500;color:var(--inspect-ink);\">Enter Capability Input</h2></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:84px;width:560px;height:44px;\" data-region-id=\"dialog-description\" data-region-path=\"dialog/dialog-description\" data-role=\"dialog-description\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:0px;width:520px;height:44px;\" data-region-id=\"dialog-description-slot\" data-region-path=\"dialog/dialog-description/dialog-description-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:44px;\" data-component-id=\"dialog-description\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"say-hello-world#description\" data-presentation-intent=\"body\" data-realized-via=\"type\" style=\"font-size:13px;line-height:1.6;overflow-wrap:anywhere;color:var(--inspect-ink);\">No input is required. The contract and payload are server-owned.</p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:128px;width:560px;height:64px;\" data-region-id=\"dialog-footer\" data-region-path=\"dialog/dialog-footer\" data-role=\"dialog-actions\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:12px;width:270px;height:40px;\" data-region-id=\"footer-gap\" data-region-path=\"dialog/dialog-footer/footer-gap\" data-role=\"spacer\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:270px;height:40px;\" data-component-id=\"dialog-status\"><aside data-component-type=\"feedback\" data-semantic-family=\"feedback\" data-semantic-identity=\"say-hello-world#status\" data-presentation-intent=\"live-status\" data-realized-via=\"type\" style=\"font-size:12px;color:var(--status);\"></aside></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:300px;top:12px;width:110px;height:40px;\" data-region-id=\"slot-cancel\" data-region-path=\"dialog/dialog-footer/slot-cancel\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:110px;height:40px;\" data-component-id=\"dialog-cancel\"><button type=\"button\" data-semantic-action=\"cancel-hello-world\" data-action-disposition=\"ADMISSIBLEADMISSIBLE\" data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"say-hello-world#cancel\" data-presentation-intent=\"secondary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Cancel</button></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:420px;top:12px;width:120px;height:40px;\" data-region-id=\"slot-submit\" data-region-path=\"dialog/dialog-footer/slot-submit\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:120px;height:40px;\" data-component-id=\"dialog-submit\"><button type=\"button\" data-semantic-action=\"submit-hello-world\" data-action-disposition=\"ADMISSIBLEADMISSIBLE\" data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"say-hello-world#submit\" data-presentation-intent=\"primary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Submit</button></div>\n      </div>\n    </div>\n  </div>\n</div>\n",
+  "interaction": {
+    "planType": "ui-interaction-plan.v1",
+    "surfaceId": "dialog-input-hello-world",
+    "componentAttribute": "data-component-id",
+    "reflect": {
+      "action": {
+        "controlSelector": "button",
+        "disabledProperty": "disabled",
+        "reasonAttribute": "title",
+        "dispositionAttribute": "data-action-disposition"
+      },
+      "text": {
+        "selector": "[data-component-type]",
+        "property": "textContent"
+      }
+    },
+    "state": [],
+    "validation": [],
+    "bindings": [],
+    "actions": [
+      {
+        "actionId": "submit-hello-world",
+        "requiresAdmissible": [],
+        "availability": "available",
+        "scenarioEvent": "workbench.capability.submitted",
+        "components": [
+          "dialog-submit"
+        ]
+      },
+      {
+        "actionId": "cancel-hello-world",
+        "requiresAdmissible": [],
+        "availability": "available",
+        "scenarioEvent": "workbench.capability.cancelled",
+        "components": [
+          "dialog-cancel"
+        ]
+      }
+    ]
+  },
+  "geometry": {
+    "width": 560.0,
+    "height": 192.0
+  },
+  "fields": [],
+  "exampleSelector": null,
+  "title": "Enter Capability Input",
+  "description": "No input is required. The contract and payload are server-owned.",
+  "anchor": {
+    "kind": "scene-node",
+    "nodeIdentity": "cell:scenario:say-hello-world:input",
+    "fallback": "viewport-transition"
+  },
+  "motion": {
+    "open": "expand-from-anchor",
+    "close": "collapse-to-anchor",
+    "reducedMotionFallback": "none"
+  }
+}

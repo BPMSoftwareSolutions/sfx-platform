@@ -1,0 +1,165 @@
+{
+  "directory": "artifacts\\lab\\verification-2026-09-10T01-00-46.891Z",
+  "observedAt": "2026-09-10T01:01:27.530Z",
+  "publicationId": "sha256:eafdae1b86f5b42f3c34bb9ef6c74883b6f5e5f93267792d295e31946616e33b",
+  "passed": 17,
+  "cases": [
+    {
+      "id": "returns-the-exact-canonical-greeting-without-domain-input",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": null
+    },
+    {
+      "id": "constructs-greeting-for-sidney",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": null
+    },
+    {
+      "id": "preserves-multibyte-name",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": null
+    },
+    {
+      "id": "hold-admitted-providers-that-declare-no-target",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": "NOT_OBSERVABLE"
+    },
+    {
+      "id": "admit-provider-once-its-target-is-declared",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": "PROVIDERS_RESOLVED"
+    },
+    {
+      "id": "refuse-target-the-binding-does-not-declare",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": "NOT_OBSERVABLE"
+    },
+    {
+      "id": "refuse-unadmitted-and-unconformed-providers",
+      "status": "PASSED",
+      "kind": "live-native-execution",
+      "kernel": "terminated",
+      "domain": "NOT_OBSERVABLE"
+    },
+    {
+      "id": "stale-publication",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "STALE_PUBLICATION"
+    },
+    {
+      "id": "unpublished-subject",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "SUBJECT_NOT_PUBLISHED"
+    },
+    {
+      "id": "forged-contract",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INPUT_OWNERSHIP_REFUSED"
+    },
+    {
+      "id": "forged-namespace",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INVALID_LAB_REQUEST"
+    },
+    {
+      "id": "raw-envelope-bypass",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INVALID_LAB_REQUEST"
+    },
+    {
+      "id": "empty-name",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INPUT_CONTRACT_REFUSED"
+    },
+    {
+      "id": "oversized-name",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INPUT_CONTRACT_REFUSED"
+    },
+    {
+      "id": "forged-inventory",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INPUT_OWNERSHIP_REFUSED"
+    },
+    {
+      "id": "unpublished-example",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "EXAMPLE_NOT_PUBLISHED"
+    },
+    {
+      "id": "direct-service-inventory-forgery",
+      "status": "PASSED",
+      "kind": "policy-refusal",
+      "code": "INPUT_POLICY_REFUSED"
+    }
+  ],
+  "scope": "Local shared Lab, canonical input ownership and database-to-memory execution; not Hugging Face deployment or remote authentication.",
+  "browserChecks": [
+    {
+      "name": "Hello World action has no editable payload and returns exact greeting",
+      "status": "PASSED"
+    },
+    {
+      "name": "Missing name refused and focused; 101-character name refused and focused",
+      "status": "PASSED"
+    },
+    {
+      "name": "Keyboard submission preserves Unicode and literal script markup",
+      "status": "PASSED",
+      "scriptElements": 0,
+      "dialogPresent": false
+    },
+    {
+      "name": "Provider held and eligible outcomes preserve dispositions, reasons and counts",
+      "status": "PASSED"
+    },
+    {
+      "name": "Provider supporting details and trace digests remain available",
+      "status": "PASSED"
+    },
+    {
+      "name": "Reset clears prior outcome and restores first retained example",
+      "status": "PASSED"
+    },
+    {
+      "name": "Capability, example, Run and Reset disabled while executing",
+      "status": "PASSED"
+    },
+    {
+      "name": "Narrow layout stacks panels without horizontal overflow",
+      "status": "PASSED",
+      "viewportWidth": 390,
+      "scrollWidth": 375,
+      "columns": "333px"
+    }
+  ],
+  "validation": {
+    "platformFullTestSuite": "PASSED",
+    "compilerRendererAndApiTests": "14 passed",
+    "embodyBindingAndCommandTests": "5 passed",
+    "typecheck": "PASSED",
+    "productionBuild": "PASSED",
+    "lint": "PASSED with 3 pre-existing hook warnings"
+  }
+}

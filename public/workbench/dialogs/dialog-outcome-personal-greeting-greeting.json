@@ -1,0 +1,55 @@
+{
+  "html": "\n<div class=\"ui-surface\" data-surface-profile=\"window\" style=\"width:560px;height:304px;\">\n  <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:304px;\" data-region-id=\"outcome-dialog\" data-region-path=\"outcome-dialog\" data-role=\"capability-outcome-dialog\" data-tenant-policy=\"single\">\n    <div class=\"ui-container\" style=\"left:0px;top:0px;width:560px;height:84px;\" data-region-id=\"outcome-header\" data-region-path=\"outcome-dialog/outcome-header\" data-role=\"dialog-title\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:16px;width:520px;height:18px;\" data-region-id=\"outcome-eyebrow\" data-region-path=\"outcome-dialog/outcome-header/outcome-eyebrow\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:18px;\" data-component-id=\"outcome-context\"><span data-component-type=\"label\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#greeting.context\" data-presentation-intent=\"section-label\" data-realized-via=\"type\" style=\"font:10px/1.5 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);\">PERSONAL-GREETING.V1</span></div>\n      </div>\n      <div class=\"ui-container\" style=\"left:20px;top:40px;width:520px;height:28px;\" data-region-id=\"outcome-heading\" data-region-path=\"outcome-dialog/outcome-header/outcome-heading\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:28px;\" data-component-id=\"outcome-title\"><h2 data-component-type=\"heading\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#greeting.title\" data-presentation-intent=\"card-title\" data-realized-via=\"type\" style=\"font-size:20px;line-height:1.35;font-weight:500;color:var(--inspect-ink);\">Capability outcome</h2></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:84px;width:560px;height:104px;\" data-region-id=\"outcome-elements\" data-region-path=\"outcome-dialog/outcome-elements\" data-role=\"outcome-layout\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:8px;width:520px;height:88px;\" data-region-id=\"slot-outcome-greeting-message\" data-region-path=\"outcome-dialog/outcome-elements/slot-outcome-greeting-message\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:88px;\" data-component-id=\"outcome-greeting-message\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#greeting.message\" data-presentation-intent=\"outcome-text\" data-realized-via=\"type\" data-bound-state=\"outcome.greeting.message\" data-binding-direction=\"read\" style=\"font-size:13px;line-height:1.6;overflow-wrap:anywhere;\"></p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:188px;width:560px;height:56px;\" data-region-id=\"outcome-evidence\" data-region-path=\"outcome-dialog/outcome-evidence\" data-role=\"evidence-note\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:8px;width:520px;height:40px;\" data-region-id=\"outcome-evidence-slot\" data-region-path=\"outcome-dialog/outcome-evidence/outcome-evidence-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:520px;height:40px;\" data-component-id=\"outcome-evidence-note\"><p data-component-type=\"text\" data-semantic-family=\"information\" data-semantic-identity=\"greet-by-name#greeting.evidence-limit\" data-presentation-intent=\"fine-print\" data-realized-via=\"type\" style=\"font:10px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--inspect-muted);\">This outcome is retained testimony for its run. Its presentation may change; its meaning may not.</p></div>\n      </div>\n    </div>\n    <div class=\"ui-container\" style=\"left:0px;top:244px;width:560px;height:60px;\" data-region-id=\"outcome-footer\" data-region-path=\"outcome-dialog/outcome-footer\" data-role=\"dialog-actions\" data-tenant-policy=\"single\">\n      <div class=\"ui-container\" style=\"left:20px;top:10px;width:388px;height:40px;\" data-region-id=\"outcome-spacer\" data-region-path=\"outcome-dialog/outcome-footer/outcome-spacer\" data-tenant-policy=\"single\">\n      </div>\n      <div class=\"ui-container\" style=\"left:420px;top:10px;width:120px;height:40px;\" data-region-id=\"outcome-close-slot\" data-region-path=\"outcome-dialog/outcome-footer/outcome-close-slot\" data-tenant-policy=\"single\">\n        <div class=\"ui-component\" style=\"left:0px;top:0px;width:120px;height:40px;\" data-component-id=\"outcome-close\"><button type=\"button\" data-semantic-action=\"dismiss-outcome\" data-action-disposition=\"ADMISSIBLEADMISSIBLE\" data-component-type=\"action\" data-semantic-family=\"action\" data-semantic-identity=\"greet-by-name#dismiss-outcome\" data-presentation-intent=\"secondary-action\" data-realized-via=\"type\" style=\"align-self:stretch;\">Close</button></div>\n      </div>\n    </div>\n  </div>\n</div>\n",
+  "geometry": {
+    "width": 560.0,
+    "height": 304.0
+  },
+  "interaction": {
+    "planType": "ui-interaction-plan.v1",
+    "surfaceId": "dialog-outcome-personal-greeting-greeting",
+    "componentAttribute": "data-component-id",
+    "reflect": {
+      "action": {
+        "controlSelector": "button",
+        "disabledProperty": "disabled",
+        "reasonAttribute": "title",
+        "dispositionAttribute": "data-action-disposition"
+      },
+      "text": {
+        "selector": "[data-component-type]",
+        "property": "textContent"
+      }
+    },
+    "state": [
+      {
+        "stateId": "outcome.greeting.message",
+        "valueKind": "string",
+        "mutability": "fixed",
+        "initialValue": ""
+      }
+    ],
+    "validation": [],
+    "bindings": [
+      {
+        "component": "outcome-greeting-message",
+        "state": "outcome.greeting.message",
+        "aspect": "value",
+        "direction": "read",
+        "writable": false,
+        "coerce": null,
+        "initialPhysicalValue": null
+      }
+    ],
+    "actions": [
+      {
+        "actionId": "dismiss-outcome",
+        "requiresAdmissible": [],
+        "availability": "available",
+        "scenarioEvent": "workbench.outcome.dismissed",
+        "components": [
+          "outcome-close"
+        ]
+      }
+    ]
+  }
+}
