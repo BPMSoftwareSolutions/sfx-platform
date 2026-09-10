@@ -1,5 +1,5 @@
 {
-  "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304",
+  "publicationId": "sha256:51a125471207d06002b23b90371d666b3e7af9cc439a0617d392acda0e3db269",
   "compiler": "sidefx-lab-profile-compiler.v1",
   "pilots": [
     {
@@ -91,14 +91,14 @@
       "examples": [],
       "authority": {
         "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
         "scenarioId": "say-hello-world",
         "identity": {
           "scenarioDefinitionDigest": "sha256:123b5017f236eae5d2cfcd3b0f7a27a1f85b01119bf2e1fe440dd65f7c539e8c",
           "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
           "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
-          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
-          "artifactDigest": "sha256:e50a0e7e3a982c3bfc25e68bf79a0045529181641936813f41ce0ebe1b953645"
+          "resolverVersion": "sha256:7b429795362d4e3ad3e1319da810b3db0ea5c6405e11a4fdd1cba759a427ddb1",
+          "artifactDigest": "sha256:474c4b0a9fdc4023dcef4c5045b6a6a8e3b73dad705034a0efea0e74923cb03d"
         }
       }
     },
@@ -215,14 +215,14 @@
       "examples": [],
       "authority": {
         "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
         "scenarioId": "greet-by-name",
         "identity": {
           "scenarioDefinitionDigest": "sha256:07f4cbb2048538eb88e3a73b6d60d1fa15e08bc49293a00f6e6da055a9b08b54",
           "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
           "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
-          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
-          "artifactDigest": "sha256:71f77a3826aefd69e59a0e683376256e30eb30898825ffe5f784383e4398bc30"
+          "resolverVersion": "sha256:7b429795362d4e3ad3e1319da810b3db0ea5c6405e11a4fdd1cba759a427ddb1",
+          "artifactDigest": "sha256:5c64d45fa19c039118ded499e1136814c4afaa082c23810dd94ca141ae4bb030"
         }
       }
     },
@@ -1153,14 +1153,14 @@
       ],
       "authority": {
         "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
         "scenarioId": "resolve-sidefx-eligible-providers",
         "identity": {
           "scenarioDefinitionDigest": "sha256:a18c0e606e1a70c22c5efd173e130016747bbaaf14f3f875bcc6428d9cc6a93f",
           "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
           "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
-          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
-          "artifactDigest": "sha256:a7335b6046a87c87cb70ed19a7857b0a95823dccadfb3420c1c3883db1570de8"
+          "resolverVersion": "sha256:7b429795362d4e3ad3e1319da810b3db0ea5c6405e11a4fdd1cba759a427ddb1",
+          "artifactDigest": "sha256:5f76da33df38ef77de4837011d9cc1ed9bfef251619aca1e1d9292af1eff25db"
         }
       }
     },
@@ -1172,7 +1172,6 @@
         "description": "Retrieve an actual quote from the configured RapidAPI provider, then run the database-selected capability to produce canonical price evidence. Enter an uppercase symbol such as AAPL. One request; no automatic retry.",
         "inputContract": "live-equity-price-request.v1",
         "inputSchemaDigest": "sha256:97b2f584d847b242202f4c06d90d9051492a47f83293d6f74f0e6be54929d539",
-        "providerInputBindingDigest": "sha256:09ecb038af10e553a16ec517857dc1eaf9efd4a6e1e608bc47fb4ca27e947f9b",
         "interaction": "form",
         "inputs": [
           {
@@ -1214,7 +1213,7 @@
         ],
         "outcome": {
           "contract": "equity-market-price-evidence.v1",
-          "schemaDigest": "sha256:7491b5daf9ab87fb56b86a61fe661ad86dc03b305cca97517d3819183d49ca24",
+          "schemaDigest": "sha256:075cb1dd62d074a2000d8682572b05e54638a281d74163ae1b88abe5deff316b",
           "view": "structured-result",
           "summaryPointers": [
             "/disposition",
@@ -1229,6 +1228,7 @@
           ],
           "collectionPointers": [],
           "tracePointers": [],
+          "resolvedDisposition": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
           "externalProviderInvoked": true
         }
       },
@@ -1239,29 +1239,9 @@
           "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.sidefx.local/contracts/live-equity-price-request.v1.schema.json\",\n  \"title\": \"Live equity price request\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"contractId\",\n    \"payload\"\n  ],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"live-equity-price-request.v1\"\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"additionalProperties\": false,\n      \"required\": [\n        \"symbol\",\n        \"region\"\n      ],\n      \"properties\": {\n        \"symbol\": {\n          \"type\": \"string\",\n          \"minLength\": 1,\n          \"maxLength\": 24,\n          \"pattern\": \"^[A-Z0-9.^=-]{1,24}$\"\n        },\n        \"region\": {\n          \"type\": \"string\",\n          \"minLength\": 2,\n          \"maxLength\": 2,\n          \"enum\": [\n            \"US\"\n          ]\n        }\n      }\n    }\n  }\n}\n"
         },
         {
-          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/input.schema.json",
-          "digest": "sha256:f6a05f620b86855b6f43c9e2964215226a771afb8bfc63bd05e3f6e535990cde",
-          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-evidence-request.v1.schema.json\",\n  \"title\": \"Equity market price evidence request\",\n  \"description\": \"One canonical request for provider-neutral equity market price evidence. The native provider testimony, provider binding and credential realization remain outside the capability's semantic identity.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"payload\"],\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"equity-market-price-evidence-request.v1\"\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"required\": [\"nativeTestimony\", \"region\", \"providerBinding\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"nativeTestimony\": {\n          \"type\": \"object\",\n          \"description\": \"The raw supplier payload. Its shape is selected by presence, never by provider identity.\"\n        },\n        \"region\": {\n          \"type\": \"string\",\n          \"minLength\": 1\n        },\n        \"providerBinding\": {\n          \"type\": \"object\",\n          \"required\": [\"bindingId\", \"providerId\"],\n          \"additionalProperties\": false,\n          \"properties\": {\n            \"bindingId\": { \"type\": \"string\", \"minLength\": 1 },\n            \"providerId\": { \"type\": \"string\", \"minLength\": 1 }\n          }\n        }\n      }\n    }\n  }\n}\n"
-        },
-        {
-          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/testimony.schema.json",
-          "digest": "sha256:00ec143466f6e349946a394f6b757978e6aebfa06b145fbc8bf0b8cb2a8a4a68",
-          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/native-equity-market-price-testimony.v1.schema.json\",\n  \"title\": \"Native equity market price testimony\",\n  \"description\": \"The raw supplier payload admitted at the native testimony boundary. Its shape is selected by presence, never by provider identity; the canonical mapping reads either declared native shape.\",\n  \"type\": \"object\"\n}\n"
-        },
-        {
           "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/evidence.schema.json",
-          "digest": "sha256:7491b5daf9ab87fb56b86a61fe661ad86dc03b305cca97517d3819183d49ca24",
-          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-evidence.v1.schema.json\",\n  \"title\": \"Equity market price evidence\",\n  \"description\": \"One canonical outcome for provider-neutral equity market price evidence: either the resolved evidence or an explicit native-testimony rejection. An observed price is attributable provider testimony, not an assertion of intrinsic value or cross-provider equivalence.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\", \"providerTestimony\"],\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"equity-market-price-evidence.v1\"\n    },\n    \"disposition\": {\n      \"enum\": [\n        \"EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED\",\n        \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\"\n      ]\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"required\": [\"symbol\", \"region\", \"currency\", \"observedPrice\", \"observedMarketTime\", \"marketState\", \"exchange\", \"sourceAttribution\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"symbol\": { \"type\": \"string\", \"minLength\": 1 },\n        \"region\": { \"type\": \"string\", \"minLength\": 1 },\n        \"currency\": { \"type\": \"string\", \"minLength\": 1 },\n        \"observedPrice\": { \"type\": \"number\" },\n        \"observedMarketTime\": { \"type\": \"integer\", \"minimum\": 0 },\n        \"marketState\": { \"type\": \"string\", \"minLength\": 1 },\n        \"exchange\": { \"type\": \"string\", \"minLength\": 1 },\n        \"sourceAttribution\": { \"type\": \"string\", \"minLength\": 1 }\n      }\n    },\n    \"reasonCode\": {\n      \"const\": \"REQUIRED_NATIVE_FIELDS_ABSENT\"\n    },\n    \"absentFieldCount\": {\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"providerTestimony\": {\n      \"type\": \"object\",\n      \"required\": [\"bindingId\", \"providerId\", \"nativeShape\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"bindingId\": { \"type\": \"string\", \"minLength\": 1 },\n        \"providerId\": { \"type\": \"string\", \"minLength\": 1 },\n        \"nativeShape\": {\n          \"enum\": [\n            \"quoteSummary.result.0.price\",\n            \"quoteResponse.result.0\"\n          ]\n        }\n      }\n    }\n  },\n  \"allOf\": [\n    {\n      \"if\": {\n        \"properties\": { \"disposition\": { \"const\": \"EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED\" } }\n      },\n      \"then\": {\n        \"required\": [\"payload\"],\n        \"properties\": {\n          \"reasonCode\": false,\n          \"absentFieldCount\": false\n        }\n      }\n    },\n    {\n      \"if\": {\n        \"properties\": { \"disposition\": { \"const\": \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\" } }\n      },\n      \"then\": {\n        \"required\": [\"reasonCode\", \"absentFieldCount\"],\n        \"properties\": {\n          \"payload\": false\n        }\n      }\n    }\n  ]\n}\n"
-        },
-        {
-          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/provider-unavailable.schema.json",
-          "digest": "sha256:5071fc7519708c6bf3bbec38eea0d7126b706e3cf548e777544b2b9facd5c6b6",
-          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-provider-unavailable.v1.schema.json\",\n  \"title\": \"Equity market price provider unavailable\",\n  \"description\": \"Resolution is held with attributable provider attempt evidence and no price evidence is invented.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\"],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"equity-market-price-provider-unavailable.v1\"\n    },\n    \"disposition\": {\n      \"const\": \"EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE\"\n    },\n    \"providerAttemptEvidence\": {\n      \"type\": \"object\"\n    }\n  }\n}\n"
-        },
-        {
-          "sourcePath": "capabilities/resolve-equity-market-price-evidence/contracts/testimony-rejection.schema.json",
-          "digest": "sha256:e03692ae347f4cbbc70d6dd6850198d6a7d30f1edaf99da04d3cdcf55db3a37a",
-          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/native-equity-market-price-testimony-rejection.v1.schema.json\",\n  \"title\": \"Native equity market price testimony rejection\",\n  \"description\": \"The native testimony is rejected without widening the mapping or emitting canonical price evidence.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\", \"reasonCode\"],\n  \"properties\": {\n    \"contractId\": {\n      \"const\": \"native-equity-market-price-testimony-rejection.v1\"\n    },\n    \"disposition\": {\n      \"const\": \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\"\n    },\n    \"reasonCode\": {\n      \"const\": \"REQUIRED_NATIVE_FIELDS_ABSENT\"\n    },\n    \"absentFieldCount\": {\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"providerTestimony\": {\n      \"type\": \"object\"\n    }\n  }\n}\n"
+          "digest": "sha256:075cb1dd62d074a2000d8682572b05e54638a281d74163ae1b88abe5deff316b",
+          "text": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"https://schemas.agentic-harness.local/contracts/equity-market-price-evidence.v1.schema.json\",\n  \"title\": \"Equity market price evidence\",\n  \"description\": \"One canonical outcome for provider-neutral equity market price evidence: the resolved evidence, an explicit native-testimony rejection, or an explicit provider-unavailable hold. An observed price is attributable provider testimony, not an assertion of intrinsic value or cross-provider equivalence.\",\n  \"type\": \"object\",\n  \"required\": [\"contractId\", \"disposition\", \"providerTestimony\"],\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"contractId\": { \"const\": \"equity-market-price-evidence.v1\" },\n    \"disposition\": {\n      \"enum\": [\n        \"EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED\",\n        \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\",\n        \"EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE\"\n      ]\n    },\n    \"payload\": {\n      \"type\": \"object\",\n      \"required\": [\"symbol\", \"region\", \"currency\", \"observedPrice\", \"observedMarketTime\", \"marketState\", \"exchange\", \"sourceAttribution\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"symbol\": { \"type\": \"string\", \"minLength\": 1 },\n        \"region\": { \"type\": \"string\", \"minLength\": 1 },\n        \"currency\": { \"type\": \"string\", \"minLength\": 1 },\n        \"observedPrice\": { \"type\": \"number\" },\n        \"observedMarketTime\": { \"type\": \"integer\", \"minimum\": 0 },\n        \"marketState\": { \"type\": \"string\", \"minLength\": 1 },\n        \"exchange\": { \"type\": \"string\", \"minLength\": 1 },\n        \"sourceAttribution\": { \"type\": \"string\", \"minLength\": 1 }\n      }\n    },\n    \"reasonCode\": {\n      \"enum\": [\"REQUIRED_NATIVE_FIELDS_ABSENT\", \"PROVIDER_EXCHANGE_NOT_COMPLETED\"]\n    },\n    \"absentFieldCount\": { \"type\": \"integer\", \"minimum\": 0 },\n    \"providerTestimony\": {\n      \"type\": \"object\",\n      \"required\": [\"bindingId\", \"providerId\"],\n      \"additionalProperties\": false,\n      \"properties\": {\n        \"bindingId\": { \"type\": \"string\", \"minLength\": 1 },\n        \"providerId\": { \"type\": \"string\", \"minLength\": 1 },\n        \"nativeShape\": { \"enum\": [\"quoteSummary.result.0.price\", \"quoteResponse.result.0\"] }\n      }\n    }\n  },\n  \"allOf\": [\n    {\n      \"if\": { \"properties\": { \"disposition\": { \"const\": \"EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED\" } } },\n      \"then\": { \"required\": [\"payload\"], \"properties\": { \"reasonCode\": false, \"absentFieldCount\": false } }\n    },\n    {\n      \"if\": { \"properties\": { \"disposition\": { \"const\": \"NATIVE_MARKET_PRICE_TESTIMONY_REJECTED\" } } },\n      \"then\": { \"required\": [\"reasonCode\", \"absentFieldCount\"], \"properties\": { \"payload\": false } }\n    },\n    {\n      \"if\": { \"properties\": { \"disposition\": { \"const\": \"EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE\" } } },\n      \"then\": { \"required\": [\"reasonCode\"], \"properties\": { \"payload\": false, \"absentFieldCount\": false } }\n    }\n  ]\n}\n"
         }
       ],
       "inputSchema": {
@@ -1308,7 +1288,7 @@
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://schemas.agentic-harness.local/contracts/equity-market-price-evidence.v1.schema.json",
         "title": "Equity market price evidence",
-        "description": "One canonical outcome for provider-neutral equity market price evidence: either the resolved evidence or an explicit native-testimony rejection. An observed price is attributable provider testimony, not an assertion of intrinsic value or cross-provider equivalence.",
+        "description": "One canonical outcome for provider-neutral equity market price evidence: the resolved evidence, an explicit native-testimony rejection, or an explicit provider-unavailable hold. An observed price is attributable provider testimony, not an assertion of intrinsic value or cross-provider equivalence.",
         "type": "object",
         "required": [
           "contractId",
@@ -1323,7 +1303,8 @@
           "disposition": {
             "enum": [
               "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
-              "NATIVE_MARKET_PRICE_TESTIMONY_REJECTED"
+              "NATIVE_MARKET_PRICE_TESTIMONY_REJECTED",
+              "EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE"
             ]
           },
           "payload": {
@@ -1374,7 +1355,10 @@
             }
           },
           "reasonCode": {
-            "const": "REQUIRED_NATIVE_FIELDS_ABSENT"
+            "enum": [
+              "REQUIRED_NATIVE_FIELDS_ABSENT",
+              "PROVIDER_EXCHANGE_NOT_COMPLETED"
+            ]
           },
           "absentFieldCount": {
             "type": "integer",
@@ -1384,8 +1368,7 @@
             "type": "object",
             "required": [
               "bindingId",
-              "providerId",
-              "nativeShape"
+              "providerId"
             ],
             "additionalProperties": false,
             "properties": {
@@ -1442,20 +1425,38 @@
                 "payload": false
               }
             }
+          },
+          {
+            "if": {
+              "properties": {
+                "disposition": {
+                  "const": "EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "reasonCode"
+              ],
+              "properties": {
+                "payload": false,
+                "absentFieldCount": false
+              }
+            }
           }
         ]
       },
       "examples": [],
       "authority": {
         "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-        "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+        "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
         "scenarioId": "resolve-equity-market-price-evidence",
         "identity": {
-          "scenarioDefinitionDigest": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "scenarioDefinitionDigest": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
-          "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
-          "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
-          "artifactDigest": "sha256:977fd6183b82e13926ff25d8c3ae3e2105a788caa6a43972a7ba7807e24b945a"
+          "platformDigest": "sha256:6f7cc1e575b3a14d9e68c67ae1545bd5e34990d6c65bd2c47fe5f916162105f5",
+          "resolverVersion": "sha256:7b429795362d4e3ad3e1319da810b3db0ea5c6405e11a4fdd1cba759a427ddb1",
+          "artifactDigest": "sha256:704b454c5042c547eb9f3a61cb53c464474a815b058c82fbbfb392cd8acd0c16"
         }
       }
     }

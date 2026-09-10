@@ -13,7 +13,7 @@ const [hello, greet, providers] = publication.pilots;
 assert(hello && greet && providers);
 
 test('finance uses declared symbol and region controls and refuses provider-owned fields', () => {
-  const finance = publication.pilots.find(p => p.profile.providerInputBindingDigest);
+  const finance = publication.pilots.find(p => p.profile.subject === 'resolve-equity-market-price-evidence');
   assert(finance);
   const values = { '/payload/symbol': 'AAPL', '/payload/region': 'US' };
   assert.deepEqual(bindInput(finance, values), { contractId: 'live-equity-price-request.v1', payload: { symbol: 'AAPL', region: 'US' } });
@@ -26,17 +26,17 @@ test('finance uses declared symbol and region controls and refuses provider-owne
   assert(!html.includes('name="/payload/nativeTestimony"'));
 });
 
-test('finance response binding checks the observed request and permitted provider declaration', async () => {
-  const finance = publication.pilots.find(p => p.profile.providerInputBindingDigest)!;
+test('finance response binding checks the observed request', async () => {
+  const finance = publication.pilots.find(p => p.profile.subject === 'resolve-equity-market-price-evidence')!;
   const input = bindInput(finance, { '/payload/symbol': 'AAPL', '/payload/region': 'US' });
   const base = { status: 'EXECUTED', capabilityId: finance.profile.subject, scenarioId: finance.authority.scenarioId,
     disposition: 'rejected', outcome: null, observationCount: 0, executionCount: 0, durationMs: 1,
-    evidence: { authorityIdentity: finance.authority.identity, snapshotId: finance.authority.snapshotId, projectionDigest: finance.authority.projectionDigest,
-      providerInput: { bindingDigest: finance.profile.providerInputBindingDigest, requestInput: input } }, execution: { result: {} } } as LabResult;
+    evidence: { authorityIdentity: finance.authority.identity, snapshotId: finance.authority.snapshotId, projectionDigest: finance.authority.projectionDigest },
+    execution: { result: { input } } } as LabResult;
   const request = { publicationId: publication.publicationId, subject: finance.profile.subject, values: { '/payload/symbol': 'AAPL', '/payload/region': 'US' } };
   assert.equal((await runPublishedInput(publication, request, async () => base)).status, 'EXECUTED');
   const changed = structuredClone(base); assert(changed.status === 'EXECUTED');
-  (changed.evidence.providerInput as Record<string, unknown>).bindingDigest = 'forged';
+  changed.execution.result.input = { contractId: 'live-equity-price-request.v1', payload: { symbol: 'MSFT', region: 'US' } };
   assert.equal((await runPublishedInput(publication, request, async () => changed)).status, 'UNKNOWN');
 });
 

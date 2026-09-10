@@ -37,10 +37,6 @@ for (const profile of profiles) {
   };
   const prefix = 'capabilities/' + profile.subject;
   const interfaces = JSON.parse(resource(prefix + '/interfaces.authority.json').text);
-  if (profile.providerInputBindingDigest) {
-    const bindings = (interfaces.invocationInputBindings ?? []).map((ref: string) => resource(path.posix.join(prefix, ref)));
-    assert.equal(bindings.filter((r: { digest: string }) => r.digest === profile.providerInputBindingDigest).length, 1, 'PROVIDER_INPUT_BINDING_NOT_SELECTED');
-  }
   const catalogPath = path.posix.normalize(path.posix.join(prefix, interfaces.contractCatalog));
   const catalog = JSON.parse(resource(catalogPath).text) as Record<string, string>;
   const resources = [...new Set(Object.values(catalog).map(ref => path.posix.normalize(path.posix.join(path.posix.dirname(catalogPath), ref))))].map(resource);

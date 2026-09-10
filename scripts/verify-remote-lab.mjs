@@ -27,15 +27,16 @@ for (const pilot of publication.pilots) {
     assert.equal(execution.result.disposition, 'terminated');
     assert.deepEqual(execution.evidence.authorityIdentity, pilot.authority.identity);
     assert.equal(execution.evidence.snapshotId, pilot.authority.snapshotId);
-    if (pilot.profile.providerInputBindingDigest) {
-      assert.equal(execution.evidence.providerInput.bindingDigest, pilot.profile.providerInputBindingDigest);
-      assert.equal(execution.evidence.providerInput.exchange.httpStatus, 200);
-      assert.equal(execution.evidence.providerInput.exchange.exchangeCount, 1);
-      assert.equal(execution.result.outcome.payload.symbol, values['/payload/symbol']);
-      assert.equal(execution.result.outcome.payload.observedPrice, execution.result.input.payload.nativeTestimony.quoteSummary.result[0].price.regularMarketPrice.raw);
+    if (pilot.profile.outcome.externalProviderInvoked) {
+      const outcome = execution.result.outcome;
+      assert.equal(outcome.disposition, pilot.profile.outcome.resolvedDisposition);
+      assert.equal(outcome.payload.symbol, values['/payload/symbol']);
+      assert.equal(typeof outcome.payload.observedPrice, 'number');
+      assert(outcome.payload.observedPrice > 0);
+      assert.equal(typeof outcome.payload.currency, 'string');
     }
     summary.checks.push({ id, passed: true, disposition: execution.result.outcome.disposition ?? execution.result.disposition,
-      ...(execution.evidence.providerInput ? { price: execution.result.outcome.payload.observedPrice, currency: execution.result.outcome.payload.currency, exchange: execution.evidence.providerInput.exchange } : {}) });
+      ...(pilot.profile.outcome.externalProviderInvoked ? { price: execution.result.outcome.payload.observedPrice, currency: execution.result.outcome.payload.currency } : {}) });
     console.log(JSON.stringify(summary.checks.at(-1)));
     for (const [name, body, token, expected] of [
       ['invalid-token', command, 'invalid', 401],

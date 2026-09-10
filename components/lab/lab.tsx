@@ -106,9 +106,8 @@ export function LabOutcome({ profile, result }: { profile: LabProfile; result: L
   const { outcome } = result;
   return <div className="lab-result">
     <p className="lab-kernel">Kernel disposition <strong>{result.disposition}</strong></p>
-    {result.evidence.providerInput ? <div className="lab-message"><p className="lab-verdict">Live provider retrieval</p>
-      <p>Retrieved {String(at(result.evidence, '/providerInput/exchange/timing/completedAt') ?? '')}</p>
-      <p>{String(at(result.evidence, '/providerInput/provider/providerId') ?? '')} · HTTP {String(at(result.evidence, '/providerInput/exchange/httpStatus') ?? '')}</p></div> : null}
+    {profile.outcome.externalProviderInvoked ? <div className="lab-message"><p className="lab-verdict">Live provider retrieval</p>
+      <p>{String(at(outcome, '/providerTestimony/providerId') ?? '')} · {String(at(outcome, '/payload/sourceAttribution') ?? '')}</p></div> : null}
     {result.disposition === 'terminated' ? profile.outcome.view === 'text'
       ? <p className="lab-greeting">{String(at(outcome, profile.outcome.pointer!) ?? '')}</p>
       : <>

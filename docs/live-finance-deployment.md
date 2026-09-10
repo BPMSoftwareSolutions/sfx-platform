@@ -29,20 +29,18 @@ the existing production or staging apps.
 
 ## What executed
 
-The registered `resolve-equity-market-price-evidence` root retains its original
-`equity-market-price-evidence-request.v1` contract: native testimony, region and
-provider identity. It remains a normalizer. Its retained interface now references
-`provider-input-binding.authority.json`; the separate live-request schema admits
-only an uppercase symbol and `US` region. The normalizer contract was not widened.
-
-The database delivery recognizes that declared input binding, verifies the exact
-native plan and the separately permitted binding digest, then uses the pinned SDA
-credential-binding and governed-HTTP providers. The endpoint, request projection,
-credential reference and response checks are data. Credentials, redirects, retries
-and arbitrary endpoints are not caller options. A successful observed response is
-projected into the existing normalizer input and that database-selected native
-scenario executes. HTTP evidence is separate from the kernel result; this does not
-claim a new HTTP kernel scenario or managed provider admission.
+The registered `resolve-equity-market-price-evidence` root now takes the
+`live-equity-price-request.v1` contract: an uppercase symbol and `US` region. It
+is a declared composition, not a normalizer carrying an invocation-time binding.
+Its execution authority chains five operations: build the credential-binding
+request, bind the external credential reference (effect), build the governed HTTP
+request from symbol and region, observe the bounded exchange (effect), and
+normalize the observed testimony into canonical evidence. Ports, endpoints, the
+credential reference, the response mapping and the transformations are declared
+authority, not code. Credentials, redirects, retries and arbitrary endpoints are
+not caller options. The pinned SDA credential-binding and governed-HTTP providers
+execute the effects; the candidate Node provider materializes them into the body
+and shares one governed effect context across the scenario's effect ports.
 
 The installed CLI also exercised this complete path, exiting 0:
 

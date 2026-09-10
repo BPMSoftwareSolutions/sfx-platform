@@ -32,10 +32,10 @@ export interface LabProfile {
     summaryPointers?: string[]; collectionPointers?: string[]; tracePointers?: string[];
     collectionFields?: Record<string, string[]>;
     domainLabels?: Record<string, string>; managedAdmission?: string; externalProviderInvoked?: boolean;
+    resolvedDisposition?: string;
   };
   exampleSource?: { sourcePath: string; digest: string; allowedFixtureIds: string[] };
   exampleLabels?: Record<string, string>;
-  providerInputBindingDigest?: string;
 }
 export interface SchemaResource { sourcePath: string; digest: string; text: string }
 export interface LabPilot {

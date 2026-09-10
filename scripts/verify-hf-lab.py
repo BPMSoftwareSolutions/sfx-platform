@@ -26,10 +26,13 @@ with httpx.Client(timeout=150, headers={'Authorization': 'Bearer ' + os.environ[
         assert result['disposition'] == 'terminated', result
         assert result['evidence']['authorityIdentity'] == pilot['authority']['identity']
         check = {'subject': profile['subject'], 'passed': True, 'outcome': result['outcome']}
-        if profile.get('providerInputBindingDigest'):
-            check['exchange'] = result['evidence']['providerInput']['exchange']
-            assert check['exchange']['httpStatus'] == 200
-            assert result['outcome']['payload']['observedPrice'] == result['execution']['result']['input']['payload']['nativeTestimony']['quoteSummary']['result'][0]['price']['regularMarketPrice']['raw']
+        if profile.get('outcome', {}).get('externalProviderInvoked'):
+            outcome = result['outcome']
+            assert outcome['disposition'] == profile['outcome'].get('resolvedDisposition'), outcome
+            assert outcome['payload']['symbol'] == values['/payload/symbol'], outcome
+            assert isinstance(outcome['payload']['observedPrice'], (int, float)) and outcome['payload']['observedPrice'] > 0, outcome
+            check['price'] = outcome['payload']['observedPrice']
+            check['currency'] = outcome['payload']['currency']
         summary['checks'].append(check)
         print(json.dumps({'subject': profile['subject'], 'passed': True}))
     forged = {**request, 'values': {**request['values'], '/payload/nativeTestimony': {}}}

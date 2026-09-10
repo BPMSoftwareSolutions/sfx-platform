@@ -50,10 +50,7 @@ export async function runPublishedInput(publication: LabPublication, raw: unknow
     if (!object(identity) || Object.entries(pilot.authority.identity).some(([k, v]) => identity[k] !== v)
       || result.evidence.snapshotId !== pilot.authority.snapshotId || result.evidence.projectionDigest !== pilot.authority.projectionDigest
       || result.scenarioId !== pilot.authority.scenarioId
-      || (pilot.profile.providerInputBindingDigest
-        ? at(result.evidence, '/providerInput/bindingDigest') !== pilot.profile.providerInputBindingDigest
-          || JSON.stringify(at(result.evidence, '/providerInput/requestInput')) !== JSON.stringify(input)
-        : JSON.stringify(at(result.execution, '/result/input')) !== JSON.stringify(input))) {
+      || JSON.stringify(at(result.execution, '/result/input')) !== JSON.stringify(input)) {
       return { status: 'UNKNOWN', capabilityId: r.subject, code: 'EXECUTION_BINDING_MISMATCH', message: 'The response does not match the published input and authority. Execution cannot be confirmed for this experience.' };
     }
     if (result.disposition === 'terminated' && !validators(pilot).outcome(result.outcome)) {
