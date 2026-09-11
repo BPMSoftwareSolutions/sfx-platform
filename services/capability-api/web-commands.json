@@ -1,4 +1,7 @@
 {
   "policyType": "sidefx-web-commands.v1",
-  "commands": [{ "object": "capability", "operation": "invoke" }]
+  "commands": [
+    { "object": "capability", "operation": "invoke" },
+    { "object": "capability", "operation": "circuit" }
+  ]
 }

@@ -59,6 +59,9 @@ const server = createCommandServer({ mapping, maxConcurrent: 2, maxBodyBytes: 65
     return supplied.length === expected.length && timingSafeEqual(supplied, expected);
   },
   authorize(envelope) {
+    // A circuit is a read of selected authority; any well-formed capability
+    // identity may be inspected. Invocation stays bound to the publication.
+    if (envelope.object === 'capability' && envelope.operation === 'circuit') return true;
     const pilot = publication.pilots.find(p => p.profile.subject === envelope.subject && p.profile.namespace === envelope.namespace);
     if (!pilot) return false;
     if (Date.now() - windowStarted >= 60000) { windowStarted = Date.now(); calls = 0; }
