@@ -19,7 +19,7 @@
         "detail": "Select to enter capability input.",
         "source": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         },
         "facts": {
@@ -27,29 +27,14 @@
         }
       },
       {
-        "id": "i-1db05d56f0c97a8e9cba",
-        "identity": "cell:scenario:resolve-equity-market-price-evidence:provider-input-binding",
+        "id": "i-4bbce01fc7eb45b46bcc",
+        "identity": "cell:scenario:resolve-equity-market-price-evidence:provider",
         "kind": "provider-port",
-        "label": "Provider input binding",
-        "detail": "The declared binding obtains native provider testimony for this scenario.",
-        "source": {
-          "label": "Published provider input binding",
-          "sha256": "sha256:09ecb038af10e553a16ec517857dc1eaf9efd4a6e1e608bc47fb4ca27e947f9b",
-          "pointer": "/providerInputBinding"
-        },
-        "facts": {
-          "scenarioId": "resolve-equity-market-price-evidence"
-        }
-      },
-      {
-        "id": "i-168fbf702b3085b0e8f6",
-        "identity": "cell:scenario:resolve-equity-market-price-evidence:native-input",
-        "kind": "input",
-        "label": "equity-market-price-evidence-request",
-        "detail": "Native testimony supplied by the declared binding; read-only.",
+        "label": "https://yahoo-finance166.p.rapidapi.com/api/stock/get-price?",
+        "detail": "Declared effect ports: sda-external-credential-reference-binding-port.v1, sda-governed-http-exchange-port.v1",
         "source": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         },
         "facts": {
@@ -61,10 +46,10 @@
         "identity": "cell:scenario:resolve-equity-market-price-evidence:event",
         "kind": "event",
         "label": "equity-market-price-evidence-requested",
-        "detail": "the canonical evidence retains symbol, region, currency, price, market time, market state, exchange, source attribution, and provider testimony identity",
+        "detail": "the canonical evidence retains symbol, region, currency, price, market time, market state, exchange, source attribution, and provider testimony identity, or names why resolution was held",
         "source": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         },
         "facts": {
@@ -79,7 +64,7 @@
         "detail": "Select to reopen this run’s outcome.",
         "source": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         },
         "facts": {
@@ -92,58 +77,45 @@
         "id": "r-resolve-equity-market-price-evidence-0",
         "identity": "resolve-equity-market-price-evidence:interface:0",
         "source": "i-c8cb7d46bb2dc5795a4d",
-        "target": "i-1db05d56f0c97a8e9cba",
+        "target": "i-4bbce01fc7eb45b46bcc",
         "kind": "interface-binding",
         "label": "binding",
         "provenance": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         }
       },
       {
         "id": "r-resolve-equity-market-price-evidence-1",
         "identity": "resolve-equity-market-price-evidence:interface:1",
-        "source": "i-1db05d56f0c97a8e9cba",
-        "target": "i-168fbf702b3085b0e8f6",
+        "source": "i-4bbce01fc7eb45b46bcc",
+        "target": "i-d694ab5cb8f1d828fbee",
         "kind": "interface-binding",
-        "label": "binding",
+        "label": "scenario interface",
         "provenance": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         }
       },
       {
         "id": "r-resolve-equity-market-price-evidence-2",
         "identity": "resolve-equity-market-price-evidence:interface:2",
-        "source": "i-168fbf702b3085b0e8f6",
-        "target": "i-d694ab5cb8f1d828fbee",
-        "kind": "interface-binding",
-        "label": "scenario interface",
-        "provenance": {
-          "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
-          "pointer": "/scenario/resolve-equity-market-price-evidence"
-        }
-      },
-      {
-        "id": "r-resolve-equity-market-price-evidence-3",
-        "identity": "resolve-equity-market-price-evidence:interface:3",
         "source": "i-d694ab5cb8f1d828fbee",
         "target": "i-11256b52ed6ddeaf9575",
         "kind": "interface-binding",
         "label": "scenario interface",
         "provenance": {
           "label": "Selected database scenario interface",
-          "sha256": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+          "sha256": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
           "pointer": "/scenario/resolve-equity-market-price-evidence"
         }
       }
     ]
   },
   "geometry": {
-    "width": 1460,
+    "width": 1180,
     "height": 330,
     "boxes": {
       "i-c8cb7d46bb2dc5795a4d": [
@@ -152,26 +124,20 @@
         230,
         125
       ],
-      "i-1db05d56f0c97a8e9cba": [
+      "i-4bbce01fc7eb45b46bcc": [
         320,
         95,
         230,
         125
       ],
-      "i-168fbf702b3085b0e8f6": [
+      "i-d694ab5cb8f1d828fbee": [
         600,
         95,
         230,
         125
       ],
-      "i-d694ab5cb8f1d828fbee": [
-        880,
-        95,
-        230,
-        125
-      ],
       "i-11256b52ed6ddeaf9575": [
-        1160,
+        880,
         95,
         230,
         125
@@ -180,10 +146,10 @@
     "engine": "declared-interface-row"
   },
   "coverage": {
-    "nodes": 5,
-    "routes": 4,
+    "nodes": 4,
+    "routes": 3,
     "omittedSourceNodes": 0,
-    "scope": "Selected scenario input/event/outcome and declared provider binding. Internal mechanics are a separate view."
+    "scope": "Selected scenario input/event/outcome and declared effect ports. Internal mechanics are a separate view."
   },
   "topology": {
     "roots": [
@@ -202,13 +168,8 @@
       "keyboardActivable": true
     },
     {
-      "targetId": "i-1db05d56f0c97a8e9cba",
-      "entityId": "i-1db05d56f0c97a8e9cba",
-      "keyboardActivable": true
-    },
-    {
-      "targetId": "i-168fbf702b3085b0e8f6",
-      "entityId": "i-168fbf702b3085b0e8f6",
+      "targetId": "i-4bbce01fc7eb45b46bcc",
+      "entityId": "i-4bbce01fc7eb45b46bcc",
       "keyboardActivable": true
     },
     {
@@ -235,36 +196,31 @@
       "targetId": "r-resolve-equity-market-price-evidence-2",
       "entityId": "r-resolve-equity-market-price-evidence-2",
       "keyboardActivable": true
-    },
-    {
-      "targetId": "r-resolve-equity-market-price-evidence-3",
-      "entityId": "r-resolve-equity-market-price-evidence-3",
-      "keyboardActivable": true
     }
   ],
   "provenance": {
     "authority": {
       "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-      "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+      "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
       "scenarioId": "resolve-equity-market-price-evidence",
       "identity": {
-        "scenarioDefinitionDigest": "sha256:80e0185026b9f61d6f2461614448731164ce94f836019acbddef886c0142f29a",
+        "scenarioDefinitionDigest": "sha256:e0303b20f842fe09426beb2ab6264915400652c125c6784a57a17a710b1f042c",
         "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
-        "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
-        "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
-        "artifactDigest": "sha256:977fd6183b82e13926ff25d8c3ae3e2105a788caa6a43972a7ba7807e24b945a"
+        "platformDigest": "sha256:6f7cc1e575b3a14d9e68c67ae1545bd5e34990d6c65bd2c47fe5f916162105f5",
+        "resolverVersion": "sha256:7b429795362d4e3ad3e1319da810b3db0ea5c6405e11a4fdd1cba759a427ddb1",
+        "artifactDigest": "sha256:704b454c5042c547eb9f3a61cb53c464474a815b058c82fbbfb392cd8acd0c16"
       }
     },
-    "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304"
+    "publicationId": "sha256:51a125471207d06002b23b90371d666b3e7af9cc439a0617d392acda0e3db269"
   },
   "invocation": {
     "subject": "resolve-equity-market-price-evidence",
     "inputNode": "i-c8cb7d46bb2dc5795a4d",
     "outcomeNode": "i-11256b52ed6ddeaf9575",
-    "providerNode": "i-1db05d56f0c97a8e9cba",
+    "providerNode": "i-4bbce01fc7eb45b46bcc",
     "eventNode": "i-d694ab5cb8f1d828fbee",
     "stepNodes": {
-      "admit-input": "i-168fbf702b3085b0e8f6",
+      "admit-input": "i-c8cb7d46bb2dc5795a4d",
       "resolve-event-authority": "i-d694ab5cb8f1d828fbee",
       "execute-event-authority": "i-d694ab5cb8f1d828fbee",
       "admit-outcome": "i-11256b52ed6ddeaf9575",

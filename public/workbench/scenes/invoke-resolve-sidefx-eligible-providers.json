@@ -115,7 +115,7 @@
     "nodes": 3,
     "routes": 2,
     "omittedSourceNodes": 0,
-    "scope": "Selected scenario input/event/outcome and declared provider binding. Internal mechanics are a separate view."
+    "scope": "Selected scenario input/event/outcome and declared effect ports. Internal mechanics are a separate view."
   },
   "topology": {
     "roots": [
@@ -157,17 +157,17 @@
   "provenance": {
     "authority": {
       "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-      "projectionDigest": "sha256:5441dc0f88ac07771c1d8048532549fe481bc9d8fa2922932dd0d9f149db9023",
+      "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
       "scenarioId": "resolve-sidefx-eligible-providers",
       "identity": {
         "scenarioDefinitionDigest": "sha256:a18c0e606e1a70c22c5efd173e130016747bbaaf14f3f875bcc6428d9cc6a93f",
         "pinnedPlatformCommit": "716811046f52dd2a67f9ff308a50d755571cbbad",
         "platformDigest": "sha256:4a9ce9d7b96c39aeadba21c7e65e7a2a3a7b4a545b8fe6dbf041c18f7b7cd9de",
-        "resolverVersion": "sha256:bf39e0a6ad0058b05ff479ae59d892d29a248a48a3ca67ae58f8b9e39eb19ffe",
-        "artifactDigest": "sha256:a7335b6046a87c87cb70ed19a7857b0a95823dccadfb3420c1c3883db1570de8"
+        "resolverVersion": "sha256:7b429795362d4e3ad3e1319da810b3db0ea5c6405e11a4fdd1cba759a427ddb1",
+        "artifactDigest": "sha256:5f76da33df38ef77de4837011d9cc1ed9bfef251619aca1e1d9292af1eff25db"
       }
     },
-    "publicationId": "sha256:2f43afdafdf734303c449cab844ad0a0dddc3c5d5645178fe3b004e6e547b304"
+    "publicationId": "sha256:51a125471207d06002b23b90371d666b3e7af9cc439a0617d392acda0e3db269"
   },
   "invocation": {
     "subject": "resolve-sidefx-eligible-providers",
