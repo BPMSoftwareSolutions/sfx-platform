@@ -1,22 +1,17 @@
 import { enabled } from '@/lib/workbench/server';
-import { isCapabilityId, isViewId, lowerScene } from '@/lib/workbench/scene';
+import { isCapabilityId, isViewId } from '@/lib/workbench/scene';
 
 /* Serve one capability view as `circuit-scene.v1`.
  *
- * Preferred source: the selected database authority, derived by the estate
- * service through the same `capability circuit` operation invocation uses. The
- * circuit is a view of that authority, so no separately compiled product
- * participates.
- *
- * Transitional fallback: the estate's compiled topology under public/media,
- * for the legacy views whose catalogue identifiers were produced by that
- * compiler. It is removed when the workbench catalogue is derived from
- * authority (the two use different node-id schemes today).
+ * The circuit is derived from the selected database authority by the estate
+ * service, through the same `capability circuit` operation invocation uses. The
+ * database is the only source: no separately compiled product participates, and
+ * there is no fallback to one.
  */
-async function authorityCircuit(capabilityId: string) {
+async function authorityCircuit(capabilityId: string, viewId: string) {
   const endpoint = process.env.SIDEFX_INVOCATION_ENDPOINT;
   const token = process.env.SIDEFX_SERVICE_TOKEN;
-  if (!endpoint || !token) return null;
+  if (!endpoint || !token) return { response: Response.json({ code: 'SCENE_UNAVAILABLE' }, { status: 503 }) };
   try {
     const response = await fetch(new URL('/commands', endpoint), {
       method: 'POST',
@@ -24,37 +19,28 @@ async function authorityCircuit(capabilityId: string) {
       body: JSON.stringify({ object: 'capability', operation: 'circuit', subject: capabilityId }),
       cache: 'no-store', signal: AbortSignal.timeout(15000),
     });
-    if (!response.ok) return null;
-    return (await response.json())?.result?.circuit ?? null;
-  } catch { return null; }
+    if (!response.ok) return { response: Response.json({ code: 'SCENE_UNAVAILABLE' }, { status: 404 }) };
+    const circuit = (await response.json())?.result?.circuit;
+    if (!circuit || circuit.identities?.viewId !== viewId) {
+      return { response: Response.json({ code: 'VIEW_IDENTITY_MISMATCH' }, { status: 409 }) };
+    }
+    const refused = (circuit.findings ?? []).filter((finding: { severity: string }) => finding.severity === 'error');
+    if (refused.length) return { response: Response.json({ code: 'SCENE_REFUSED', findings: refused }, { status: 422 }) };
+    return { circuit };
+  } catch {
+    return { response: Response.json({ code: 'SCENE_UNAVAILABLE' }, { status: 503 }) };
+  }
 }
 
-export async function GET(request: Request, context: { params: Promise<{ capabilityId: string; viewId: string }> }) {
+export async function GET(_request: Request, context: { params: Promise<{ capabilityId: string; viewId: string }> }) {
   if (!enabled()) return new Response(null, { status: 404 });
   const { capabilityId, viewId } = await context.params;
   if (!isCapabilityId(capabilityId) || !isViewId(viewId)) {
     return Response.json({ code: 'SCENE_IDENTITY_INVALID' }, { status: 400 });
   }
-  const headers = { 'content-type': 'application/json', 'cache-control': 'private, max-age=300' };
-
-  const circuit = await authorityCircuit(capabilityId);
-  if (circuit && circuit.identities?.viewId === viewId) {
-    const refused = (circuit.findings ?? []).filter((f: { severity: string }) => f.severity === 'error');
-    if (refused.length) return Response.json({ code: 'SCENE_REFUSED', findings: refused }, { status: 422 });
-    return Response.json({ scene: circuit, artifact: '' }, { headers });
-  }
-
-  try {
-    const { scene, artifact } = await lowerScene(capabilityId, viewId);
-    const refused = scene.findings.filter(f => f.severity === 'error');
-    if (refused.length) {
-      return Response.json({ code: 'SCENE_REFUSED', findings: refused }, { status: 422 });
-    }
-    return Response.json({ scene, artifact }, { headers });
-  } catch (error) {
-    const code = String((error as Error)?.message ?? '');
-    if (code === 'VIEW_IDENTITY_MISMATCH') return Response.json({ code }, { status: 409 });
-    if (code === 'VIEW_OUTSIDE_PRODUCTS') return Response.json({ code: 'SCENE_IDENTITY_INVALID' }, { status: 400 });
-    return Response.json({ code: 'SCENE_UNAVAILABLE' }, { status: 404 });
-  }
+  const result = await authorityCircuit(capabilityId, viewId);
+  if (result.response) return result.response;
+  return Response.json({ scene: result.circuit, artifact: '' }, {
+    headers: { 'content-type': 'application/json', 'cache-control': 'private, max-age=300' },
+  });
 }
