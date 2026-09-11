@@ -587,13 +587,7 @@
   /* The catalogue is data: 218 capabilities, their views, their scenarios and
    * what may be done with each. The runtime reads it and narrows — capability,
    * then scenario, then view — rather than knowing any capability by name. */
-  /* The estate is data the service derives from the selected authority. The
-   * package carries none of it: the capability catalogue is fetched at load,
-   * and each capability's circuits are fetched when it is selected, then kept
-   * for the session. Nothing here knows a capability by name. */
-  var endpoints = config.estateEndpoints || {};
-  var catalogue = { capabilities: [] };
-  var capabilityRecords = {};
+  var catalogue = config.estate || { capabilities: [] };
 
   function capability(capabilityId) {
     return catalogue.capabilities.filter(function (c) {
@@ -601,35 +595,10 @@
   }
 
   function viewsFor(capabilityId, scenarioId) {
-    var record = capabilityRecords[capabilityId];
+    var record = capability(capabilityId);
     if (!record) { return []; }
     return record.views.filter(function (view) {
-      return !scenarioId || view.identities.scenarioId === scenarioId;
-    });
-  }
-
-  function fetchJson(url) {
-    return fetch(url, { credentials: "same-origin" }).then(function (response) {
-      if (!response.ok) { throw new Error("estate unavailable"); }
-      return response.json();
-    });
-  }
-
-  function loadCatalogue() {
-    if (!endpoints.catalogue) { return Promise.resolve(null); }
-    return fetchJson(endpoints.catalogue).then(function (payload) {
-      catalogue = { capabilities: payload.capabilities || [] };
-      return payload;
-    });
-  }
-
-  function loadCapability(capabilityId) {
-    if (capabilityRecords[capabilityId]) { return Promise.resolve(capabilityRecords[capabilityId]); }
-    if (!endpoints.circuit) { return Promise.resolve(null); }
-    var url = endpoints.circuit.replace("{capabilityId}", encodeURIComponent(capabilityId));
-    return fetchJson(url).then(function (payload) {
-      capabilityRecords[capabilityId] = { views: payload.views || [] };
-      return capabilityRecords[capabilityId];
+      return !scenarioId || view.scenarioId === scenarioId;
     });
   }
 
@@ -659,7 +628,8 @@
         value: record.capabilityId,
         label: text.format("capabilityOption", {
           capabilityId: record.capabilityId,
-          affordance: text.message((record.affordances || []).indexOf("invoke") !== -1
+          views: record.views.length,
+          affordance: text.message(record.affordances.indexOf("invoke") !== -1
             ? "capabilityInvocable" : "capabilityInspectOnly")
         })
       };
@@ -668,12 +638,8 @@
   }
 
   function renderScenarios(capabilityId) {
-    var views = viewsFor(capabilityId, null);
-    var scenarios = [];
-    views.forEach(function (view) {
-      var scenarioId = view.identities.scenarioId;
-      if (scenarioId && scenarios.indexOf(scenarioId) === -1) { scenarios.push(scenarioId); }
-    });
+    var record = capability(capabilityId);
+    var scenarios = (record && record.scenarios) || [];
     var options = [{
       value: "",
       label: text.format("scenarioAll", { count: scenarios.length })
@@ -687,7 +653,7 @@
     var views = viewsFor(capabilityId, scenarioId);
     var options = views.map(function (view) {
       return {
-        value: view.identities.viewId,
+        value: view.viewId,
         label: text.format("viewOption", {
           label: view.label, nodes: view.coverage.nodes, routes: view.coverage.routes })
       };
@@ -698,7 +664,7 @@
 
   function selectedView(capabilityId, viewId) {
     var views = viewsFor(capabilityId, null);
-    return views.filter(function (view) { return view.identities.viewId === viewId; })[0] || null;
+    return views.filter(function (view) { return view.viewId === viewId; })[0] || null;
   }
 
   function openSelection(capabilityId, scenarioId, viewId) {
@@ -709,38 +675,94 @@
       unsupported(text.message("sceneUnpublished"));
       return;
     }
-    /* The circuit arrives derived from authority, already a scene. */
-    if (view.sceneVersion !== "circuit-scene.v1") {
-      publish("view.scope", text.message("sceneContractUnsupported"));
-      unsupported(text.message("sceneContractUnsupported"));
+    if (!view.scene && !resolverFor(capabilityId, view)) {
+      /* Catalogued, but its circuit is neither packaged here nor resolvable
+       * from a host. Said plainly rather than shown as an empty diagram. */
+      publish("view.scope", text.message("graphUnavailable"));
+      publish("view.coverage", text.format("coverage", {
+        nodes: view.coverage.nodes, routes: view.coverage.routes,
+        omitted: view.coverage.omittedSourceNodes }));
+      unsupported(text.message("sceneNotPackaged"));
       return;
     }
-    view.selected = viewId;
-    beginLoad();
-    adopt(view, "");
+    loadSceneFrom(view, capabilityId);
   }
 
-  /* Resolve a capability's circuits, then draw its first (or chosen) view. A
-   * capability may change while its circuits are in flight; the token keeps a
-   * late response harmless. */
-  var selectionToken = 0;
-  function selectCapability(capabilityId, scenarioId, viewId) {
-    var mine = ++selectionToken;
+  /* Where an unpackaged circuit is resolved from. The endpoint is declared by
+   * the estate binding the build carried in, so the runtime substitutes an
+   * identity into a template it was given and never knows a path of its own. */
+  function resolverFor(capabilityId, view) {
+    var declared = catalogue.sceneResolver;
+    if (!declared || !declared.endpoint) { return null; }
+    return {
+      url: declared.endpoint
+        .replace("{capabilityId}", encodeURIComponent(capabilityId))
+        .replace("{viewId}", encodeURIComponent(view.viewId)),
+      combined: declared.response === "combined"
+    };
+  }
+
+  /* Load a scene from an estate view descriptor. Race protection and the
+   * identity check are the same as any other load: a stale response can never
+   * replace the newly selected view. */
+  function loadSceneFrom(view, capabilityId) {
+    var mine = ++loadToken;
+    var resolver = view.scene ? null : resolverFor(capabilityId, view);
     publish("view.scope", text.message("loadingGraph"));
-    return loadCapability(capabilityId).then(function () {
-      if (mine !== selectionToken) { return; }
-      renderScenarios(capabilityId);
-      var chosen = viewId || renderViews(capabilityId, scenarioId);
-      openSelection(capabilityId, scenarioId, chosen);
-    }).catch(function () {
-      if (mine !== selectionToken) { return; }
-      publish("view.scope", text.message("graphUnavailable"));
-      unsupported(text.message("sceneLoadFailed"));
-    });
+    /* A scene that resolves from a host arrives over the network, so the
+     * previous circuit would otherwise stay on screen — under the newly
+     * selected capability's title — until the response lands. Clear it. */
+    beginLoad();
+    fetch(resolver ? resolver.url : view.scene, { credentials: "same-origin" })
+      .then(function (response) {
+        if (!response.ok) { throw new Error("scene unavailable"); }
+        return response.json();
+      })
+      .then(function (body) {
+        if (mine !== loadToken) { return; }
+        /* A resolved response carries the scene and the bytes it describes
+         * together, so the two cannot be fetched out of step. A packaged one
+         * is the scene itself, with its artifact beside it. */
+        var payload = resolver && resolver.combined ? body.scene : body;
+        if (resolver && resolver.combined) {
+          if (!payload || payload.sceneVersion !== "circuit-scene.v1") {
+            publish("view.scope", text.message("sceneContractUnsupported"));
+            unsupported(text.message("sceneContractUnsupported"));
+            return;
+          }
+          if (payload.identities.viewId !== view.viewId) {
+            publish("view.scope", text.message("graphIdentityMismatch"));
+            return;
+          }
+          adopt(payload, body.artifact || "");
+          return;
+        }
+        if (payload.sceneVersion !== "circuit-scene.v1") {
+          publish("view.scope", text.message("sceneContractUnsupported"));
+          unsupported(text.message("sceneContractUnsupported"));
+          return;
+        }
+        if (payload.identities.viewId !== view.viewId) {
+          publish("view.scope", text.message("graphIdentityMismatch"));
+          return;
+        }
+        if (!view.artifact) {
+          adopt(payload, "");
+          return;
+        }
+        return fetch(view.artifact, { credentials: "same-origin" })
+          .then(function (r) { return r.ok ? r.text() : ""; })
+          .then(function (svg) {
+            if (mine !== loadToken) { return; }
+            adopt(payload, svg);
+          });
+      })
+      .catch(function () {
+        if (mine !== loadToken) { return; }
+        publish("view.scope", text.message("graphUnavailable"));
+        unsupported(text.message("sceneLoadFailed"));
+      });
   }
-
-  /* A capability's circuits arrive already derived and already scenes, so the
-   * runtime never fetches a scene separately or resolves a stored artifact. */
 
   /* --------------------------------------------------------- run telemetry */
 
@@ -839,24 +861,7 @@
       group.setAttribute("aria-label", route.kind + ": " + (route.label || route.kind));
       var path = document.createElementNS(NS, "path");
       path.setAttribute("class", "route-path");
-      var direction = b.x >= a.x ? 1 : -1;
-      var startX = a.x + direction * a.w / 2, endX = b.x - direction * b.w / 2;
-      var obstacles = Object.keys(centre).map(function (id) { return centre[id]; }).filter(function (box) {
-        return box !== a && box !== b && box.x0 < Math.max(startX, endX)
-          && box.x0 + box.w > Math.min(startX, endX)
-          && box.y0 <= Math.max(a.y, b.y) && box.y0 + box.h >= Math.min(a.y, b.y);
-      });
-      if (obstacles.length) {
-        // A summary can connect across another node. Route around its box,
-        // preserving the declared connection rather than drawing through it.
-        var lane = Math.max.apply(null, [a.y0 + a.h, b.y0 + b.h].concat(obstacles.map(function (box) {
-          return box.y0 + box.h;
-        }))) + 28;
-        path.setAttribute("d", "M " + startX + " " + a.y + " H " + (startX + direction * 24)
-          + " V " + lane + " H " + (endX - direction * 24) + " V " + b.y + " H " + endX);
-      } else {
-        path.setAttribute("d", "M " + startX + " " + a.y + " L " + endX + " " + b.y);
-      }
+      path.setAttribute("d", "M " + a.x + " " + a.y + " L " + b.x + " " + b.y);
       path.setAttribute("fill", "none");
       path.setAttribute("stroke", "#6f9fb0");
       path.setAttribute("stroke-width", "2");
@@ -893,38 +898,21 @@
       kind.textContent = node.kind.toUpperCase();
       group.appendChild(kind);
 
-      /* Measure and wrap without stripping punctuation from contract IDs or
-       * endpoint URLs. An unbroken identifier must fit too. */
-      var measure = document.createElement("canvas").getContext("2d");
-      measure.font = "15px Arial, sans-serif";
-      var remaining = Array.from(String(node.label)), lines = [], maxWidth = box.w - 32;
-      var maxLines = Math.max(1, Math.floor((box.h - 62) / 19) + 1);
-      while (remaining.length && lines.length < maxLines) {
-        var count = 0;
-        while (count < remaining.length && measure.measureText(remaining.slice(0, count + 1).join("")).width <= maxWidth) count++;
-        count = Math.max(1, count);
-        if (count < remaining.length && lines.length < maxLines - 1) {
-          var boundary = remaining.slice(0, count).join("").search(/[\s\-/][^\s\-/]*$/);
-          if (boundary >= Math.floor(count / 2)) count = boundary + 1;
-        }
-        var row = remaining.splice(0, count).join("");
-        if (remaining.length && lines.length === maxLines - 1) {
-          while (measure.measureText(row + "…").width > maxWidth && row.length) row = Array.from(row).slice(0, -1).join("");
-          row += "…";
-        }
-        lines.push(row.trim());
-      }
-      var title = document.createElementNS(NS, "title");
-      title.textContent = node.label;
-      group.appendChild(title);
-      lines.forEach(function (row, index) {
+      /* Wrap the label rather than letting it run past the box. */
+      var words = String(node.label).split(/[\s.]+/);
+      var line = "", lines = [];
+      words.forEach(function (word) {
+        var candidate = line ? line + " " + word : word;
+        if (candidate.length > 24) { lines.push(line); line = word; } else { line = candidate; }
+      });
+      if (line) { lines.push(line); }
+      lines.slice(0, 4).forEach(function (row, index) {
         var label = document.createElementNS(NS, "text");
         label.setAttribute("x", box.x);
         label.setAttribute("y", box.y0 + 54 + index * 19);
         label.setAttribute("text-anchor", "middle");
         label.setAttribute("fill", "#e6f6f4");
         label.setAttribute("font-size", "15");
-        label.setAttribute("font-family", "Arial, sans-serif");
         label.textContent = row;
         group.appendChild(label);
       });
@@ -1049,12 +1037,16 @@
                     userState("view.selected"));
     },
     "select-capability": function () {
-      selectCapability(userState("estate.capability"), null, null);
+      var capabilityId = userState("estate.capability");
+      renderScenarios(capabilityId);
+      var viewId = renderViews(capabilityId, null);
+      openSelection(capabilityId, null, viewId);
     },
     "select-scenario": function () {
       var capabilityId = userState("estate.capability");
       var scenarioId = userState("estate.scenario") || null;
-      openSelection(capabilityId, scenarioId, renderViews(capabilityId, scenarioId));
+      var viewId = renderViews(capabilityId, scenarioId);
+      openSelection(capabilityId, scenarioId, viewId);
     },
     "show-material": function () { applyPresentation("material"); },
     "show-base-svg": function () { applyPresentation("base"); },
@@ -1101,7 +1093,9 @@
     if (capabilityId && capabilityId !== lastSelection.capability) {
       lastSelection.capability = capabilityId;
       lastSelection.scenario = null;
-      selectCapability(capabilityId, null, null);
+      renderScenarios(capabilityId);
+      lastSelection.view = renderViews(capabilityId, null);
+      openSelection(capabilityId, null, lastSelection.view);
       return;
     }
     if (scenarioId !== lastSelection.scenario) {
@@ -1129,19 +1123,20 @@
 
   /* ---------------------------------------------------------------- start */
 
-  renderTelemetry(null, []);
-  loadCatalogue().then(function (payload) {
-    if (payload && catalogue.capabilities.length) {
-      var startCapability = renderCapabilities();
-      if (startCapability) {
-        lastSelection.capability = startCapability;
-        lastSelection.scenario = null;
-        return selectCapability(startCapability, null, null);
-      }
-    } else {
-      loadScene(config.initialViewId);
-    }
-  }).then(reportHeight, reportHeight);
+  var startCapability = renderCapabilities();
+  if (startCapability) {
+    renderScenarios(startCapability);
+    var startView = renderViews(startCapability, null);
+    renderTelemetry(null, []);
+    lastSelection.capability = startCapability;
+    lastSelection.scenario = null;
+    lastSelection.view = startView;
+    openSelection(startCapability, null, startView);
+  } else {
+    renderTelemetry(null, []);
+    loadScene(config.initialViewId);
+  }
+  reportHeight();
 
   window.SFX_WORKBENCH = {
     findings: findings,

@@ -70,10 +70,7 @@ export function createCommandServer({ mapping, execute, authenticate = () => tru
     }
     if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)
       || !Object.keys(envelope).every(key => ['object', 'operation', 'subject', 'namespace', 'input'].includes(key))
-      || typeof envelope.object !== 'string' || !envelope.object.length
-      || typeof envelope.operation !== 'string' || !envelope.operation.length
-      // The catalogue is the one read that names no subject.
-      || (envelope.operation !== 'catalogue' && (typeof envelope.subject !== 'string' || !envelope.subject.length))
+      || !['object', 'operation', 'subject'].every(key => typeof envelope[key] === 'string' && envelope[key].length)
       || (envelope.namespace !== undefined && (typeof envelope.namespace !== 'string' || !envelope.namespace.length))) {
       return refuse(response, 400, 'INVALID_REQUEST', 'Expected object, operation, subject and optional namespace/input.');
     }
