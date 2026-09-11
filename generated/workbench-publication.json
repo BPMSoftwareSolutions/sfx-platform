@@ -131,6 +131,67 @@
             }
           ],
           "layout": "dialogs/dialog-outcome-live-finance-price.json"
+        },
+        {
+          "outcomeId": "provider-unavailable",
+          "title": "Capability outcome",
+          "match": {
+            "contractId": "equity-market-price-evidence.v1",
+            "discriminatorPointer": "/disposition",
+            "discriminatorValues": [
+              "EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE"
+            ]
+          },
+          "anchor": {
+            "kind": "scene-node",
+            "nodeIdentity": "cell:scenario:resolve-equity-market-price-evidence:outcome",
+            "fallback": "viewport-transition"
+          },
+          "elements": [
+            {
+              "elementId": "disposition",
+              "pointers": {
+                "value": "/disposition"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Domain disposition",
+              "emptyText": null,
+              "dispositionLabels": {
+                "EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE": "Provider unavailable; no price was produced"
+              },
+              "precision": null,
+              "op": "mapped-text"
+            },
+            {
+              "elementId": "reason",
+              "pointers": {
+                "value": "/reasonCode"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Hold reason",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "text"
+            },
+            {
+              "elementId": "provider",
+              "pointers": {
+                "bindingId": "/providerTestimony/bindingId",
+                "providerId": "/providerTestimony/providerId"
+              },
+              "itemPath": null,
+              "fields": null,
+              "label": "Provider",
+              "emptyText": null,
+              "dispositionLabels": null,
+              "precision": null,
+              "op": "key-value"
+            }
+          ],
+          "layout": "dialogs/dialog-outcome-live-finance-provider-unavailable.json"
         }
       ]
     },
