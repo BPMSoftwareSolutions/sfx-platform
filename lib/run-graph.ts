@@ -5,13 +5,18 @@ import type { CircuitEdge, CircuitProjection, CircuitNode } from '@/contracts/es
  * Run-graph view model — the platform half of the id binding.
  *
  * The run graph is the composed execution graph the run actually compiled, served as a declared
- * public projection. This module normalises it, applies the declared view granularity (the
- * nearest-enclosing-cell collapse, capped at `DETAIL_CELL_LIMIT`) and converts the collapsed view
- * into the renderer's projection. No capability vocabulary lives here: binding is by `cellId` and
- * `edgeId` alone.
+ * public projection. This module normalises it, collapses it to fit `DETAIL_CELL_LIMIT` and
+ * converts the collapsed view into the renderer's projection. No capability vocabulary lives here:
+ * binding is by `cellId` and `edgeId` alone.
+ *
+ * KNOWN DEFECT (review §15 item 4): the collapse rule, the limit, the altitude-to-primitive table
+ * and the edge-family mapping below are platform code, not declared authority. The declared homes
+ * are the estate's `read-capability-circuit` view (nearest-enclosing-cell membership) and
+ * `read-circuit-presentation` (`granularity.detailCellLimit`). Revisit when the declared view
+ * serves membership per run (review §15 item 3) or the primitive mapping is declared (Phase 3).
  */
 
-/** Declared presentation cap: the collapsed view is laid out, detail beyond it is on demand. */
+/** Presentation cap mirrored from `read-circuit-presentation` (declared value 30); see KNOWN DEFECT. */
 export const DETAIL_CELL_LIMIT = 30;
 
 export interface RunGraphCell {
@@ -143,7 +148,7 @@ export function normalizeRunGraph(graph: SdaRunGraph): RunGraph {
 }
 
 /**
- * The declared granularity rule: when the graph carries more cells than the detail limit, redraw
+ * The platform's collapse (not declared; see KNOWN DEFECT): when the graph carries more cells than the detail limit, redraw
  * with the nearest enclosing cells only — walk each drawn cell up its `parentCellId` chain until
  * the drawn set fits the limit. Cells with no parent stay drawn. A flat graph that cannot
  * collapse is drawn whole rather than truncated; `collapsed` records which happened.
