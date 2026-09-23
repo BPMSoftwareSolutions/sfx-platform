@@ -139,10 +139,25 @@ body>header>nav { max-width: var(--page-width); padding-inline: var(--page-gutte
 .circuit-node--active { animation: circuit-node-pulse 1.4s ease-in-out infinite; }
 .circuit-node--done rect { stroke-width: 2.5; }
 .circuit-node--failed rect { stroke: var(--color-failure); stroke-width: 2.5; }
+/* Material nodes: the observed state layers over the plate; it never replaces the material. */
+.circuit-node-plate { transition: opacity .3s ease; }
+.circuit-node--planned .circuit-node-plate { opacity: .45; }
+.circuit-node--active .circuit-node-plate { opacity: 1; }
+.circuit-node--done .circuit-node-plate { opacity: .95; }
+.circuit-node--failed .circuit-node-plate { opacity: .8; }
+.circuit-node--active .circuit-node-contour { stroke-dasharray: 7 4; }
+.circuit-node--done .circuit-node-contour { stroke-width: 2.5; }
+.circuit-node--failed .circuit-node-contour { stroke: var(--color-failure); stroke-width: 2.5; }
+.circuit-node--failed .circuit-node-detail { stroke: var(--color-failure); }
 .circuit-edge--planned { opacity: .35; }
 .circuit-edge--active { stroke-dasharray: 7 4; }
 .circuit-edge--done { stroke-width: 2.5; }
 .circuit-edge--failed { stroke: var(--color-failure); stroke-width: 2.5; }
+.circuit-edge-material { transition: opacity .3s ease; }
+.circuit-edge-material--planned { opacity: .16; }
+.circuit-edge-material--active { opacity: .7; }
+.circuit-edge-material--done { opacity: .6; }
+.circuit-edge-material--failed { opacity: .45; }
 @keyframes circuit-node-pulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }
 /* Authored bundles are comparison candidates: labelled, set beside the trace, never traced. */
 .authored-comparison { border: 1px dashed var(--color-grid-line); }

@@ -102,6 +102,20 @@ export type RunGraphResult =
   | { ok: true; value: SdaRunGraph }
   | { ok: false; code: string; message: string };
 
+/**
+ * The compiled capability graph — `GET /v1/capabilities/{id}/graph`.
+ *
+ * The same declared public projection as a run graph, compiled for the capability itself with no
+ * run: `graphId`, `canonicalGraphDigest`, cells and edges only. It is the engine's compilation of
+ * the capability's execution graph, not a run observation.
+ */
+export const SdaCapabilityGraph = SdaRunGraph;
+export type SdaCapabilityGraph = SdaRunGraph;
+
+export type CapabilityGraphResult =
+  | { ok: true; value: SdaCapabilityGraph }
+  | { ok: false; code: string; message: string };
+
 /** What the run action returns to the client. Serializable across the server-action boundary. */
 export type RunAdmission =
   | { ok: true; runId: string; state: SdaRunState }

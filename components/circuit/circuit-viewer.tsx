@@ -2,10 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { CircuitProjection } from '@/contracts/estate';
+import type { CircuitProjection, MaterialToken } from '@/contracts/estate';
 
 import { layoutCircuit } from './layout';
-import { EDGE_STYLES, FIDELITY_COPY, PRIMITIVE_STYLES } from './scl-theme';
+import { materialGeometry, type MaterialGeometry } from './material-geometry';
+import {
+  EDGE_STYLES,
+  FIDELITY_COPY,
+  MATERIAL_STYLES,
+  PRIMITIVE_MATERIAL,
+  PRIMITIVE_STYLES,
+  type MaterialStyle,
+} from './scl-theme';
 
 /**
  * Circuit viewer — §12.2, §12.4, §6.6.
@@ -13,12 +21,21 @@ import { EDGE_STYLES, FIDELITY_COPY, PRIMITIVE_STYLES } from './scl-theme';
  * Topology, labels, status and evidence come from the deterministic projection. The viewer adds
  * selection, an equivalent text outline, a legend, a node inspector and opt-in illustrative flow.
  *
+ * A node carrying a canonical `material` is drawn as the component plate inside its defining
+ * shape, with the state affordances layered over the material — the observed class never replaces
+ * what the component is. Nodes without a material (authored projections) keep the primitive rect.
+ *
  * The SVG and the text outline are both server-rendered, so public reading and the text
  * explanation remain available without JavaScript; only the controls require it.
  */
 
 /** Observed execution state for one node, applied as an explicit class and data attribute. */
 export type LiveNodeState = 'planned' | 'active' | 'done' | 'failed';
+
+/** `url(#…)` fragments must not carry cell-id punctuation. */
+const fragmentId = (value: string) => `circuit-${value.replace(/[^a-zA-Z0-9]+/g, '-')}`;
+const clipId = (nodeId: string) => fragmentId(`clip-${nodeId}`);
+const edgePatternId = (token: string) => fragmentId(`edge-${token}`);
 
 interface Props {
   circuit: CircuitProjection;
@@ -29,9 +46,11 @@ interface Props {
   liveNodes?: Partial<Record<string, LiveNodeState>>;
   /** Live trace overlay for drawn edges: edge id to observed state. */
   liveEdges?: Partial<Record<string, LiveNodeState>>;
+  /** Canonical material token to its published `/media/materials/...` asset. */
+  materials?: Record<string, string>;
 }
 
-export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes, liveEdges }: Props) {
+export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes, liveEdges, materials }: Props) {
   const layout = useMemo(() => layoutCircuit(circuit), [circuit]);
   const [internalSelection, setInternalSelection] = useState<string | undefined>(undefined);
   const [playing, setPlaying] = useState(false);
@@ -63,6 +82,35 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [playing]);
+
+  // Every drawn node carries a material silhouette. A run cell resolves its own material; an
+  // authored projection falls back to the primitive's table entry. The plate image is layered
+  // only when the projection resolves a canonical material and its asset is published.
+  const nodeVisuals = useMemo(() => {
+    const map = new Map<
+      string,
+      { token: MaterialToken; style: MaterialStyle; url?: string; geometry: MaterialGeometry; plate: boolean }
+    >();
+    for (const node of circuit.nodes) {
+      const box = layout.nodeById[node.id];
+      if (!box) continue;
+      const token = node.material ?? PRIMITIVE_MATERIAL[node.primitive];
+      const style = MATERIAL_STYLES[token];
+      if (!style) continue;
+      const url = node.material ? materials?.[token] : undefined;
+      map.set(node.id, { token, style, url, geometry: materialGeometry(style.shape, box), plate: Boolean(url) });
+    }
+    return map;
+  }, [circuit.nodes, layout, materials]);
+
+  const edgeMaterialTokens = useMemo(() => {
+    const tokens = new Set<MaterialToken>();
+    if (!materials) return tokens;
+    for (const edge of circuit.edges) {
+      if (edge.material && materials[edge.material]) tokens.add(edge.material);
+    }
+    return tokens;
+  }, [circuit.edges, materials]);
 
   const fidelity = FIDELITY_COPY[circuit.fidelity];
   const selectedNode = circuit.nodes.find((n) => n.id === selected);
@@ -119,12 +167,70 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
               {`${fidelity.explanation} ${circuit.nodes.length} nodes, ${circuit.edges.length} routes. The node list below carries the same content as text.`}
             </desc>
 
+            <defs>
+              {[...nodeVisuals.entries()]
+                .filter(([, visual]) => visual.plate)
+                .map(([nodeId, visual]) => (
+                  <clipPath key={nodeId} id={clipId(nodeId)}>
+                    <path d={visual.geometry.silhouette} />
+                  </clipPath>
+                ))}
+              {[...edgeMaterialTokens].map((token) => {
+                const crop = MATERIAL_STYLES[token].crop;
+                return (
+                  <pattern
+                    key={token}
+                    id={edgePatternId(token)}
+                    patternUnits="userSpaceOnUse"
+                    width={120}
+                    height={28}
+                  >
+                    <svg
+                      x={0}
+                      y={0}
+                      width={120}
+                      height={28}
+                      viewBox={`${crop.x} ${crop.y} ${crop.width} ${crop.height}`}
+                      preserveAspectRatio="none"
+                    >
+                      <image
+                        href={materials?.[token]}
+                        x={0}
+                        y={0}
+                        width={1024}
+                        height={1024}
+                        preserveAspectRatio="none"
+                      />
+                    </svg>
+                  </pattern>
+                );
+              })}
+            </defs>
+
             {layout.edges.map((edge) => {
               const source = circuit.edges.find((e) => e.id === edge.id);
               const style = EDGE_STYLES[source?.family ?? 'SUPPORT'];
               const liveEdge = liveEdges?.[edge.id];
+              const edgeToken = source?.material && materials?.[source.material] ? source.material : undefined;
+              // A loop-back route reads as a loop: dashed at rest; state still layers over it.
+              const dash = edge.back ? '6 4' : style.dash === '1 0' ? undefined : style.dash;
               return (
-                <g key={edge.id}>
+                <g key={edge.id} style={edgeToken ? { isolation: 'isolate' } : undefined} data-back={edge.back || undefined}>
+                  {edgeToken ? (
+                    <>
+                      <path d={edge.path} fill="none" stroke="#07131e" strokeWidth={6} strokeLinecap="round" opacity={0.9} />
+                      <path
+                        d={edge.path}
+                        className={liveEdge ? `circuit-edge-material circuit-edge-material--${liveEdge}` : 'circuit-edge-material'}
+                        fill="none"
+                        stroke={`url(#${edgePatternId(edgeToken)})`}
+                        strokeWidth={6}
+                        strokeLinecap="round"
+                        opacity={0.4}
+                        style={{ mixBlendMode: 'screen' }}
+                      />
+                    </>
+                  ) : null}
                   <path
                     d={edge.path}
                     className={liveEdge ? `circuit-edge circuit-edge--${liveEdge}` : 'circuit-edge'}
@@ -132,9 +238,21 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                     fill="none"
                     stroke={style.stroke}
                     strokeWidth={1.5}
-                    strokeDasharray={style.dash === '1 0' ? undefined : style.dash}
+                    strokeDasharray={dash}
                     opacity={0.8}
                   />
+                  {edge.junctions.map((junction, index) => (
+                    <circle
+                      key={`${edge.id}-junction-${index}`}
+                      className="circuit-junction"
+                      cx={junction.x}
+                      cy={junction.y}
+                      r={3.2}
+                      fill={style.stroke}
+                      stroke="#07131e"
+                      strokeWidth={1}
+                    />
+                  ))}
                   {playing && !reducedMotion ? (
                     // Illustrative flow only. It follows the exact compiled path (§12.4).
                     <circle r={5} fill="var(--color-text)" opacity={0.9}>
@@ -157,9 +275,21 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
             {circuit.nodes.map((node) => {
               const box = layout.nodeById[node.id];
               if (!box) return null;
-              const style = PRIMITIVE_STYLES[node.primitive];
+              const visual = nodeVisuals.get(node.id);
+              const primitiveStyle = PRIMITIVE_STYLES[node.primitive];
+              const style = node.material && visual ? visual.style : primitiveStyle;
               const isSelected = node.id === selected;
               const live = liveNodes?.[node.id];
+              const geometry = visual?.geometry;
+              // Every silhouette keeps its glyph band clear of the label.
+              const inset = geometry?.labelInsetX ?? 14;
+              // The plate image is drawn only when the projection itself resolves a material.
+              const plateUrl = node.material ? visual?.url : undefined;
+              const crop = plateUrl ? visual?.style.crop : undefined;
+              const colors =
+                node.material && visual
+                  ? { fill: visual.style.fill, stroke: visual.style.stroke }
+                  : { fill: primitiveStyle.fill, stroke: primitiveStyle.stroke };
               return (
                 <g
                   key={node.id}
@@ -178,19 +308,107 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                   }}
                   style={{ cursor: 'pointer' }}
                 >
-                  <rect
-                    x={box.x}
-                    y={box.y}
-                    width={box.width}
-                    height={box.height}
-                    rx={node.primitive === 'RESPONSIBILITY' ? 4 : 14}
-                    fill={style.fill}
-                    stroke={isSelected ? 'var(--color-signal)' : style.stroke}
-                    strokeWidth={isSelected ? 2.5 : 1.5}
-                    strokeDasharray={node.primitive === 'UNRESOLVED' ? '5 4' : undefined}
-                  />
+                  {geometry && plateUrl && crop ? (
+                    <>
+                      {/* The material plate inside the token's defining shape; state layers over it. */}
+                      <path d={geometry.silhouette} fill="#07131e" opacity={0.6} />
+                      <g
+                        clipPath={`url(#${clipId(node.id)})`}
+                        className="circuit-node-plate"
+                        style={{ isolation: 'isolate', pointerEvents: 'none' }}
+                      >
+                        <path d={geometry.silhouette} fill="#07131e" />
+                        <svg
+                          x={box.x}
+                          y={box.y}
+                          width={box.width}
+                          height={box.height}
+                          viewBox={`${crop.x} ${crop.y} ${crop.width} ${crop.height}`}
+                          preserveAspectRatio="none"
+                        >
+                          <image
+                            href={plateUrl}
+                            x={0}
+                            y={0}
+                            width={1024}
+                            height={1024}
+                            preserveAspectRatio="none"
+                            opacity={0.92}
+                            style={{ mixBlendMode: 'screen' }}
+                          />
+                        </svg>
+                      </g>
+                      {geometry.details.map((d, index) => (
+                        <path
+                          key={`${node.id}-detail-${index}`}
+                          d={d}
+                          className="circuit-node-detail"
+                          fill="none"
+                          stroke={colors.stroke}
+                          strokeWidth={1.2}
+                          opacity={0.7}
+                        />
+                      ))}
+                      {([
+                        [14, 0.05],
+                        [8, 0.09],
+                        [4, 0.16],
+                      ] as const).map(([width, opacity]) => (
+                        <path
+                          key={`${node.id}-glow-${width}`}
+                          d={geometry.silhouette}
+                          fill="none"
+                          stroke={colors.stroke}
+                          strokeWidth={width}
+                          opacity={opacity}
+                        />
+                      ))}
+                      <path
+                        d={geometry.silhouette}
+                        className="circuit-node-contour"
+                        fill="none"
+                        stroke={isSelected ? 'var(--color-signal)' : style.stroke}
+                        strokeWidth={isSelected ? 2.5 : 1.5}
+                      />
+                    </>
+                  ) : geometry ? (
+                    <>
+                      {/* The same silhouette without its asset: fill, details and contour. */}
+                      <path d={geometry.silhouette} fill={colors.fill} />
+                      {geometry.details.map((d, index) => (
+                        <path
+                          key={`${node.id}-detail-${index}`}
+                          d={d}
+                          className="circuit-node-detail"
+                          fill="none"
+                          stroke={colors.stroke}
+                          strokeWidth={1.2}
+                          opacity={0.7}
+                        />
+                      ))}
+                      <path
+                        d={geometry.silhouette}
+                        className="circuit-node-contour"
+                        fill="none"
+                        stroke={isSelected ? 'var(--color-signal)' : colors.stroke}
+                        strokeWidth={isSelected ? 2.5 : 1.5}
+                        strokeDasharray={node.primitive === 'UNRESOLVED' ? '5 4' : undefined}
+                      />
+                    </>
+                  ) : (
+                    <rect
+                      x={box.x}
+                      y={box.y}
+                      width={box.width}
+                      height={box.height}
+                      rx={14}
+                      fill={colors.fill}
+                      stroke={isSelected ? 'var(--color-signal)' : colors.stroke}
+                      strokeWidth={isSelected ? 2.5 : 1.5}
+                    />
+                  )}
                   <text
-                    x={box.x + 14}
+                    x={box.x + inset}
                     y={box.y + 20}
                     fill={style.stroke}
                     fontSize={10}
@@ -199,13 +417,13 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                   >
                     {style.label.toUpperCase()}
                   </text>
-                  {box.lines.map((line, index) => (
+                  {(box.displayLines ?? box.lines).map((line, index) => (
                     <text
                       key={`${node.id}-line-${index}`}
-                      x={box.x + 14}
+                      x={box.x + inset}
                       y={box.y + 40 + index * 19}
                       fill={style.text}
-                      fontSize={14}
+                      fontSize={13}
                       fontFamily="var(--font-sans)"
                     >
                       {line}
@@ -241,7 +459,7 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
           <h3 className="font-mono text-xs uppercase tracking-widest text-muted">Circuit outline</h3>
           <ol className="mt-3 space-y-2">
             {circuit.nodes.map((node) => {
-              const style = PRIMITIVE_STYLES[node.primitive];
+              const style = node.material ? MATERIAL_STYLES[node.material] : PRIMITIVE_STYLES[node.primitive];
               return (
                 <li key={node.id}>
                   <button
@@ -273,7 +491,11 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
               </div>
               <div>
                 <dt className="text-xs text-muted">Primitive</dt>
-                <dd>{PRIMITIVE_STYLES[selectedNode.primitive].label}</dd>
+                <dd>
+                  {selectedNode.material
+                    ? MATERIAL_STYLES[selectedNode.material].label
+                    : PRIMITIVE_STYLES[selectedNode.primitive].label}
+                </dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Source identity</dt>

@@ -3,6 +3,7 @@ import {
   SdaEventPage,
   SdaRunGraph,
   SdaRunResource,
+  type CapabilityGraphResult,
   type ScenarioOutput,
   type SdaRunEvent,
 } from '@/contracts/sda-api';
@@ -20,6 +21,8 @@ import type { InvocationView } from '@/contracts/invocation';
 const endpoint = () => process.env.SDA_API_ENDPOINT?.trim().replace(/\/+$/, '') || undefined;
 const token = () => process.env.SDA_API_TOKEN?.trim() || undefined;
 const timeoutMs = () => Number(process.env.SDA_API_TIMEOUT_MS ?? 630_000);
+/** A capability graph is a compile, not a run; it must not hold a page render for the run timeout. */
+const capabilityGraphTimeoutMs = () => Number(process.env.SDA_GRAPH_TIMEOUT_MS ?? 60_000);
 const pollIntervalMs = () => Number(process.env.SDA_POLL_INTERVAL_MS ?? 300);
 const completionDeadlineMs = () => Number(process.env.SDA_COMPLETION_DEADLINE_MS ?? 300_000);
 
@@ -40,7 +43,7 @@ async function readProblem(response: Response): Promise<{ code: string; message:
   return { code: 'BAD_RESPONSE', message: 'The SDA run API returned a response this site could not read.' };
 }
 
-async function requestJson(path: string, init: RequestInit = {}): Promise<SdaResult<unknown>> {
+async function requestJson(path: string, init: RequestInit = {}, timeoutOverrideMs?: number): Promise<SdaResult<unknown>> {
   const base = endpoint();
   if (!base) return unavailable('NOT_CONFIGURED', 'No SDA run API endpoint is configured for this deployment, so nothing can be executed here.');
   const bearer = token();
@@ -53,7 +56,7 @@ async function requestJson(path: string, init: RequestInit = {}): Promise<SdaRes
         ...(bearer ? { authorization: 'Bearer ' + bearer } : {}),
         ...(init.headers ?? {}),
       },
-      signal: AbortSignal.timeout(timeoutMs()),
+      signal: AbortSignal.timeout(timeoutOverrideMs ?? timeoutMs()),
       cache: 'no-store',
     });
   } catch {
@@ -108,6 +111,21 @@ export async function readRunGraph(runId: string): Promise<SdaResult<SdaRunGraph
   if (!result.ok) return result;
   const parsed = SdaRunGraph.safeParse(result.value);
   if (!parsed.success) return { ok: false, status: 0, code: 'BAD_RESPONSE', message: 'The SDA run API returned a run graph this site could not read.' };
+  return { ok: true, value: parsed.data };
+}
+
+/**
+ * Read the capability's compiled execution graph — `GET /v1/capabilities/{id}/graph`.
+ *
+ * The engine compiles the capability's circuit with no run; the response is the declared public
+ * projection (cells, edges, `graphId`, `canonicalGraphDigest`). A capability the engine cannot
+ * compile is reported with the engine's own code and message, never silently replaced.
+ */
+export async function readCapabilityGraph(capabilityId: string): Promise<CapabilityGraphResult> {
+  const result = await requestJson(`/v1/capabilities/${encodeURIComponent(capabilityId)}/graph`, {}, capabilityGraphTimeoutMs());
+  if (!result.ok) return { ok: false, code: result.code, message: result.message };
+  const parsed = SdaRunGraph.safeParse(result.value);
+  if (!parsed.success) return { ok: false, code: 'BAD_RESPONSE', message: 'The SDA run API returned a capability graph this site could not read.' };
   return { ok: true, value: parsed.data };
 }
 

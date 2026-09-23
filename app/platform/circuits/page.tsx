@@ -38,7 +38,7 @@ export default function CircuitsPage() {
           title="Input, event, responsibility, outcome"
           lede="This is a published capability from the estate, not a mockup. Select any node to read its meaning, source identity and declared state."
         />
-        {capability && circuit ? (
+        {capability && circuit && circuit.nodes.length > 0 ? (
           <>
             <p className="mb-4 text-sm text-muted">
               Showing{' '}
@@ -51,7 +51,11 @@ export default function CircuitsPage() {
           </>
         ) : (
           <Callout tone="unavailable" title="No published circuit is available">
-            <p>The estate publication is not readable in this build, so no circuit can be shown.</p>
+            <p>
+              {capability && circuit
+                ? 'This capability’s execution graph is compiled by the engine at request time; open the capability page to see it.'
+                : 'The estate publication is not readable in this build, so no circuit can be shown.'}
+            </p>
           </Callout>
         )}
       </Section>
@@ -86,16 +90,16 @@ export default function CircuitsPage() {
         />
         <div className="max-w-3xl space-y-4">
           <p className="text-lg">
-            When full topology cannot be qualified from source, the circuit renders the
-            source-backed boundary: the declared input, event, responsibility and outcome, with
-            unresolved references left visible and labelled.
+            The circuit surface is the execution graph the engine compiles, not a pre-rendered
+            substitute. Where this generation carries only an authored bundle, that bundle is a
+            labelled comparison candidate — never the trace.
           </p>
-          <Callout tone="limitation" title="Boundary view — detailed topology incomplete">
+          <Callout tone="limitation" title="Authored bundles are comparison candidates">
             <p>
-              In the current published generation the selected blueprints carry normalized nodes and
-              no normalized edges. Capability circuits therefore render the boundary lens. Known
-              members and valid declared routes are drawn; nothing is inferred to fill the gap, and no
-              other capability&rsquo;s picture is substituted.
+              The compiled execution graph is fetched from the engine at request time, and a
+              capability the engine cannot compile shows the engine&rsquo;s own reason instead of a
+              substitute circuit. Authored bundles are labelled as authored and are never presented
+              as observed execution.
             </p>
           </Callout>
         </div>

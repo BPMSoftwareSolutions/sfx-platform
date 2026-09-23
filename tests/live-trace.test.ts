@@ -9,7 +9,7 @@ import type { LiveRunView } from '../components/estate/live-run';
 import type { SdaRunEvent, SdaRunGraph } from '../contracts/sda-api';
 import type { CircuitProjection } from '../contracts/estate';
 import { applyEvents, emptyTrace } from '../lib/live-trace';
-import { buildRunGraphView, normalizeRunGraph, runGraphViewProjection } from '../lib/run-graph';
+import { buildRunGraphView, compiledGraphSurface, normalizeRunGraph, runGraphViewProjection } from '../lib/run-graph';
 
 /**
  * Live trace — id binding only.
@@ -288,7 +288,7 @@ test('the trace surface shows the collapsed view with the declared limit', () =>
   }));
   assert.match(markup, /collapsed at limit 30/);
   assert.match(markup, /9 of 73 cells drawn/);
-  const nodeCount = (markup.match(/class="circuit-node/g) ?? []).length;
+  const nodeCount = (markup.match(/class="circuit-node circuit-node--/g) ?? []).length;
   assert.ok(nodeCount <= 30, `expected at most 30 drawn nodes, saw ${nodeCount}`);
 });
 
@@ -301,4 +301,77 @@ test('the trace surface reports unmatched testimony rather than dropping it', ()
   }));
   assert.match(markup, /Unmatched testimony \(1\)/);
   assert.match(markup, /cell:ghost/);
+});
+
+test('the compiled capability graph is drawn planned and unlit with no run', () => {
+  const surface = compiledGraphSurface(fixture, 'fixture');
+  const markup = renderToStaticMarkup(createElement(CapabilityCircuitPanel, {
+    circuits: [authoredCircuit],
+    capabilityGraph: surface,
+  }));
+  assert.match(markup, /Compiled execution graph/);
+  assert.match(markup, /4 of 4 cells drawn/);
+  assert.match(markup, /no run/);
+  assert.match(markup, /class="circuit-node circuit-node--planned"[^>]*data-live="planned"/);
+  const nodeCount = (markup.match(/class="circuit-node circuit-node--/g) ?? []).length;
+  assert.equal(nodeCount, 4);
+  assert.doesNotMatch(markup, /boundary/i);
+  // The authored bundle stays a labelled comparison candidate, never the trace surface.
+  assert.match(markup, /Authored circuit — labelled comparison candidate \(not observed execution\)/);
+});
+
+test('a compile the engine cannot complete names the engine reason and draws no substitute circuit', () => {
+  const markup = renderToStaticMarkup(createElement(CapabilityCircuitPanel, {
+    circuits: [authoredCircuit],
+    capabilityGraph: { error: { code: 'CAPABILITY_PLAN_NOT_COMPILED', message: 'The capability names no executable plan.' } },
+  }));
+  assert.match(markup, /could not compile this capability/);
+  assert.match(markup, /CAPABILITY_PLAN_NOT_COMPILED/);
+  assert.match(markup, /The capability names no executable plan\./);
+  assert.match(markup, /No substitute circuit is shown/);
+  assert.equal((markup.match(/class="circuit-node/g) ?? []).length, 0);
+  assert.match(markup, /Authored circuit — labelled comparison candidate \(not observed execution\)/);
+});
+
+const materialAssets = {
+  event: '/media/materials/event.jpg',
+  outcome: '/media/materials/outcome.jpg',
+  'provider-port': '/media/materials/provider-port.jpg',
+};
+
+test('the dynamic trace draws the canonical material on cells and routes', () => {
+  const markup = renderToStaticMarkup(createElement(CapabilityCircuitPanel, {
+    circuits: [authoredCircuit],
+    capabilityGraph: compiledGraphSurface(fixture, 'fixture'),
+    materials: materialAssets,
+  }));
+  assert.match(markup, /href="\/media\/materials\/outcome.jpg"/, 'the scenario cell draws the outcome plate');
+  assert.match(markup, /href="\/media\/materials\/event.jpg"/, 'a mechanic cell draws the event plate');
+  assert.match(markup, /circuit-node-plate/);
+  assert.match(markup, /stroke="url\(#circuit-edge-event\)"/, 'a sequence route is textured with the event material');
+  assert.match(markup, /class="circuit-node circuit-node--planned"[^>]*data-live="planned"/);
+});
+
+test('observed transitions keep the material inside the lit node', () => {
+  const markup = renderToStaticMarkup(createElement(CapabilityCircuitPanel, {
+    circuits: [authoredCircuit],
+    liveOverride: liveView(),
+    materials: materialAssets,
+  }));
+  assert.match(markup, /class="circuit-node circuit-node--done"[^>]*data-live="done"/);
+  const lit = markup.slice(markup.indexOf('circuit-node--done'));
+  assert.match(lit, /circuit-node-plate/, 'the lit node still carries its plate');
+  assert.match(lit, /href="\/media\/materials\/event.jpg"/, 'the lit node still references its material');
+});
+
+test('without materials the trace keeps the shaped primitive rendering and references no asset', () => {
+  const markup = renderToStaticMarkup(createElement(CapabilityCircuitPanel, {
+    circuits: [authoredCircuit],
+    capabilityGraph: compiledGraphSurface(fixture, 'fixture'),
+  }));
+  assert.doesNotMatch(markup, /\/media\/materials\//);
+  // Every drawn node still carries its silhouette: a shaped contour path, never a plain card.
+  assert.equal((markup.match(/class="circuit-node-contour"/g) ?? []).length, 4);
+  const silhouettes = [...markup.matchAll(/<path d="([^"]+)" fill="color-mix/g)].map((match) => match[1]);
+  assert.equal(new Set(silhouettes).size, silhouettes.length, 'primitive silhouettes are distinct');
 });

@@ -27,12 +27,12 @@ const TOPOLOGY_SQL = join(HERE, 'sql', 'publish-estate-topology.sql');
 const ADAPTER_VERSION = 'estate-publication-adapter/1.2.0';
 const CONTRACT_VERSION = '1.0.0';
 const SCL_VERSION = '0.2';
-/** The authored bundle renderer is the capability's stored circuit; the boundary renderer is
- * only ever used when the live topology declares no authored circuit for that capability. */
+/** The authored bundle renderer is the capability's stored circuit; the absent renderer records
+ * that the execution graph is compiled by the engine at request time — never a boundary lens. */
 const AUTHORED_RENDERER_VERSION = 'stored-circuit/1.0.0';
-const BOUNDARY_RENDERER_VERSION = 'boundary-projection/1.0.0';
+const ABSENT_RENDERER_VERSION = 'absent-projection/1.0.0';
 const AUTHORED_SOURCE_PROFILE = 'media-circuit-bundle.v1';
-const BOUNDARY_SOURCE_PROFILE = 'estate-scenario-face.v1';
+const ABSENT_SOURCE_PROFILE = 'capability-engine-compile.v1';
 
 /** Default source: the executed read-only inventory query recorded by the database repo (§14.1). */
 const DEFAULT_SOURCE = 'C:/lab/sidefx-database/data/media/website-inventory.json';
@@ -320,70 +320,26 @@ function resolveAuthoredMapping(face, capability, topology, editionsByDefinition
 }
 
 /**
- * §12.2 — compile the circuit for one scenario face.
+ * §12.2 — compile the circuit record for one scenario face.
  *
  * The projection is built from the live topology: when the estate carries an authored circuit
- * bundle for the face (or its capability/blueprint), the projection renders that bundle. The
- * source-backed boundary lens is published only where the live topology truly declares none,
- * and it then carries the explicit NO_AUTHORED_CIRCUIT validation diagnostic.
+ * bundle for the face (or its capability/blueprint), the projection names that bundle so the page
+ * can render it as a labelled comparison candidate. The execution graph itself is compiled by the
+ * engine at request time; the publication never fabricates boundary-lens nodes or routes as a
+ * substitute circuit, and a face without an authored bundle is published as an explicit absence.
  */
 function compileScenarioCircuit(face, blueprintsForCapability, capability, topology, editionsByDefinition) {
-  const nodes = [];
-  const edges = [];
   const diagnostics = [];
+  const graph = { nodes: [], edges: [] };
 
   const authored = resolveAuthoredMapping(face, capability, topology, editionsByDefinition);
-
-  const add = (id, primitive, label, sourceId, state) => {
-    nodes.push({ id, primitive, label, sourceId, state });
-  };
-
-  if (face.input_id) {
-    add('input', 'INPUT', readableFromIdentity(face.input_id), face.input_id, sourceState(face.input_contract_state));
-  } else {
-    add('input', 'UNRESOLVED', 'Input not declared', null, sourceState(null));
-    diagnostics.push({ code: 'MISSING_INPUT', message: 'This scenario face declares no input.' });
-  }
-
-  if (face.event_id) {
-    add('event', 'EVENT', readableFromIdentity(face.event_id), face.event_id, sourceState(face.event_authority_state));
-  } else {
-    add('event', 'UNRESOLVED', 'Event not declared', null, sourceState(null));
-    diagnostics.push({ code: 'MISSING_EVENT', message: 'This scenario face declares no event.' });
-  }
-
-  // The responsibility sentence is source text, shown verbatim.
-  if (face.responsibility) {
-    add('responsibility', 'RESPONSIBILITY', face.responsibility, face.scenario_id, sourceState(null));
-  } else {
-    add('responsibility', 'UNRESOLVED', 'Responsibility not declared', null, sourceState(null));
-    diagnostics.push({
-      code: 'MISSING_RESPONSIBILITY',
-      message: 'This scenario face declares no responsibility.',
-    });
-  }
-
-  if (face.outcome_id) {
-    add('outcome', 'OUTCOME', readableFromIdentity(face.outcome_id), face.outcome_id, sourceState(null));
-  } else {
-    add('outcome', 'UNRESOLVED', 'Outcome not declared', null, sourceState(null));
-    diagnostics.push({ code: 'MISSING_OUTCOME', message: 'This scenario face declares no outcome.' });
-  }
-
-  // Execution flow across the declared boundary. Product transfer is typed separately (§12.3).
-  edges.push({ id: 'e-input-event', from: 'input', to: 'event', family: 'PRODUCT_TRANSFER' });
-  edges.push({ id: 'e-event-responsibility', from: 'event', to: 'responsibility', family: 'EXECUTION' });
-  edges.push({ id: 'e-responsibility-outcome', from: 'responsibility', to: 'outcome', family: 'EXECUTION' });
-
-  const unresolved = nodes.filter((n) => n.primitive === 'UNRESOLVED').length;
-  const graph = { nodes, edges };
 
   if (authored) {
     const { bundle, subjectKind } = authored;
     const url = authoredUrl(bundle);
     diagnostics.push({
       code: 'AUTHORED_CIRCUIT_RESOLVED',
-      message: `The authored ${subjectKind.toLowerCase()} circuit bundle ${bundle.bundle_revision.slice(0, 12)}… (${intOf(bundle.view_count)} topology view(s)) is rendered from the live topology; the boundary outline below is its source-backed text equivalent.`,
+      message: `The authored ${subjectKind.toLowerCase()} circuit bundle ${bundle.bundle_revision.slice(0, 12)}… (${intOf(bundle.view_count)} topology view(s)) is published from the live topology as a labelled comparison candidate; the execution graph is compiled by the engine at request time and is never this bundle.`,
     });
     return {
       capabilityId: face.capability_id,
@@ -403,18 +359,17 @@ function compileScenarioCircuit(face, blueprintsForCapability, capability, topol
         label: bundle.scenario_id ?? bundle.capability_id ?? bundle.blueprint_id ?? null,
         topologyViews: intOf(bundle.view_count),
       },
-      nodes,
-      edges,
+      ...graph,
       diagnostics,
     };
   }
 
-  // No authored bundle exists in the live topology for this face. The boundary lens is the only
-  // qualified source, and it is published as an explicit validation error, never as a silent
-  // substitute for a circuit the estate might carry.
+  // No authored bundle exists in the live topology for this face. The publication records the
+  // absence explicitly: the engine compiles the execution graph at request time, and no boundary
+  // lens, node or route is published as a substitute.
   diagnostics.push({
     code: 'NO_AUTHORED_CIRCUIT',
-    message: 'The live topology declares no authored circuit bundle for this scenario face, capability or blueprint in this generation. The source-backed boundary contract is published as a recorded validation error.',
+    message: 'The live topology declares no authored circuit bundle for this scenario face, capability or blueprint in this generation. The execution graph is compiled by the engine at request time; this record is the explicit absence and no substitute circuit is published.',
   });
   const withoutEdges = blueprintsForCapability.filter((b) => intOf(b.edge_count) === 0);
   if (withoutEdges.length > 0) {
@@ -424,27 +379,25 @@ function compileScenarioCircuit(face, blueprintsForCapability, capability, topol
     });
   }
 
-  const fidelity = unresolved > 0 ? 'PARTIAL_BOUNDARY' : 'BOUNDARY';
   return {
     capabilityId: face.capability_id,
     scenarioId: face.scenario_id,
-    sourceProfile: BOUNDARY_SOURCE_PROFILE,
+    sourceProfile: ABSENT_SOURCE_PROFILE,
     sourceDigest: stableDigest(face),
     graphDigest: stableDigest(graph),
     sclVersion: SCL_VERSION,
-    rendererVersion: BOUNDARY_RENDERER_VERSION,
+    rendererVersion: ABSENT_RENDERER_VERSION,
     lens: 'SCENARIO',
-    fidelity,
+    fidelity: 'NONE',
     renderer: {
-      kind: 'BOUNDARY',
+      kind: 'ABSENT',
       subjectKind: null,
       bundleRevision: null,
       url: null,
       label: null,
       topologyViews: null,
     },
-    nodes,
-    edges,
+    ...graph,
     diagnostics,
   };
 }
@@ -630,15 +583,15 @@ function build(sourcePath, topology) {
 
     for (const face of faces) circuits.push(compileScenarioCircuit(face, bps, sourceCapability, topology, editionsByDefinition));
     if (!faces.length) {
-      const graph = { nodes: [{id:'scenario-unresolved',primitive:'UNRESOLVED',label:'No scenario is declared in this selection',sourceId:null,state:sourceState(null)}], edges: [] };
-      circuits.push({capabilityId,scenarioId:null,sourceProfile:'estate-capability-boundary.v1',sourceDigest:stableDigest(sourceCapability),graphDigest:stableDigest(graph),sclVersion:SCL_VERSION,rendererVersion:BOUNDARY_RENDERER_VERSION,lens:'CAPABILITY_OVERVIEW',fidelity:'PARTIAL_BOUNDARY',renderer:{kind:'BOUNDARY',subjectKind:null,bundleRevision:null,url:null,label:null,topologyViews:null},...graph,diagnostics:[{code:'SCENARIO_NOT_DECLARED',message:'The selected capability has no scenario face. Its identity and unresolved scenario slot remain visible.'},{code:'NO_AUTHORED_CIRCUIT',message:'The live topology declares no authored circuit bundle for this capability in this generation. The boundary contract is published as a recorded validation error.'}]});
+      const graph = { nodes: [], edges: [] };
+      circuits.push({capabilityId,scenarioId:null,sourceProfile:ABSENT_SOURCE_PROFILE,sourceDigest:stableDigest(sourceCapability),graphDigest:stableDigest(graph),sclVersion:SCL_VERSION,rendererVersion:ABSENT_RENDERER_VERSION,lens:'CAPABILITY_OVERVIEW',fidelity:'NONE',renderer:{kind:'ABSENT',subjectKind:null,bundleRevision:null,url:null,label:null,topologyViews:null},...graph,diagnostics:[{code:'SCENARIO_NOT_DECLARED',message:'The selected capability has no scenario face. Its identity and unresolved scenario slot remain visible.'},{code:'NO_AUTHORED_CIRCUIT',message:'The live topology declares no authored circuit bundle for this capability in this generation. The execution graph is compiled by the engine at request time; no substitute circuit is published.'}]});
     }
 
     const capabilityCircuits = circuits.filter((c) => c.capabilityId === capabilityId);
     const authored = capabilityCircuits.some((c) => c.renderer?.kind === 'AUTHORED_CIRCUIT');
     const graphFidelity = authored
       ? (capabilityCircuits.every((c) => c.fidelity === 'FULL') ? 'FULL' : 'PARTIAL_BOUNDARY')
-      : (!faces.length || capabilityCircuits.some((c) => c.fidelity === 'PARTIAL_BOUNDARY') ? 'PARTIAL_BOUNDARY' : 'BOUNDARY');
+      : 'NONE';
 
     // Related capabilities: those sharing a declared input or outcome contract identity.
     const contracts = new Set(faces.flatMap((f) => [f.input_id, f.outcome_id]).filter(Boolean));
@@ -722,18 +675,19 @@ function build(sourcePath, topology) {
     });
   }
 
-  // The live topology read is estate authority for circuit rendering. A capability that has no
-  // authored bundle in the selected generation is published as an explicit validation error;
-  // its source-backed boundary contract is shown, never a silent substitute.
+  // The live topology read is estate authority for authored comparison bundles. A capability with
+  // no authored bundle is published as an explicit absence: the execution graph is compiled by the
+  // engine at request time, and no substitute circuit is ever published in its place.
   const circuitsAuthored = circuits.filter((c) => c.renderer?.kind === 'AUTHORED_CIRCUIT').length;
-  const circuitsBoundary = circuits.length - circuitsAuthored;
+  const circuitsBoundary = circuits.filter((c) => c.renderer?.kind === 'BOUNDARY').length;
+  const circuitsAbsent = circuits.length - circuitsAuthored - circuitsBoundary;
   const authoredCapabilityIds = new Set(circuits.filter((c) => c.renderer?.kind === 'AUTHORED_CIRCUIT').map((c) => c.capabilityId));
   const capabilitiesWithAuthoredCircuit = authoredCapabilityIds.size;
   const capabilitiesWithoutAuthoredCircuit = capabilities.length - capabilitiesWithAuthoredCircuit;
   if (capabilitiesWithoutAuthoredCircuit > 0) {
     findings.push({
       code: 'CIRCUIT_TOPOLOGY_ABSENT',
-      message: `${capabilitiesWithoutAuthoredCircuit} of ${capabilities.length} selected capabilities have no authored circuit bundle in this generation's live topology (${intOf(topology.summary.selected_blueprint_cells)} declared blueprint cells, ${intOf(topology.summary.selected_blueprint_edges)} normalized edges, ${intOf(topology.summary.circuit_requirements_without_selection)} unselected circuit requirements). Their source-backed boundary contracts are published with an explicit NO_AUTHORED_CIRCUIT diagnostic and are a validation error.`,
+      message: `${capabilitiesWithoutAuthoredCircuit} of ${capabilities.length} selected capabilities have no authored circuit bundle in this generation's live topology (${intOf(topology.summary.selected_blueprint_cells)} declared blueprint cells, ${intOf(topology.summary.selected_blueprint_edges)} normalized edges, ${intOf(topology.summary.circuit_requirements_without_selection)} unselected circuit requirements). Their execution graphs are compiled by the engine at request time; the publication records the explicit absence and never a substitute circuit.`,
       count: capabilitiesWithoutAuthoredCircuit,
     });
   }
@@ -784,6 +738,7 @@ function build(sourcePath, topology) {
       blueprintEdges,
       circuitsAuthored,
       circuitsBoundary,
+      circuitsAbsent,
       capabilitiesWithAuthoredCircuit,
       capabilitiesWithoutAuthoredCircuit,
       mechanicsWithoutDeclaredName,
@@ -850,7 +805,7 @@ function main() {
     `  ${c.publishedCapabilities} capabilities · ${c.mechanics} mechanics · ${c.providers} providers · ${c.scenarioFaces} scenario faces · ${circuits.length} circuits`,
   );
   console.log(
-    `  circuits: ${c.circuitsAuthored} authored (${c.capabilitiesWithAuthoredCircuit} capabilities) · ${c.circuitsBoundary} boundary (${c.capabilitiesWithoutAuthoredCircuit} capabilities without a selected bundle)`,
+    `  circuits: ${c.circuitsAuthored} authored comparison (${c.capabilitiesWithAuthoredCircuit} capabilities) · ${c.circuitsAbsent} engine-compiled absence (${c.capabilitiesWithoutAuthoredCircuit} capabilities without a selected bundle)`,
   );
   for (const f of publication.findings) console.log(`  finding ${f.code} (${f.count}): ${f.message}`);
 }

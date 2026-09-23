@@ -1,5 +1,6 @@
 import type { SdaRunGraph, SdaRunGraphEndpoint } from '@/contracts/sda-api';
-import type { CircuitEdge, CircuitProjection, CircuitNode } from '@/contracts/estate';
+import type { CircuitEdge, CircuitProjection, CircuitNode, MaterialToken } from '@/contracts/estate';
+import { resolveCellMaterial, resolveEdgeMaterial } from '@/components/circuit/scl-theme';
 
 /**
  * Run-graph view model — the platform half of the id binding.
@@ -9,11 +10,15 @@ import type { CircuitEdge, CircuitProjection, CircuitNode } from '@/contracts/es
  * converts the collapsed view into the renderer's projection. No capability vocabulary lives here:
  * binding is by `cellId` and `edgeId` alone.
  *
- * KNOWN DEFECT (review §15 item 4): the collapse rule, the limit, the altitude-to-primitive table
- * and the edge-family mapping below are platform code, not declared authority. The declared homes
- * are the estate's `read-capability-circuit` view (nearest-enclosing-cell membership) and
+ * KNOWN DEFECT (review §15 item 4): the collapse rule, the limit and the altitude-to-primitive
+ * table below are platform code, not declared authority. The declared homes are the estate's
+ * `read-capability-circuit` view (nearest-enclosing-cell membership) and
  * `read-circuit-presentation` (`granularity.detailCellLimit`). Revisit when the declared view
  * serves membership per run (review §15 item 3) or the primitive mapping is declared (Phase 3).
+ *
+ * The material interpreter in `components/circuit/scl-theme.ts` is the same kind of platform
+ * table applied to the engine's native `altitude`/`kind` vocabulary; it is the one place that
+ * mapping lives, and it is consumed only here and by the viewer.
  */
 
 /** Presentation cap mirrored from `read-circuit-presentation` (declared value 30); see KNOWN DEFECT. */
@@ -54,6 +59,8 @@ export interface RunGraphViewNode {
   semanticAddress: string | null;
   memberCellIds: string[];
   collapsed: boolean;
+  /** Canonical component material resolved from altitude/kind and the cell's own topology. */
+  material: MaterialToken | null;
 }
 
 /** One drawn edge: the collapsed route between drawn nodes. */
@@ -196,12 +203,37 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
     membersByNode.set(target, members);
   }
 
+  // Route kinds touching each raw cell, so a drawn junction can be classified structurally even
+  // though the public projection publishes no junction sub-kind.
+  const inKindsByCell = new Map<string, string[]>();
+  const outKindsByCell = new Map<string, string[]>();
+  const pushKind = (map: Map<string, string[]>, cellId: string, kind: string | null) => {
+    if (!kind) return;
+    const kinds = map.get(cellId) ?? [];
+    kinds.push(kind);
+    map.set(cellId, kinds);
+  };
+  for (const edge of graph.edges) {
+    if (!byId.has(edge.from) || !byId.has(edge.to)) continue;
+    pushKind(outKindsByCell, edge.from, edge.kind);
+    pushKind(inKindsByCell, edge.to, edge.kind);
+  }
+
   const nodes: RunGraphViewNode[] = [];
   for (const cell of graph.cells) {
     if (!drawn.has(cell.cellId) || !membership[cell.cellId]) continue;
     if (nodes.some((node) => node.id === cell.cellId)) continue;
     const members = membersByNode.get(cell.cellId) ?? [cell.cellId];
     const label = labelForCell(cell);
+    // Only expression addresses name the operation behind a cell; the enclosing path repeats the
+    // capability slug (e.g. `…-evidence/operation/…`) and structural tails (`/provider`, `/physical`)
+    // carry no operation semantics. Exact altitude/kind resolution does not depend on any of this.
+    const semanticHints = [
+      cell.semanticAddress ?? '',
+      ...members
+        .filter((memberId) => memberId !== cell.cellId)
+        .map((memberId) => byId.get(memberId)?.semanticAddress ?? ''),
+    ].filter((address) => /#|:expression/.test(address));
     nodes.push({
       id: cell.cellId,
       label: members.length > 1 ? `${label} · ${members.length} cells` : label,
@@ -211,6 +243,15 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
       semanticAddress: cell.semanticAddress,
       memberCellIds: members,
       collapsed: members.length > 1,
+      material: resolveCellMaterial({
+        altitude: cell.altitude,
+        kind: cell.kind,
+        semanticHints,
+        routeKinds: {
+          in: inKindsByCell.get(cell.cellId) ?? [],
+          out: outKindsByCell.get(cell.cellId) ?? [],
+        },
+      }),
     });
   }
 
@@ -291,21 +332,31 @@ function familyForEdge(kind: string | null): CircuitEdge['family'] {
 /**
  * Build the renderer projection for the collapsed run graph. The viewer's live classes are the
  * only state; this projection is the declared skeleton drawn unlit.
+ *
+ * A capability graph compiled by the engine with no run uses `COMPILED_GRAPH` copy; a graph bound
+ * to an observed run keeps `RUN_GRAPH`. Everything else is identical: ids, altitude primitives and
+ * the same planned-only skeleton.
  */
 export function runGraphViewProjection(
   view: RunGraphView,
-  options: { capabilityId: string; scenarioId?: string | null }
+  options: {
+    capabilityId: string;
+    scenarioId?: string | null;
+    fidelity?: 'RUN_GRAPH' | 'COMPILED_GRAPH';
+    sourceProfile?: string;
+  }
 ): CircuitProjection {
+  const fidelity = options.fidelity ?? 'RUN_GRAPH';
   return {
     capabilityId: options.capabilityId,
     scenarioId: options.scenarioId ?? null,
-    sourceProfile: `run-graph:${view.graphId}`,
+    sourceProfile: options.sourceProfile ?? `run-graph:${view.graphId}`,
     sourceDigest: view.canonicalGraphDigest,
     graphDigest: view.canonicalGraphDigest,
     sclVersion: 'run-graph.v1',
-    rendererVersion: 'sda-run-graph.v1',
+    rendererVersion: fidelity === 'COMPILED_GRAPH' ? 'sda-capability-graph.v1' : 'sda-run-graph.v1',
     lens: 'SCENARIO',
-    fidelity: 'RUN_GRAPH',
+    fidelity,
     nodes: view.nodes.map((node) => ({
       id: node.id,
       primitive: primitiveForAltitude(node.altitude),
@@ -317,13 +368,64 @@ export function runGraphViewProjection(
           ? `Planned view cell enclosing ${node.memberCellIds.length} raw cells; lit only by their testimony.`
           : `Planned ${node.altitude ?? 'unresolved'} cell; lit only by its own testimony.`,
       },
+      material: node.material ?? undefined,
     })),
     edges: view.edges.map((edge) => ({
       id: edge.id,
       from: edge.from,
       to: edge.to,
       family: familyForEdge(edge.kind),
+      /** The engine's own route kind, so the layout can draw loop-backs and join channels. */
+      kind: edge.kind ?? undefined,
+      material: resolveEdgeMaterial(edge.kind) ?? undefined,
     })),
     diagnostics: [],
+  };
+}
+
+/** The collapsed-view measurements the compiled surface states beside its badge. */
+export interface RunGraphViewStats {
+  totalCells: number;
+  totalEdges: number;
+  drawnNodes: number;
+  drawnEdges: number;
+  collapsed: boolean;
+  detailCellLimit: number;
+}
+
+export interface CompiledGraphSurface {
+  projection: CircuitProjection;
+  stats: RunGraphViewStats;
+}
+
+/** What the page hands the panel for the compiled (unobserved) surface. */
+export type CapabilityGraphSurface = CompiledGraphSurface | { error: { code: string; message: string } };
+
+function viewStats(view: RunGraphView): RunGraphViewStats {
+  return {
+    totalCells: view.totalCells,
+    totalEdges: view.totalEdges,
+    drawnNodes: view.nodes.length,
+    drawnEdges: view.edges.length,
+    collapsed: view.collapsed,
+    detailCellLimit: view.detailCellLimit,
+  };
+}
+
+/**
+ * The engine-compiled capability graph, collapsed by the same id-binding rule a run uses and
+ * rendered unlit. No run exists: nothing on this surface is observed, and an engine that cannot
+ * compile returns the absence, never a substitute circuit.
+ */
+export function compiledGraphSurface(graph: SdaRunGraph, capabilityId: string): CompiledGraphSurface {
+  const view = buildRunGraphView(normalizeRunGraph(graph));
+  return {
+    projection: runGraphViewProjection(view, {
+      capabilityId,
+      scenarioId: null,
+      fidelity: 'COMPILED_GRAPH',
+      sourceProfile: `capability-graph:${view.graphId}`,
+    }),
+    stats: viewStats(view),
   };
 }

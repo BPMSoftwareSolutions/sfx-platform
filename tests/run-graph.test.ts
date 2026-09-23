@@ -3,8 +3,15 @@ import test from 'node:test';
 
 import type { SdaRunGraph } from '../contracts/sda-api';
 import {
+  MATERIAL_STYLES,
+  PRIMITIVE_MATERIAL,
+  resolveCellMaterial,
+  resolveEdgeMaterial,
+} from '../components/circuit/scl-theme';
+import {
   DETAIL_CELL_LIMIT,
   buildRunGraphView,
+  compiledGraphSurface,
   normalizeRunGraph,
   primitiveForAltitude,
   runGraphViewProjection,
@@ -150,4 +157,125 @@ test('a declared address object is preserved as text without asserting its struc
   assert.equal(semanticAddressText({ mechanicId: 'object', mechanicPath: 'payload' }), 'object');
   assert.equal(semanticAddressText({ semanticRole: 'SCENARIO_OUTCOME' }), 'SCENARIO_OUTCOME');
   assert.equal(semanticAddressText(undefined), null);
+});
+
+test('the material interpreter resolves altitude/kind exactly and refines a mechanic by its name', () => {
+  const none = { in: [], out: [] };
+  assert.equal(resolveCellMaterial({ altitude: 'scenario', kind: 'scenario', semanticHints: [], routeKinds: none }), 'outcome');
+  assert.equal(resolveCellMaterial({ altitude: 'mechanic', kind: 'mechanic', semanticHints: [], routeKinds: none }), 'event');
+  assert.equal(resolveCellMaterial({ altitude: 'provider', kind: 'provider', semanticHints: [], routeKinds: none }), 'provider-port');
+  assert.equal(resolveCellMaterial({ altitude: 'physical', kind: 'physical', semanticHints: [], routeKinds: none }), 'provider');
+  assert.equal(resolveCellMaterial({
+    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['validate-semantic-carrier/scenario/validate-carrier-source'], routeKinds: none,
+  }), 'validation');
+  assert.equal(resolveCellMaterial({
+    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['seal-capability-change/scenario/seal-capability-change'], routeKinds: none,
+  }), 'authority');
+  assert.equal(resolveCellMaterial({
+    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['select-equity-price-route#/expression/value/selection'], routeKinds: none,
+  }), 'decision');
+  assert.equal(resolveCellMaterial({
+    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['hold-unsealable-capability-change.v1#/expression'], routeKinds: none,
+  }), 'rejection');
+  assert.equal(resolveCellMaterial({ altitude: 'quantum', kind: 'quantum', semanticHints: [], routeKinds: none }), null);
+  assert.equal(resolveCellMaterial({ altitude: null, kind: null, semanticHints: [], routeKinds: none }), null);
+});
+
+test('junction cells take their material from the route kinds touching them', () => {
+  const junction = (routeKinds: { in: string[]; out: string[] }) =>
+    resolveCellMaterial({ altitude: 'mechanic', kind: 'junction', semanticHints: [], routeKinds });
+  assert.equal(junction({ in: [], out: ['selection', 'selection'] }), 'branch');
+  assert.equal(junction({ in: [], out: ['selection'] }), 'branch');
+  assert.equal(junction({ in: [], out: ['broadcast'] }), 'fan-out');
+  assert.equal(junction({ in: ['join'], out: [] }), 'convergence');
+  assert.equal(junction({ in: [], out: ['failure'] }), 'rejection');
+  assert.equal(junction({ in: ['sequence'], out: [] }), 'termination');
+});
+
+test('route kinds resolve to the material their conduit is textured with', () => {
+  assert.equal(resolveEdgeMaterial('sequence'), 'event');
+  assert.equal(resolveEdgeMaterial('selection'), 'branch');
+  assert.equal(resolveEdgeMaterial('broadcast'), 'fan-out');
+  assert.equal(resolveEdgeMaterial('join'), 'convergence');
+  assert.equal(resolveEdgeMaterial('failure'), 'rejection');
+  assert.equal(resolveEdgeMaterial('return'), 'outcome');
+  assert.equal(resolveEdgeMaterial('product-transfer'), 'outcome');
+  assert.equal(resolveEdgeMaterial('support-link'), 'evidence');
+  assert.equal(resolveEdgeMaterial(null), null);
+});
+
+test('the mapping table keys the engine’s own primitive kinds directly, with no capability code', () => {
+  const none = { in: [], out: [] };
+  for (const token of [
+    'input',
+    'event',
+    'outcome',
+    'authority',
+    'validation',
+    'evidence',
+    'human-approval',
+    'decision',
+    'branch',
+    'fan-out',
+    'convergence',
+    'rejection',
+    'termination',
+  ] as const) {
+    assert.equal(
+      resolveCellMaterial({ altitude: 'mechanic', kind: token, semanticHints: [], routeKinds: none }),
+      token,
+      `a declared mechanic|${token} keeps its material`
+    );
+  }
+  assert.equal(
+    resolveCellMaterial({ altitude: 'mechanic', kind: 'junction', semanticHints: [], routeKinds: { in: [], out: ['recurrence'] } }),
+    'branch',
+    'a recurrence junction is a branch, not a guess'
+  );
+});
+
+test('every canonical material keeps a unique silhouette and every primitive selects one', () => {
+  const tokens = Object.keys(MATERIAL_STYLES);
+  const shapes = tokens.map((token) => MATERIAL_STYLES[token as keyof typeof MATERIAL_STYLES].shape);
+  assert.equal(tokens.length, 15);
+  assert.equal(new Set(shapes).size, 15, 'no two materials share a silhouette');
+  assert.equal(Object.keys(PRIMITIVE_MATERIAL).length, 10, 'every engine primitive has a fallback silhouette');
+  for (const [primitive, token] of Object.entries(PRIMITIVE_MATERIAL)) {
+    assert.ok(MATERIAL_STYLES[token], `${primitive} selects a declared material`);
+  }
+  assert.equal(PRIMITIVE_MATERIAL.RESPONSIBILITY, 'decision');
+  assert.equal(PRIMITIVE_MATERIAL.UNRESOLVED, 'rejection');
+});
+
+test('the run-graph projection carries a material per drawn cell and route, collapsed counts unchanged', () => {
+  const graph = deepGraph();
+  const view = buildRunGraphView(normalizeRunGraph(graph));
+  const projection = runGraphViewProjection(view, { capabilityId: 'demo', scenarioId: null });
+  assert.equal(projection.nodes.length, view.nodes.length);
+  assert.equal(projection.edges.length, view.edges.length);
+  assert.equal(projection.nodes.length, 5, 'four mechanics collapse into the scenario root');
+  assert.equal(view.collapsed, true);
+  assert.equal(view.nodes.find((node) => node.id === 'cell:scenario:root')!.label, 'root');
+  assert.match(view.nodes.find((node) => node.id === 'cell:mechanic:m0')!.label, /10 cells/);
+  const root = projection.nodes.find((node) => node.id === 'cell:scenario:root');
+  const mechanic = projection.nodes.find((node) => node.id === 'cell:mechanic:m0');
+  assert.equal(root?.material, 'outcome');
+  assert.equal(mechanic?.material, 'event');
+  assert.ok(projection.edges.every((edge) => edge.material === 'event'), 'fixture routes are sequences');
+  assert.ok(projection.edges.every((edge) => edge.kind === 'sequence'), 'the engine route kind travels with the projection');
+  assert.ok(!projection.nodes.some((node) => node.id === 'cell:provider:m0.p0'), 'a collapsed provider is drawn inside its mechanic');
+});
+
+test('the engine-compiled capability surface collapses by the same id rule and names no run', () => {
+  const surface = compiledGraphSurface(deepGraph(), 'demo');
+  assert.equal(surface.projection.fidelity, 'COMPILED_GRAPH');
+  assert.equal(surface.projection.nodes.length, surface.stats.drawnNodes);
+  assert.equal(surface.projection.edges.length, surface.stats.drawnEdges);
+  assert.ok(surface.stats.drawnNodes <= DETAIL_CELL_LIMIT);
+  assert.equal(surface.stats.totalCells, 41);
+  assert.equal(surface.stats.collapsed, true);
+  assert.match(surface.projection.sourceProfile, /^capability-graph:/);
+  for (const node of surface.projection.nodes) {
+    assert.ok(node.state.readable.includes('testimony'), 'the compiled surface is lit by testimony only');
+  }
 });

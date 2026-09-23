@@ -91,7 +91,7 @@ export default function SclPage() {
 
       <Section labelledBy="example">
         <SectionHeader id="example" eyebrow="A complete example" title="A published circuit, read as text" />
-        {example && circuit ? (
+        {example && circuit && circuit.nodes.length > 0 ? (
           <div className="max-w-3xl">
             <p className="mb-4 text-sm text-muted">
               From{' '}

@@ -6,13 +6,20 @@ import { EditionCircuit, EditionFilm } from '@/components/estate/visual-edition'
 import { StoredCircuitPanel } from '@/components/estate/stored-circuit-panel';
 import { CapabilityRun } from '@/components/estate/capability-run';
 import { findCapability, getCapabilities, getCircuitsForCapability } from '@/lib/estate';
-import { getEdition, getStoredCircuits } from '@/lib/visuals';
+import { getEdition, getMaterials, getStoredCircuits } from '@/lib/visuals';
 import { pageMetadata } from '@/lib/seo';
 import { getCapabilityExample } from '@/lib/capability-examples';
 import { getInputContract } from '@/lib/input-contracts';
+import { readCapabilityGraph } from '@/lib/sda-api';
+import { compiledGraphSurface, type CapabilityGraphSurface } from '@/lib/run-graph';
 import { LiveRunProvider } from '@/components/estate/live-run';
 import { admitCapabilityRun, advanceCapabilityRun, readCapabilityRunGraph } from './actions';
 interface Params { params: Promise<{namespace:string;capabilityId:string}> }
+/**
+ * The trace surface is the engine's compiled execution graph, fetched server-side for this
+ * capability; the page cannot be prerendered against an engine that may not be running at build.
+ */
+export const dynamic = 'force-dynamic';
 export async function generateMetadata({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
  if(!capability)return pageMetadata({title:'Capability not found',description:'Unknown capability identity.',path:'/capabilities',noindex:true});
@@ -24,6 +31,17 @@ export default async function CapabilityDetailPage({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
  if(!capability)notFound();
  const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),storedCircuits=getStoredCircuits(capability.semanticObjectDefinitionPk),example=getCapabilityExample(capability.entityId),contract=getInputContract(capability.entityId);
+ // Only authored projections reach the comparison surface: an absent or legacy boundary record is
+ // never shipped to the browser, so no substitute circuit can ride the payload.
+ const authoredCircuits=circuits.filter(c=>c.renderer?.kind==='AUTHORED_CIRCUIT');
+ // The compiled graph is fetched with the capability, unrelated to any run. A compile the engine
+ // cannot complete becomes the panel's explicit absence card carrying the engine's reason.
+ const compiled = await readCapabilityGraph(capability.entityId);
+ const capabilityGraph: CapabilityGraphSurface = compiled.ok
+  ? compiledGraphSurface(compiled.value, capability.entityId)
+  : { error: { code: compiled.code, message: compiled.message } };
+ // The dynamic trace draws its component plates from this generation's reviewed materials.
+ const materials=getMaterials();
  return <LiveRunProvider admit={admitCapabilityRun} advance={advanceCapabilityRun} graph={readCapabilityRunGraph}>
   <section className="capability-hero page-width">
    <div><Link className="kicker" href="/capabilities">The capability estate / {capability.title}</Link>
@@ -37,9 +55,8 @@ export default async function CapabilityDetailPage({params}:Params){
   {edition?<div className="page-width"><div className="experience-strip">{Object.entries(edition.experience).map(([label,text],i)=><div key={label}><span className="kicker">0{i+1} / {label}</span><p>{text}</p></div>)}</div></div>:null}
   <section className="page-width editorial-section" id="circuit" aria-labelledby="capability-circuit-title">
    <div className="editorial-heading"><div><p className="kicker">01 / Open the capability</p><h2 id="capability-circuit-title">Meaning you can<br/><em>move through.</em></h2></div><p>Inspect the inputs, responsibilities and outcomes. Each view preserves its source and evidence scope.</p></div>
-   {storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:edition?.circuitUrl?<EditionCircuit edition={edition}/>:<CapabilityCircuitPanel circuits={circuits}/>}
-   {storedCircuits.length&&edition?.circuitUrl?<details className="mt-6 border-t border-grid-line pt-5"><summary className="cursor-pointer text-sm">Explore the authored teaching circuit</summary><div className="mt-5"><EditionCircuit edition={edition}/></div></details>:null}
-   {storedCircuits.length?<details className="mt-6 border-t border-grid-line pt-5" id="declared-circuit"><summary className="cursor-pointer text-sm">Inspect the {capability.scenarios.length} scenario boundary contracts</summary><div className="mt-5"><CapabilityCircuitPanel circuits={circuits}/></div></details>:null}
+   <CapabilityCircuitPanel circuits={authoredCircuits} capabilityGraph={capabilityGraph} materials={materials}/>
+   {storedCircuits.length||edition?.circuitUrl?<details className="mt-6 border-t border-grid-line pt-5"><summary className="cursor-pointer text-sm">Authored circuit — labelled comparison candidate (not observed execution)</summary><div className="mt-5">{storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:null}{edition?.circuitUrl?<EditionCircuit edition={edition}/>:null}</div></details>:null}
   </section>
   <section className="page-width editorial-section" aria-labelledby="scenario-title">
    <div className="editorial-heading"><div><p className="kicker">02 / The scenarios</p><h2 id="scenario-title">Different situations.<br/><em>One capability.</em></h2></div><p>Each scenario has its own input, event, responsibility, outcome and image requirement.</p></div>

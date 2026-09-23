@@ -8,4 +8,6 @@ export function getVisualPublication(){
  return cached;
 }
 export function getEdition(definitionPk:string){return getVisualPublication().editions.find(e=>e.definitionPk===definitionPk);}
+/** The generation's reviewed component materials, token → published `/media/materials/...` asset. */
+export function getMaterials():Record<string,string>{return Object.fromEntries(getVisualPublication().materials.map(m=>[m.id,m.url]));}
 export function getStoredCircuits(definitionPk:string){return getVisualPublication().circuits.filter(c=>c.capabilityDefinitionPk===definitionPk).map(({scenarioId,url,label,topologyViews})=>({scenarioId,url,label,topologyViews}));}

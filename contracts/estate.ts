@@ -18,7 +18,7 @@ const unknownable = <T extends z.ZodTypeAny>(inner: T) => inner.nullable();
 export const Digest = z.string().regex(/^sha256:[0-9a-f]{64}$/, 'expected a sha256 digest');
 
 /** §12.2 — how much of the circuit the source actually qualifies. */
-export const GraphFidelity = z.enum(['FULL', 'BOUNDARY', 'PARTIAL_BOUNDARY', 'RUN_GRAPH']);
+export const GraphFidelity = z.enum(['FULL', 'BOUNDARY', 'PARTIAL_BOUNDARY', 'RUN_GRAPH', 'COMPILED_GRAPH', 'NONE']);
 export type GraphFidelity = z.infer<typeof GraphFidelity>;
 
 /** §12.5 / §11.5 — image production status. A placeholder is a transient state, not fulfillment. */
@@ -86,6 +86,30 @@ export const ScenarioFace = z.object({
 });
 export type ScenarioFace = z.infer<typeof ScenarioFace>;
 
+/**
+ * §12.3 — the fifteen canonical component materials of the infographic grammar
+ * (`declarations/infographic-grammar.v1.json`). These name the material plate served under
+ * `/media/materials`; a projection may resolve one per drawn cell or route.
+ */
+export const MaterialToken = z.enum([
+  'input',
+  'event',
+  'outcome',
+  'provider-port',
+  'provider',
+  'validation',
+  'evidence',
+  'human-approval',
+  'authority',
+  'branch',
+  'fan-out',
+  'convergence',
+  'decision',
+  'termination',
+  'rejection',
+]);
+export type MaterialToken = z.infer<typeof MaterialToken>;
+
 /** §12.3 — canonical primitives this renderer carries. */
 export const CircuitNode = z.object({
   id: z.string(),
@@ -109,6 +133,12 @@ export const CircuitNode = z.object({
   /** Source identity behind the label, shown on demand in the inspector. */
   sourceId: unknownable(z.string()),
   state: SourceState,
+  /**
+   * The canonical component material resolved for this drawn cell (run graphs only). The dynamic
+   * trace draws the material plate inside the token's shape; state is layered on top, never in
+   * place of the material. Absent for authored projections, which keep `primitive` styling.
+   */
+  material: MaterialToken.optional(),
 });
 export type CircuitNode = z.infer<typeof CircuitNode>;
 
@@ -118,6 +148,14 @@ export const CircuitEdge = z.object({
   to: z.string(),
   /** §12.3 — route families keep their type; a support link is not execution flow. */
   family: z.enum(['EXECUTION', 'PRODUCT_TRANSFER', 'SUPPORT']),
+  /**
+   * The engine's own route kind when the projection declares one (`sequence`, `selection`,
+   * `broadcast`, `join`, `recurrence`, `return`, …). The layout reads it to draw loop-backs and
+   * join channels; it never changes which route is declared, only how it is drawn.
+   */
+  kind: z.string().optional(),
+  /** The canonical material resolved from the engine's route kind (run graphs only). */
+  material: MaterialToken.optional(),
 });
 export type CircuitEdge = z.infer<typeof CircuitEdge>;
 
@@ -128,11 +166,13 @@ export const BundleRevision = z.string().regex(/^[0-9a-f]{64}$/, 'expected a bar
  * §12.2 — the renderer/mapping decision for one projection, read from the live topology.
  *
  * AUTHORED_CIRCUIT means the selected generation carries a stored circuit bundle for this
- * capability/scenario/blueprint and that bundle is what the page renders. BOUNDARY means the
- * live topology declares none; that absence is a validation diagnostic, never silent.
+ * capability/scenario/blueprint and that bundle is what the page renders as a comparison
+ * candidate. ABSENT means the publication records that no circuit is published for this face:
+ * the execution graph is compiled by the engine at request time, and a compile that cannot
+ * succeed is an explicit absence, never a substitute circuit.
  */
 export const CircuitRenderer = z.object({
-  kind: z.enum(['AUTHORED_CIRCUIT', 'BOUNDARY']),
+  kind: z.enum(['AUTHORED_CIRCUIT', 'BOUNDARY', 'ABSENT']),
   subjectKind: z.enum(['CAPABILITY', 'SCENARIO', 'BLUEPRINT']).nullable(),
   bundleRevision: BundleRevision.nullable(),
   /** A publication-local /media path. Null exactly when no authored bundle exists. */
@@ -281,6 +321,8 @@ export const EstatePublication = z.object({
     /** Circuits rendered from the live authored topology, and the capabilities that own them. */
     circuitsAuthored: z.number().int().nonnegative(),
     circuitsBoundary: z.number().int().nonnegative(),
+    /** Faces whose circuit is an explicit absence record: compiled by the engine at request time. */
+    circuitsAbsent: z.number().int().nonnegative().optional(),
     capabilitiesWithAuthoredCircuit: z.number().int().nonnegative(),
     capabilitiesWithoutAuthoredCircuit: z.number().int().nonnegative(),
     mechanicsWithoutDeclaredName: z.number().int().nonnegative(),
