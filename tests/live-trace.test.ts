@@ -8,7 +8,7 @@ import { CapabilityCircuitPanel } from '../components/estate/capability-circuit-
 import type { LiveRunView } from '../components/estate/live-run';
 import type { SdaRunEvent, SdaRunGraph } from '../contracts/sda-api';
 import type { CircuitProjection } from '../contracts/estate';
-import { applyEvents, emptyTrace } from '../lib/live-trace';
+import { applyEvents, emptyTrace, testimonyTrail } from '../lib/live-trace';
 import { buildRunGraphView, compiledGraphSurface, normalizeRunGraph, runGraphViewProjection } from '../lib/run-graph';
 
 /**
@@ -109,7 +109,7 @@ test('failure testimony fails its bound node; a later completion cannot repaint 
   assert.equal(after.states['cell:mechanic:a'], 'failed');
 });
 
-test('a cell that completes but classifies its outcome as failure lights failed, not done', () => {
+test('a completed cell with a declared non-success outcome is held, never failed from its display text', () => {
   const classified = applyEvents(emptyTrace(view), [
     cellTestimony(1, 'cell:provider:a.p', {
       disposition: 'completed',
@@ -118,9 +118,47 @@ test('a cell that completes but classifies its outcome as failure lights failed,
       display: { entry: { status: 'failed' } },
     }),
   ], view);
-  assert.equal(classified.states['cell:provider:a.p'], 'failed');
-  // A parent does not inherit failure from a child testimony unless the collapse drew them together.
+  assert.equal(classified.states['cell:provider:a.p'], 'held');
+  // A parent does not inherit a child's hold from testimony unless the collapse drew them together.
   assert.equal(classified.states['cell:mechanic:a'], 'planned');
+});
+
+test('a declared failure disposition stays failed regardless of display status', () => {
+  const classified = applyEvents(emptyTrace(view), [
+    cellTestimony(1, 'cell:provider:a.p', {
+      disposition: 'failed',
+      failureCode: 'PROVIDER_FAILED',
+      display: { entry: { status: 'completed' } },
+    }),
+  ], view);
+  assert.equal(classified.states['cell:provider:a.p'], 'failed');
+});
+
+test('a later completed route supersedes a held attempt on the same drawn node', () => {
+  const collapsed = buildRunGraphView(normalizeRunGraph(fixture), 2);
+  assert.equal(collapsed.membership['cell:provider:a.p'], 'cell:mechanic:a', 'the collapse draws the provider beside its mechanic');
+  const trace = applyEvents(emptyTrace(collapsed), [
+    cellTestimony(1, 'cell:provider:a.p', {
+      disposition: 'completed',
+      outcomeClassification: 'failure',
+      outcomeVariant: 'retained-non-success',
+    }),
+    cellTestimony(2, 'cell:mechanic:a'),
+  ], collapsed);
+  assert.equal(trace.states['cell:mechanic:a'], 'done', 'the later completion is the surviving route state');
+});
+
+test('the run’s own completion closes the scenario root even without its testimony', () => {
+  const completed = applyEvents(emptyTrace(view), [
+    event(1, 'run.exited', { exitCode: 0, durationMs: 10 }),
+  ], view);
+  assert.equal(completed.states['cell:scenario:root'], 'done');
+  assert.equal(completed.states['cell:mechanic:a'], 'planned', 'lifecycle completes only the root');
+
+  const failed = applyEvents(emptyTrace(view), [
+    event(1, 'run.exited', { exitCode: 1, durationMs: 10 }),
+  ], view);
+  assert.equal(failed.states['cell:scenario:root'], 'failed');
 });
 
 test('the graph.captured marker names no node and does not disturb testimony', () => {
@@ -158,6 +196,24 @@ test('edge testimony binds by edgeId; a cancelled admission stays unlit', () => 
   assert.equal(trace.edgeStates['edge:return:a'], 'done');
   assert.equal(trace.edgeStates['edge:return:b'], 'planned');
   assert.equal(trace.edges['edge:return:a'], 'done');
+});
+
+test('the observed trail keeps cursor order and names only bound steps', () => {
+  const trace = applyEvents(emptyTrace(view), [
+    cellTestimony(2, 'cell:mechanic:a'),
+    event(3, 'edge-execution-testimony.v1', { testimonyType: 'edge-execution-testimony.v1', edgeId: 'edge:return:a', admissionDisposition: 'admitted' }),
+    cellTestimony(4, 'cell:mechanic:b'),
+    cellTestimony(5, 'cell:ghost'),
+  ], view);
+  assert.deepEqual(
+    testimonyTrail(trace.transitions),
+    [
+      { id: 'cell:mechanic:a', state: 'done' },
+      { id: 'edge:return:a', state: 'done' },
+      { id: 'cell:mechanic:b', state: 'done' },
+    ],
+    'the token follows the run in cursor order and never a step without a binding'
+  );
 });
 
 test('testimony without a membership entry is recorded and never lit', () => {
@@ -212,6 +268,23 @@ test('the viewer renders planned, observed and failed states and live edges', ()
   assert.match(markup, /class="circuit-node circuit-node--failed"[^>]*data-live="failed"/);
   assert.match(markup, /class="circuit-edge circuit-edge--done"[^>]*data-live="done"/);
   assert.match(markup, /class="circuit-edge circuit-edge--planned"[^>]*data-live="planned"/);
+});
+
+test('a held attempt renders as its own explicit state, never as failed', () => {
+  const trace = applyEvents(emptyTrace(view), [
+    cellTestimony(1, 'cell:provider:a.p', {
+      disposition: 'completed',
+      outcomeClassification: 'failure',
+      outcomeVariant: 'retained-non-success',
+      display: { entry: { status: 'failed' } },
+    }),
+  ], view);
+  const markup = renderToStaticMarkup(createElement(CapabilityCircuitPanel, {
+    circuits: [authoredCircuit],
+    liveOverride: liveView(view, { states: trace.states, edgeStates: trace.edgeStates, transitions: trace.transitions }),
+  }));
+  assert.match(markup, /class="circuit-node circuit-node--held"[^>]*data-live="held"/);
+  assert.doesNotMatch(markup, /circuit-node--failed/);
 });
 
 const authoredCircuit: CircuitProjection = {

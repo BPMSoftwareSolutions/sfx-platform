@@ -1,6 +1,6 @@
 import type { SdaRunGraph, SdaRunGraphEndpoint } from '@/contracts/sda-api';
 import type { CircuitEdge, CircuitProjection, CircuitNode, MaterialToken } from '@/contracts/estate';
-import { resolveCellMaterial, resolveEdgeMaterial } from '@/components/circuit/scl-theme';
+import { EDGE_FAMILY_MATERIAL, resolveCellMaterial, resolveEdgeMaterial } from '@/components/circuit/scl-theme';
 
 /**
  * Run-graph view model — the platform half of the id binding.
@@ -219,11 +219,40 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
     pushKind(inKindsByCell, edge.to, edge.kind);
   }
 
+  // Composites are identified structurally: a drawn cell that encloses other graph cells. Its
+  // body's declared mechanic roots and member altitudes are passed to the material table so an
+  // operation resolves as its operation, not as the generic event plate.
+  const childrenByCell = new Map<string, string[]>();
+  for (const cell of graph.cells) {
+    if (!cell.parentCellId || !byId.has(cell.parentCellId)) continue;
+    const children = childrenByCell.get(cell.parentCellId) ?? [];
+    children.push(cell.cellId);
+    childrenByCell.set(cell.parentCellId, children);
+  }
+  const bodyOf = (cellId: string) => {
+    const roots: string[] = [];
+    const altitudes = new Set<string>();
+    const walk = (id: string) => {
+      for (const childId of childrenByCell.get(id) ?? []) {
+        const child = byId.get(childId);
+        if (!child) continue;
+        if (child.altitude) altitudes.add(child.altitude);
+        const address = child.semanticAddress ?? '';
+        if (address.includes('#')) roots.push(address.slice(0, address.indexOf('#')));
+        walk(childId);
+      }
+    };
+    walk(cellId);
+    return { roots, altitudes: [...altitudes] };
+  };
+
   const nodes: RunGraphViewNode[] = [];
   for (const cell of graph.cells) {
     if (!drawn.has(cell.cellId) || !membership[cell.cellId]) continue;
     if (nodes.some((node) => node.id === cell.cellId)) continue;
     const members = membersByNode.get(cell.cellId) ?? [cell.cellId];
+    const body = bodyOf(cell.cellId);
+    const composite = members.length > 1 || body.altitudes.length > 0;
     const label = labelForCell(cell);
     // Only expression addresses name the operation behind a cell; the enclosing path repeats the
     // capability slug (e.g. `…-evidence/operation/…`) and structural tails (`/provider`, `/physical`)
@@ -251,6 +280,9 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
           in: inKindsByCell.get(cell.cellId) ?? [],
           out: outKindsByCell.get(cell.cellId) ?? [],
         },
+        composite,
+        operationRoots: body.roots,
+        memberAltitudes: body.altitudes,
       }),
     });
   }
@@ -370,15 +402,19 @@ export function runGraphViewProjection(
       },
       material: node.material ?? undefined,
     })),
-    edges: view.edges.map((edge) => ({
-      id: edge.id,
-      from: edge.from,
-      to: edge.to,
-      family: familyForEdge(edge.kind),
-      /** The engine's own route kind, so the layout can draw loop-backs and join channels. */
-      kind: edge.kind ?? undefined,
-      material: resolveEdgeMaterial(edge.kind) ?? undefined,
-    })),
+    edges: view.edges.map((edge) => {
+      const family = familyForEdge(edge.kind);
+      return {
+        id: edge.id,
+        from: edge.from,
+        to: edge.to,
+        family,
+        /** The engine's own route kind, so the layout can draw loop-backs and join channels. */
+        kind: edge.kind ?? undefined,
+        /** The route kind's material, or the family's: a connector always has its family shape. */
+        material: resolveEdgeMaterial(edge.kind) ?? EDGE_FAMILY_MATERIAL[family],
+      };
+    }),
     diagnostics: [],
   };
 }

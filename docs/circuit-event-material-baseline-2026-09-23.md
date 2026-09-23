@@ -388,3 +388,101 @@ the scenario testimony is `completed`, the output is `EQUITY_MARKET_PRICE_EVIDEN
   `lib/{run-graph.ts,live-trace.ts}`, `app/globals.css`, tests). The mapping and replay reflect
   that working tree, not HEAD; the raw captures are independent of it.
 - No file under `components/`, `lib/`, `app/` or `contracts/` was changed by this study.
+
+---
+
+## 8. Corrections — state semantics and material mapping (state lane)
+
+This appendix records the corrections applied after the baseline study and supersedes §4.2, §5.1
+and the M1/M2 mapping findings where they differ. The layout artifacts
+(`components/circuit/{geometry.js,layout.ts,circuit-viewer.tsx}`, `app/globals.css`) are untouched
+by this lane. The corrected classification lives in `lib/live-trace.ts`; the corrected mapping
+lives in `components/circuit/scl-theme.ts` with its plumbing in `lib/run-graph.ts`. Corrected
+proof artifacts are machine-local in `%TEMP%\opencode\correct`
+(`corrected-replay.json`, `corrected-summary.json`).
+
+### 8.1 State semantics — decision
+
+State is derived only from testified `disposition`, `outcomeClassification` and `outcomeVariant`,
+plus the run's lifecycle facts. `display.entry.status`/`text` and the word `completed` are
+presentation, never evidence.
+
+| observed facts | state | why |
+| --- | --- | --- |
+| `disposition` failed/rejected/…, `failureCode`, failure testimony | **failed** | declared on the cell itself; sticky, later testimony cannot repaint it |
+| `disposition=completed` **+** `outcomeClassification=failure` (or `outcomeVariant=retained-non-success`) | **held** | a declared non-success attempt superseded by a later route (429 → fallback): not a failure, and it never taints the enclosing composite or root |
+| `disposition` completed/observed/admitted/… | **done** | the testimony's own disposition |
+| testimony arrived, cell not closed | **active** | no terminal disposition yet |
+
+- **Drawn-node aggregation**: failure > active > done > held. A member that completed supersedes
+  a held sibling on the same drawn node (the surviving route wins); a node whose only observed
+  members are held shows `held` explicitly.
+- **Root/scenario completion is a lifecycle fact**: `run.exited` with `exitCode 0` completes the
+  scenario node, a failed exit fails it — whether or not the scenario's own testimony arrived.
+  Absence is never evidence, and the scenario's `completed` display text is never parsed.
+- `held` renders as its own state (`circuit-node--held` / `data-live="held"`). The circuit
+  viewer's local state union was not touched; `components/estate/capability-circuit-panel.tsx`
+  names the widening at the binding boundary (flagged for the layout lane to import the trace
+  type when it next edits the viewer).
+
+Counts over the drawn view of the baseline captures:
+
+| run | before | after |
+| --- | --- | --- |
+| hello | 6 done (6/6) | 6 done (6/6) — unchanged |
+| equity (15 drawn nodes) | 4 done / 11 failed (10 fallback operations **+ the scenario root**) | **5 done / 10 held / 0 failed** — scenario root done, 4 provider-success operations done, 10 fallback operations held |
+| equity raw cells | — | 497 done / 32 held (10 retained/rejected/credential provider legs, their physical cells, 12 failure-classified composite cells) |
+
+The M1 failure taint (G2) is gone: exit 0 no longer renders as failure, and no display `failed`
+string participates in classification. `run.exited` is exit 0 for both baseline runs.
+
+### 8.2 False positives — heuristics use the declared operation root only
+
+`MATERIAL_WORDS` now matches the cell's declared operation identity — the address before `#` —
+not the whole semantic address. Expression-language field and binding names are never capability
+semantics (baseline flags 3 and 4):
+
+- `…/bindings/completed*` (18 cells) no longer reads as `termination`; each resolves through its
+  mechanic root (`select-*` → decision 15, `normalize-*` → evidence 3).
+- `…/fields/cancellationScopeReference` (1 cell) no longer reads as `rejection`; it resolves to
+  its root (`build-*-exchange-request` → input).
+- `…/bindings/conforming*` (3 cells) no longer reads as `validation`; the same root rule → evidence.
+
+Recomputed equity classification (529 observed cells; full 873-cell graph in parentheses):
+
+| token | before | after |
+| --- | --- | --- |
+| input | 328 (346) | 343 (361) |
+| decision | 28 (304) | 49 (325) |
+| evidence | 59 (96) | 66 (103) |
+| branch | 28 (41) | 28 (41) — junction route kinds unchanged |
+| provider-port | 14 (14) | 28 (28) — includes the 14 exchange composites |
+| provider | 14 (14) | 14 (14) |
+| outcome | 1 (1) | 1 (1) |
+| termination | 18 (18) | **0 (0)** |
+| rejection | 1 (1) | **0 (0)** |
+| validation | 3 (3) | **0 (0)** |
+| event | 35 (35) | **0 (0)** — composites now resolve; hello keeps event |
+
+Hello is unchanged: 5 event leaves + 1 outcome, 6/6 observed cells resolved.
+
+### 8.3 Composite mapping — the 35 generic plates
+
+A composite is identified structurally (a drawn cell that encloses other cells), never by a
+capability name. `COMPOSITE_MATERIAL` extends the table: a composite body that declares a provider
+leg (`provider` + `physical` members, no expression root of its own) resolves to `provider-port` —
+the boundary the operation binds; a composite body with expression members resolves through the
+same `MATERIAL_WORDS` table applied to its body's mechanic roots. Declared materials for the 35
+equity composites: input 14, provider-port 14, decision 6, evidence 1, event 0. The hello operation
+composite keeps `event` (its body declares no matching vocabulary). No per-capability code, no new
+token: the table remains the single interpreter.
+
+### 8.4 Verification against the captures
+
+- hello replay: 6/6 done nodes, 5/5 done edges, zero unmatched.
+- equity replay: 5 done / 10 held / 0 failed drawn nodes; scenario done; 28/28 drawn edges done;
+  zero binding misses; raw cell states 497 done / 32 held.
+- 529/529 observed cells resolve a material; 873/873 full-graph cells resolve; no `null`; zero
+  address-derived termination/rejection; sequence 795→event, selection 82→branch, return 36→outcome
+  unchanged.
+- `tsc --noEmit` clean, `node scripts/test.mjs` 88 pass / 0 fail, `next build` green.

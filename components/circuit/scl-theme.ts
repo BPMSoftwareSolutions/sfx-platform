@@ -98,6 +98,18 @@ export const EDGE_STYLES: Record<CircuitEdge['family'], { label: string; stroke:
 };
 
 /**
+ * §12.3 — the family fallback for a connector's material. Every route has a family even when the
+ * engine declares no route kind, so a connector is never an untextured generic line: execution
+ * routes carry the event plate, product transfers the outcome plate, and support links evidence.
+ * This is the same single material vocabulary the nodes resolve through.
+ */
+export const EDGE_FAMILY_MATERIAL: Record<CircuitEdge['family'], MaterialToken> = {
+  EXECUTION: 'event',
+  PRODUCT_TRANSFER: 'outcome',
+  SUPPORT: 'evidence',
+};
+
+/**
  * §12.3 — the material interpreter for the engine's native execution graph.
  *
  * The dynamic trace is compiled by the engine and publishes cells as `altitude` + `kind` plus an
@@ -255,8 +267,39 @@ export const MATERIAL_WORDS: Array<{ token: MaterialToken; stems: string[] }> = 
   { token: 'provider', stems: ['provider', 'implement', 'adapter', 'invoc'] },
 ];
 
+/**
+ * Composite operation bodies (the mapping hole of §4.2): a drawn cell that encloses other cells
+ * is the operation's envelope, not a leaf. Its material is read from its declared body — the
+ * mechanic roots of its expression members through MATERIAL_WORDS — or, when the body is a
+ * provider leg (a provider cell and its realized physical cell, with no expression root of its
+ * own), from the boundary the leg binds. Keyed by the member altitudes the body declares; the
+ * first rule whose members are all present wins.
+ */
+export const COMPOSITE_MATERIAL: Array<{ members: string[]; token: MaterialToken }> = [
+  { members: ['provider', 'physical'], token: 'provider-port' },
+];
+
+/**
+ * The declared operation identity of an address is its mechanic root: the part before the
+ * expression path (`build-equity-price-binding-request#/expression/fields/…`). The field and
+ * binding names after `#` are expression-language vocabulary, not capability semantics, and are
+ * never matched against MATERIAL_WORDS.
+ */
+function operationRootOf(address: string): string {
+  const hash = address.indexOf('#');
+  return hash === -1 ? address : address.slice(0, hash);
+}
+
 function wordsOf(address: string): string[] {
-  return address.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  return operationRootOf(address).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+function wordMaterial(addresses: string[]): MaterialToken | null {
+  const words = addresses.flatMap(wordsOf);
+  for (const entry of MATERIAL_WORDS) {
+    if (words.some((word) => entry.stems.some((stem) => word.startsWith(stem)))) return entry.token;
+  }
+  return null;
 }
 
 function junctionMaterial(routeKinds: { in: string[]; out: string[] }): MaterialToken {
@@ -277,6 +320,12 @@ export function resolveCellMaterial(input: {
   semanticHints: string[];
   /** Route kinds touching the cell itself, used to classify a junction. */
   routeKinds: { in: string[]; out: string[] };
+  /** True when the drawn cell encloses other cells: an operation composite, not a leaf. */
+  composite?: boolean;
+  /** Declared mechanic roots of a composite's body (the addresses before `#`). */
+  operationRoots?: string[];
+  /** Altitudes of the cells drawn inside a composite. */
+  memberAltitudes?: string[];
 }): MaterialToken | null {
   const altitude = input.altitude?.toLowerCase() ?? '';
   const kind = input.kind?.toLowerCase() ?? '';
@@ -285,9 +334,15 @@ export function resolveCellMaterial(input: {
   if (exact) {
     // A mechanic's own name refines the generic execution plate; scopes and bindings stay fixed.
     if (exact !== 'event') return exact;
-    const words = input.semanticHints.flatMap(wordsOf);
-    for (const entry of MATERIAL_WORDS) {
-      if (words.some((word) => entry.stems.some((stem) => word.startsWith(stem)))) return entry.token;
+    // Only the declared operation identity is vocabulary. A composite reads its body's mechanic
+    // roots; a leaf reads the hint addresses' roots. Field and binding names are excluded.
+    const fromName = wordMaterial(input.composite ? input.operationRoots ?? [] : input.semanticHints);
+    if (fromName) return fromName;
+    if (input.composite) {
+      const altitudes = new Set(input.memberAltitudes ?? []);
+      for (const rule of COMPOSITE_MATERIAL) {
+        if (rule.members.every((member) => altitudes.has(member))) return rule.token;
+      }
     }
     return exact;
   }

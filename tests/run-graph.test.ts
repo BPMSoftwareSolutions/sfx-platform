@@ -27,7 +27,7 @@ import {
  */
 
 function graphOf(
-  cells: Array<{ cellId: string; altitude?: string; parentCellId?: string | null; kind?: string }>,
+  cells: Array<{ cellId: string; altitude?: string; parentCellId?: string | null; kind?: string; semanticAddress?: string }>,
   edges: Array<{ edgeId: string; from: string; to: string; kind?: string }> = []
 ): SdaRunGraph {
   return {
@@ -38,7 +38,7 @@ function graphOf(
       altitude: cell.altitude ?? 'mechanic',
       kind: cell.kind ?? cell.altitude ?? 'mechanic',
       parentCellId: cell.parentCellId ?? null,
-      semanticAddress: `test/scenario/${cell.cellId.replace(/^cell:/, '')}`,
+      semanticAddress: cell.semanticAddress ?? `test/scenario/${cell.cellId.replace(/^cell:/, '')}`,
       ports: {
         input: { portId: `${cell.cellId}:input`, contractId: 'test.v1' },
         outcome: { portId: `${cell.cellId}:outcome`, contractId: 'test.v1' },
@@ -179,6 +179,32 @@ test('the material interpreter resolves altitude/kind exactly and refines a mech
   }), 'rejection');
   assert.equal(resolveCellMaterial({ altitude: 'quantum', kind: 'quantum', semanticHints: [], routeKinds: none }), null);
   assert.equal(resolveCellMaterial({ altitude: null, kind: null, semanticHints: [], routeKinds: none }), null);
+});
+
+test('expression field and binding names are not capability semantics: no termination or rejection false positives', () => {
+  const none = { in: [], out: [] };
+  const material = (address: string) =>
+    resolveCellMaterial({ altitude: 'mechanic', kind: 'mechanic', semanticHints: [address], routeKinds: none });
+  assert.equal(material('select-equity-price-route#/expression/bindings/completed'), 'decision', 'a completed binding is not termination');
+  assert.equal(material('select-equity-price-route#/expression/bindings/completed/left'), 'decision');
+  assert.equal(material('normalize-equity-price-evidence#/expression/bindings/completed'), 'evidence');
+  assert.equal(material('normalize-equity-price-evidence#/expression/bindings/conforming'), 'evidence');
+  assert.equal(material('build-equity-price-exchange-request#/expression/fields/cancellationScopeReference'), 'input', 'a scope reference is not rejection');
+});
+
+test('an operation composite resolves from its declared body, not the generic event plate', () => {
+  const graph = graphOf([
+    { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
+    { cellId: 'cell:mechanic:op', altitude: 'mechanic', parentCellId: 'cell:scenario:root', semanticAddress: 'cap/scenario/cap/operation/cap.operation.1' },
+    { cellId: 'cell:mechanic:op:expression', altitude: 'mechanic', parentCellId: 'cell:mechanic:op', semanticAddress: 'build-equity-price-binding-request#/expression' },
+    { cellId: 'cell:mechanic:prov', altitude: 'mechanic', parentCellId: 'cell:scenario:root', semanticAddress: 'cap/scenario/cap/operation/cap.operation.2' },
+    { cellId: 'cell:provider:prov', altitude: 'provider', parentCellId: 'cell:mechanic:prov' },
+    { cellId: 'cell:physical:prov', altitude: 'physical', parentCellId: 'cell:mechanic:prov' },
+  ]);
+  const view = buildRunGraphView(normalizeRunGraph(graph));
+  assert.equal(view.nodes.find((node) => node.id === 'cell:mechanic:op')!.material, 'input', 'an expression body resolves through its mechanic root');
+  assert.equal(view.nodes.find((node) => node.id === 'cell:mechanic:prov')!.material, 'provider-port', 'a provider-leg body resolves to the boundary it binds');
+  assert.equal(view.nodes.find((node) => node.id === 'cell:physical:prov')!.material, 'provider');
 });
 
 test('junction cells take their material from the route kinds touching them', () => {
