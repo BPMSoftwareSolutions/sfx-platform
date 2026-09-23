@@ -8,6 +8,7 @@
   },
   "scripts": {
     "publish:estate": "node scripts/publish-estate.mjs",
+    "publish:circuits": "node scripts/publish-circuits.mjs",
     "publish:contracts": "node scripts/publish-input-contracts.mjs",
     "publish:lab": "node --import tsx scripts/publish-lab.ts",
     "dev:lab": "node --import tsx scripts/start-lab.mjs",

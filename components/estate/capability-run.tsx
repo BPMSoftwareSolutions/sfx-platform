@@ -1,31 +1,27 @@
 import type { CapabilityPage } from '@/contracts/estate';
 import type { ResolvedInputContract } from '@/contracts/input-contract';
-import type { InvocationView } from '@/contracts/invocation';
 import { Callout } from '@/components/ui';
 import { CapabilityRunPanel } from './capability-run-panel';
 
 /**
  * Capability execution section — §5.17, §13.1.
  *
- * Offered for every published capability, because the command surface accepts any capability
+ * Offered for every published capability, because the run API accepts any declared capability
  * identity: whether one can execute is the estate's answer, given when the visitor runs it,
  * not a claim this page makes in advance.
  *
  * Availability is deliberately not resolved while rendering. These pages are prerendered and one
- * image is promoted between environments, so the command endpoint is server-side runtime
- * configuration (§8.7); a deployment without one reports that when the visitor runs, rather than
- * having a build-time answer baked into every page.
+ * image is promoted between environments, so the run endpoint is server-side runtime
+ * configuration; a deployment without one reports that when the visitor runs.
  */
 export function CapabilityRun({
   capability,
   contract,
   example,
-  run,
 }: {
   capability: CapabilityPage;
   contract: ResolvedInputContract;
   example: string | null;
-  run: (namespace: string, capabilityId: string, input: string) => Promise<InvocationView>;
 }) {
   return (
     <section className="page-width editorial-section" aria-labelledby="capability-execution-title" id="execute">
@@ -35,9 +31,9 @@ export function CapabilityRun({
           <h2 id="capability-execution-title">Meaning you can<br /><em>execute.</em></h2>
         </div>
         <p>
-          Run this capability against an input you supply. Its authority is read from the database,
-          its body is built in memory and executed there, and the result below is the one the
-          capability produced.
+          Run this capability against an input you supply. The platform admits the run through the
+          SDA run API, watches the observation lane advance — the circuit nodes above take their
+          live state from what is observed — and shows the lean scenario output the run produced.
         </p>
       </div>
 
@@ -47,7 +43,6 @@ export function CapabilityRun({
         contractId={contract.contractId}
         schema={contract.schema}
         example={example}
-        run={run}
       />
 
       <Callout tone="limitation" title="What an execution here establishes, and what it does not">

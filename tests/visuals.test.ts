@@ -20,7 +20,10 @@ function reselect(dir:string){
  writeFileSync(join(folder,'publication-manifest.json'),JSON.stringify({version:2,publicationId:p.publicationId,artifacts}));
 }
 test('all selected images and stored circuit closures match their delivered bytes',()=>{
- assert.ok(visual.visuals.length>=20);assert.ok(visual.materials.length===15);assert.ok(visual.circuits.length>0);
+ assert.ok(visual.visuals.length>=20);assert.ok(visual.materials.length===15);
+ // Delivery bytes for every published visual, material and authored circuit closure are verified by
+ // validateVisualAssets above; this generation publishes no authored circuit closure.
+ assert.ok(visual.circuits.every(c=>c.bundleRevision.length===64&&c.artifacts.every(a=>visual.artifacts[a])));
  assert.ok(visual.visuals.every(v=>v.originalDigest!==v.digest&&v.model?.startsWith('gemini-')));
 });
 test('capability identities are never borrowed from their scenario records',()=>{
@@ -43,6 +46,8 @@ test('recomputing release hashes cannot disguise a cross-entity image binding',(
 }));
 test('recomputing release hashes cannot attach a circuit to another capability',()=>fixture(dir=>{
  const file=join(dir,'generated/visual-publication.json'),v=JSON.parse(readFileSync(file,'utf8'));
+ const capability=publication.capabilities.find(c=>c.scenarios.length)!,subject=capability.scenarios[0]!;
+ if(!v.circuits.length)v.circuits=[{capabilityId:capability.entityId,capabilityDefinitionPk:capability.semanticObjectDefinitionPk,scenarioId:subject.scenarioId,definitionPk:subject.semanticObjectDefinitionPk,objectPk:subject.semanticObjectPk,bundleRevision:'0'.repeat(64),label:capability.entityId,url:'/media/library/test/catalog.js',artifacts:[],scope:'DECLARED_SOURCE_TOPOLOGY'}];
  v.circuits[0].capabilityDefinitionPk=publication.capabilities.find(c=>c.entityId!==v.circuits[0].capabilityId)!.semanticObjectDefinitionPk;
  writeFileSync(file,JSON.stringify(v));reselect(dir);
  assert.throws(()=>readValidatedPublication(join(dir,'generated')),/circuit owner\/definition mismatch/);

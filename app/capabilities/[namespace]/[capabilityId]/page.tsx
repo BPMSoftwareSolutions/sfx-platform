@@ -10,7 +10,8 @@ import { getEdition, getStoredCircuits } from '@/lib/visuals';
 import { pageMetadata } from '@/lib/seo';
 import { getCapabilityExample } from '@/lib/capability-examples';
 import { getInputContract } from '@/lib/input-contracts';
-import { runCapability } from './actions';
+import { LiveRunProvider } from '@/components/estate/live-run';
+import { admitCapabilityRun, advanceCapabilityRun } from './actions';
 interface Params { params: Promise<{namespace:string;capabilityId:string}> }
 export async function generateMetadata({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
@@ -23,7 +24,7 @@ export default async function CapabilityDetailPage({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
  if(!capability)notFound();
  const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),storedCircuits=getStoredCircuits(capability.semanticObjectDefinitionPk),example=getCapabilityExample(capability.entityId),contract=getInputContract(capability.entityId);
- return <>
+ return <LiveRunProvider admit={admitCapabilityRun} advance={advanceCapabilityRun}>
   <section className="capability-hero page-width">
    <div><Link className="kicker" href="/capabilities">The capability estate / {capability.title}</Link>
     <h1>{edition?.storyTitle??capability.title}</h1>
@@ -47,7 +48,7 @@ export default async function CapabilityDetailPage({params}:Params){
     <div><h3>{s.scenarioId.replaceAll('-',' ')}</h3><p>{s.responsibility}</p><a className="text-link" href={'?scenario='+encodeURIComponent(s.scenarioId)+'#circuit'}>Inspect this scenario ↗</a></div>
    </article>)}</div>
   </section>
-  <CapabilityRun capability={capability} contract={contract} example={example} run={runCapability}/>
+  <CapabilityRun capability={capability} contract={contract} example={example}/>
   <section className="page-width editorial-section">
    <details className="border-t border-grid-line pt-6"><summary className="cursor-pointer text-sm">Source, availability and exact identity</summary><dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
     <div><dt className="kicker">Identity</dt><dd className="mt-2 break-all">{capability.entityId}</dd></div>
@@ -56,5 +57,5 @@ export default async function CapabilityDetailPage({params}:Params){
     <div><dt className="kicker">Downloads</dt><dd className="mt-2">{capability.downloadEligibility.reason}</dd></div>
    </dl><p className="mt-6 max-w-3xl text-sm text-muted">Blueprints retain their authority records and typed routes. Execution views expose native cells or declared operations; mechanic views expose expression dependencies. Each graph keeps exact source identities, contracts and evidence scope.</p></details>
   </section>
- </>;
+ </LiveRunProvider>;
 }

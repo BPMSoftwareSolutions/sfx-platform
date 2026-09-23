@@ -1,6 +1,6 @@
 import { loadLabPublication } from '@/lib/lab/publication';
 import { runPublishedInput } from '@/lib/lab/invocation';
-import { invokeCapability } from '@/lib/capability-api';
+import { invokeCapabilityToView } from '@/lib/sda-api';
 
 export async function POST(request: Request) {
   if (process.env.SIDEFX_LAB_ENABLED !== '1') return new Response(null, { status: 404 });
@@ -25,6 +25,6 @@ export async function POST(request: Request) {
   let raw: unknown;
   try { raw = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { return new Response(null, { status: 400 }); }
-  const result = await runPublishedInput(loadLabPublication(), raw, invokeCapability);
+  const result = await runPublishedInput(loadLabPublication(), raw, invokeCapabilityToView);
   return Response.json(result, { headers: { 'cache-control': 'no-store' } });
 }

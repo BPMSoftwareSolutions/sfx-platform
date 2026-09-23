@@ -272,7 +272,40 @@ function build(sourcePath) {
   const managedCapabilities = intOf(rs[2][0]?.selected_managed_capabilities);
   const mechanicRows = rs[3].map((r) => pick(r, ALLOW_LIST.mechanic));
   const relationshipRows = rs[4].map((r) => pick(r, ALLOW_LIST.relationship));
-  const providerRows = rs[5].map((r) => pick(r, ALLOW_LIST.provider));
+
+  // One page per declared provider identity. A generation may carry several definitions of the
+  // same provider; the definition carrying the selected visual is preferred, then the latest.
+  const providerDefinitions = rs[5].map((r) => pick(r, ALLOW_LIST.provider));
+  const providersByIdentity = new Map();
+  const readyProviderDefinitions = new Set(
+    selectedVisuals.filter((v) => v.kind === 'PROVIDER').map((v) => String(v.definitionPk)),
+  );
+  for (const row of providerDefinitions) {
+    const key = `${row.namespace_id ?? ''}\u0000${row.provider_id}`;
+    const rowReady = readyProviderDefinitions.has(String(row.semantic_object_definition_pk));
+    const entry = providersByIdentity.get(key);
+    if (!entry) {
+      providersByIdentity.set(key, {
+        row: { ...row },
+        ready: rowReady,
+        mechanicRelationships: intOf(row.mechanic_relationships),
+        capabilityRelationships: intOf(row.capability_relationships),
+      });
+      continue;
+    }
+    entry.mechanicRelationships += intOf(row.mechanic_relationships);
+    entry.capabilityRelationships += intOf(row.capability_relationships);
+    const newer = Number(row.semantic_object_definition_pk) > Number(entry.row.semantic_object_definition_pk);
+    if ((rowReady && !entry.ready) || (rowReady === entry.ready && newer)) {
+      entry.row = { ...row };
+      entry.ready = rowReady;
+    }
+  }
+  const providerRows = [...providersByIdentity.values()].map((entry) => ({
+    ...entry.row,
+    mechanic_relationships: entry.mechanicRelationships,
+    capability_relationships: entry.capabilityRelationships,
+  }));
   const scenarioRows = rs[6].map((r) => pick(r, ALLOW_LIST.scenario));
   const blueprintRows = rs[7].map((r) => pick(r, ALLOW_LIST.blueprint));
 
@@ -280,7 +313,7 @@ function build(sourcePath) {
   const declared = raw.rowCounts;
   const actual = [
     rs[0].length, rs[1].length, rs[2].length, mechanicRows.length,
-    relationshipRows.length, providerRows.length, scenarioRows.length,
+    relationshipRows.length, providerDefinitions.length, scenarioRows.length,
     blueprintRows.length, rs[8].length, capabilityRows.length,
   ];
   declared.forEach((n, i) => {

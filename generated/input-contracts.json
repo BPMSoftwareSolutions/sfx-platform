@@ -1,11 +1,11 @@
 {
   "publicationType": "sidefx-input-contract-publication.v2",
-  "publicationId": "sha256:eae96af93e6ecba469a9f1e935fe1ba59afd48a500d46a5dd7428e03f0eb4785",
-  "builtAt": "2026-09-09T11:09:57.591Z",
+  "publicationId": "sha256:a71f889122b13813e23cf5b1f767efa1b39a1c0d246b9f73ce15891e333a1a95",
+  "builtAt": "2026-09-23T11:27:04.527Z",
   "source": {
     "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
-    "projectionDigest": "sha256:e036610730972f246d8e33cd882e45dd793013076aea2e401086b93d4993a7ee",
-    "viewDefinitionDigest": "sha256:b574443a65db450c9f269105d725acb98087cfc0e524f6982a27d5169a110564",
+    "projectionDigest": "sha256:8aae1f306ced5952333da0fb936d2f846081f8ed31b6f627a2099ad49cbbfdb0",
+    "viewDefinitionDigest": "sha256:b213142d32df9231d839f943c24986deade7826415af5b72342cfc4612501bbd",
     "queryDigest": "sha256:31219e79d2b671e666a79527d4271e69584acbeff52dbb33ab98c9d08eb2bb39",
     "disposition": "READ_QUERY_COMPLETE"
   },
@@ -39,6 +39,12 @@
       "contractId": "admit-consumer-source-facts-input.v1",
       "schemaRef": "sha256:713f91ba124d795d346e8fa5b555dffa4bcb3f6c7adc4a3479a5a212474f81fb",
       "sourceSchemaDigest": "sha256:cac9635063207f9c146cfc8ae4b524bc9e2676fe52931121023e44dcd6d9a42a"
+    },
+    "admit-declared-contract": {
+      "scenarioId": "admit-declared-contract",
+      "contractId": "admit-declared-contract-request.v1",
+      "schemaRef": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0",
+      "sourceSchemaDigest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
     },
     "admit-execution-vector": {
       "scenarioId": "admit-execution-vector",
@@ -148,11 +154,29 @@
       "schemaRef": "sha256:c7e108e71959ecbac856f90a66ab4a0e2cab421074a0bffe2b6278e35e930427",
       "sourceSchemaDigest": "sha256:8d39cfd91a2597d68c0ffa671fc8e986a5dc696a2e8a84673a5c3bf10ea01c1c"
     },
+    "author-provider-configuration-change": {
+      "scenarioId": "author-provider-configuration-change",
+      "contractId": "provider-binding-change-request.v1",
+      "schemaRef": "sha256:2407e39ad6f198a0f2e41373f605437ae5faf38de922bcaa814bbd75fa53a043",
+      "sourceSchemaDigest": "sha256:45dd5f1963d033b361fc8fdae5a3ba0fd7e8025415a7760183b7229b9e5e8470"
+    },
     "author-tooling-capability-candidate": {
       "scenarioId": "author-tooling-capability-candidate",
       "contractId": "capability-authoring-context.v1",
       "schemaRef": "sha256:1cc72aa5b4ef954a3cd6f4fc78625d26320a11692a13923b06076730bf3329af",
       "sourceSchemaDigest": "sha256:f18e546a0268370cae9042b0da61c7e22deccf46ac5d1f86fd95d8b0f642d90e"
+    },
+    "authoring-altitude-model-stubs": {
+      "scenarioId": "authoring-altitude-model-stubs",
+      "contractId": "authoring-altitude-model-stubs-request.v1",
+      "schemaRef": "sha256:3bd01cee162d072458aaa64dc5eb4282ec5fd862001d0a2432d0315e03999ede",
+      "sourceSchemaDigest": "sha256:29b7deda3005a6561a15552eace3a38b99b4e2fb6b3880427a3c70ad9ce8a09b"
+    },
+    "authority-read-provider": {
+      "scenarioId": "authority-read-provider",
+      "contractId": "authority-read-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
     },
     "bind-canonical-blueprint-review": {
       "scenarioId": "bind-canonical-blueprint-review",
@@ -178,6 +202,12 @@
       "schemaRef": "sha256:84305017be34ec297a4845c8c9657d3860fd29563269dd146087b40642c0b605",
       "sourceSchemaDigest": "sha256:f225ab625cd5254977a22871f8919dd84b78b4333e2bf14d3a2e4ba8a871f573"
     },
+    "carry-consumer-authority-context": {
+      "scenarioId": "carry-consumer-authority-context",
+      "contractId": "carry-consumer-authority-context-request.v1",
+      "schemaRef": "sha256:01db9e2d794dc61da605db9a89d04e14ef03b99f4682c2132bf570f99c627da2",
+      "sourceSchemaDigest": "sha256:049ff7d03084b0c6531c4012b0284816e74700b2866a7acb00e3bc9ebc6c18ac"
+    },
     "classify-sidefx-semantic-corpus-sources": {
       "scenarioId": "classify-sidefx-semantic-corpus-sources",
       "contractId": "sidefx-semantic-corpus-source-classification-request.v1",
@@ -196,11 +226,23 @@
       "schemaRef": "sha256:6de34a927e06f06689d32a2b6fc4e4ac9f1706c79cb0d55b00737bdc9f9a4190",
       "sourceSchemaDigest": "sha256:f89cb8260e3d01e565547b2a0ad0c885b362b5052a28b3ba9b1183ead146523c"
     },
+    "compile-declared-authority": {
+      "scenarioId": "compile-declared-authority",
+      "contractId": "compile-declared-authority-request.v1",
+      "schemaRef": "sha256:8298707bf0b30813d2e43acdb0e44c98ed517faa9c080c448791cfa2433c43f5",
+      "sourceSchemaDigest": "sha256:6834b925acec63f569285a813663f13178cd7c01a53bc85ca609c8c5c50daead"
+    },
     "compose-canonical-scenario-graph": {
       "scenarioId": "compose-canonical-scenario-graph",
       "contractId": "compose-canonical-scenario-graph-input.v1",
       "schemaRef": "sha256:00c561bdedeab23b1431df03c400a5ff1dd90673dbc3602ef79af7f4e1029091",
       "sourceSchemaDigest": "sha256:ff3fed9f107f8d24b00eb972cfee06f26331bc7314e3570bb90e385c56d67185"
+    },
+    "compose-resolve-equity-market-price-evidence": {
+      "scenarioId": "compose-resolve-equity-market-price-evidence",
+      "contractId": "live-equity-price-request.v1",
+      "schemaRef": "sha256:09bccb61a3e91169765a0fc6c419439dcb3a9ff2839782d6ab59a496130f2202",
+      "sourceSchemaDigest": "sha256:97b2f584d847b242202f4c06d90d9051492a47f83293d6f74f0e6be54929d539"
     },
     "construct-capability-author-delegate-request": {
       "scenarioId": "construct-capability-author-delegate-request",
@@ -219,6 +261,12 @@
       "contractId": "construct-deterministic-realization-plan-input.v1",
       "schemaRef": "sha256:a15c6a0af0541087c86ac84658e2ff841c6744b2b59c186ece3303185b6b46b0",
       "sourceSchemaDigest": "sha256:2bf7d47ec1cab462f6485b0348703e8fe8133899b303777da3d75b484edcbfd9"
+    },
+    "construct-embodiment-plan": {
+      "scenarioId": "construct-embodiment-plan",
+      "contractId": "construct-embodiment-plan-request.v1",
+      "schemaRef": "sha256:d21b9e9069f9b591bdd5435caa1789bb618929efe500978971aecb44f0dab52a",
+      "sourceSchemaDigest": "sha256:0ce2dcedc07857bbc8a54a10f1b510e439ddbf9171f4d02db33e7d9090df2955"
     },
     "construct-model-connection-runtime-closure": {
       "scenarioId": "construct-model-connection-runtime-closure",
@@ -267,6 +315,54 @@
       "contractId": "controlled-tooling-migration-request.v1",
       "schemaRef": "sha256:ba6529a2ab327042ea392e9911bf487049472658914bc280d933716cb6a8b399",
       "sourceSchemaDigest": "sha256:0d822fc1b0d7625f9dcd0f37c9e6b469159803157b23189302a1818b6f1ce78a"
+    },
+    "consumer-execution-provider": {
+      "scenarioId": "consumer-execution-provider",
+      "contractId": "consumer-execution-provider-request.v1",
+      "schemaRef": "sha256:59b6151f65eec381f8b87dfafdd686cb7b4a328e5f69d6e6b7a8f1f50774c5ca",
+      "sourceSchemaDigest": "sha256:f2b9a17e4d3f5a611d9a3b4892dc03fa8163decba3897b6c3b8f90796aac2e4a"
+    },
+    "consumer-object-provider": {
+      "scenarioId": "consumer-object-provider",
+      "contractId": "consumer-object-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "consumer-plan-provider": {
+      "scenarioId": "consumer-plan-provider",
+      "contractId": "consumer-plan-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "consumer-write-provider": {
+      "scenarioId": "consumer-write-provider",
+      "contractId": "consumer-write-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "contract-admission-provider": {
+      "scenarioId": "contract-admission-provider",
+      "contractId": "contract-admission-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "count-declared-capabilities": {
+      "scenarioId": "count-declared-capabilities",
+      "contractId": "count-declared-capabilities-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:8db437476a7db73a24ec51cc7845bf235c4bc269d8b590b8d55d051d2917b7ad"
+    },
+    "count-declared-contracts": {
+      "scenarioId": "count-declared-contracts",
+      "contractId": "count-declared-contracts-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:8db437476a7db73a24ec51cc7845bf235c4bc269d8b590b8d55d051d2917b7ad"
+    },
+    "database-query-provider": {
+      "scenarioId": "database-query-provider",
+      "contractId": "database-query-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
     },
     "decide-implementation-admission": {
       "scenarioId": "decide-implementation-admission",
@@ -436,6 +532,30 @@
       "schemaRef": "sha256:6f030f68e791638204828dca44135f3fb7edb65562e967925ac770014afb10cf",
       "sourceSchemaDigest": "sha256:932ecd2e4ec751ce6b1e211499e7f4937651ffc7fbb3eb3138c3c86366c4673a"
     },
+    "dispatch-pair-demo": {
+      "scenarioId": "dispatch-pair-demo",
+      "contractId": "dispatch-pair-demo-request.v1",
+      "schemaRef": "sha256:1aec268e1653742aa9c4c76aaac64b58e1c15b0ac04f4a0a5a0ebc5126178d4c",
+      "sourceSchemaDigest": "sha256:150d02622fb5774a92f46a19918679d2625a589a2b2732a7a58c8b3532e35f70"
+    },
+    "embodiment-plan-provider": {
+      "scenarioId": "embodiment-plan-provider",
+      "contractId": "embodiment-plan-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "embodiment-write-provider": {
+      "scenarioId": "embodiment-write-provider",
+      "contractId": "embodiment-write-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "enforce-altitude-request-cap": {
+      "scenarioId": "enforce-altitude-request-cap",
+      "contractId": "altitude-model-request.v1",
+      "schemaRef": "sha256:9befd4b2bed60286ac22ed3b804dd3f95ece5221ed5c895da8d1c37a33271937",
+      "sourceSchemaDigest": "sha256:fb5805543ebd30164b176f1eb8cbaae51d7e5e3c370e6dcfd0f5902c9b87f337"
+    },
     "establish-capsule-first-repository-closure": {
       "scenarioId": "establish-capsule-first-repository-closure",
       "contractId": "capsule-first-repository-closure-request.v1",
@@ -490,6 +610,18 @@
       "schemaRef": "sha256:81ba89618ec66624eae3c594c9e4614b500f242af6e043b7bc3d036e3ff6e7a2",
       "sourceSchemaDigest": "sha256:a4991834c66974c87d57541ad00f2e6fbdd4adca8503562cc130fed87cb9192e"
     },
+    "execute-consumer-plan": {
+      "scenarioId": "execute-consumer-plan",
+      "contractId": "execute-consumer-plan-request.v1",
+      "schemaRef": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0",
+      "sourceSchemaDigest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
+    },
+    "execute-declared-capability": {
+      "scenarioId": "execute-declared-capability",
+      "contractId": "capability-execution-request.v1",
+      "schemaRef": "sha256:cd3f3274c2daa379b4f9e06ac174dd9fb7e1cb64e9fbd74ced3db0946005e13a",
+      "sourceSchemaDigest": "sha256:f0c1eae7ab2bc0cbf3eb5273f80b98b091c1b3486c6853b887ff3a34baf283b5"
+    },
     "execute-governed-model-invocation": {
       "scenarioId": "execute-governed-model-invocation",
       "contractId": "execute-governed-model-invocation-input.v1",
@@ -514,6 +646,24 @@
       "schemaRef": "sha256:efd11df137b97bf6c8446e2541c494f81af190c7b75efe4744c74bfd1e7c1a50",
       "sourceSchemaDigest": "sha256:e8b4d601723c340746006ea5e5a88cb600caec113c77fb823896094bcf40ee83"
     },
+    "execute-semantic-execution-graph": {
+      "scenarioId": "execute-semantic-execution-graph",
+      "contractId": "execute-semantic-execution-graph-request.v1",
+      "schemaRef": "sha256:085550fdc7ce369fe7d218fc83e306065cb78adb1d3bd64ddf497537bd770f70",
+      "sourceSchemaDigest": "sha256:d9e1af99956302e01c3dc5805e3d3f9352754d485290b8ad5e5994409da78f9d"
+    },
+    "execute-semantic-value-graph": {
+      "scenarioId": "execute-semantic-value-graph",
+      "contractId": "execute-semantic-value-graph-request.v1",
+      "schemaRef": "sha256:085550fdc7ce369fe7d218fc83e306065cb78adb1d3bd64ddf497537bd770f70",
+      "sourceSchemaDigest": "sha256:d9e1af99956302e01c3dc5805e3d3f9352754d485290b8ad5e5994409da78f9d"
+    },
+    "execution-graph-read-provider": {
+      "scenarioId": "execution-graph-read-provider",
+      "contractId": "execution-graph-read-provider-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
     "extract-semantic-carrier-graph": {
       "scenarioId": "extract-canonical-carrier-graph",
       "contractId": "semantic-carrier-extraction-request.v1",
@@ -529,8 +679,8 @@
     "generate-governed-narration": {
       "scenarioId": "generate-governed-narration",
       "contractId": "presentation-scene-graph.v1",
-      "schemaRef": "sha256:cdbd8fa03cf0bd3fd18564f61058985eac65016a7867b443d477031b687f9ec7",
-      "sourceSchemaDigest": "sha256:a2d3576415e0dd76bd8fa995097c8ee9aabe82e6e2940fcc8b869d4232977ca5"
+      "schemaRef": null,
+      "sourceSchemaDigest": null
     },
     "govern-authoring-convergence": {
       "scenarioId": "govern-authoring-convergence",
@@ -568,6 +718,18 @@
       "schemaRef": "sha256:f8ba06f4426ea9c4bf3b8180216b403c2429a4701de0c40f6b2c3bb436bcec11",
       "sourceSchemaDigest": "sha256:5d0534e325987feac3dd16123e7ebdf681350435873dbec8457482044da35833"
     },
+    "hello-world-2": {
+      "scenarioId": "hello-world-2",
+      "contractId": "hello-world-2-request.v1",
+      "schemaRef": "sha256:0ab6c8c9e9e687edae854fc1133620f48ee8189df77344c1b4acd898e75b3ff7",
+      "sourceSchemaDigest": "sha256:c7fb3141d38355510e7ea3a34a663ffb6742a1d86dab2348cdfd74dd31f4a05f"
+    },
+    "hello-world-sql": {
+      "scenarioId": "hello-world-sql",
+      "contractId": "hello-world-request.v1",
+      "schemaRef": "sha256:cf10b43b6aaecb7258cbfefefe908287b15e9721af5f7bca3b60e39d7f6d343d",
+      "sourceSchemaDigest": "sha256:7e1fd9bacb7942c489607d0a71735caccef0e55780290d5fc8fcb0ed70d172a7"
+    },
     "ingest-sidefx-json-authority": {
       "scenarioId": "ingest-schema-admitted-json-authority",
       "contractId": "sidefx-json-authority-ingestion-request.v1",
@@ -592,17 +754,65 @@
       "schemaRef": "sha256:8751a9c402def598de3ce49194f2ff99b2e02f6bcf0b2d697d246df1fc5ff001",
       "sourceSchemaDigest": "sha256:ec6c84a5b4142ef26d900b17530684f0748112e64ee69f20256264d08869626d"
     },
+    "invoke-database-capability": {
+      "scenarioId": "invoke-database-capability",
+      "contractId": "invoke-database-capability-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "lane3-authoring-proof": {
+      "scenarioId": "lane3-authoring-proof",
+      "contractId": "lane3-authoring-proof-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "lane3-placement-sandbox": {
+      "scenarioId": "lane3-placement-sandbox",
+      "contractId": "lane3-placement-sandbox-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "list-capabilities": {
+      "scenarioId": "list-capabilities",
+      "contractId": "list-capabilities-request.v1",
+      "schemaRef": "sha256:164be71dc7db267964c81b129f39d183493bfba473a53763b594f73593a60104",
+      "sourceSchemaDigest": "sha256:7f0f2c440d818dccdd22850c6a084035884413ab746f43672702998dc93c7ccc"
+    },
+    "list-providers": {
+      "scenarioId": "list-providers",
+      "contractId": "provider-catalogue-request.v1",
+      "schemaRef": "sha256:446208e6d264845ca1000c09a95814fb9f17696e17bcaba34a88a5f8a0f07da1",
+      "sourceSchemaDigest": "sha256:1258b8a111c033afd030a2dd522e35affe417687bf3783ab25430d942bb14469"
+    },
+    "load-memory-scenario": {
+      "scenarioId": "load-memory-scenario",
+      "contractId": "load-memory-scenario-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
     "manage-capability-capsule": {
       "scenarioId": "collapse-admitted-capability",
       "contractId": "capability-capsule-record.v1",
       "schemaRef": "sha256:9f9295235b93c1849e2e5d6b75a990da61b0355d4fcfc822569885867e74a6f8",
       "sourceSchemaDigest": "sha256:41d32f07fefd5929ea52be917ff9c26a0557262fbfeb40de8e7b48cc5b428eb6"
     },
+    "manage-capsule-estate": {
+      "scenarioId": "admit-capsule-manager-command",
+      "contractId": "capsule-estate-operation-request.v2",
+      "schemaRef": "sha256:9d7d1fffee29abcd8c33dc6c6aa214a4645af97d4f188f94abaa874d12c464f5",
+      "sourceSchemaDigest": "sha256:42db2898d75a5ffc52097884a81d125ee24413c700a8fb114d5ecb1f8b7be322"
+    },
     "materialize-authorized-file-batch": {
       "scenarioId": "materialize-authorized-file-batch",
       "contractId": "authorized-file-batch-materialization-request.v1",
       "schemaRef": "sha256:91fe9106e5f2602e29de6d1a1a53e1339e540242545727d4aec188c5257a222e",
       "sourceSchemaDigest": "sha256:db04a5a3bf9281eee45877e2d8db4ea86a6c251833ec58533b43a76d4b26e6d1"
+    },
+    "materialize-capability-embodiment": {
+      "scenarioId": "materialize-capability-embodiment",
+      "contractId": "construct-embodiment-plan-request.v1",
+      "schemaRef": "sha256:d21b9e9069f9b591bdd5435caa1789bb618929efe500978971aecb44f0dab52a",
+      "sourceSchemaDigest": "sha256:0ce2dcedc07857bbc8a54a10f1b510e439ddbf9171f4d02db33e7d9090df2955"
     },
     "materialize-converged-candidate": {
       "scenarioId": "materialize-converged-candidate",
@@ -616,6 +826,12 @@
       "schemaRef": "sha256:c7ebbe77d3075fe7a7dfbcb112e8bf71e3dfaa9a3389278ee2658d699c361b5e",
       "sourceSchemaDigest": "sha256:ca7980e2fd686b8bdd4661ad6751c09890363f5c29acc5fa1b761abdbfb27fa5"
     },
+    "native-expression-projection": {
+      "scenarioId": "native-expression-projection",
+      "contractId": "native-expression-projection-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
     "observe-capability-change": {
       "scenarioId": "observe-capability-change",
       "contractId": "capability-change-status-request.v1",
@@ -625,8 +841,8 @@
     "observe-governed-http-exchange": {
       "scenarioId": "observe-governed-http-exchange",
       "contractId": "observe-governed-http-exchange-input.v1",
-      "schemaRef": "sha256:f4ff721e54ef3f2ef812099174f21e8ab3e8034938c0b5c14b797dfd4389f092",
-      "sourceSchemaDigest": "sha256:24b86148e6879d73b2440d26492a6f137509b94c35365257ca3416152307e8b5"
+      "schemaRef": "sha256:ff6a4fb2b876dd9339a687eb7f82a0a1043e12aa8f164dc07b9f722048c664b8",
+      "sourceSchemaDigest": "sha256:b332bb30b838fdbd03898c6fcb2542552ad35415903b77f80eec0b8d391e311a"
     },
     "observe-governed-repository": {
       "scenarioId": "observe-governed-repository",
@@ -667,8 +883,8 @@
     "obtain-governed-speech-media": {
       "scenarioId": "obtain-governed-speech-media",
       "contractId": "authorized-narration-generation-request.v1",
-      "schemaRef": "sha256:bd05e88baf3a1630a5ab00fba51ddbfba2c5fee358844a2951f0ab5f3ee5a09c",
-      "sourceSchemaDigest": "sha256:1175eee2a54ba78e1028e96705275e9dfa673ffe9c1eeacae7399deb543f2dab"
+      "schemaRef": "sha256:391913696790ebde784dba08196aa2dada04552282405bbf8954e85f4f266d2b",
+      "sourceSchemaDigest": "sha256:fd643b1a0a4416aa9de7954af0765d3f5af5480d31db755ae05dc872a5056804"
     },
     "open-capability-change": {
       "scenarioId": "open-capability-change",
@@ -712,11 +928,29 @@
       "schemaRef": "sha256:90302a321a5fe2d311dbeea7ef1a24ea9a154532031570287d297a503ae60cfb",
       "sourceSchemaDigest": "sha256:583b399e9cf1368086456901abd031a4abcf923e6b1b461a9f675a88ea5fce50"
     },
+    "plan-capability-embodiment": {
+      "scenarioId": "plan-capability-embodiment",
+      "contractId": "plan-capability-embodiment-request.v1",
+      "schemaRef": "sha256:7562f2382b0b9fdb7f084dbc73c405802b17132dd078dcdf17e40bd7cedd5029",
+      "sourceSchemaDigest": "sha256:30b0336f9018701784ff0c8556375e5d0ccd82016911872e4e1bf1613c218cc9"
+    },
+    "plan-consumer-execution": {
+      "scenarioId": "plan-consumer-execution",
+      "contractId": "plan-consumer-execution-request.v1",
+      "schemaRef": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0",
+      "sourceSchemaDigest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
+    },
     "preserve-admitted-projection-on-incomplete-regeneration": {
       "scenarioId": "preserve-admitted-projection-on-incomplete-regeneration",
       "contractId": "preserve-admitted-projection-input.v1",
       "schemaRef": "sha256:a6feff7c5610eabb1d41d1925d1fd836dabef7b9c68995a49943d1f7eee4ebc7",
       "sourceSchemaDigest": "sha256:068ed904a972f5b4e0a224e26f379065475df504c3bb95dc078709ff7b2ce05b"
+    },
+    "probe-compose-altitude-request": {
+      "scenarioId": "probe-compose-altitude-request",
+      "contractId": "probe-compose-altitude-request-request.v1",
+      "schemaRef": "sha256:d964ca512c0d23bedf4f5091c93bb5005ec8b5bd2a31374b54d6c93f50115196",
+      "sourceSchemaDigest": "sha256:eb51121242ab2af9c9a16acb5c860ef2cbc32282f9219df1e0470924874a2f67"
     },
     "project-accessibility-binding": {
       "scenarioId": "project-accessibility-binding",
@@ -766,11 +1000,17 @@
       "schemaRef": "sha256:0d5e71987bb7204b67bdc3caa6fa04e3f6f74258133b607e41df6498fc2823df",
       "sourceSchemaDigest": "sha256:ed27901209c0b4b516369c282ceb35ee0f423ddad87d356ab0917853c1dfa549"
     },
+    "project-consumer-execution-embodiment-plan": {
+      "scenarioId": "project-consumer-execution-embodiment-plan",
+      "contractId": "capability-authority-declaration.v1",
+      "schemaRef": "sha256:33c01934f8f26c6940d38bdfdfac4b28cf5bebb5889c9b35a6db46a621609fcb",
+      "sourceSchemaDigest": "sha256:f5002cff2653820bf711da5148f8cfb6d7b2c9d28645255943b602ab8ccb182f"
+    },
     "project-consumer-execution-embodiment-v2": {
       "scenarioId": "project-consumer-execution-embodiment-v2",
       "contractId": "consumer-execution-embodiment-projection-context.v1",
-      "schemaRef": "sha256:3384b06192f8307f33aa4702e9bd3f251eb74e621abe472929e45484249bb808",
-      "sourceSchemaDigest": "sha256:1b1c863e0e74b5378886892029ff9c3aa44af21b61c2e94546a76b4e789b20de"
+      "schemaRef": null,
+      "sourceSchemaDigest": null
     },
     "project-document-presentation": {
       "scenarioId": "project-document-presentation",
@@ -813,6 +1053,12 @@
       "contractId": "project-model-provider-protocol-input.v1",
       "schemaRef": "sha256:63af463a3be045e66c813bde9080fb2446c1b7317bf14bc10306b7217a654d55",
       "sourceSchemaDigest": "sha256:e3e9d706ad792791baacab1eadd3c1e219d3c1f2f6175a5201297d830a3b8bc0"
+    },
+    "project-native-expressions": {
+      "scenarioId": "project-native-expressions",
+      "contractId": "project-native-expressions-request.v1",
+      "schemaRef": "sha256:f7c6a8b92897b719c77122cea5ae3912af55e03d8aadb91e9474b211c0086493",
+      "sourceSchemaDigest": "sha256:4b960c9359729a8de2873f3e3e01326026e8da7a22b0bbe20d05fa419073e07d"
     },
     "project-openapi-description": {
       "scenarioId": "project-openapi-description",
@@ -910,6 +1156,12 @@
       "schemaRef": "sha256:0d391312a5eef34c524cd94190820e9e94ac1157c22a914cf5eec699064e6aa2",
       "sourceSchemaDigest": "sha256:68fbcde7e9ba67656fc16f3b8516787faaae17d0cc69e34c98f21cd231cd4204"
     },
+    "proof-flow": {
+      "scenarioId": "proof-flow",
+      "contractId": "proof-flow-request.v1",
+      "schemaRef": "sha256:84af0e0d3b0b461c8411b4310aa926a3b8840ba2ec5ccaca973e3fe63e961582",
+      "sourceSchemaDigest": "sha256:28f0e8f6ef3194ad415cdcdfb06bc897177c637941b01fc3a8cd42ba8dab6667"
+    },
     "prove-canonical-blueprint-geometry": {
       "scenarioId": "prove-canonical-blueprint-geometry",
       "contractId": "canonical-blueprint-geometry-proof-request.v1",
@@ -985,8 +1237,8 @@
     "publish-capability-change": {
       "scenarioId": "publish-capability-change",
       "contractId": "sealed-capability-change-set.v1",
-      "schemaRef": "sha256:1442ffc10fb276407b4aa7718ab6f9d581b4049bea9dbc7274a470ccf7881e3a",
-      "sourceSchemaDigest": "sha256:5ffaded2b75462dcfc55c30657e78bcf37ce076e727023eb2f52ae7b8d5d0386"
+      "schemaRef": null,
+      "sourceSchemaDigest": null
     },
     "publish-implementation-evidence": {
       "scenarioId": "publish-implementation-evidence",
@@ -1012,6 +1264,12 @@
       "schemaRef": "sha256:747ed67f85f5195e725b61367b37aa56657a67aebe1cf98bb1330f5829d03327",
       "sourceSchemaDigest": "sha256:023441dd1931af619efeee527a89fb2683cbe4ff29c84039fad3a73850d971a1"
     },
+    "read-authority": {
+      "scenarioId": "read-authority",
+      "contractId": "read-authority-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
     "read-authorized-file": {
       "scenarioId": "read-authorized-file",
       "contractId": "authorized-file-read-request.v1",
@@ -1023,6 +1281,108 @@
       "contractId": "authorized-file-read-request.v1",
       "schemaRef": "sha256:65790e9b32df519ce71fa079f0ecf4b858a82401f514f6258138ca5fdf3cd11f",
       "sourceSchemaDigest": "sha256:f53e93deeb66949fc762aee23c5c4b197613c78eb7351d5133401d66dc3d2e36"
+    },
+    "read-capability-authority": {
+      "scenarioId": "read-capability-authority",
+      "contractId": "construct-embodiment-plan-request.v1",
+      "schemaRef": "sha256:d21b9e9069f9b591bdd5435caa1789bb618929efe500978971aecb44f0dab52a",
+      "sourceSchemaDigest": "sha256:0ce2dcedc07857bbc8a54a10f1b510e439ddbf9171f4d02db33e7d9090df2955"
+    },
+    "read-capability-circuit": {
+      "scenarioId": "read-capability-circuit",
+      "contractId": "circuit-view-request.v1",
+      "schemaRef": "sha256:12a6397ab1742b53dcdcfd5dcf498288c5b9c65cab0d462339f8bbf962f84ac9",
+      "sourceSchemaDigest": "sha256:97a80087d1ff7740fe028c1d9a39c4b92c1177127005bdb67b998d06afcf50cf"
+    },
+    "read-capability-meaning": {
+      "scenarioId": "read-capability-meaning",
+      "contractId": "read-capability-meaning-request.v1",
+      "schemaRef": "sha256:b5defeb97bd86e17e131230c8f50e93862c1678f99d89eee436e68bde6087c90",
+      "sourceSchemaDigest": "sha256:c7d33887812d5f085150014b2db643270fa048e4ce85b0d03dfa619ec8005bff"
+    },
+    "read-circuit-presentation": {
+      "scenarioId": "read-circuit-presentation",
+      "contractId": "circuit-presentation-request.v1",
+      "schemaRef": "sha256:27b2ac2c5b6767539bb6d9c608857fb34eb7d4f73e29c249d9152a3a7bcc7201",
+      "sourceSchemaDigest": "sha256:9f8d3cc9c31e44ead46c84f4118e0f1b2eb4984e96e6913df979e4671fabea39"
+    },
+    "read-credential-non-disclosure": {
+      "scenarioId": "read-credential-non-disclosure",
+      "contractId": "credential-non-disclosure-request.v1",
+      "schemaRef": "sha256:4d4b01113caaf2d17e9d26f772c363eddcfa224b478d75f787f578cdfc384ee6",
+      "sourceSchemaDigest": "sha256:3a4ece0d8e29a1630d4dd980403828dd4ee202715024af18aabc156ee6ce90cf"
+    },
+    "read-declared-authority": {
+      "scenarioId": "read-declared-authority",
+      "contractId": "read-declared-authority-request.v1",
+      "schemaRef": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0",
+      "sourceSchemaDigest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
+    },
+    "read-declared-capability-document": {
+      "scenarioId": "read-declared-capability-document",
+      "contractId": "read-capability-meaning-request.v1",
+      "schemaRef": "sha256:b5defeb97bd86e17e131230c8f50e93862c1678f99d89eee436e68bde6087c90",
+      "sourceSchemaDigest": "sha256:c7d33887812d5f085150014b2db643270fa048e4ce85b0d03dfa619ec8005bff"
+    },
+    "read-declared-execution-graph": {
+      "scenarioId": "read-declared-execution-graph",
+      "contractId": "read-declared-execution-graph-request.v1",
+      "schemaRef": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0",
+      "sourceSchemaDigest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
+    },
+    "read-demo-acceptance": {
+      "scenarioId": "read-demo-acceptance",
+      "contractId": "demo-acceptance-request.v1",
+      "schemaRef": "sha256:f2894c97ed9ca47a3efb55177430575128fb5e487b07b6c29612ec968ae0bec0",
+      "sourceSchemaDigest": "sha256:fa16353901b8d5b230cd2f91255d904232c1caa8d5c152bfaffbbe5f2a1e909c"
+    },
+    "read-invocation-timing": {
+      "scenarioId": "read-invocation-timing",
+      "contractId": "invocation-timing-request.v1",
+      "schemaRef": "sha256:eda0733b1173a1f5d5b11f48cce633b3acf9e5861757a4e127113639e999c335",
+      "sourceSchemaDigest": "sha256:ede9dfd751eed46c87932df446070d0d62c72e571b3e7f7dadecb1caa0ac6f75"
+    },
+    "read-kernel-acceptance-suite": {
+      "scenarioId": "read-kernel-acceptance-suite",
+      "contractId": "kernel-acceptance-suite-request.v1",
+      "schemaRef": "sha256:446208e6d264845ca1000c09a95814fb9f17696e17bcaba34a88a5f8a0f07da1",
+      "sourceSchemaDigest": "sha256:1258b8a111c033afd030a2dd522e35affe417687bf3783ab25430d942bb14469"
+    },
+    "read-observation-projection": {
+      "scenarioId": "read-observation-projection",
+      "contractId": "observation-projection-request.v1",
+      "schemaRef": "sha256:92b49d19d8a7c95ba9eed11e432468bc954f9fa5570dfcfe34704c134c132166",
+      "sourceSchemaDigest": "sha256:febc571c76cc34a477e40713395f0a7e9793b7538b96a6afed4250218f404d98"
+    },
+    "read-observation-telemetry-authority": {
+      "scenarioId": "read-observation-telemetry-authority",
+      "contractId": "observation-telemetry-request.v1",
+      "schemaRef": "sha256:5c97ec9c72fcb2a55ef57661a38a6322e1aaa1dd9ac889e069ea8d82b15a30e6",
+      "sourceSchemaDigest": "sha256:9a050160d613e14524376e0f43bfd35646e4a35cca9196b8d0d0b2f8e188d96c"
+    },
+    "read-projected-bodies": {
+      "scenarioId": "read-projected-bodies",
+      "contractId": "read-projected-bodies-request.v1",
+      "schemaRef": "sha256:0728eb1cfce96d9a9df6c706f63ff473e1224b393fba987a6f29ba5b1a40bcc2",
+      "sourceSchemaDigest": "sha256:2b89aa59b140b57e563da5826aadcf4e464e57a26920e608daab4760ff73eb98"
+    },
+    "read-provider-configuration": {
+      "scenarioId": "read-provider-configuration",
+      "contractId": "provider-configuration-request.v1",
+      "schemaRef": "sha256:f64842adddc15f2ae2963a5469bed83e015e71aee3485c7c8748de37285d0089",
+      "sourceSchemaDigest": "sha256:a4175f43afc79a6a7149c9c0dff41b94a37b9cb687319823676d9c8bfe759656"
+    },
+    "read-retained-publication": {
+      "scenarioId": "read-retained-publication",
+      "contractId": "read-retained-publication-request.v1",
+      "schemaRef": "sha256:98700708864902d492db0130d057a6ac5b01fba9979cd5fe11d573a1cddb6259",
+      "sourceSchemaDigest": "sha256:ae465ba94c524c083baf8c552ac120a0cfa88e1cd7559f93b884ff3aa27302ea"
+    },
+    "read-scenario-authority": {
+      "scenarioId": "read-scenario-authority",
+      "contractId": "read-scenario-authority-request.v1",
+      "schemaRef": "sha256:48d7b395adb2fa1d5a0b6db5a44abf183a095a32597f0dc8e3526575693ef2a2",
+      "sourceSchemaDigest": "sha256:1b1bb0e6b1a55a09176495d95ed4f399f579f7ea6b5b0481ba4865ef582e7fcc"
     },
     "realize-admitted-capability": {
       "scenarioId": "realize-admitted-capability",
@@ -1042,6 +1402,12 @@
       "schemaRef": "sha256:227901b8a8a787ca2fd186988119539dda941170082f3aca5908e6f3163e3c78",
       "sourceSchemaDigest": "sha256:beb59c9b55d0d56c54f3ec9be508aa91d63152f0779162cdcde6bdfff4c21f9e"
     },
+    "render-consumer-object": {
+      "scenarioId": "render-consumer-object",
+      "contractId": "render-consumer-object-request.v1",
+      "schemaRef": "sha256:d43d96cb4256216116deb92adfe70af0fcf1ee2b5bf29e7ecc3516e158090de8",
+      "sourceSchemaDigest": "sha256:5537a62345ee1d518f89308bfcf926004396afe086c6ce066948d11dbecf0d68"
+    },
     "reproduce-target-execution-vector": {
       "scenarioId": "reproduce-target-execution-vector",
       "contractId": "reproduce-target-execution-vector-input.v1",
@@ -1053,6 +1419,12 @@
       "contractId": "reproduce-structural-model-input.v1",
       "schemaRef": "sha256:916a41979710ebbed0964cb763e0b1033ae8f03aef23d21f2fd9ab29cb6d2797",
       "sourceSchemaDigest": "sha256:66d164c8c76b3ba39b75aa9b9082cc5623c14f061d26f1d3c474b08d46df78e5"
+    },
+    "request-capability-from-objective": {
+      "scenarioId": "request-capability-from-objective",
+      "contractId": "agent-objective-request.v1",
+      "schemaRef": "sha256:daf0a905f829d0c90611e4ae9bdce066065d0f63fa5d1d34b1f59792490c5b26",
+      "sourceSchemaDigest": "sha256:2fb9ac53522f42a17da058cc5ede39caddf8e7ec543d7dc9f4433dc793e94bed"
     },
     "resolve-admitted-market-facts": {
       "scenarioId": "resolve-admitted-market-facts",
@@ -1077,6 +1449,18 @@
       "contractId": "capability-reinforcing-fit-record.v1",
       "schemaRef": "sha256:66d3ed43a6223ef1b02b6bdaa90346ab4738a975b1eb9d220c0bd416caee8104",
       "sourceSchemaDigest": "sha256:eb2f5937af78dc20fabc07f9efcde738d508bb68286e1083844b2fefb8b36dfd"
+    },
+    "resolve-credential": {
+      "scenarioId": "resolve-credential",
+      "contractId": "resolve-credential-request.v1",
+      "schemaRef": "sha256:d23174c98b089360899aecd546e5f8426ffa68fe4462e0b3a7e49eaea06b292d",
+      "sourceSchemaDigest": "sha256:fc1e6d77d11a90ad35b397ee44be9335a4a98d42a0693022710c328263451f75"
+    },
+    "resolve-equity-market-price-evidence": {
+      "scenarioId": "resolve-equity-market-price-evidence",
+      "contractId": "live-equity-price-request.v1",
+      "schemaRef": "sha256:09bccb61a3e91169765a0fc6c419439dcb3a9ff2839782d6ab59a496130f2202",
+      "sourceSchemaDigest": "sha256:97b2f584d847b242202f4c06d90d9051492a47f83293d6f74f0e6be54929d539"
     },
     "resolve-estate-dependency-closure": {
       "scenarioId": "resolve-estate-dependency-closure",
@@ -1113,6 +1497,12 @@
       "contractId": "product-promise-fit-record.v1",
       "schemaRef": "sha256:64fad36fb34c5ca9775b4371b6e3c2d14884857f1fe05f8c6f3c060fdd13e688",
       "sourceSchemaDigest": "sha256:7653eb2a8276f63f305b5e8e10d7f68bd45de03d3e28263b69c534131394a188"
+    },
+    "resolve-provider-slot-bindings": {
+      "scenarioId": "resolve-provider-slot-bindings",
+      "contractId": "capability-authority-declaration.v1",
+      "schemaRef": null,
+      "sourceSchemaDigest": null
     },
     "resolve-registered-realization-plan": {
       "scenarioId": "resolve-registered-realization-plan",
@@ -1198,11 +1588,263 @@
       "schemaRef": "sha256:8eceacd74144f0f3ae5c2eb75f90b59afc68bfa08c87ad0904b7c3824fc74880",
       "sourceSchemaDigest": "sha256:0493e35119e6aa545b64d7b794373db46638eed55398a4840f7bfad379bee664"
     },
+    "route-two-child-proof": {
+      "scenarioId": "route-two-child-proof",
+      "contractId": "route-two-child-request.v1",
+      "schemaRef": "sha256:bb0c34f9a68b7d47aac1520f3fa2d1cec96f8d04c7315bef60492698aaf98458",
+      "sourceSchemaDigest": "sha256:c77e4d2b5c78ef774d8497281396dacf8f037eafff20df24c0ff28477419f82e"
+    },
+    "run-declared-graph": {
+      "scenarioId": "run-declared-graph",
+      "contractId": "run-declared-graph-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
+    "run-declared-query": {
+      "scenarioId": "run-declared-query",
+      "contractId": "run-declared-query-request.v1",
+      "schemaRef": "sha256:44f9a9de4e44eac863bb4e02e4ef1c70bd7329714f70c35d98fd165ab0e30f62",
+      "sourceSchemaDigest": "sha256:38a55822a07b63060678c362c22e0d741258722bebf4e5fae6a7e6e2e8668000"
+    },
+    "run-pilot-container": {
+      "scenarioId": "run-pilot-container",
+      "contractId": "run-pilot-container-request.v1",
+      "schemaRef": "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf",
+      "sourceSchemaDigest": "sha256:ac79d5f21b24bc32782380d222adfb19224f8c68945623ee78496c56c56d870e"
+    },
     "say-hello-world": {
       "scenarioId": "say-hello-world",
       "contractId": "hello-world-request.v1",
-      "schemaRef": "sha256:9e0ae22dee03b301f8a93f399bab9f0a088991159e7735514f26f1d0820f712c",
-      "sourceSchemaDigest": "sha256:0cb0cff2850d0636dd684850c859b4216e4b65e3ebb1f646fcb7c34771a08eb0"
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-authority-state-projection.v1": {
+      "scenarioId": "sda-authority-state-projection.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-authority-transformation-port.v1": {
+      "scenarioId": "sda-authority-transformation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-bounded-base64-byte-digest-port.v1": {
+      "scenarioId": "sda-bounded-base64-byte-digest-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-canonical-capability-feature-resolution-port.v1": {
+      "scenarioId": "sda-canonical-capability-feature-resolution-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-declarative-state-projection.v1": {
+      "scenarioId": "sda-declarative-state-projection.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-declarative-value-port.v1": {
+      "scenarioId": "sda-declarative-value-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-external-credential-reference-binding-port.v1": {
+      "scenarioId": "sda-external-credential-reference-binding-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-external-observation-port.v1": {
+      "scenarioId": "sda-external-observation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-filesystem-artifact-store.v1": {
+      "scenarioId": "sda-filesystem-artifact-store.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-fixture-contract-validator.v1": {
+      "scenarioId": "sda-fixture-contract-validator.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-generic-llm-connector-port.v1": {
+      "scenarioId": "sda-generic-llm-connector-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-disposable-root-lifecycle-port.v1": {
+      "scenarioId": "sda-governed-disposable-root-lifecycle-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-external-root-batch-materialization-port.v1": {
+      "scenarioId": "sda-governed-external-root-batch-materialization-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-external-root-consumer-projection-port.v1": {
+      "scenarioId": "sda-governed-external-root-consumer-projection-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-external-root-observation-port.v1": {
+      "scenarioId": "sda-governed-external-root-observation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-external-root-projected-application-execution-port.v1": {
+      "scenarioId": "sda-governed-external-root-projected-application-execution-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-file-system-shaping-port.v2": {
+      "scenarioId": "sda-governed-file-system-shaping-port.v2",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-http-exchange-port.v1": {
+      "scenarioId": "sda-governed-http-exchange-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-repository-observation-port.v1": {
+      "scenarioId": "sda-governed-repository-observation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-serial-execution-port.v1": {
+      "scenarioId": "sda-governed-serial-execution-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-target-execution-observation-port.v1": {
+      "scenarioId": "sda-governed-target-execution-observation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-tooling-binding-transaction-port.v1": {
+      "scenarioId": "sda-governed-tooling-binding-transaction-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-governed-tooling-migration-operation-port.v1": {
+      "scenarioId": "sda-governed-tooling-migration-operation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-json-authority-ingestion-port.v1": {
+      "scenarioId": "sda-json-authority-ingestion-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-json-cli.v1": {
+      "scenarioId": "sda-json-cli.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-json-query-cli.v1": {
+      "scenarioId": "sda-json-query-cli.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-managed-language-module-invocation-port.v1": {
+      "scenarioId": "sda-managed-language-module-invocation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-node-consumer-runtime.v1": {
+      "scenarioId": "sda-node-consumer-runtime.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-os-environment-credential-port.v1": {
+      "scenarioId": "sda-os-environment-credential-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-projected-capability-invocation-port.v1": {
+      "scenarioId": "sda-projected-capability-invocation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-projected-capability-invocation-port.v2": {
+      "scenarioId": "sda-projected-capability-invocation-port.v2",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-proof-binding-evaluation-port.v1": {
+      "scenarioId": "sda-proof-binding-evaluation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-scenario-semantic-carrier-evaluation-port.v1": {
+      "scenarioId": "sda-scenario-semantic-carrier-evaluation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-scenario-semantic-carrier-extraction-port.v1": {
+      "scenarioId": "sda-scenario-semantic-carrier-extraction-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-scenario-semantic-carrier-validation-port.v1": {
+      "scenarioId": "sda-scenario-semantic-carrier-validation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-schema-contract-admission.v1": {
+      "scenarioId": "sda-schema-contract-admission.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-semantic-execution-graph-compilation-port.v1": {
+      "scenarioId": "sda-semantic-execution-graph-compilation-port.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
+    },
+    "sda-semantic-vector-index.v1": {
+      "scenarioId": "sda-semantic-vector-index.v1",
+      "contractId": null,
+      "schemaRef": null,
+      "sourceSchemaDigest": null
     },
     "seal-capability-change": {
       "scenarioId": "seal-capability-change",
@@ -1219,14 +1861,20 @@
     "speech-provider": {
       "scenarioId": "speech-provider-exchange",
       "contractId": "speech-generation-invocation.v2",
-      "schemaRef": "sha256:de5281b6d38c5d273474341a1831b3ad127fff21e3d398a83becba5272c85556",
-      "sourceSchemaDigest": "sha256:7f06a32558e57fffb7ff8dd0633fa03f16441764b38e6d40ee2c821c808a97ad"
+      "schemaRef": "sha256:66d1a8430a5945e8b441b9fdb5cf159f2f81625f58af6d8b6fc031001b5c12d6",
+      "sourceSchemaDigest": "sha256:4563d5ddee4265b1c855cbc54a0c543a9f2f6db30ac37b8018bff3444edc0007"
     },
     "stage-projected-candidate": {
       "scenarioId": "stage-projected-candidate",
       "contractId": "stage-projected-candidate-input.v1",
       "schemaRef": "sha256:84f31348de4088ef238ff12c6520ad6d7b47d1e64efecdb951dafa2957aaa779",
       "sourceSchemaDigest": "sha256:8eab5ac2f62d0c1d362e5e38a061d80fd167e30c18e5fb96bbca7a1ff205f1f8"
+    },
+    "store-credential": {
+      "scenarioId": "store-credential",
+      "contractId": "store-credential-request.v1",
+      "schemaRef": "sha256:32d268e6fcaad6c99373a96ee76c18b02f1cbaeb32d7f373ccc4d58811d53061",
+      "sourceSchemaDigest": "sha256:1086e8cc57ec2a531fe3cdeefe733dc0971d0d7cd442d706afb74861ecae40d1"
     },
     "trace-sidefx-scenario-lineage": {
       "scenarioId": "trace-sidefx-scenario-lineage",
@@ -1251,6 +1899,12 @@
       "contractId": "capability-lifecycle-proof-record.v1",
       "schemaRef": "sha256:3f600fb06f38b5146e53744bec69e4939bb2e96fa39ab7a949b139777e61752f",
       "sourceSchemaDigest": "sha256:8ba2efc806a1289d1f90cc1caddd9d7b7e39d1992631a49e1b33ec8b670d79fd"
+    },
+    "verify-agent-relevance-guard": {
+      "scenarioId": "verify-agent-relevance-guard",
+      "contractId": "agent-relevance-guard-request.v1",
+      "schemaRef": "sha256:4d321dc40e39521df527c1cfbe7633e42a664bb0fb932bc6b6f0d77284db9a3d",
+      "sourceSchemaDigest": "sha256:a00ef5fdef922a4d2e2e89d1cef69fe9413a06fc99f27a4373b67d882b0ef1a4"
     },
     "verify-capability-authoring-lineage": {
       "scenarioId": "verify-capability-authoring-lineage",
@@ -1317,6 +1971,18 @@
       "contractId": "binary-artifact-write-request.v1",
       "schemaRef": "sha256:e2b1921bc0870a29523b7e657324097075d4adbc550144bbe728140f1eb71810",
       "sourceSchemaDigest": "sha256:5d11174e6b54a0e0c522093f196c59194feec3e6a2e6d9ebb310e6b07b9fcc66"
+    },
+    "write-capability-embodiment": {
+      "scenarioId": "write-capability-embodiment",
+      "contractId": "write-capability-embodiment-request.v1",
+      "schemaRef": "sha256:793e0b6708906ec1b018ecf45e5f7544bc3acd894e3728642c0eed812d0b2cdf",
+      "sourceSchemaDigest": "sha256:75dbfbdce67029df1935ba1a4983695b0adcc2b089826940d30f670847be3e75"
+    },
+    "write-consumer-embodiment": {
+      "scenarioId": "write-consumer-embodiment",
+      "contractId": "write-consumer-embodiment-request.v1",
+      "schemaRef": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0",
+      "sourceSchemaDigest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
     }
   },
   "schemas": {
@@ -1810,6 +2476,9 @@
           }
         }
       }
+    },
+    "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0": {
+      "type": "object"
     },
     "sha256:0d74f72bc23de6c44da4c4788b941e565908a3910e2fbc81e757745a0ac71e3c": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -3880,6 +4549,23 @@
         }
       }
     },
+    "sha256:2407e39ad6f198a0f2e41373f605437ae5faf38de922bcaa814bbd75fa53a043": {
+      "type": "object",
+      "required": [
+        "providerId",
+        "input"
+      ],
+      "properties": {
+        "providerId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
     "sha256:1cc72aa5b4ef954a3cd6f4fc78625d26320a11692a13923b06076730bf3329af": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "type": "object",
@@ -3925,6 +4611,21 @@
           "additionalProperties": true
         }
       }
+    },
+    "sha256:3bd01cee162d072458aaa64dc5eb4282ec5fd862001d0a2432d0315e03999ede": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/authoring-altitude-model-stubs-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "objective": {
+          "type": "string"
+        }
+      }
+    },
+    "sha256:82ef96cebaf5fbe16269fd18b0240d78f5b9b90a4155a17eb797115b09148ecf": {
+      "type": "object",
+      "additionalProperties": true
     },
     "sha256:5012e021e4c996f626afe56a56538ed9b3895ecaf44f29c94c69b395b80e3527": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -4515,6 +5216,35 @@
         }
       }
     },
+    "sha256:01db9e2d794dc61da605db9a89d04e14ef03b99f4682c2132bf570f99c627da2": {
+      "type": "object",
+      "required": [
+        "plan",
+        "scenario",
+        "scenarioInput",
+        "executionAuthority",
+        "providerBindings",
+        "authorityIdentity"
+      ],
+      "properties": {
+        "plan": {
+          "type": "object"
+        },
+        "scenario": {
+          "type": "object"
+        },
+        "scenarioInput": {},
+        "executionAuthority": {
+          "type": "object"
+        },
+        "providerBindings": {
+          "type": "array"
+        },
+        "authorityIdentity": {
+          "type": "object"
+        }
+      }
+    },
     "sha256:f3d6a7bba73f77eb0c8330e14302c20ecbd1196374375825376c379e5beb6180": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/sidefx/sidefx-semantic-corpus-source-classification-request.schema.json",
@@ -4880,6 +5610,13 @@
         }
       }
     },
+    "sha256:8298707bf0b30813d2e43acdb0e44c98ed517faa9c080c448791cfa2433c43f5": {
+      "type": "object",
+      "required": [
+        "capabilityId"
+      ],
+      "additionalProperties": true
+    },
     "sha256:00c561bdedeab23b1431df03c400a5ff1dd90673dbc3602ef79af7f4e1029091": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -4956,6 +5693,46 @@
               "items": {
                 "type": "string"
               }
+            }
+          }
+        }
+      }
+    },
+    "sha256:09bccb61a3e91169765a0fc6c419439dcb3a9ff2839782d6ab59a496130f2202": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/live-equity-price-request.v1.schema.json",
+      "title": "Live equity price request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "live-equity-price-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "symbol",
+            "region"
+          ],
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 24,
+              "pattern": "^[A-Z0-9.^=-]{1,24}$"
+            },
+            "region": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "enum": [
+                "US"
+              ]
             }
           }
         }
@@ -5317,6 +6094,34 @@
               }
             }
           }
+        }
+      }
+    },
+    "sha256:d21b9e9069f9b591bdd5435caa1789bb618929efe500978971aecb44f0dab52a": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/construct-embodiment-plan-request.v1.schema.json",
+      "title": "Construct Embodiment Plan Request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityId"
+      ],
+      "properties": {
+        "capabilityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenarioId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "enum": [
+            "node",
+            "python",
+            "csharp"
+          ]
         }
       }
     },
@@ -6256,6 +7061,17 @@
         "effectCapabilityBindings"
       ],
       "additionalProperties": false
+    },
+    "sha256:59b6151f65eec381f8b87dfafdd686cb7b4a328e5f69d6e6b7a8f1f50774c5ca": {
+      "type": "object",
+      "required": [
+        "carrier"
+      ],
+      "properties": {
+        "carrier": {
+          "type": "object"
+        }
+      }
     },
     "sha256:a9b1f1851f15370bc2571e7f6cf0c61685f0dc50636a4c254d51277ec07b5e07": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -8489,6 +9305,119 @@
         }
       }
     },
+    "sha256:1aec268e1653742aa9c4c76aaac64b58e1c15b0ac04f4a0a5a0ebc5126178d4c": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/dispatch-pair-demo-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "dispatch-pair-demo-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "sha256:9befd4b2bed60286ac22ed3b804dd3f95ece5221ed5c895da8d1c37a33271937": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/altitude-model-request.v1.schema.json",
+      "title": "Compact altitude model request",
+      "description": "Compact scheduling facts and bound document references for one altitude model call. contextRefs are handles resolved under the pinned authority; contextSlices are bounded document selections. Embedded context (graphSource, authority, catalog, plan, currentInvocationRequest) is refused with ALTITUDE_REQUEST_EMBEDDED_CONTEXT; bodies over 256 KB are refused with ALTITUDE_REQUEST_OVERSIZED before any model call.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "altitude",
+        "toolId",
+        "objective",
+        "inputContractId"
+      ],
+      "properties": {
+        "altitude": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "toolId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputContractId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contextRefs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "digest": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "contextSlices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "ref",
+              "document"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "document": {}
+            }
+          }
+        }
+      },
+      "x-sidefx-requestCapBytes": 262144,
+      "x-sidefx-oversizeRefusal": "ALTITUDE_REQUEST_OVERSIZED",
+      "x-sidefx-embeddedContextMembers": [
+        "graphSource",
+        "authority",
+        "catalog",
+        "plan",
+        "currentInvocationRequest"
+      ],
+      "x-sidefx-embeddedContextRefusal": "ALTITUDE_REQUEST_EMBEDDED_CONTEXT",
+      "x-sidefx-unknownMemberRefusal": "ALTITUDE_REQUEST_UNKNOWN_MEMBER",
+      "x-sidefx-guardCapabilityId": "enforce-altitude-request-cap"
+    },
     "sha256:c8e14eda40adad6876c049e85c84226ee24c672decb4df237caa467ba7f96f9a": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -9830,6 +10759,33 @@
         }
       }
     },
+    "sha256:cd3f3274c2daa379b4f9e06ac174dd9fb7e1cb64e9fbd74ced3db0946005e13a": {
+      "type": "object",
+      "required": [
+        "capabilityId",
+        "target",
+        "scenarioInput"
+      ],
+      "properties": {
+        "capabilityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenarioId": {
+          "type": "string"
+        },
+        "scenarioInput": {},
+        "namespaceId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "sha256:17f272efd47bc7413477445ef7e471738641be7e8d2fccf11d49f19a7ddf2149": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -10298,6 +11254,19 @@
         }
       }
     },
+    "sha256:085550fdc7ce369fe7d218fc83e306065cb78adb1d3bd64ddf497537bd770f70": {
+      "type": "object",
+      "required": [
+        "plan",
+        "input"
+      ],
+      "properties": {
+        "plan": {
+          "type": "object"
+        },
+        "input": {}
+      }
+    },
     "sha256:ddb1f89ec51db1462a4347fad922d5c90f2a21d30234da35da687f946a281c3f": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.scenario-driven.dev/semantic-carrier/semantic-carrier-extraction-request.v1.schema.json",
@@ -10709,144 +11678,6 @@
         "digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
-        }
-      }
-    },
-    "sha256:cdbd8fa03cf0bd3fd18564f61058985eac65016a7867b443d477031b687f9ec7": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "https://schemas.agentic-harness.local/contracts/presentation-scene-graph.v1.schema.json",
-      "title": "Presentation Scene Graph",
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "contractId",
-        "payload"
-      ],
-      "properties": {
-        "contractId": {
-          "const": "presentation-scene-graph.v1"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "sceneGraphId",
-            "sceneGraphDigest",
-            "admittedAuthority",
-            "narrationIntent"
-          ],
-          "properties": {
-            "sceneGraphId": {
-              "type": "string",
-              "minLength": 1
-            },
-            "sceneGraphDigest": {
-              "type": "string",
-              "pattern": "^sha256:[a-f0-9]{64}$"
-            },
-            "admittedAuthority": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "authorityId",
-                "digest"
-              ],
-              "properties": {
-                "authorityId": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "digest": {
-                  "type": "string",
-                  "pattern": "^sha256:[a-f0-9]{64}$"
-                }
-              }
-            },
-            "narrationIntent": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "performanceProfile",
-                "assertions"
-              ],
-              "properties": {
-                "performanceProfile": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "voiceProfile",
-                    "pacing",
-                    "altitude"
-                  ],
-                  "properties": {
-                    "voiceProfile": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "pacing": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "altitude": {
-                      "type": "string",
-                      "minLength": 1
-                    }
-                  }
-                },
-                "assertions": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "assertionId",
-                      "ordinal",
-                      "text"
-                    ],
-                    "properties": {
-                      "assertionId": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "ordinal": {
-                        "type": "integer",
-                        "minimum": 1
-                      },
-                      "text": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "groundedBy": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                          "kind",
-                          "referenceId"
-                        ],
-                        "properties": {
-                          "kind": {
-                            "type": "string",
-                            "enum": [
-                              "authority",
-                              "evidence-reference"
-                            ]
-                          },
-                          "referenceId": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "digest": {
-                            "type": "string",
-                            "pattern": "^sha256:[a-f0-9]{64}$"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
         }
       }
     },
@@ -11759,6 +12590,62 @@
         }
       }
     },
+    "sha256:0ab6c8c9e9e687edae854fc1133620f48ee8189df77344c1b4acd898e75b3ff7": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/hello-world-2-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "hello-world-2-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "sha256:cf10b43b6aaecb7258cbfefefe908287b15e9721af5f7bca3b60e39d7f6d343d": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/hello-world-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "hello-world-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
     "sha256:49572ec0cf60dcfd950a6e92c985ef48ec892ec4cf971a9f6f58e8c69ed69a6d": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/sidefx/sidefx-json-authority-ingestion-request.schema.json",
@@ -12331,6 +13218,23 @@
         }
       }
     },
+    "sha256:164be71dc7db267964c81b129f39d183493bfba473a53763b594f73593a60104": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "namespaceId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "sha256:446208e6d264845ca1000c09a95814fb9f17696e17bcaba34a88a5f8a0f07da1": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
     "sha256:9f9295235b93c1849e2e5d6b75a990da61b0355d4fcfc822569885867e74a6f8": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/manage-capability-capsule/record.schema.json",
@@ -12647,6 +13551,89 @@
           "enum": [
             "RESOLVED"
           ]
+        }
+      }
+    },
+    "sha256:9d7d1fffee29abcd8c33dc6c6aa214a4645af97d4f188f94abaa874d12c464f5": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/capsule-estate-operation-request.v2.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "capsule-estate-operation-request.v2"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation",
+            "repositoryRootRef"
+          ],
+          "properties": {
+            "operation": {
+              "enum": [
+                "verify",
+                "resolve",
+                "list",
+                "inspect",
+                "invoke",
+                "expand",
+                "project",
+                "prove-direct-execution",
+                "prove-capsule-first",
+                "prove-sterile-checkout"
+              ]
+            },
+            "repositoryRootRef": {
+              "type": "string",
+              "pattern": "^file:"
+            },
+            "query": {
+              "type": "string"
+            },
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+            },
+            "capabilityIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              }
+            },
+            "fixtureIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "capabilityInput": {},
+            "targetRootRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "disposableParentRootRef": {
+              "type": "string",
+              "minLength": 1
+            },
+            "requestLineage": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
       }
     },
@@ -12984,7 +13971,8 @@
         }
       }
     },
-    "sha256:f4ff721e54ef3f2ef812099174f21e8ab3e8034938c0b5c14b797dfd4389f092": {
+    "sha256:ff6a4fb2b876dd9339a687eb7f82a0a1043e12aa8f164dc07b9f722048c664b8": {
+      "type": "object",
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/observe-governed-http-exchange-input.schema.json",
       "anyOf": [
@@ -13672,7 +14660,7 @@
         }
       }
     },
-    "sha256:bd05e88baf3a1630a5ab00fba51ddbfba2c5fee358844a2951f0ab5f3ee5a09c": {
+    "sha256:391913696790ebde784dba08196aa2dada04552282405bbf8954e85f4f266d2b": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/authorized-narration-generation-request.v1.schema.json",
       "title": "Authorized Narration Generation Request",
@@ -13816,15 +14804,18 @@
               }
             },
             "terminalDisposition": {
-              "type": [
-                "string",
-                "null"
-              ],
-              "enum": [
-                "COMPLETED",
-                "HELD",
-                "REJECTED",
-                null
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "COMPLETED",
+                    "HELD",
+                    "REJECTED"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
               ]
             }
           }
@@ -13914,89 +14905,6 @@
             }
           },
           "additionalProperties": true
-        }
-      }
-    },
-    "sha256:9d7d1fffee29abcd8c33dc6c6aa214a4645af97d4f188f94abaa874d12c464f5": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "https://schemas.agentic-harness.local/capsule-estate-operation-request.v2.schema.json",
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "contractId",
-        "payload"
-      ],
-      "properties": {
-        "contractId": {
-          "const": "capsule-estate-operation-request.v2"
-        },
-        "payload": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "operation",
-            "repositoryRootRef"
-          ],
-          "properties": {
-            "operation": {
-              "enum": [
-                "verify",
-                "resolve",
-                "list",
-                "inspect",
-                "invoke",
-                "expand",
-                "project",
-                "prove-direct-execution",
-                "prove-capsule-first",
-                "prove-sterile-checkout"
-              ]
-            },
-            "repositoryRootRef": {
-              "type": "string",
-              "pattern": "^file:"
-            },
-            "query": {
-              "type": "string"
-            },
-            "capabilityId": {
-              "type": "string",
-              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
-            },
-            "capabilityIds": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
-              }
-            },
-            "fixtureIds": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "capabilityInput": {},
-            "targetRootRef": {
-              "type": "string",
-              "minLength": 1
-            },
-            "disposableParentRootRef": {
-              "type": "string",
-              "minLength": 1
-            },
-            "requestLineage": {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            }
-          }
         }
       }
     },
@@ -14171,6 +15079,34 @@
         }
       ]
     },
+    "sha256:7562f2382b0b9fdb7f084dbc73c405802b17132dd078dcdf17e40bd7cedd5029": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/plan-capability-embodiment-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "plan-capability-embodiment-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
     "sha256:a6feff7c5610eabb1d41d1925d1fd836dabef7b9c68995a49943d1f7eee4ebc7": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -14211,6 +15147,12 @@
           }
         }
       }
+    },
+    "sha256:d964ca512c0d23bedf4f5091c93bb5005ec8b5bd2a31374b54d6c93f50115196": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/probe-compose-altitude-request-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": true
     },
     "sha256:1927137897449f99a8f820eedf632e1afd695f1858b52ea2b3c30be035bc8c07": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -15138,181 +16080,50 @@
         }
       }
     },
-    "sha256:3384b06192f8307f33aa4702e9bd3f251eb74e621abe472929e45484249bb808": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json",
+    "sha256:33c01934f8f26c6940d38bdfdfac4b28cf5bebb5889c9b35a6db46a621609fcb": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
-        "contextType",
-        "protocol",
-        "capabilityAuthority",
-        "fixtureAuthority",
-        "targets",
-        "requestedExecutableOrigin"
+        "contractId",
+        "capabilityId",
+        "scenarioId",
+        "target",
+        "authority",
+        "closure",
+        "mechanics",
+        "snapshotId",
+        "projectionDigest",
+        "viewDefinitionDigest"
       ],
       "properties": {
-        "contextType": {
-          "const": "consumer-execution-embodiment-projection-context.v1"
+        "contractId": {
+          "const": "capability-authority-declaration.v1"
         },
-        "protocol": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "protocolId",
-            "contractRef",
-            "contractDigest"
-          ],
-          "properties": {
-            "protocolId": {
-              "const": "consumer-execution-embodiment-plan.v2"
-            },
-            "contractRef": {
-              "type": "string",
-              "minLength": 1
-            },
-            "contractDigest": {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/digest"
-            }
-          }
+        "capabilityId": {
+          "type": "string"
         },
-        "capabilityAuthority": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "capabilityId",
-            "authorityRef",
-            "authorityDigest"
-          ],
-          "properties": {
-            "capabilityId": {
-              "const": "execute-composed-scenario-authority"
-            },
-            "authorityRef": {
-              "type": "string",
-              "minLength": 1
-            },
-            "authorityDigest": {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/digest"
-            }
-          }
+        "scenarioId": {
+          "type": "string"
         },
-        "fixtureAuthority": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "fixtureRef",
-            "fixtureDigest",
-            "partitionCount"
-          ],
-          "properties": {
-            "fixtureRef": {
-              "type": "string",
-              "minLength": 1
-            },
-            "fixtureDigest": {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/digest"
-            },
-            "partitionCount": {
-              "const": 8
-            }
-          }
+        "target": {
+          "type": "string"
         },
-        "targets": {
-          "type": "array",
-          "minItems": 3,
-          "maxItems": 3,
-          "prefixItems": [
-            {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/nodeTarget"
-            },
-            {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/csharpTarget"
-            },
-            {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/pythonTarget"
-            }
-          ],
-          "items": false
+        "authority": {
+          "type": "object"
         },
-        "requestedExecutableOrigin": {
-          "const": "PROJECTED_ONLY"
-        }
-      },
-      "$defs": {
-        "digest": {
-          "type": "string",
-          "pattern": "^sha256:[a-f0-9]{64}$"
+        "closure": {
+          "type": "object"
         },
-        "targetBase": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "target",
-            "projectionAuthorityRef",
-            "projectionAuthorityDigest"
-          ],
-          "properties": {
-            "target": {
-              "enum": [
-                "node",
-                "csharp",
-                "python"
-              ]
-            },
-            "projectionAuthorityRef": {
-              "type": "string",
-              "minLength": 1
-            },
-            "projectionAuthorityDigest": {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/digest"
-            }
-          }
+        "mechanics": {
+          "type": "object"
         },
-        "nodeTarget": {
-          "allOf": [
-            {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/targetBase"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "target": {
-                  "const": "node"
-                }
-              }
-            }
-          ]
+        "snapshotId": {
+          "type": "string"
         },
-        "csharpTarget": {
-          "allOf": [
-            {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/targetBase"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "target": {
-                  "const": "csharp"
-                }
-              }
-            }
-          ]
+        "projectionDigest": {
+          "type": "string"
         },
-        "pythonTarget": {
-          "allOf": [
-            {
-              "$ref": "https://schemas.agentic-harness.local/consumer-execution-embodiment-projection-context.v1.schema.json#/$defs/targetBase"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "target": {
-                  "const": "python"
-                }
-              }
-            }
-          ]
+        "viewDefinitionDigest": {
+          "type": "string"
         }
       }
     },
@@ -15794,6 +16605,34 @@
           }
         }
       ]
+    },
+    "sha256:f7c6a8b92897b719c77122cea5ae3912af55e03d8aadb91e9474b211c0086493": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/project-native-expressions-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "project-native-expressions-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
     },
     "sha256:bb6280b45026597372294c53ffd4cf7d72ec00a056b2703c38ba3f03ae480a47": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -17418,6 +18257,34 @@
         }
       }
     },
+    "sha256:84af0e0d3b0b461c8411b4310aa926a3b8840ba2ec5ccaca973e3fe63e961582": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/proof-flow-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "proof-flow-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
     "sha256:f94096613aa9a09d8a0edcfc3eee372e6d799bb1cd3bfa8daa35bd30b68ca781": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -18635,109 +19502,6 @@
         }
       }
     },
-    "sha256:1442ffc10fb276407b4aa7718ab6f9d581b4049bea9dbc7274a470ccf7881e3a": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "contractId",
-        "payload"
-      ],
-      "$id": "https://schemas.agentic-harness.local/contracts/sealed-capability-change-set.v1.schema.json",
-      "properties": {
-        "contractId": {
-          "const": "sealed-capability-change-set.v1"
-        },
-        "payload": {
-          "type": "object",
-          "required": [
-            "changeId",
-            "state",
-            "sealedBaseline",
-            "candidateCapsuleDigest",
-            "proofReceiptDigest",
-            "repositoryLineage",
-            "baselineCompatible",
-            "mainlineProofPassed",
-            "admissionRecorded"
-          ],
-          "properties": {
-            "changeId": {},
-            "state": {},
-            "sealedBaseline": {},
-            "candidateCapsuleDigest": {},
-            "proofReceiptDigest": {},
-            "repositoryLineage": {},
-            "baselineCompatible": {},
-            "mainlineProofPassed": {},
-            "admissionRecorded": {},
-            "candidateFeatureDigest": {
-              "type": "string",
-              "pattern": "^sha256:[a-f0-9]{64}$"
-            },
-            "candidateFeatureEntry": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "capsuleDigest",
-                "entryRef",
-                "entryDigest"
-              ],
-              "properties": {
-                "capsuleDigest": {
-                  "type": "string",
-                  "pattern": "^sha256:[a-f0-9]{64}$"
-                },
-                "entryRef": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "entryDigest": {
-                  "type": "string",
-                  "pattern": "^sha256:[a-f0-9]{64}$"
-                }
-              }
-            },
-            "reviewedDesignIdentity": {
-              "type": "object",
-              "required": [
-                "featureDigest"
-              ],
-              "properties": {
-                "featureDigest": {
-                  "type": "string",
-                  "pattern": "^sha256:[a-f0-9]{64}$"
-                }
-              },
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": true,
-          "allOf": [
-            {
-              "if": {
-                "required": [
-                  "publicationEffectAuthorized"
-                ],
-                "properties": {
-                  "publicationEffectAuthorized": {
-                    "const": true
-                  }
-                }
-              },
-              "then": {
-                "required": [
-                  "candidateFeatureDigest",
-                  "candidateFeatureEntry",
-                  "reviewedDesignIdentity",
-                  "estateEffectRequest"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
     "sha256:16213541309bb040582745b9f3ba7d09db809be163f47e761b3653d75dca4eff": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -19430,6 +20194,346 @@
         }
       }
     },
+    "sha256:12a6397ab1742b53dcdcfd5dcf498288c5b9c65cab0d462339f8bbf962f84ac9": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/circuit-view-request.v1.schema.json",
+      "title": "Circuit view request",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "circuit-view-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "capabilityId",
+            "cellTestimony",
+            "edgeTestimony"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cellTestimony": {
+              "type": "array"
+            },
+            "edgeTestimony": {
+              "type": "array"
+            },
+            "granularity": {
+              "type": "string"
+            },
+            "plannedCells": {
+              "type": "array"
+            },
+            "plannedEdges": {
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "sha256:b5defeb97bd86e17e131230c8f50e93862c1678f99d89eee436e68bde6087c90": {
+      "type": "object",
+      "properties": {
+        "capabilityId": {
+          "type": "string"
+        },
+        "namespaceId": {
+          "type": "string"
+        },
+        "scenarioId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "capabilityId"
+      ],
+      "additionalProperties": true
+    },
+    "sha256:27b2ac2c5b6767539bb6d9c608857fb34eb7d4f73e29c249d9152a3a7bcc7201": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/circuit-presentation-request.v1.schema.json",
+      "title": "Circuit presentation request",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "contractId"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "circuit-presentation-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "sha256:4d4b01113caaf2d17e9d26f772c363eddcfa224b478d75f787f578cdfc384ee6": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/credential-non-disclosure-request.v1.schema.json",
+      "title": "Credential non-disclosure request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "credential-non-disclosure-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "sentinel",
+            "channels"
+          ],
+          "properties": {
+            "sentinel": {
+              "type": "string"
+            },
+            "channels": {
+              "type": "array"
+            },
+            "fileScans": {
+              "type": "array"
+            },
+            "tamperedStore": {
+              "type": "object"
+            },
+            "restore": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "sha256:f2894c97ed9ca47a3efb55177430575128fb5e487b07b6c29612ec968ae0bec0": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/demo-acceptance-request.v1.schema.json",
+      "title": "Demo acceptance request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "demo-acceptance-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "captures"
+          ],
+          "properties": {
+            "harness": {
+              "type": "string"
+            },
+            "captures": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "caseId",
+                  "exitCode"
+                ],
+                "properties": {
+                  "caseId": {
+                    "type": "string"
+                  },
+                  "context": {
+                    "type": "string"
+                  },
+                  "exitCode": {
+                    "type": "integer"
+                  },
+                  "stdout": {
+                    "type": "string"
+                  },
+                  "stderr": {
+                    "type": "string"
+                  },
+                  "declaredUnavailable": {
+                    "type": "boolean"
+                  },
+                  "claims": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "equalsCase": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sha256:eda0733b1173a1f5d5b11f48cce633b3acf9e5861757a4e127113639e999c335": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/invocation-timing-request.v1.schema.json",
+      "title": "Invocation timing request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "invocation-timing-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "cellTestimony"
+          ],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "cellTestimony": {
+              "type": "array"
+            },
+            "measured": {
+              "type": "object"
+            },
+            "noiseMilliseconds": {
+              "type": "number"
+            },
+            "topCount": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "sha256:92b49d19d8a7c95ba9eed11e432468bc954f9fa5570dfcfe34704c134c132166": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/observation-projection-request.v1.schema.json",
+      "title": "Observation projection request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "observation-projection-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "sha256:5c97ec9c72fcb2a55ef57661a38a6322e1aaa1dd9ac889e069ea8d82b15a30e6": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/observation-telemetry-request.v1.schema.json",
+      "title": "Observation telemetry request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "observation-telemetry-request.v1"
+        }
+      }
+    },
+    "sha256:0728eb1cfce96d9a9df6c706f63ff473e1224b393fba987a6f29ba5b1a40bcc2": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/read-projected-bodies-request.v1.schema.json",
+      "title": "Read projected bodies request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityId"
+      ],
+      "properties": {
+        "capabilityId": {
+          "type": "string"
+        },
+        "generationPk": {
+          "type": "integer"
+        }
+      }
+    },
+    "sha256:f64842adddc15f2ae2963a5469bed83e015e71aee3485c7c8748de37285d0089": {
+      "type": "object",
+      "required": [
+        "providerId"
+      ],
+      "properties": {
+        "providerId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "sha256:98700708864902d492db0130d057a6ac5b01fba9979cd5fe11d573a1cddb6259": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "type": "string"
+        },
+        "capabilityId": {
+          "type": "string"
+        },
+        "viewId": {
+          "type": "string"
+        },
+        "artifactDigest": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "sha256:48d7b395adb2fa1d5a0b6db5a44abf183a095a32597f0dc8e3526575693ef2a2": {
+      "type": "object",
+      "properties": {
+        "scenarioId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenarioId"
+      ],
+      "additionalProperties": true
+    },
     "sha256:35860c9c2a77a828f3f74ba7febb245f9cb74d905ae099aa0be245c47e22d806": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/realize-admitted-capability/record.schema.json",
@@ -19823,6 +20927,34 @@
         }
       }
     },
+    "sha256:d43d96cb4256216116deb92adfe70af0fcf1ee2b5bf29e7ecc3516e158090de8": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/render-consumer-object-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "render-consumer-object-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
     "sha256:dea5b6461a30d627e7fb990a6ac3ccea935d3dcdfad2c9b21b2bbd4b823627d3": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/input.schema.json",
@@ -19941,6 +21073,40 @@
                     }
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sha256:daf0a905f829d0c90611e4ae9bdce066065d0f63fa5d1d34b1f59792490c5b26": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/agent-objective-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "agent-objective-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "objective"
+          ],
+          "properties": {
+            "objective": {
+              "type": "string",
+              "minLength": 1
+            },
+            "visibleCapabilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             }
           }
@@ -20476,6 +21642,56 @@
           ],
           "properties": {
             "aggregateDisposition": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "sha256:d23174c98b089360899aecd546e5f8426ffa68fe4462e0b3a7e49eaea06b292d": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/resolve-credential-request.v1.schema.json",
+      "title": "Resolve credential request",
+      "description": "A credential requirement: which reference, for which authorized invocation, under which endpoint authority digest and effect scope. No secret material.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "resolve-credential-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "credentialReference",
+            "invocationIdentity",
+            "requestingCapabilityId",
+            "endpointAuthorityDigest",
+            "effectScope"
+          ],
+          "properties": {
+            "credentialReference": {
+              "type": "string",
+              "minLength": 1
+            },
+            "invocationIdentity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "requestingCapabilityId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "endpointAuthorityDigest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "effectScope": {
               "type": "string",
               "minLength": 1
             }
@@ -23927,9 +25143,9 @@
         }
       }
     },
-    "sha256:9e0ae22dee03b301f8a93f399bab9f0a088991159e7735514f26f1d0820f712c": {
+    "sha256:bb0c34f9a68b7d47aac1520f3fa2d1cec96f8d04c7315bef60492698aaf98458": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "https://schemas.agentic-harness.local/contracts/hello-world-request.v1.schema.json",
+      "$id": "https://schemas.agentic-harness.local/contracts/route-two-child-request.v1.schema.json",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -23938,13 +25154,36 @@
       ],
       "properties": {
         "contractId": {
-          "const": "hello-world-request.v1"
+          "const": "route-two-child-request.v1"
         },
         "payload": {
           "type": "object",
-          "additionalProperties": false
+          "additionalProperties": false,
+          "required": [
+            "branch"
+          ],
+          "properties": {
+            "branch": {
+              "enum": [
+                "left",
+                "right"
+              ]
+            }
+          }
         }
       }
+    },
+    "sha256:44f9a9de4e44eac863bb4e02e4ef1c70bd7329714f70c35d98fd165ab0e30f62": {
+      "type": "object",
+      "properties": {
+        "statement": {
+          "type": "string"
+        },
+        "resultColumn": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
     },
     "sha256:f6218d53b685926f39392d758d7fb6158404791235e0c7324a70477bb68689fb": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -24200,7 +25439,7 @@
         }
       }
     },
-    "sha256:de5281b6d38c5d273474341a1831b3ad127fff21e3d398a83becba5272c85556": {
+    "sha256:66d1a8430a5945e8b441b9fdb5cf159f2f81625f58af6d8b6fc031001b5c12d6": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "$id": "https://schemas.agentic-harness.local/contracts/speech-generation-invocation.v2.schema.json",
       "title": "Speech Generation Invocation v2 (speech-provider candidate shared carrier)",
@@ -24331,15 +25570,18 @@
               }
             },
             "terminalDisposition": {
-              "type": [
-                "string",
-                "null"
-              ],
-              "enum": [
-                "COMPLETED",
-                "HELD",
-                "REJECTED",
-                null
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "COMPLETED",
+                    "HELD",
+                    "REJECTED"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
               ]
             }
           }
@@ -24385,6 +25627,44 @@
               }
             },
             "stagingDigest": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "sha256:32d268e6fcaad6c99373a96ee76c18b02f1cbaeb32d7f373ccc4d58811d53061": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/store-credential-request.v1.schema.json",
+      "title": "Store credential request",
+      "description": "One plaintext secret under an allowed vault reference name. The secret is the only plaintext member and never appears in an outcome, testimony or row.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "store-credential-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "referenceName",
+            "secret"
+          ],
+          "properties": {
+            "referenceName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "secret": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scope": {
               "type": "string"
             }
           }
@@ -25665,6 +26945,26 @@
               "type": "boolean"
             }
           }
+        }
+      }
+    },
+    "sha256:4d321dc40e39521df527c1cfbe7633e42a664bb0fb932bc6b6f0d77284db9a3d": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.sidefx.local/contracts/agent-relevance-guard-request.v1.schema.json",
+      "title": "Agent relevance guard request",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "agent-relevance-guard-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     },
@@ -27289,6 +28589,34 @@
               "type": "string",
               "minLength": 4,
               "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+            }
+          }
+        }
+      }
+    },
+    "sha256:793e0b6708906ec1b018ecf45e5f7544bc3acd894e3728642c0eed812d0b2cdf": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.agentic-harness.local/contracts/write-capability-embodiment-request.v1.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "payload"
+      ],
+      "properties": {
+        "contractId": {
+          "const": "write-capability-embodiment-request.v1"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
             }
           }
         }

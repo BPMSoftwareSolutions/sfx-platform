@@ -53,11 +53,14 @@ From the website repository, with the development server stopped during publicat
 
 ```powershell
 npm run publish:estate
+npm run publish:circuits
 npm run select:estate
 npx tsx scripts/prune-media.ts --apply
 npm run build
 npm run check
 ```
+
+`npm run publish:circuits` re-derives the scenario circuit component-shape mappings from the media base tables (`media.asset`, `media.bundle_member`, `media.blob`) and merges them into the restored `generated/visual-publication.json`, so a catalog that arrived without circuits cannot leave capability pages without their stored circuits. The read runs as a ROLLBACK batch through the SDA kernel runner and needs no database checkout.
 
 The release manifest pins the estate, boundary circuits and visual publication together. `public/media/**` and `generated/*.json` disable Git newline conversion because their exact bytes are verified in the Linux container. CI checks and deploys the same image to staging by digest.
 

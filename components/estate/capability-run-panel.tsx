@@ -1,23 +1,20 @@
 'use client';
 
-import { useId, useMemo, useState, useTransition } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import type { JsonSchema } from '@/contracts/input-contract';
-import type { InvocationView } from '@/contracts/invocation';
 import { initialDocument, objectProperties, requiredKeys } from '@/lib/json-schema-form';
 import { childPath, hasInvalidDraft, parseDraft, removeItemDrafts, type JsonDrafts, type JsonEditor } from '@/lib/json-drafts';
+import { useLiveRun, type LiveRunView } from './live-run';
 import { SchemaField } from './schema-field';
 
 /**
- * Capability run panel — §13.1.
+ * Capability run panel — §13.1, SDA run API v1.
  *
  * Input is composed either as a form generated from the capability's own declared contract, or
- * as raw JSON. The two are the same document: switching modes carries the value across, so the
- * form is a view of the input rather than a separate thing that has to agree with it.
- *
- * Nothing executes until the visitor presses Run. The panel renders exactly what the estate
- * returned — a kernel disposition and outcome, or the estate's own refusal code — and never
- * fills a refusal with an example result.
+ * as raw JSON. Nothing executes until the visitor presses Run: admission starts a run, the
+ * observation lane advances by cursor and the circuit nodes take their live state from the
+ * events. The result shown is the run's own terminal state and lean scenario output.
  */
 
 interface Props {
@@ -26,22 +23,13 @@ interface Props {
   contractId: string | null;
   schema: JsonSchema | null;
   example: string | null;
-  run: (namespace: string, capabilityId: string, input: string) => Promise<InvocationView>;
 }
 
 type Mode = 'form' | 'raw';
 
-const REFUSAL_GUIDANCE: Record<string, string> = {
-  CAPABILITY_PREPARATION_REQUIRED:
-    'This capability has no preparation retained for the current estate generation, so it cannot be executed yet. Preparation resolves its requirements and proves its fixtures before any execution is offered.',
-  CAPABILITY_PREPARATION_STALE:
-    'A preparation exists but was made against a different estate generation or toolchain, so it no longer stands for this revision. It has to be prepared again.',
-  CAPABILITY_NOT_FOUND:
-    'The estate resolved no declared root for this capability, so there is nothing to execute.',
-};
-
-export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema, example, run }: Props) {
+export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema, example }: Props) {
   const baseId = useId();
+  const live = useLiveRun();
 
   const seed = useMemo(() => {
     if (example) { try { return JSON.parse(example) as unknown; } catch { /* fall through */ } }
@@ -63,8 +51,8 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
     },
     removeItem(path, index) { setDrafts(previous => removeItemDrafts(previous, path, index)); },
   };
-  const [view, setView] = useState<InvocationView | undefined>();
-  const [pending, startTransition] = useTransition();
+
+  const pending = live.phase === 'admitting' || live.phase === 'polling';
 
   /** The document is the single value; each mode is a view of it. */
   const toMode = (next: Mode) => {
@@ -87,11 +75,7 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
   const execute = () => {
     if (invalidInput || pending) return;
     const payload = mode === 'raw' ? raw : JSON.stringify(document);
-    setView(undefined);
-    startTransition(async () => {
-      try { setView(await run(namespace, capabilityId, payload)); }
-      catch { setView({ status: 'UNKNOWN', capabilityId, code: 'REQUEST_FAILED', message: 'The page lost contact before execution could be confirmed.' }); }
-    });
+    live.admit(namespace, capabilityId, payload);
   };
 
   const properties = schema ? objectProperties(schema) : [];
@@ -171,87 +155,70 @@ export function CapabilityRunPanel({ namespace, capabilityId, contractId, schema
         </button>
       </div>
 
-      <p aria-live="polite" className="invocation-status">
-        {pending ? 'Reading the prepared authority and executing in memory…' : view ? summarise(view) : ''}
-      </p>
+      <p aria-live="polite" className="invocation-status">{statusLine(live)}</p>
 
-      {view ? <Result view={view} /> : null}
+      {live.phase === 'failed' && live.error ? <Failure error={live.error} /> : null}
+      {live.phase === 'complete' ? <LiveResult view={live} /> : null}
     </div>
   );
 }
 
-function summarise(view: InvocationView): string {
-  if (view.status === 'EXECUTED') return `Execution complete — disposition ${view.disposition}.`;
-  if (view.status === 'REFUSED') return `Not executed — ${view.code}.`;
-  if (view.status === 'UNKNOWN') return 'Execution unconfirmed — check its status before retrying.';
-  return `Not executed — ${view.message}`;
+function statusLine(live: LiveRunView): string {
+  if (live.phase === 'admitting') return 'Admitting the run…';
+  if (live.phase === 'polling') return `Executing — ${live.events.length} events observed so far.`;
+  if (live.phase === 'complete') return `Run complete — ${live.events.length} events observed.`;
+  if (live.phase === 'failed') return live.error ? `Not executed — ${live.error.code}.` : 'Execution unconfirmed.';
+  return '';
 }
 
-function Result({ view }: { view: InvocationView }) {
-  if (view.status === 'UNKNOWN') {
-    return (
-      <div className="invocation-result invocation-result--refused">
-        <p className="kicker">Execution unconfirmed · {view.code}</p>
-        <p>{view.message}</p>
-        <p className="invocation-note">The request may still be running or may have completed. Losing the response does not cancel execution. Check its status before retrying.</p>
-      </div>
-    );
-  }
-  if (view.status === 'UNAVAILABLE') {
-    return (
-      <div className="invocation-result invocation-result--refused">
-        <p className="kicker">Not executed · {view.code}</p>
-        <p>{view.message}</p>
-      </div>
-    );
-  }
-
-  if (view.status === 'REFUSED') {
-    return (
-      <div className="invocation-result invocation-result--refused">
-        <p className="kicker">Estate refusal · {view.code}</p>
-        <p>{REFUSAL_GUIDANCE[view.code] ?? view.message}</p>
-        <p className="invocation-note">
-          This is the estate&apos;s own result for this capability. Nothing was executed and no other
-          capability&apos;s result stands in for it.
-        </p>
-      </div>
-    );
-  }
-
-  const refused = view.disposition === 'rejected' || view.disposition === 'failed';
+function Failure({ error }: { error: { code: string; message: string } }) {
   return (
-    <div className={`invocation-result${refused ? ' invocation-result--refused' : ''}`}>
+    <div className="invocation-result invocation-result--refused">
+      <p className="kicker">Run refused or unconfirmed · {error.code}</p>
+      <p>{error.message}</p>
+    </div>
+  );
+}
+
+function messageOf(output: unknown): string | undefined {
+  if (output === null || typeof output !== 'object') return undefined;
+  const payload = (output as { payload?: unknown }).payload;
+  if (payload === null || typeof payload !== 'object') return undefined;
+  const message = (payload as { message?: unknown }).message;
+  return typeof message === 'string' ? message : undefined;
+}
+
+function LiveResult({ view }: { view: LiveRunView }) {
+  const message = messageOf(view.output);
+  return (
+    <div className="invocation-result">
       <div className="invocation-verdict">
         <div>
-          <p className="kicker">Kernel disposition</p>
-          <p className="invocation-disposition">{view.disposition}</p>
+          <p className="kicker">Run state</p>
+          <p className="invocation-disposition">{view.terminalState}</p>
         </div>
         <div>
-          <p className="kicker">Kernel testimony</p>
-          <p>{view.observationCount} observations · {view.executionCount} executions{view.durationMs !== null ? ` · ${view.durationMs} ms` : ''}</p>
+          <p className="kicker">Observation lane</p>
+          <p>{view.events.length} events · run {view.runId?.slice(0, 8)}</p>
         </div>
       </div>
 
-      {view.disposition === 'rejected' ? (
-        <p className="invocation-note">
-          The capability&apos;s contract refused this input. That is a real result of running it, not a
-          fault in this page.
-        </p>
-      ) : null}
+      {message !== undefined ? <p className="live-output-message">{message}</p> : null}
 
-      <details>
-        <summary>Outcome</summary>
-        <pre>{JSON.stringify(view.outcome, null, 2)}</pre>
+      <details open>
+        <summary>Scenario output</summary>
+        <pre>{view.output !== undefined ? JSON.stringify(view.output, null, 2) : view.outputText ?? 'The run produced no readable scenario output.'}</pre>
       </details>
 
       <details>
-        <summary>Execution provenance</summary>
-        <pre>{JSON.stringify(view.evidence, null, 2)}</pre>
-      </details>
-      <details>
-        <summary>Full execution record</summary>
-        <pre>{JSON.stringify(view.execution, null, 2)}</pre>
+        <summary>Observed node transitions ({view.transitions.length})</summary>
+        <ol className="live-transitions">
+          {view.transitions.map((transition, index) => (
+            <li key={`${transition.cursor}-${transition.nodeId}-${index}`} className="font-mono text-xs">
+              {transition.nodeId}: {transition.from ?? 'idle'} → {transition.to} (cursor {transition.cursor}, {transition.signal})
+            </li>
+          ))}
+        </ol>
       </details>
     </div>
   );

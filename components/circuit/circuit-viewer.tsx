@@ -17,14 +17,19 @@ import { EDGE_STYLES, FIDELITY_COPY, PRIMITIVE_STYLES } from './scl-theme';
  * explanation remain available without JavaScript; only the controls require it.
  */
 
+/** Observed execution state for one node, applied as an explicit class and data attribute. */
+export type LiveNodeState = 'active' | 'done' | 'failed';
+
 interface Props {
   circuit: CircuitProjection;
   /** Selection is shareable URL state; the page owns the URL and passes the selection down. */
   selectedNodeId?: string;
   onSelectNode?: (nodeId: string | undefined) => void;
+  /** Live trace overlay: node id to observed state. Declared route is never recoloured as observed otherwise. */
+  liveNodes?: Partial<Record<string, LiveNodeState>>;
 }
 
-export function CircuitViewer({ circuit, selectedNodeId, onSelectNode }: Props) {
+export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes }: Props) {
   const layout = useMemo(() => layoutCircuit(circuit), [circuit]);
   const [internalSelection, setInternalSelection] = useState<string | undefined>(undefined);
   const [playing, setPlaying] = useState(false);
@@ -149,9 +154,12 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode }: Props) 
               if (!box) return null;
               const style = PRIMITIVE_STYLES[node.primitive];
               const isSelected = node.id === selected;
+              const live = liveNodes?.[node.id];
               return (
                 <g
                   key={node.id}
+                  className={live ? `circuit-node circuit-node--${live}` : 'circuit-node'}
+                  data-live={live}
                   role="button"
                   tabIndex={0}
                   aria-pressed={isSelected}

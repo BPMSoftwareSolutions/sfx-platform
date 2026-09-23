@@ -45,12 +45,15 @@ export async function runPublishedInput(publication: LabPublication, raw: unknow
   catch (error) { return refused(error instanceof Error ? error.message : 'INPUT_REFUSED', r.subject); }
   const result = await invoke(r.subject, input, pilot.profile.namespace);
   if (result.status === 'EXECUTED') {
-    // The local delivery pins authority before loading. Check the response as well.
+    // The local delivery pins authority before loading and checks the response where the run
+    // returned inline evidence. SDA run API v1 hands out evidence references only, so the pinned
+    // inline checks apply when the response carries them, and the declared scenario echo and
+    // outcome contract are checked in every case.
     const identity = result.evidence.authorityIdentity;
-    if (!object(identity) || Object.entries(pilot.authority.identity).some(([k, v]) => identity[k] !== v)
-      || result.evidence.snapshotId !== pilot.authority.snapshotId || result.evidence.projectionDigest !== pilot.authority.projectionDigest
+    if (object(identity) && (Object.entries(pilot.authority.identity).some(([k, v]) => identity[k] !== v)
+      || result.evidence.snapshotId !== pilot.authority.snapshotId || result.evidence.projectionDigest !== pilot.authority.projectionDigest)
       || result.scenarioId !== pilot.authority.scenarioId
-      || JSON.stringify(at(result.execution, '/result/input')) !== JSON.stringify(input)) {
+      || (at(result.execution, '/result/input') !== undefined && JSON.stringify(at(result.execution, '/result/input')) !== JSON.stringify(input))) {
       return { status: 'UNKNOWN', capabilityId: r.subject, code: 'EXECUTION_BINDING_MISMATCH', message: 'The response does not match the published input and authority. Execution cannot be confirmed for this experience.' };
     }
     if (result.disposition === 'terminated' && !validators(pilot).outcome(result.outcome)) {

@@ -11,10 +11,14 @@
 !content/**
 !contracts/**
 !lib/**
+!services/**
 !generated/estate-publication.json
 !generated/circuit-projections.json
 !generated/publication-manifest.json
 !generated/visual-publication.json
+!generated/input-contracts.json
+!generated/lab-publication.json
+!generated/workbench-publication.json
 !public/**
 !scripts/validate-publication.ts
 !scripts/validate-media.ts

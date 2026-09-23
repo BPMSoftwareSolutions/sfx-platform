@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { CircuitViewer } from '@/components/circuit/circuit-viewer';
 import type { CircuitProjection } from '@/contracts/estate';
+import { useLiveRunOptional } from './live-run';
 
 /**
  * Scenario and node selection — §5.17, §12.4.
@@ -12,11 +13,23 @@ import type { CircuitProjection } from '@/contracts/estate';
  * `useSearchParams`. That keeps the circuit and its text outline in the server-rendered HTML, so
  * public reading works without JavaScript; the URL is synchronised after hydration and a shared
  * link restores the same view.
+ *
+ * Live run state is applied to the nodes as explicit classes. When this panel sits inside a
+ * collapsed disclosure, an admitted run opens it so the observed trace is visible.
  */
 export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjection[] }) {
   const first = circuits[0];
   const [scenarioId, setScenarioId] = useState(first?.scenarioId ?? '');
   const [nodeId, setNodeId] = useState<string | undefined>(undefined);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const live = useLiveRunOptional();
+  const liveNodes = live?.states;
+
+  const traceActive = Boolean(live && (live.phase === 'admitting' || live.phase === 'polling' || Object.keys(live.states).length > 0));
+  useEffect(() => {
+    if (traceActive) rootRef.current?.closest('details')?.setAttribute('open', '');
+  }, [traceActive]);
+
 
   // Restore a shared selection once the URL is available in the browser.
   useEffect(() => {
@@ -48,7 +61,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
   }
 
   return (
-    <div className="circuit-surface">
+    <div className="circuit-surface" ref={rootRef}>
       {circuits.length > 1 ? (
         <div className="mb-4">
           <label
@@ -80,6 +93,7 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
       <CircuitViewer
         circuit={circuit}
         selectedNodeId={nodeId}
+        liveNodes={liveNodes}
         onSelectNode={(next) => {
           setNodeId(next);
           syncUrl(circuit.scenarioId??'', next);

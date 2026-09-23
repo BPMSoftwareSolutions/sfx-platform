@@ -131,6 +131,13 @@ body>header>nav { max-width: var(--page-width); padding-inline: var(--page-gutte
 .stored-circuit iframe { display: block; border: 0; width: 100%; height: 775px; background: #101d2e; }
 .circuit-surface { color-scheme: dark; --color-ink:#07131e; --color-ink-2:#101e2a; --color-grid-line:#2c4350; --color-text:#e6edf5; --color-muted:#a8bcc8; --color-signal:#88e2d3; --color-authority:#82a8f9; --color-projection:#b6a4ff; --color-telemetry:#efbe77; --color-failure:#ff8a6b; padding: 24px; background:var(--color-ink); color:var(--color-text); }
 .circuit-surface select { color:var(--color-text); }
+/* Live observed-execution overlay: explicit classes only. The declared route is never
+   recoloured as observed, and the state stays legible with motion suppressed (§12.4). */
+.circuit-node--active rect { stroke-dasharray: 7 4; }
+.circuit-node--active { animation: circuit-node-pulse 1.4s ease-in-out infinite; }
+.circuit-node--done rect { stroke-width: 2.5; }
+.circuit-node--failed rect { stroke: var(--color-failure); stroke-width: 2.5; }
+@keyframes circuit-node-pulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }
 @media(max-width: 1000px) {
  .landing-hero { gap: 32px; padding-block: 60px; }
  .landing-intro h1 { font-size: 43px; }
