@@ -164,7 +164,7 @@ export interface CompletedRun {
   failure?: { code: string; message: string };
 }
 
-/** Admit, advance the cursor to terminal and read the lean output. Used by the lab adapter. */
+/** Admit, drain the observation lane and read the lean output. Used by the lab adapter. */
 export async function runCapabilityToCompletion(subject: string, input: unknown, namespace?: string): Promise<SdaResult<CompletedRun>> {
   if (!sdaApiConfigured()) return unavailable('NOT_CONFIGURED', 'No SDA run API endpoint is configured for this deployment, so nothing can be executed here.');
   const admitted = await admitCapabilityRun(subject, input, namespace);
@@ -178,7 +178,10 @@ export async function runCapabilityToCompletion(subject: string, input: unknown,
     if (!page.ok) return page;
     events.push(...page.value.events);
     cursor = page.value.nextCursor;
-    if (page.value.terminal) {
+    // `terminal` comes from the run record alone, so it can turn true while the lane still holds
+    // undrained pages. Report a terminal run only once `hasMore` is false; otherwise the
+    // observation count stops at the page bound and undercounts the run.
+    if (page.value.terminal && !page.value.hasMore) {
       const state = page.value.state === 'completed' ? 'completed' : 'failed';
       const result: CompletedRun = { runId, state, events, failure: admitted.value.failure };
       if (state === 'completed') {

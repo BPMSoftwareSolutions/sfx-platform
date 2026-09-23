@@ -1,5 +1,5 @@
 import type { SdaRunEvent } from '@/contracts/sda-api';
-import type { RunGraphView } from '@/lib/run-graph';
+import type { RunGraphView, RunGraphViewNode } from '@/lib/run-graph';
 
 /**
  * Live trace binding — §4.2 of the trace plan, id binding only.
@@ -9,18 +9,49 @@ import type { RunGraphView } from '@/lib/run-graph';
  * because its `edgeId` does. Testimony with no membership is recorded as unmatched and never
  * lights anything. Planned nodes are drawn unlit until their own testimony arrives.
  *
- * State is derived from the testified `disposition`, `outcomeClassification` and
- * `outcomeVariant`, plus the run's own lifecycle facts. The display entry's `text` and
- * `status` are presentation, never evidence: a provider exchange whose display reads `failed`
- * but whose testimony completed with `outcomeClassification=failure` (for example a 429
- * `retained-non-success`) is `held` — a declared non-success attempt that a later route
- * supersedes. It is not a failure, it never taints the enclosing operation, and the scenario
- * root completes from the run's own completion (`run.exited` exit 0), including when its
- * scenario testimony never arrived. Only a declared failure disposition, a `failureCode`, or a
- * failed terminal run is `failed`.
+ * State rules — decision D1 (docs/observation-altitudes-implementation-plan-2026-09-23.md §3),
+ * obs §5, OA5 and acceptance item 5:
+ *
+ * - A cell's state comes from its own testimony only: its `disposition` (or `status`),
+ *   `failureCode`, the declared failure testimony type and `outcomeClassification`. The display
+ *   entry's `text` and `status` are presentation, never evidence, and no variant is read by name.
+ *   - `failed`: an execution failure (a `failureCode`, the failure testimony type or a failed
+ *     disposition), or a cell that completed with `outcomeClassification: "failure"`. A failed
+ *     attempt shows as failed.
+ *   - `done`: any other completed cell.
+ *   - `active`: a started or pending cell.
+ * - Every cell's testified outcome (`outcomeVariant`, `outcomeClassification`) is recorded beside
+ *   its state: completion and outcome are distinct facts. A classification the testimony does
+ *   not carry stays `null`; it is never inferred from the variant.
+ * - A drawn node's id is a cellId. Once that cell has testified, the node's state is the cell's
+ *   own state. Before then the node is `active` if any member has testified and `planned`
+ *   otherwise. A member's failure never overrides the node's own testified state; the node keeps
+ *   a count of its failed members so the failure stays visible.
+ * - Nothing is marked superseded. No declared fact says a later route superseded an attempt,
+ *   so no rule produces `held`.
+ * - `run.admitted`, `run.started` and `run.exited` set the run's own status (`run`) and never a
+ *   node. Process exit completes the run; it is not the scenario's outcome.
  */
 
+/**
+ * `held` is produced by no rule here (D1). It stays in the union because renderer code still
+ * names it (`components/circuit/circuit-viewer.tsx`, `app/globals.css`).
+ */
 export type LiveNodeState = 'planned' | 'active' | 'done' | 'held' | 'failed';
+
+/** An outcome as one cell testified it. A member the testimony did not carry is `null`. */
+export interface LiveOutcome {
+  variant: string | null;
+  classification: string | null;
+}
+
+/** The run's own lifecycle, from the lane's run events alone. It never sets a node state. */
+export interface LiveRunStatus {
+  /** The latest run lifecycle event observed. */
+  state: 'admitted' | 'started' | 'exited';
+  /** The exit code `run.exited` carried; `null` before exit or when the host reported none. */
+  exitCode: number | null;
+}
 
 export interface LiveTransition {
   cursor: number;
@@ -52,15 +83,24 @@ export interface LiveTrace {
   cells: Record<string, LiveNodeState>;
   /** Raw edge id -> observed state, before aggregation onto the drawn edge. */
   edges: Record<string, LiveNodeState>;
+  /** Drawn node id -> the outcome its own cell testified; absent until that cell testifies one. */
+  outcomes: Record<string, LiveOutcome>;
+  /** Raw cell id -> the outcome that cell testified. */
+  cellOutcomes: Record<string, LiveOutcome>;
+  /** Drawn node id -> how many of its member cells, other than its own, are failed. */
+  failedMembers: Record<string, number>;
   transitions: LiveTransition[];
   /** The most recently active drawn node, for the pulse. Cleared only by later testimony. */
   active: string | null;
   /** Testimony ids with no membership entry: bound to nothing, never dropped, never lit. */
   unmatched: string[];
+  /** The run's lifecycle status; `null` until a run lifecycle event arrives. */
+  run: LiveRunStatus | null;
 }
 
 interface EventFacts {
   testimonyType?: string;
+  observationType?: string;
   status?: string;
   disposition?: string;
   admissionDisposition?: string;
@@ -80,6 +120,14 @@ interface EventFacts {
 const FAILED_STATUS = new Set(['failed', 'rejected', 'admission-rejected', 'error']);
 const DONE_STATUS = new Set(['completed', 'observed', 'admitted', 'terminated', 'succeeded', 'selected']);
 const ACTIVE_STATUS = new Set(['started', 'deferred', 'buffered', 'pending']);
+/** The kernel's declared failure record (`GraphObservationFailures.ObservationType`). */
+const FAILURE_TESTIMONY_TYPE = 'execution-failure-testimony.v1';
+/** The host's run lifecycle event kinds (sda-api-v1 authority, `runEvent.kind`). */
+const RUN_LIFECYCLE = new Map<string, LiveRunStatus['state']>([
+  ['run.admitted', 'admitted'],
+  ['run.started', 'started'],
+  ['run.exited', 'exited'],
+]);
 
 function factsOf(event: SdaRunEvent): EventFacts {
   return event.payload !== null && typeof event.payload === 'object' ? (event.payload as EventFacts) : {};
@@ -95,31 +143,37 @@ function isTestimony(facts: EventFacts): boolean {
   return typeof facts.testimonyType === 'string' && facts.testimonyType.length > 0;
 }
 
+/** The kernel's failure record, by its exact declared type; never a substring of a type name. */
+function isFailureTestimony(facts: EventFacts): boolean {
+  return facts.testimonyType === FAILURE_TESTIMONY_TYPE || facts.observationType === FAILURE_TESTIMONY_TYPE;
+}
+
 function cellState(facts: EventFacts): LiveNodeState | undefined {
   const status = facts.disposition ?? facts.status;
-  const testimony = facts.testimonyType ?? '';
-  const variant = facts.outcomeVariant ?? '';
-  // Genuine failure is declared on the cell itself: a failed disposition, a failure code, or a
-  // failure testimony. The display entry is presentation and is never consulted.
-  if (facts.failureCode || testimony.includes('failure') || (status ? FAILED_STATUS.has(status) : false)) {
+  // An execution failure is declared on the cell itself: a failure code, the failure testimony or
+  // a failed disposition. The display entry is presentation and is never consulted.
+  if (facts.failureCode || isFailureTestimony(facts) || (status ? FAILED_STATUS.has(status) : false)) {
     return 'failed';
   }
-  // A cell that completed with a declared non-success outcome — a 429 retained as
-  // `retained-non-success`, a rejected endpoint, an unavailable credential — is held, not
-  // failed: the route's later resolution supersedes the attempt. `outcomeClassification` is the
-  // engine's own verdict; the variant names the hold shape even when the classification is
-  // absent from the testimony.
-  if (facts.outcomeClassification === 'failure' || variant.startsWith('retained-non-success')) return 'held';
-  if (status && DONE_STATUS.has(status)) return 'done';
+  // A completed cell is done unless its own outcome is classified `failure`: a failed attempt
+  // shows as failed, with its variant recorded beside it. The classification is the engine's own
+  // verdict; nothing is inferred from the variant's name.
+  if (status && DONE_STATUS.has(status)) return facts.outcomeClassification === 'failure' ? 'failed' : 'done';
   if (status && ACTIVE_STATUS.has(status)) return 'active';
   if (facts.cellId && isTestimony(facts)) return 'active';
   return undefined;
 }
 
+/** The outcome a testimony carries, or undefined when it carries neither member. */
+function outcomeOf(facts: EventFacts): LiveOutcome | undefined {
+  const variant = typeof facts.outcomeVariant === 'string' ? facts.outcomeVariant : null;
+  const classification = typeof facts.outcomeClassification === 'string' ? facts.outcomeClassification : null;
+  return variant === null && classification === null ? undefined : { variant, classification };
+}
+
 function edgeState(facts: EventFacts): LiveNodeState | undefined {
   const admission = facts.admissionDisposition ?? facts.disposition;
-  const testimony = facts.testimonyType ?? '';
-  if (facts.failureCode || testimony.includes('failure') || (admission ? FAILED_STATUS.has(admission) : false)) return 'failed';
+  if (facts.failureCode || isFailureTestimony(facts) || (admission ? FAILED_STATUS.has(admission) : false)) return 'failed';
   if (admission && DONE_STATUS.has(admission)) return 'done';
   if (admission && ACTIVE_STATUS.has(admission)) return 'active';
   // A cancelled or rejected admission is observed testimony that the edge was not taken: the
@@ -130,39 +184,26 @@ function edgeState(facts: EventFacts): LiveNodeState | undefined {
 }
 
 /**
- * Drawn-node state from its member testimony. Failure outranks everything and sticks at the
- * caller; a still-active member keeps the node active; a completed member supersedes a held
- * attempt on the same drawn node (the later route completed); a node whose only observed
- * members are held shows that explicit state rather than failing.
+ * A drawn node's state is its own cell's testified state (the node id is that cell's id). Until
+ * that cell testifies, the node is active when any member has testified and planned otherwise.
+ * A member never overrides the node's own state; its failure is counted instead.
  */
-function aggregateNode(view: RunGraphView, nodeId: string, cells: Record<string, LiveNodeState>): LiveNodeState {
-  const node = view.nodes.find((candidate) => candidate.id === nodeId);
-  if (!node) return 'planned';
-  let failed = false;
-  let observed = false;
-  let incomplete = false;
-  let completed = false;
-  let held = false;
+function nodeState(
+  node: RunGraphViewNode | undefined,
+  cells: Record<string, LiveNodeState>
+): { state: LiveNodeState; failedMembers: number } {
+  if (!node) return { state: 'planned', failedMembers: 0 };
+  let memberTestified = false;
+  let failedMembers = 0;
   for (const member of node.memberCellIds) {
+    if (member === node.id) continue;
     const state = cells[member];
-    if (state === 'failed') failed = true;
-    else if (state === 'done') {
-      observed = true;
-      completed = true;
-    } else if (state === 'held') {
-      observed = true;
-      held = true;
-    } else if (state === 'active') {
-      observed = true;
-      incomplete = true;
-    }
+    if (state === undefined) continue;
+    memberTestified = true;
+    if (state === 'failed') failedMembers += 1;
   }
-  if (failed) return 'failed';
-  if (!observed) return 'planned';
-  if (incomplete) return 'active';
-  if (completed) return 'done';
-  if (held) return 'held';
-  return 'planned';
+  const own = cells[node.id];
+  return { state: own ?? (memberTestified ? 'active' : 'planned'), failedMembers };
 }
 
 function aggregateEdge(view: RunGraphView, edgeId: string, edgeStates: Record<string, LiveNodeState>): LiveNodeState {
@@ -187,11 +228,27 @@ export function testimonyTrail(transitions: LiveTransition[]): LiveTrailStep[] {
 export function emptyTrace(view?: RunGraphView): LiveTrace {
   const states: Record<string, LiveNodeState> = {};
   const edgeStates: Record<string, LiveNodeState> = {};
+  const failedMembers: Record<string, number> = {};
   if (view) {
-    for (const node of view.nodes) states[node.id] = 'planned';
+    for (const node of view.nodes) {
+      states[node.id] = 'planned';
+      failedMembers[node.id] = 0;
+    }
     for (const edge of view.edges) edgeStates[edge.id] = 'planned';
   }
-  return { states, edgeStates, cells: {}, edges: {}, transitions: [], active: null, unmatched: [] };
+  return {
+    states,
+    edgeStates,
+    cells: {},
+    edges: {},
+    outcomes: {},
+    cellOutcomes: {},
+    failedMembers,
+    transitions: [],
+    active: null,
+    unmatched: [],
+    run: null,
+  };
 }
 
 /**
@@ -206,9 +263,14 @@ export function applyEvents(trace: LiveTrace, events: SdaRunEvent[], view?: RunG
   const edgeStates: Record<string, LiveNodeState> = { ...trace.edgeStates };
   const cells: Record<string, LiveNodeState> = { ...trace.cells };
   const edges: Record<string, LiveNodeState> = { ...trace.edges };
+  const outcomes: Record<string, LiveOutcome> = { ...trace.outcomes };
+  const cellOutcomes: Record<string, LiveOutcome> = { ...trace.cellOutcomes };
+  const failedMembers: Record<string, number> = { ...trace.failedMembers };
   const transitions = trace.transitions.slice();
   const unmatched = trace.unmatched.slice();
   let active = trace.active;
+  let run = trace.run;
+  const nodes = new Map(view.nodes.map((node) => [node.id, node]));
 
   const noteUnmatched = (id: string) => {
     if (!unmatched.includes(id)) unmatched.push(id);
@@ -216,12 +278,14 @@ export function applyEvents(trace: LiveTrace, events: SdaRunEvent[], view?: RunG
 
   const applyNode = (cursor: number, kind: string, signal: string, nodeId: string) => {
     const previous = states[nodeId] ?? 'planned';
-    if (previous === 'failed') return;
-    const next = aggregateNode(view, nodeId, cells);
-    if (next === previous) return;
-    states[nodeId] = next;
-    transitions.push({ cursor, kind, signal, nodeId, from: previous, to: next });
-    if (next === 'active') active = nodeId;
+    const next = nodeState(nodes.get(nodeId), cells);
+    failedMembers[nodeId] = next.failedMembers;
+    const own = cellOutcomes[nodeId];
+    if (own) outcomes[nodeId] = own;
+    if (next.state === previous) return;
+    states[nodeId] = next.state;
+    transitions.push({ cursor, kind, signal, nodeId, from: previous, to: next.state });
+    if (next.state === 'active') active = nodeId;
     else if (active === nodeId) active = null;
   };
 
@@ -236,40 +300,31 @@ export function applyEvents(trace: LiveTrace, events: SdaRunEvent[], view?: RunG
     else if (active === edgeId) active = null;
   };
 
-  /**
-   * The run's own completion is the root fact: exit 0 completes the scenario, a failed exit
-   * fails it. The scenario's own testimony is not required — absence is not evidence — and its
-   * display text is never consulted.
-   */
-  const applyLifecycle = (cursor: number, kind: string, signal: string, exitCode: number) => {
-    const next: LiveNodeState = exitCode === 0 ? 'done' : 'failed';
-    for (const node of view.nodes) {
-      if ((node.altitude ?? '').toLowerCase() !== 'scenario') continue;
-      const previous = states[node.id] ?? 'planned';
-      if (previous === 'failed' || previous === next) continue;
-      states[node.id] = next;
-      transitions.push({ cursor, kind, signal, nodeId: node.id, from: previous, to: next });
-      if (active === node.id) active = null;
-    }
-  };
-
   for (const event of events) {
     const facts = factsOf(event);
     const kind = event.kind;
     const signal = signalOf(event);
 
-    if (event.kind === 'run.exited' && typeof facts.exitCode === 'number') {
-      applyLifecycle(event.cursor, kind, signal, facts.exitCode);
+    // The run's lifecycle is the run's status, never a node's: exit is not the scenario's outcome.
+    const lifecycle = RUN_LIFECYCLE.get(kind);
+    if (lifecycle) {
+      run = { state: lifecycle, exitCode: lifecycle === 'exited' && typeof facts.exitCode === 'number' ? facts.exitCode : null };
       continue;
     }
 
     if (facts.cellId) {
+      const cellId = facts.cellId;
       const state = cellState(facts);
       if (state) {
-        cells[facts.cellId] = cells[facts.cellId] === 'failed' ? 'failed' : state;
-        const nodeId = view.membership[facts.cellId];
+        // A failure sticks at its cell: later testimony repaints neither its state nor its outcome.
+        if (cells[cellId] !== 'failed') {
+          cells[cellId] = state;
+          const outcome = outcomeOf(facts);
+          if (outcome) cellOutcomes[cellId] = outcome;
+        }
+        const nodeId = view.membership[cellId];
         if (nodeId) applyNode(event.cursor, kind, signal, nodeId);
-        else noteUnmatched(facts.cellId);
+        else noteUnmatched(cellId);
       }
       continue;
     }
@@ -286,5 +341,5 @@ export function applyEvents(trace: LiveTrace, events: SdaRunEvent[], view?: RunG
     }
   }
 
-  return { states, edgeStates, cells, edges, transitions, active, unmatched };
+  return { states, edgeStates, cells, edges, outcomes, cellOutcomes, failedMembers, transitions, active, unmatched, run };
 }

@@ -40,14 +40,14 @@ const runResource = (overrides: Record<string, unknown> = {}) => ({
 
 const event = (cursor: number, kind: string, payload: unknown) => ({ cursor, at: '2026-09-23T00:00:00.000Z', kind, payload });
 
-const eventPage = (state: string, terminal: boolean, events: unknown[]) => ({
+const eventPage = (state: string, terminal: boolean, events: unknown[], hasMore = false) => ({
   runId: 'run-fixture-0001',
   state,
   terminal,
   events,
   nextCursor: events.length ? (events[events.length - 1] as { cursor: number }).cursor : 0,
   latestCursor: events.length ? (events[events.length - 1] as { cursor: number }).cursor : 0,
-  hasMore: false,
+  hasMore,
 });
 
 test('with no endpoint configured the site executes nothing and says so', async () => {
@@ -138,6 +138,51 @@ test('a real run is carried through with its terminal state, lane and lean outpu
     else process.env.SDA_API_TOKEN = previous;
     server.close();
   }
+});
+
+test('a terminal page that still has more drains the lane before the run is reported', async () => {
+  // The host sets `terminal` from the run record alone, so a terminal page can still leave
+  // undrained events behind. The lab path must keep reading until `hasMore` is false or its
+  // observation count stops at the page bound and undercounts the run.
+  const { server, origin } = await listen(async (request, response) => {
+    const url = new URL(request.url ?? '/', 'http://localhost');
+    if (request.method === 'POST') {
+      response.writeHead(202, { 'content-type': 'application/json' });
+      response.end(JSON.stringify(runResource()));
+      return;
+    }
+    if (url.pathname.endsWith('/events')) {
+      const after = Number(url.searchParams.get('after') ?? '0');
+      response.writeHead(200, { 'content-type': 'application/json' });
+      if (after < 2) {
+        response.end(JSON.stringify(eventPage('completed', true, [
+          event(1, 'run.admitted', {}),
+          event(2, 'run.started', { pid: 42 }),
+        ], true)));
+      } else {
+        response.end(JSON.stringify(eventPage('completed', true, [
+          event(3, 'observation', { testimonyType: 'cell-execution-testimony.v1', cellId: 'cell:scenario:root', disposition: 'completed' }),
+        ], false)));
+      }
+      return;
+    }
+    if (url.pathname.endsWith('/output')) {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ contractId: 'fixture.v1', payload: {} }));
+      return;
+    }
+    response.writeHead(404, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({ error: { code: 'ROUTE_NOT_FOUND', message: 'No route.' } }));
+  });
+  try {
+    const { invokeCapabilityToView } = await clientWith(origin);
+    const view = await invokeCapabilityToView('c', {});
+    assert.equal(view.status, 'EXECUTED');
+    if (view.status !== 'EXECUTED') return;
+    assert.equal(view.observationCount, 3, 'the drained lane carries the union of both pages');
+    const cursors = view.execution.observations.map((observation) => (observation as { cursor: number }).cursor);
+    assert.deepEqual(cursors, [1, 2, 3]);
+  } finally { server.close(); }
 });
 
 test('a failed terminal state is an execution, not a site failure', async () => {

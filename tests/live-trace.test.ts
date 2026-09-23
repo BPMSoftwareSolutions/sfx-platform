@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -44,6 +47,38 @@ function graphOf(
       to: { cellId: edge.to, portId: `${edge.to}:input` },
     })),
   };
+}
+
+const fixtureDir = fileURLToPath(new URL('./fixtures/circuit/', import.meta.url));
+
+function fixtureText(name: string): string {
+  return readFileSync(join(fixtureDir, name), 'utf8');
+}
+
+/** A run capture's event stream: every page body's events, deduplicated by cursor. */
+function captureEvents(capture: { pages?: Array<{ body?: { events?: SdaRunEvent[] } }> }): SdaRunEvent[] {
+  const byCursor = new Map<number, SdaRunEvent>();
+  for (const page of capture.pages ?? []) for (const event of page.body?.events ?? []) byCursor.set(event.cursor, event);
+  return [...byCursor.values()].sort((a, b) => a.cursor - b.cursor);
+}
+
+/**
+ * The observer SSE's `data:` lines are the lane's JSON events: `seq` is the cursor and
+ * `receivedAt` the arrival time. The observer names the process lifecycle `run-start`/`run-end`;
+ * the host lane names it `run.started`/`run.exited` (sda-api-v1 authority). Every testimony
+ * passes through untouched.
+ */
+function sseEvents(text: string): SdaRunEvent[] {
+  const events: SdaRunEvent[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.startsWith('data:')) continue;
+    const body = line.slice(5).trim();
+    if (!body) continue;
+    const record = JSON.parse(body) as { seq: number; receivedAt: string; kind: string; payload?: unknown };
+    const kind = record.kind === 'run-start' ? 'run.started' : record.kind === 'run-end' ? 'run.exited' : record.kind;
+    events.push({ cursor: record.seq, at: record.receivedAt, kind, payload: record.payload ?? null });
+  }
+  return events.sort((a, b) => a.cursor - b.cursor);
 }
 
 const fixture = graphOf(
@@ -109,7 +144,7 @@ test('failure testimony fails its bound node; a later completion cannot repaint 
   assert.equal(after.states['cell:mechanic:a'], 'failed');
 });
 
-test('a completed cell with a declared non-success outcome is held, never failed from its display text', () => {
+test('a completed cell whose own outcome is classified failure is a failed attempt with its variant', () => {
   const classified = applyEvents(emptyTrace(view), [
     cellTestimony(1, 'cell:provider:a.p', {
       disposition: 'completed',
@@ -118,9 +153,13 @@ test('a completed cell with a declared non-success outcome is held, never failed
       display: { entry: { status: 'failed' } },
     }),
   ], view);
-  assert.equal(classified.states['cell:provider:a.p'], 'held');
-  // A parent does not inherit a child's hold from testimony unless the collapse drew them together.
+  assert.equal(classified.states['cell:provider:a.p'], 'failed');
+  // Completion and outcome are distinct facts: the variant and classification stay recorded.
+  assert.deepEqual(classified.cellOutcomes['cell:provider:a.p'], { variant: 'retained-non-success', classification: 'failure' });
+  // A parent does not inherit a child's state from testimony unless the collapse drew them together.
   assert.equal(classified.states['cell:mechanic:a'], 'planned');
+  // No rule produces `held`; it stays in the union only because renderer code names it.
+  for (const state of Object.values(classified.states)) assert.notEqual(state, 'held');
 });
 
 test('a declared failure disposition stays failed regardless of display status', () => {
@@ -134,31 +173,38 @@ test('a declared failure disposition stays failed regardless of display status',
   assert.equal(classified.states['cell:provider:a.p'], 'failed');
 });
 
-test('a later completed route supersedes a held attempt on the same drawn node', () => {
+test('a member failure is counted on the drawn node and never becomes the node’s own state', () => {
   const collapsed = buildRunGraphView(normalizeRunGraph(fixture), 2);
   assert.equal(collapsed.membership['cell:provider:a.p'], 'cell:mechanic:a', 'the collapse draws the provider beside its mechanic');
-  const trace = applyEvents(emptyTrace(collapsed), [
+  const afterMemberFailure = applyEvents(emptyTrace(collapsed), [
     cellTestimony(1, 'cell:provider:a.p', {
       disposition: 'completed',
       outcomeClassification: 'failure',
       outcomeVariant: 'retained-non-success',
     }),
-    cellTestimony(2, 'cell:mechanic:a'),
   ], collapsed);
-  assert.equal(trace.states['cell:mechanic:a'], 'done', 'the later completion is the surviving route state');
+  assert.equal(afterMemberFailure.states['cell:mechanic:a'], 'active', 'a member lights the node but does not testify for it');
+  assert.equal(afterMemberFailure.failedMembers['cell:mechanic:a'], 1, 'the member failure is counted');
+  const afterOwnCompletion = applyEvents(afterMemberFailure, [cellTestimony(2, 'cell:mechanic:a')], collapsed);
+  assert.equal(afterOwnCompletion.states['cell:mechanic:a'], 'done', 'the node shows its own testified outcome');
+  assert.equal(afterOwnCompletion.failedMembers['cell:mechanic:a'], 1, 'the member failure stays counted');
 });
 
-test('the run’s own completion closes the scenario root even without its testimony', () => {
+test('run.exited sets the run status only; it never completes or fails a node', () => {
   const completed = applyEvents(emptyTrace(view), [
-    event(1, 'run.exited', { exitCode: 0, durationMs: 10 }),
+    event(1, 'run.admitted', {}),
+    event(2, 'run.started', { pid: 7 }),
+    event(3, 'run.exited', { exitCode: 0, durationMs: 10 }),
   ], view);
-  assert.equal(completed.states['cell:scenario:root'], 'done');
-  assert.equal(completed.states['cell:mechanic:a'], 'planned', 'lifecycle completes only the root');
+  assert.deepEqual(completed.run, { state: 'exited', exitCode: 0 });
+  for (const state of Object.values(completed.states)) assert.equal(state, 'planned');
+  assert.deepEqual(completed.transitions, []);
 
-  const failed = applyEvents(emptyTrace(view), [
+  const crashed = applyEvents(emptyTrace(view), [
     event(1, 'run.exited', { exitCode: 1, durationMs: 10 }),
   ], view);
-  assert.equal(failed.states['cell:scenario:root'], 'failed');
+  assert.deepEqual(crashed.run, { state: 'exited', exitCode: 1 });
+  for (const state of Object.values(crashed.states)) assert.equal(state, 'planned');
 });
 
 test('the graph.captured marker names no node and does not disturb testimony', () => {
@@ -270,7 +316,7 @@ test('the viewer renders planned, observed and failed states and live edges', ()
   assert.match(markup, /class="circuit-edge circuit-edge--planned"[^>]*data-live="planned"/);
 });
 
-test('a held attempt renders as its own explicit state, never as failed', () => {
+test('a failure-classified attempt renders as failed, never as held', () => {
   const trace = applyEvents(emptyTrace(view), [
     cellTestimony(1, 'cell:provider:a.p', {
       disposition: 'completed',
@@ -283,8 +329,8 @@ test('a held attempt renders as its own explicit state, never as failed', () => 
     circuits: [authoredCircuit],
     liveOverride: liveView(view, { states: trace.states, edgeStates: trace.edgeStates, transitions: trace.transitions }),
   }));
-  assert.match(markup, /class="circuit-node circuit-node--held"[^>]*data-live="held"/);
-  assert.doesNotMatch(markup, /circuit-node--failed/);
+  assert.match(markup, /class="circuit-node circuit-node--failed"[^>]*data-live="failed"/);
+  assert.doesNotMatch(markup, /circuit-node--held/);
 });
 
 const authoredCircuit: CircuitProjection = {
@@ -447,4 +493,94 @@ test('without materials the trace keeps the shaped primitive rendering and refer
   assert.equal((markup.match(/class="circuit-node-contour"/g) ?? []).length, 4);
   const silhouettes = [...markup.matchAll(/<path d="([^"]+)" fill="color-mix/g)].map((match) => match[1]);
   assert.equal(new Set(silhouettes).size, silhouettes.length, 'primitive silhouettes are distinct');
+});
+
+/**
+ * Durable fixture replays — implementation plan phase 4 acceptance.
+ *
+ * The captures in tests/fixtures/circuit/ are the measured pair: equity (resolved) and
+ * hello-world from the run API's event pages, and the second equity run (root rejected) caught on
+ * the observer SSE. That capture holds no graph of its own, so its events replay against the
+ * graph inside the resolved equity capture: both runs are the same capability's compiled circuit
+ * and share the root cell id. The SSE names the process lifecycle `run-start`/`run-end`; the
+ * host lane's kinds are mapped in `sseEvents`.
+ */
+
+const rootCellId = 'cell:scenario:resolve-equity-market-price-evidence';
+const operationCellId = (operation: number) => `cell:mechanic:resolve-equity-market-price-evidence.operation.${operation}`;
+
+const equityCapture = JSON.parse(fixtureText('run-resolve-equity-market-price-evidence.json')) as {
+  graph: { json: SdaRunGraph };
+  pages?: Array<{ body?: { events?: SdaRunEvent[] } }>;
+};
+const equityView = buildRunGraphView(normalizeRunGraph(equityCapture.graph.json), Number.MAX_SAFE_INTEGER);
+const equityResolved = applyEvents(emptyTrace(equityView), captureEvents(equityCapture), equityView);
+const equityDrawn = buildRunGraphView(normalizeRunGraph(equityCapture.graph.json));
+const equityDrawnReplay = applyEvents(emptyTrace(equityDrawn), captureEvents(equityCapture), equityDrawn);
+
+test('the equity replay reads the root from its own testimony: RESOLVED success, not exit 0', () => {
+  assert.deepEqual(equityResolved.run, { state: 'exited', exitCode: 0 });
+  assert.equal(equityResolved.unmatched.length, 0);
+  assert.equal(equityResolved.states[rootCellId], 'done');
+  assert.deepEqual(equityResolved.outcomes[rootCellId], { variant: 'EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', classification: 'success' });
+  assert.equal(equityResolved.transitions.filter((transition) => transition.to === 'held').length, 0, 'no rule produces held');
+});
+
+test('the equity replay shows every failed route attempt as failed with its own variant', () => {
+  const failedAttempts: Array<[number, string]> = [
+    [4, 'retained-non-success'], [5, 'EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE'],
+    [9, 'retained-non-success'], [10, 'EQUITY_MARKET_PRICE_PROVIDER_UNAVAILABLE'],
+    [17, 'CREDENTIAL_NOT_AVAILABLE'], [19, 'rejected-endpoint'],
+    [22, 'CREDENTIAL_NOT_AVAILABLE'], [24, 'rejected-endpoint'],
+    [27, 'CREDENTIAL_NOT_AVAILABLE'], [29, 'rejected-endpoint'],
+    [32, 'CREDENTIAL_NOT_AVAILABLE'], [34, 'rejected-endpoint'],
+  ];
+  for (const [operation, variant] of failedAttempts) {
+    const cellId = operationCellId(operation);
+    assert.equal(equityResolved.states[cellId], 'failed', `operation.${operation} must show as failed`);
+    assert.deepEqual(equityResolved.outcomes[cellId], { variant, classification: 'failure' }, `operation.${operation} keeps its testified variant`);
+  }
+  assert.equal(equityResolved.states[operationCellId(15)], 'done', 'route 3 resolves');
+  assert.deepEqual(equityResolved.outcomes[operationCellId(15)], { variant: 'EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', classification: 'success' });
+});
+
+test('the equity replay counts failed members on the drawn root without failing it', () => {
+  const rootNode = equityDrawn.nodes.find((node) => node.id === rootCellId);
+  assert.ok(rootNode, 'the scenario root is always a drawn node');
+  const failedMembers = rootNode.memberCellIds.filter((member) => member !== rootCellId && equityDrawnReplay.cells[member] === 'failed');
+  assert.ok(failedMembers.length > 0, 'the resolved root still carries its failed attempts as members');
+  assert.equal(equityDrawnReplay.failedMembers[rootCellId], failedMembers.length, 'member failures are counted, never inherited');
+  assert.equal(equityDrawnReplay.states[rootCellId], 'done', 'the node shows its own testified success');
+  assert.deepEqual(equityDrawnReplay.outcomes[rootCellId], { variant: 'EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', classification: 'success' });
+});
+
+test('the rejected equity replay fails the root by its own testimony; exit 0 completes nothing', () => {
+  const rejectedEvents = sseEvents(fixtureText('equity-rejected-trace.sse'));
+  const rejected = applyEvents(emptyTrace(equityView), rejectedEvents, equityView);
+  assert.deepEqual(rejected.run, { state: 'exited', exitCode: 0 });
+  assert.equal(rejected.states[rootCellId], 'failed');
+  assert.deepEqual(rejected.outcomes[rootCellId], { variant: 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED', classification: 'failure' });
+  assert.notEqual(rejected.states[rootCellId], 'done');
+  for (const state of Object.values(rejected.states)) assert.notEqual(state, 'held');
+});
+
+test('the hello-world replay is unchanged: six planned nodes, all completed', () => {
+  const helloCapture = JSON.parse(fixtureText('run-say-hello-world.json')) as {
+    graph: { json: SdaRunGraph };
+    pages?: Array<{ body?: { events?: SdaRunEvent[] } }>;
+  };
+  const helloView = buildRunGraphView(normalizeRunGraph(helloCapture.graph.json));
+  const trace = applyEvents(emptyTrace(helloView), captureEvents(helloCapture), helloView);
+  assert.deepEqual(trace.states, {
+    'cell:scenario:say-hello-world': 'done',
+    'cell:mechanic:say-hello-world.operation.1': 'done',
+    'cell:mechanic:say-hello-world.operation.1:expression': 'done',
+    'cell:mechanic:say-hello-world.operation.1:expression.fields.contractId': 'done',
+    'cell:mechanic:say-hello-world.operation.1:expression.fields.payload': 'done',
+    'cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message': 'done',
+  });
+  assert.deepEqual(trace.outcomes['cell:scenario:say-hello-world'], { variant: 'TERMINAL', classification: null });
+  assert.deepEqual(Object.values(trace.failedMembers), [0, 0, 0, 0, 0, 0]);
+  assert.equal(trace.unmatched.length, 0);
+  assert.deepEqual(trace.run, { state: 'exited', exitCode: 0 });
 });
