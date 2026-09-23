@@ -106,6 +106,27 @@ export const CircuitEdge = z.object({
 });
 export type CircuitEdge = z.infer<typeof CircuitEdge>;
 
+/** A bundle revision is a bare sha256 digest as stored by the media base tables. */
+export const BundleRevision = z.string().regex(/^[0-9a-f]{64}$/, 'expected a bare sha256 digest');
+
+/**
+ * §12.2 — the renderer/mapping decision for one projection, read from the live topology.
+ *
+ * AUTHORED_CIRCUIT means the selected generation carries a stored circuit bundle for this
+ * capability/scenario/blueprint and that bundle is what the page renders. BOUNDARY means the
+ * live topology declares none; that absence is a validation diagnostic, never silent.
+ */
+export const CircuitRenderer = z.object({
+  kind: z.enum(['AUTHORED_CIRCUIT', 'BOUNDARY']),
+  subjectKind: z.enum(['CAPABILITY', 'SCENARIO', 'BLUEPRINT']).nullable(),
+  bundleRevision: BundleRevision.nullable(),
+  /** A publication-local /media path. Null exactly when no authored bundle exists. */
+  url: z.string().nullable(),
+  label: z.string().nullable(),
+  topologyViews: z.number().int().nonnegative().nullable(),
+});
+export type CircuitRenderer = z.infer<typeof CircuitRenderer>;
+
 /** §11.3 — CircuitProjection. Topology is deterministic; nothing here is generated art. */
 export const CircuitProjection = z.object({
   capabilityId: z.string(),
@@ -118,6 +139,8 @@ export const CircuitProjection = z.object({
   rendererVersion: z.string(),
   lens: z.enum(['CAPABILITY_OVERVIEW', 'SCENARIO', 'EVIDENCE']),
   fidelity: GraphFidelity,
+  /** The live-topology renderer/mapping. Optional only so pre-generation fixtures stay valid. */
+  renderer: CircuitRenderer.optional(),
   nodes: z.array(CircuitNode),
   edges: z.array(CircuitEdge),
   /** Why the graph is not full, when it is not. Never silently empty. */
@@ -240,6 +263,11 @@ export const EstatePublication = z.object({
     blueprints: z.number().int().nonnegative(),
     blueprintNodes: z.number().int().nonnegative(),
     blueprintEdges: z.number().int().nonnegative(),
+    /** Circuits rendered from the live authored topology, and the capabilities that own them. */
+    circuitsAuthored: z.number().int().nonnegative(),
+    circuitsBoundary: z.number().int().nonnegative(),
+    capabilitiesWithAuthoredCircuit: z.number().int().nonnegative(),
+    capabilitiesWithoutAuthoredCircuit: z.number().int().nonnegative(),
     mechanicsWithoutDeclaredName: z.number().int().nonnegative(),
     /** §12.7 — the requirement registry is the denominator, including missing images. */
     visualsRequired: z.number().int().nonnegative(),

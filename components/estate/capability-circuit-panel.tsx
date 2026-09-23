@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { CircuitViewer } from '@/components/circuit/circuit-viewer';
 import type { CircuitProjection } from '@/contracts/estate';
+import { CircuitFrame } from './circuit-frame';
 import { useLiveRunOptional } from './live-run';
 
 /**
@@ -60,6 +61,13 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
     );
   }
 
+  // §12.2 — the live topology decides the renderer. An authored circuit bundle is rendered as
+  // the authored circuit; the source-backed boundary outline stays available as its text
+  // equivalent. A boundary projection must state that no authored circuit exists.
+  const renderer = circuit.renderer;
+  const authoredUrl = renderer?.kind === 'AUTHORED_CIRCUIT' && renderer.url ? renderer.url : null;
+  const absent = circuit.diagnostics.some((d) => d.code === 'NO_AUTHORED_CIRCUIT');
+
   return (
     <div className="circuit-surface" ref={rootRef}>
       {circuits.length > 1 ? (
@@ -90,15 +98,54 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
         </div>
       ) : null}
 
-      <CircuitViewer
-        circuit={circuit}
-        selectedNodeId={nodeId}
-        liveNodes={liveNodes}
-        onSelectNode={(next) => {
-          setNodeId(next);
-          syncUrl(circuit.scenarioId??'', next);
-        }}
-      />
+      {authoredUrl ? (
+        <>
+          <CircuitFrame
+            key={authoredUrl}
+            src={authoredUrl}
+            title={`${circuit.capabilityId} / ${circuit.scenarioId ?? 'capability'} — authored circuit`}
+          />
+          <p className="mt-2 text-xs text-muted">
+            Authored circuit from the live topology ({renderer?.subjectKind?.toLowerCase()} bundle{' '}
+            {renderer?.bundleRevision?.slice(0, 12)}…{renderer?.topologyViews ? ` · ${renderer.topologyViews} views` : ''}).
+          </p>
+          <details className="mt-3 rounded-lg border border-grid-line bg-ink-2 p-4">
+            <summary className="cursor-pointer font-display text-sm font-semibold">
+              Source-backed boundary outline
+            </summary>
+            <div className="mt-3">
+              <CircuitViewer
+                circuit={circuit}
+                selectedNodeId={nodeId}
+                liveNodes={liveNodes}
+                onSelectNode={(next) => {
+                  setNodeId(next);
+                  syncUrl(circuit.scenarioId??'', next);
+                }}
+              />
+            </div>
+          </details>
+        </>
+      ) : (
+        <>
+          {absent ? (
+            <div className="mb-3 rounded-lg border border-failure/40 bg-ink-2 p-4 text-sm text-muted" role="status">
+              No authored circuit bundle is published for this capability in this generation. The
+              live topology read records this absence as a validation error; the source-backed
+              boundary contract below is shown explicitly and is not a substitute circuit.
+            </div>
+          ) : null}
+          <CircuitViewer
+            circuit={circuit}
+            selectedNodeId={nodeId}
+            liveNodes={liveNodes}
+            onSelectNode={(next) => {
+              setNodeId(next);
+              syncUrl(circuit.scenarioId??'', next);
+            }}
+          />
+        </>
+      )}
 
       {/* Without JavaScript the select above cannot switch scenarios; these links can. */}
       {circuits.length > 1 ? (

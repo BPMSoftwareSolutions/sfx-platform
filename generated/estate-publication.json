@@ -1,5 +1,5 @@
 {
-  "publicationId": "sha256:5b9371f42573f1aef029069ec1c6ade1a93d240b7c941ae22b7d2c3b84398b62",
+  "publicationId": "sha256:9d27a24c555e46503bb2bd001d2e1b7c433df6b9e851feb47a987e7f6f454cd6",
   "contractVersion": "1.0.0",
   "source": {
     "snapshotId": "sha256:1a770ac0795d10665a88166f8d8c968dc5b2d030fdfab2b837aa6071d135f9e9",
@@ -12,8 +12,8 @@
     "rowLimit": 5000,
     "disposition": "READ_QUERY_COMPLETE"
   },
-  "builtAt": "2026-09-23T11:32:44.596Z",
-  "adapterVersion": "estate-publication-adapter/1.1.0",
+  "builtAt": "2026-09-23T13:14:41.883Z",
+  "adapterVersion": "estate-publication-adapter/1.2.0",
   "coverage": {
     "managedCapabilities": 329,
     "capabilityIdentities": 329,
@@ -26,6 +26,10 @@
     "blueprints": 67,
     "blueprintNodes": 1886,
     "blueprintEdges": 0,
+    "circuitsAuthored": 824,
+    "circuitsBoundary": 146,
+    "capabilitiesWithAuthoredCircuit": 217,
+    "capabilitiesWithoutAuthoredCircuit": 112,
     "mechanicsWithoutDeclaredName": 137,
     "visualsRequired": 3156,
     "visualsReady": 20
@@ -264,7 +268,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -600,7 +604,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -823,7 +827,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -1136,7 +1140,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -1245,7 +1249,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -1463,7 +1467,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -1776,7 +1780,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -1885,7 +1889,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -1994,7 +1998,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -2574,7 +2578,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -2683,7 +2687,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -2894,7 +2898,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3003,7 +3007,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3112,7 +3116,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3221,7 +3225,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3330,7 +3334,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3439,7 +3443,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3764,7 +3768,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -3873,7 +3877,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -4300,7 +4304,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -5888,7 +5892,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -6203,7 +6207,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -6477,7 +6481,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -7625,7 +7629,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -8921,7 +8925,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -9336,7 +9340,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -9445,7 +9449,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -9554,7 +9558,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -9772,7 +9776,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -10034,7 +10038,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -10247,7 +10251,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -10465,7 +10469,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -10887,7 +10891,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -10996,7 +11000,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -11105,7 +11109,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -11731,7 +11735,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -12554,7 +12558,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -12663,7 +12667,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -12772,7 +12776,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -12881,7 +12885,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -12990,7 +12994,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -13099,7 +13103,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -13208,7 +13212,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -14189,7 +14193,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -14502,7 +14506,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -14827,7 +14831,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -15101,7 +15105,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -15377,7 +15381,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -15600,7 +15604,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -15862,7 +15866,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16226,7 +16230,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16335,7 +16339,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16444,7 +16448,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16553,7 +16557,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16662,7 +16666,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16771,7 +16775,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -16880,7 +16884,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17193,7 +17197,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17302,7 +17306,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17411,7 +17415,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17520,7 +17524,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17629,7 +17633,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17738,7 +17742,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -17847,7 +17851,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -18517,7 +18521,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -18626,7 +18630,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -18735,7 +18739,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -18844,7 +18848,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -18953,7 +18957,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -19062,7 +19066,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -19171,7 +19175,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -19869,7 +19873,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -19978,7 +19982,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -20240,7 +20244,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -20502,7 +20506,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -20968,7 +20972,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -21077,7 +21081,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -21390,7 +21394,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -21664,7 +21668,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -22028,7 +22032,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -23324,7 +23328,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -24096,7 +24100,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -24358,7 +24362,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -24467,7 +24471,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -25005,7 +25009,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -25891,7 +25895,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -26216,7 +26220,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -26736,7 +26740,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -27457,7 +27461,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -27719,7 +27723,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -28032,7 +28036,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -28153,7 +28157,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -28262,7 +28266,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -28846,7 +28850,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -29312,7 +29316,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -29625,7 +29629,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -30040,7 +30044,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -31325,7 +31329,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -32271,7 +32275,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -32489,7 +32493,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -32598,7 +32602,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -33032,7 +33036,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -33602,7 +33606,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -33813,7 +33817,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -33924,7 +33928,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -34441,7 +34445,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -34550,7 +34554,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -34761,7 +34765,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -35086,7 +35090,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -35309,7 +35313,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -35727,7 +35731,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -36156,7 +36160,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -36522,7 +36526,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -36784,7 +36788,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -37199,7 +37203,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -37412,7 +37416,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -37776,7 +37780,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -38105,7 +38109,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -38323,7 +38327,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -38432,7 +38436,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -38541,7 +38545,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -38764,7 +38768,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -38873,7 +38877,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -39402,7 +39406,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -39919,7 +39923,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -40028,7 +40032,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -40554,7 +40558,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -40665,7 +40669,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -40774,7 +40778,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -40883,7 +40887,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -40992,7 +40996,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -41101,7 +41105,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -41210,7 +41214,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -42135,7 +42139,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -42353,7 +42357,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -42462,7 +42466,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -42724,7 +42728,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -42833,7 +42837,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -42942,7 +42946,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43051,7 +43055,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43160,7 +43164,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43269,7 +43273,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43378,7 +43382,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43487,7 +43491,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43596,7 +43600,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -43705,7 +43709,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -44018,7 +44022,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -44127,7 +44131,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -44236,7 +44240,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -44345,7 +44349,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -44818,7 +44822,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -44927,7 +44931,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45036,7 +45040,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45145,7 +45149,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45254,7 +45258,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45363,7 +45367,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45676,7 +45680,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45785,7 +45789,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -45894,7 +45898,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -46003,7 +46007,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -46430,7 +46434,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -46641,7 +46645,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -46966,7 +46970,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -47077,7 +47081,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -47186,7 +47190,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -47448,7 +47452,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -48028,7 +48032,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -48258,7 +48262,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -48381,7 +48385,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -50549,7 +50553,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -50811,7 +50815,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -51073,7 +51077,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -51291,7 +51295,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -51400,7 +51404,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -51975,7 +51979,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -52288,7 +52292,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -52868,7 +52872,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -53130,7 +53134,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -53751,7 +53755,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -54013,7 +54017,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -54479,7 +54483,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -54590,7 +54594,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -54961,7 +54965,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -55179,7 +55183,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -55492,7 +55496,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -55805,7 +55809,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -55914,7 +55918,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -56125,7 +56129,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -56246,7 +56250,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -56355,7 +56359,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -56464,7 +56468,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -56726,7 +56730,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -57039,7 +57043,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -57352,7 +57356,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -57461,7 +57465,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -58233,7 +58237,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -58599,7 +58603,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -59309,7 +59313,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -63778,7 +63782,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -64349,7 +64353,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -64470,7 +64474,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -64581,7 +64585,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -64799,7 +64803,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -65112,7 +65116,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -65323,7 +65327,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -65687,7 +65691,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -66058,7 +66062,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -66371,7 +66375,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -66633,7 +66637,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -66742,7 +66746,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -67259,7 +67263,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -67929,7 +67933,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -68038,7 +68042,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -68351,7 +68355,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -68664,7 +68668,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -68875,7 +68879,7 @@
         }
       ],
       "blueprints": [],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -69149,7 +69153,7 @@
           "edgeCount": 0
         }
       ],
-      "graphFidelity": "BOUNDARY",
+      "graphFidelity": "FULL",
       "targets": [],
       "downloadEligibility": {
         "authority": false,
@@ -84278,8 +84282,13 @@
     },
     {
       "code": "BLUEPRINT_EDGES_ABSENT",
-      "message": "67 selected blueprints carry 1886 normalized nodes and no normalized edges. Capability circuits render the source-backed boundary lens rather than a full topology.",
+      "message": "67 selected blueprints carry 1886 normalized cells and no normalized edges; the cells are retained as source facts and never drawn as routes. Capabilities whose live topology carries an authored circuit bundle render that bundle instead.",
       "count": 67
+    },
+    {
+      "code": "CIRCUIT_TOPOLOGY_ABSENT",
+      "message": "112 of 329 selected capabilities have no authored circuit bundle in this generation's live topology (1886 declared blueprint cells, 0 normalized edges, 502 unselected circuit requirements). Their source-backed boundary contracts are published with an explicit NO_AUTHORED_CIRCUIT diagnostic and are a validation error.",
+      "count": 112
     },
     {
       "code": "ENTITY_VISUALS_OUTSTANDING",

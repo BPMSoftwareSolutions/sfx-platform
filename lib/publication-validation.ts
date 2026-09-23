@@ -59,6 +59,7 @@ export function validatePublication(publicationBytes: Buffer, circuitBytes: Buff
   const emptyCapabilities = new Set(publication.capabilities.filter(c=>!c.scenarios.length).map(c=>c.entityId));
   require(circuits.length === faces.size + emptyCapabilities.size, 'Circuit coverage mismatch');
   const seen = new Set<string>();
+  const authoredCapabilities = new Set<string>();
   for (const circuit of circuits) {
     const key = JSON.stringify([circuit.capabilityId, circuit.scenarioId]);
     const overview=circuit.scenarioId===null && emptyCapabilities.has(circuit.capabilityId) && circuit.lens==='CAPABILITY_OVERVIEW' && circuit.fidelity==='PARTIAL_BOUNDARY';
@@ -69,7 +70,37 @@ export function validatePublication(publicationBytes: Buffer, circuitBytes: Buff
     const nodes = new Set(circuit.nodes.map(n => n.id));
     require(nodes.size === circuit.nodes.length && circuit.nodes.length > 0, 'Invalid circuit nodes');
     require(circuit.edges.every(e => nodes.has(e.from) && nodes.has(e.to)), 'Unresolved circuit edge');
+
+    // §12.2 — a boundary projection may only exist where the live topology declares no authored
+    // circuit, and the absence must be stated. An available authored circuit is never replaced.
+    require(circuit.renderer, 'Circuit renderer mapping missing');
+    const renderer = circuit.renderer!;
+    if (renderer.kind === 'AUTHORED_CIRCUIT') {
+      const { subjectKind, bundleRevision, url } = renderer;
+      if (subjectKind === null || bundleRevision === null || url === null) {
+        throw new Error('Authored circuit renderer mapping is incomplete');
+      }
+      require(url.startsWith('/media/') && !url.includes('..'), 'Authored circuit URL is not a publication media path');
+      require(circuit.fidelity === 'FULL', 'An authored circuit must render at full fidelity');
+      require(!circuit.diagnostics.some(d => d.code === 'NO_AUTHORED_CIRCUIT'), 'An authored circuit must not be reported absent');
+      authoredCapabilities.add(circuit.capabilityId);
+    } else {
+      require(circuit.diagnostics.some(d => d.code === 'NO_AUTHORED_CIRCUIT'),
+        'A boundary circuit must record that the live topology declares no authored circuit');
+      require(renderer.url === null && renderer.bundleRevision === null, 'A boundary circuit must not carry an authored mapping');
+    }
   }
+  const authored = circuits.filter(c => c.renderer?.kind === 'AUTHORED_CIRCUIT').length;
+  const boundary = circuits.length - authored;
+  require(publication.coverage.circuitsAuthored === authored && publication.coverage.circuitsBoundary === boundary,
+    'Authored/boundary circuit coverage mismatch');
+  require(publication.coverage.capabilitiesWithAuthoredCircuit === authoredCapabilities.size &&
+    publication.coverage.capabilitiesWithoutAuthoredCircuit === publication.capabilities.length - authoredCapabilities.size,
+    'Authored circuit capability coverage mismatch');
+  const absent = publication.findings.find(f => f.code === 'CIRCUIT_TOPOLOGY_ABSENT');
+  require(publication.coverage.capabilitiesWithoutAuthoredCircuit === 0 ||
+    (absent !== undefined && absent.count === publication.coverage.capabilitiesWithoutAuthoredCircuit),
+    'Capabilities without an authored circuit must be published as a validation error');
   return { publication, circuits };
 }
 

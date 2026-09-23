@@ -12,6 +12,7 @@
  * --allow-missing lets a build proceed with no valid publication. The site then renders
  * its unavailable state (§11.4) rather than an empty catalog.
  */
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -21,11 +22,17 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
 const OUT_DIR = join(ROOT, 'generated');
 const OUT_FILE = join(OUT_DIR, 'estate-publication.json');
+const TOPOLOGY_SQL = join(HERE, 'sql', 'publish-estate-topology.sql');
 
-const ADAPTER_VERSION = 'estate-publication-adapter/1.1.0';
+const ADAPTER_VERSION = 'estate-publication-adapter/1.2.0';
 const CONTRACT_VERSION = '1.0.0';
 const SCL_VERSION = '0.2';
-const RENDERER_VERSION = 'boundary-projection/1.0.0';
+/** The authored bundle renderer is the capability's stored circuit; the boundary renderer is
+ * only ever used when the live topology declares no authored circuit for that capability. */
+const AUTHORED_RENDERER_VERSION = 'stored-circuit/1.0.0';
+const BOUNDARY_RENDERER_VERSION = 'boundary-projection/1.0.0';
+const AUTHORED_SOURCE_PROFILE = 'media-circuit-bundle.v1';
+const BOUNDARY_SOURCE_PROFILE = 'estate-scenario-face.v1';
 
 /** Default source: the executed read-only inventory query recorded by the database repo (§14.1). */
 const DEFAULT_SOURCE = 'C:/lab/sidefx-database/data/media/website-inventory.json';
@@ -160,17 +167,172 @@ function visualRequirements(subjectKind, semanticObjectPk, semanticObjectDefinit
   }); });
 }
 
+/** Locate the SDA kernel runner the same way publish-circuits.mjs does. */
+function locateRunner() {
+  const roots = [
+    process.env.SIDEFX_SDA_ROOT,
+    resolve(ROOT, '..', 'scenario-driven-architecture'),
+    resolve(ROOT, '..', '..', 'scenario-driven-architecture'),
+  ].filter((path) => typeof path === 'string' && path.length > 0);
+  for (const root of roots) {
+    const runner = join(root, 'languages', 'typescript', 'src', 'kernel', 'bootstrap', 'run-migration.mjs');
+    if (existsSync(runner)) return runner;
+  }
+  return null;
+}
+
+/** Parse the `RS <name> rows <n>` result sets the runner prints. */
+function readResultSets(stdout) {
+  const sets = new Map();
+  let name = null;
+  for (const raw of stdout.split(/\r?\n/)) {
+    const header = /^RS (.+?) rows (\d+)$/.exec(raw);
+    if (header) {
+      name = header[1];
+      continue;
+    }
+    const line = raw.trim();
+    if (!name || !line.startsWith('{') || !line.endsWith('}')) continue;
+    try {
+      const row = JSON.parse(line);
+      if (typeof row.json_value === 'string') sets.set(name, JSON.parse(row.json_value));
+      else {
+        const list = sets.get(name) ?? [];
+        list.push(row);
+        sets.set(name, list);
+      }
+    } catch {
+      /* A partial line the runner never split is ignored. */
+    }
+  }
+  return sets;
+}
+
+/**
+ * §12.2 — read the live authored circuit topology.
+ *
+ * The topology is read from the direct base tables through the SDA kernel runner (a ROLLBACK
+ * batch), or from a captured result set passed with --topology / SIDEFX_ESTATE_TOPOLOGY. It is
+ * never inferred from the boundary. A selected circuit binding that is not a resolvable
+ * CIRCUIT_BUNDLE fails the read: publish must not substitute a boundary lens for topology the
+ * estate actually carries.
+ */
+function loadTopology(explicitFile) {
+  const file = explicitFile ?? process.env.SIDEFX_ESTATE_TOPOLOGY;
+  if (file) {
+    const captured = JSON.parse(readFileSync(file, 'utf8'));
+    return normalizeTopology(captured.resultSets ?? captured);
+  }
+  const runner = locateRunner();
+  if (!runner) {
+    throw new Error('Could not find the SDA kernel runner for the live topology read. Pass --topology <captured.json> or set SIDEFX_SDA_ROOT.');
+  }
+  const result = spawnSync(process.execPath, [runner, TOPOLOGY_SQL], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    maxBuffer: 512 * 1024 * 1024,
+    windowsHide: true,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    console.error(result.stdout ?? '');
+    console.error(result.stderr ?? '');
+    throw new Error(`The live topology query failed with status ${result.status}`);
+  }
+  const sets = readResultSets(result.stdout ?? '');
+  const captured = Object.fromEntries(sets);
+  return normalizeTopology(captured);
+}
+
+function normalizeTopology(sets) {
+  const summary = (sets.topology_summary ?? [])[0];
+  const bundles = sets.topology_bundles ?? [];
+  const cells = sets.topology_cells ?? [];
+  if (!summary || !Array.isArray(bundles) || !Array.isArray(cells)) {
+    throw new Error('The live topology read did not return its result sets (topology_summary, topology_bundles, topology_cells).');
+  }
+  const unresolved = [];
+  const derivableKinds = new Set(['CIRCUIT_BUNDLE', 'BUNDLE', 'CIRCUIT_EMBED']);
+  for (const bundle of bundles) {
+    if (!derivableKinds.has(bundle.asset_kind)) {
+      unresolved.push(`${bundle.object_kind} ${bundle.semantic_object_definition_pk} is bound to ${bundle.asset_kind}, which is not a circuit renderer`);
+    } else if (bundle.asset_kind === 'CIRCUIT_BUNDLE' && !bundle.scenario_entry && !bundle.capability_entry && !bundle.catalog_entry) {
+      unresolved.push(`${bundle.object_kind} ${bundle.semantic_object_definition_pk} bundle ${bundle.bundle_revision} carries no topology entry`);
+    }
+  }
+  if (unresolved.length > 0) {
+    throw new Error(`Authored circuit topology exists but cannot be resolved (${unresolved.length}): ${unresolved.slice(0, 5).join('; ')}`);
+  }
+  const bundleByScenarioDefinition = new Map();
+  const bundlesByCapability = new Map();
+  const editionBundlesByDefinition = new Map();
+  for (const bundle of bundles) {
+    if (bundle.asset_kind === 'CIRCUIT_BUNDLE' && bundle.object_kind === 'SCENARIO') {
+      bundleByScenarioDefinition.set(String(bundle.semantic_object_definition_pk), bundle);
+    }
+    if (bundle.asset_kind === 'BUNDLE') {
+      editionBundlesByDefinition.set(String(bundle.semantic_object_definition_pk), bundle);
+      continue;
+    }
+    if (bundle.capability_id) {
+      const list = bundlesByCapability.get(bundle.capability_id) ?? [];
+      list.push(bundle);
+      bundlesByCapability.set(bundle.capability_id, list);
+    }
+  }
+  const cellsByCapability = new Map();
+  for (const cell of cells) {
+    const list = cellsByCapability.get(cell.capability_id) ?? [];
+    list.push(cell);
+    cellsByCapability.set(cell.capability_id, list);
+  }
+  return { summary, bundles, bundleByScenarioDefinition, bundlesByCapability, editionBundlesByDefinition, cellsByCapability };
+}
+
+function authoredUrl(bundle) {
+  if (typeof bundle.url === 'string' && bundle.url.startsWith('/media/')) return bundle.url;
+  const relative = bundle.scenario_entry ?? bundle.capability_entry ?? bundle.catalog_entry;
+  if (!relative) throw new Error(`Bundle ${bundle.bundle_revision} carries no resolvable entry.`);
+  return `/media/library/${relative.replace(/\\/g, '/')}`;
+}
+
+/** The live topology's authored mapping for one capability: scenario face, then capability,
+ * then the capability's selected blueprint, then the capability's authored edition circuit.
+ * Absent means the generation carries none. A binding that cannot produce a URL is a failure. */
+function resolveAuthoredMapping(face, capability, topology, editionsByDefinition) {
+  const scenario = topology.bundleByScenarioDefinition.get(String(face.semantic_object_definition_pk));
+  if (scenario) return { bundle: scenario, subjectKind: 'SCENARIO' };
+  const capabilityId = capability.capability_id;
+  const available = topology.bundlesByCapability.get(capabilityId) ?? [];
+  const bundle = available.find((b) => b.object_kind === 'CAPABILITY');
+  if (bundle) return { bundle, subjectKind: 'CAPABILITY' };
+  const blueprint = available.find((b) => b.object_kind === 'BLUEPRINT');
+  if (blueprint) return { bundle: blueprint, subjectKind: 'BLUEPRINT' };
+  const editionBinding = topology.editionBundlesByDefinition.get(String(capability.semantic_object_definition_pk));
+  if (editionBinding) {
+    const edition = editionsByDefinition.get(String(capability.semantic_object_definition_pk));
+    if (!edition?.circuitUrl) {
+      throw new Error(`Capability ${capabilityId} is bound to edition bundle ${editionBinding.bundle_revision} but the edition carries no circuit URL; the authored circuit cannot be resolved.`);
+    }
+    return { bundle: { ...editionBinding, url: edition.circuitUrl, scenario_id: edition.id }, subjectKind: 'CAPABILITY' };
+  }
+  return null;
+}
+
 /**
  * §12.2 — compile the circuit for one scenario face.
  *
- * This generation carries Input/Event/Responsibility/Outcome per scenario and blueprints with
- * zero normalized edges, so the qualified projection is the boundary lens. Deeper topology is
- * not invented; the missing part is reported as a diagnostic instead.
+ * The projection is built from the live topology: when the estate carries an authored circuit
+ * bundle for the face (or its capability/blueprint), the projection renders that bundle. The
+ * source-backed boundary lens is published only where the live topology truly declares none,
+ * and it then carries the explicit NO_AUTHORED_CIRCUIT validation diagnostic.
  */
-function compileScenarioCircuit(face, blueprintsForCapability) {
+function compileScenarioCircuit(face, blueprintsForCapability, capability, topology, editionsByDefinition) {
   const nodes = [];
   const edges = [];
   const diagnostics = [];
+
+  const authored = resolveAuthoredMapping(face, capability, topology, editionsByDefinition);
 
   const add = (id, primitive, label, sourceId, state) => {
     nodes.push({ id, primitive, label, sourceId, state });
@@ -214,39 +376,80 @@ function compileScenarioCircuit(face, blueprintsForCapability) {
   edges.push({ id: 'e-responsibility-outcome', from: 'responsibility', to: 'outcome', family: 'EXECUTION' });
 
   const unresolved = nodes.filter((n) => n.primitive === 'UNRESOLVED').length;
+  const graph = { nodes, edges };
+
+  if (authored) {
+    const { bundle, subjectKind } = authored;
+    const url = authoredUrl(bundle);
+    diagnostics.push({
+      code: 'AUTHORED_CIRCUIT_RESOLVED',
+      message: `The authored ${subjectKind.toLowerCase()} circuit bundle ${bundle.bundle_revision.slice(0, 12)}… (${intOf(bundle.view_count)} topology view(s)) is rendered from the live topology; the boundary outline below is its source-backed text equivalent.`,
+    });
+    return {
+      capabilityId: face.capability_id,
+      scenarioId: face.scenario_id,
+      sourceProfile: AUTHORED_SOURCE_PROFILE,
+      sourceDigest: stableDigest(face),
+      graphDigest: stableDigest(graph),
+      sclVersion: SCL_VERSION,
+      rendererVersion: AUTHORED_RENDERER_VERSION,
+      lens: 'SCENARIO',
+      fidelity: 'FULL',
+      renderer: {
+        kind: 'AUTHORED_CIRCUIT',
+        subjectKind,
+        bundleRevision: bundle.bundle_revision,
+        url,
+        label: bundle.scenario_id ?? bundle.capability_id ?? bundle.blueprint_id ?? null,
+        topologyViews: intOf(bundle.view_count),
+      },
+      nodes,
+      edges,
+      diagnostics,
+    };
+  }
+
+  // No authored bundle exists in the live topology for this face. The boundary lens is the only
+  // qualified source, and it is published as an explicit validation error, never as a silent
+  // substitute for a circuit the estate might carry.
+  diagnostics.push({
+    code: 'NO_AUTHORED_CIRCUIT',
+    message: 'The live topology declares no authored circuit bundle for this scenario face, capability or blueprint in this generation. The source-backed boundary contract is published as a recorded validation error.',
+  });
   const withoutEdges = blueprintsForCapability.filter((b) => intOf(b.edge_count) === 0);
   if (withoutEdges.length > 0) {
     diagnostics.push({
-      code: 'BLUEPRINT_EDGES_UNRESOLVED',
-      message: `${withoutEdges.length} blueprint(s) for this capability carry nodes but no normalized edges, so deeper topology is not qualified in this generation.`,
-    });
-  } else if (blueprintsForCapability.length === 0) {
-    diagnostics.push({
-      code: 'NO_BLUEPRINT',
-      message: 'No blueprint is selected for this capability in this generation.',
+      code: 'BLUEPRINT_EDGES_ABSENT_IN_MODEL',
+      message: `${withoutEdges.length} selected blueprint(s) for this capability carry ${blueprintsForCapability.reduce((n, b) => n + intOf(b.node_count), 0)} declared cell(s) and no normalized edges in this generation.`,
     });
   }
 
   const fidelity = unresolved > 0 ? 'PARTIAL_BOUNDARY' : 'BOUNDARY';
-
-  const graph = { nodes, edges };
   return {
     capabilityId: face.capability_id,
     scenarioId: face.scenario_id,
-    sourceProfile: 'estate-scenario-face.v1',
+    sourceProfile: BOUNDARY_SOURCE_PROFILE,
     sourceDigest: stableDigest(face),
     graphDigest: stableDigest(graph),
     sclVersion: SCL_VERSION,
-    rendererVersion: RENDERER_VERSION,
+    rendererVersion: BOUNDARY_RENDERER_VERSION,
     lens: 'SCENARIO',
     fidelity,
+    renderer: {
+      kind: 'BOUNDARY',
+      subjectKind: null,
+      bundleRevision: null,
+      url: null,
+      label: null,
+      topologyViews: null,
+    },
     nodes,
     edges,
     diagnostics,
   };
 }
 
-function build(sourcePath) {
+function build(sourcePath, topology) {
   const raw = JSON.parse(readFileSync(sourcePath, 'utf8'));
   const rs = raw.recordsets;
 
@@ -418,22 +621,24 @@ function build(sourcePath) {
     blueprintsByCapability.get(b.capability_id).push(b);
   }
 
+  const editionsByDefinition = new Map((media.editions ?? []).map((edition) => [String(edition.definitionPk), edition]));
   const circuits = [];
   const capabilities = capabilityRows.map((sourceCapability) => {
     const capabilityId = sourceCapability.capability_id;
     const faces = (facesByCapability.get(capabilityId) ?? []).sort((a, b) => a.scenario_id.localeCompare(b.scenario_id));
     const bps = blueprintsByCapability.get(capabilityId) ?? [];
 
-    for (const face of faces) circuits.push(compileScenarioCircuit(face, bps));
+    for (const face of faces) circuits.push(compileScenarioCircuit(face, bps, sourceCapability, topology, editionsByDefinition));
     if (!faces.length) {
       const graph = { nodes: [{id:'scenario-unresolved',primitive:'UNRESOLVED',label:'No scenario is declared in this selection',sourceId:null,state:sourceState(null)}], edges: [] };
-      circuits.push({capabilityId,scenarioId:null,sourceProfile:'estate-capability-boundary.v1',sourceDigest:stableDigest(sourceCapability),graphDigest:stableDigest(graph),sclVersion:SCL_VERSION,rendererVersion:RENDERER_VERSION,lens:'CAPABILITY_OVERVIEW',fidelity:'PARTIAL_BOUNDARY',...graph,diagnostics:[{code:'SCENARIO_NOT_DECLARED',message:'The selected capability has no scenario face. Its identity and unresolved scenario slot remain visible.'}]});
+      circuits.push({capabilityId,scenarioId:null,sourceProfile:'estate-capability-boundary.v1',sourceDigest:stableDigest(sourceCapability),graphDigest:stableDigest(graph),sclVersion:SCL_VERSION,rendererVersion:BOUNDARY_RENDERER_VERSION,lens:'CAPABILITY_OVERVIEW',fidelity:'PARTIAL_BOUNDARY',renderer:{kind:'BOUNDARY',subjectKind:null,bundleRevision:null,url:null,label:null,topologyViews:null},...graph,diagnostics:[{code:'SCENARIO_NOT_DECLARED',message:'The selected capability has no scenario face. Its identity and unresolved scenario slot remain visible.'},{code:'NO_AUTHORED_CIRCUIT',message:'The live topology declares no authored circuit bundle for this capability in this generation. The boundary contract is published as a recorded validation error.'}]});
     }
 
     const capabilityCircuits = circuits.filter((c) => c.capabilityId === capabilityId);
-    const graphFidelity = !faces.length || capabilityCircuits.some((c) => c.fidelity === 'PARTIAL_BOUNDARY')
-      ? 'PARTIAL_BOUNDARY'
-      : 'BOUNDARY';
+    const authored = capabilityCircuits.some((c) => c.renderer?.kind === 'AUTHORED_CIRCUIT');
+    const graphFidelity = authored
+      ? (capabilityCircuits.every((c) => c.fidelity === 'FULL') ? 'FULL' : 'PARTIAL_BOUNDARY')
+      : (!faces.length || capabilityCircuits.some((c) => c.fidelity === 'PARTIAL_BOUNDARY') ? 'PARTIAL_BOUNDARY' : 'BOUNDARY');
 
     // Related capabilities: those sharing a declared input or outcome contract identity.
     const contracts = new Set(faces.flatMap((f) => [f.input_id, f.outcome_id]).filter(Boolean));
@@ -512,8 +717,24 @@ function build(sourcePath) {
   if (blueprintEdges === 0 && blueprintNodes > 0) {
     findings.push({
       code: 'BLUEPRINT_EDGES_ABSENT',
-      message: `${blueprintRows.length} selected blueprints carry ${blueprintNodes} normalized nodes and no normalized edges. Capability circuits render the source-backed boundary lens rather than a full topology.`,
+      message: `${blueprintRows.length} selected blueprints carry ${blueprintNodes} normalized cells and no normalized edges; the cells are retained as source facts and never drawn as routes. Capabilities whose live topology carries an authored circuit bundle render that bundle instead.`,
       count: blueprintRows.length,
+    });
+  }
+
+  // The live topology read is estate authority for circuit rendering. A capability that has no
+  // authored bundle in the selected generation is published as an explicit validation error;
+  // its source-backed boundary contract is shown, never a silent substitute.
+  const circuitsAuthored = circuits.filter((c) => c.renderer?.kind === 'AUTHORED_CIRCUIT').length;
+  const circuitsBoundary = circuits.length - circuitsAuthored;
+  const authoredCapabilityIds = new Set(circuits.filter((c) => c.renderer?.kind === 'AUTHORED_CIRCUIT').map((c) => c.capabilityId));
+  const capabilitiesWithAuthoredCircuit = authoredCapabilityIds.size;
+  const capabilitiesWithoutAuthoredCircuit = capabilities.length - capabilitiesWithAuthoredCircuit;
+  if (capabilitiesWithoutAuthoredCircuit > 0) {
+    findings.push({
+      code: 'CIRCUIT_TOPOLOGY_ABSENT',
+      message: `${capabilitiesWithoutAuthoredCircuit} of ${capabilities.length} selected capabilities have no authored circuit bundle in this generation's live topology (${intOf(topology.summary.selected_blueprint_cells)} declared blueprint cells, ${intOf(topology.summary.selected_blueprint_edges)} normalized edges, ${intOf(topology.summary.circuit_requirements_without_selection)} unselected circuit requirements). Their source-backed boundary contracts are published with an explicit NO_AUTHORED_CIRCUIT diagnostic and are a validation error.`,
+      count: capabilitiesWithoutAuthoredCircuit,
     });
   }
 
@@ -561,6 +782,10 @@ function build(sourcePath) {
       blueprints: blueprintRows.length,
       blueprintNodes,
       blueprintEdges,
+      circuitsAuthored,
+      circuitsBoundary,
+      capabilitiesWithAuthoredCircuit,
+      capabilitiesWithoutAuthoredCircuit,
       mechanicsWithoutDeclaredName,
       visualsRequired: allVisuals.length,
       visualsReady,
@@ -586,6 +811,8 @@ function main() {
   const allowMissing = args.includes('--allow-missing');
   const sourceIdx = args.indexOf('--source');
   const sourcePath = sourceIdx >= 0 ? args[sourceIdx + 1] : (process.env.SIDEFX_ESTATE_SOURCE ?? DEFAULT_SOURCE);
+  const topologyIdx = args.indexOf('--topology');
+  const topologyFile = topologyIdx >= 0 ? args[topologyIdx + 1] : undefined;
 
   mkdirSync(OUT_DIR, { recursive: true });
 
@@ -604,7 +831,8 @@ function main() {
     return;
   }
 
-  const { publication, circuits } = build(sourcePath);
+  const topology = loadTopology(topologyFile);
+  const { publication, circuits } = build(sourcePath, topology);
 
   // §11.4 step 5 — write, then select atomically via rename.
   const tmp = `${OUT_FILE}.tmp`;
@@ -620,6 +848,9 @@ function main() {
   console.log(`Published ${publication.publicationId}`);
   console.log(
     `  ${c.publishedCapabilities} capabilities · ${c.mechanics} mechanics · ${c.providers} providers · ${c.scenarioFaces} scenario faces · ${circuits.length} circuits`,
+  );
+  console.log(
+    `  circuits: ${c.circuitsAuthored} authored (${c.capabilitiesWithAuthoredCircuit} capabilities) · ${c.circuitsBoundary} boundary (${c.capabilitiesWithoutAuthoredCircuit} capabilities without a selected bundle)`,
   );
   for (const f of publication.findings) console.log(`  finding ${f.code} (${f.count}): ${f.message}`);
 }

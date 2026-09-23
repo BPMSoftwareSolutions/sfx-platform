@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "publicationId": "sha256:5b9371f42573f1aef029069ec1c6ade1a93d240b7c941ae22b7d2c3b84398b62",
+  "publicationId": "sha256:9d27a24c555e46503bb2bd001d2e1b7c433df6b9e851feb47a987e7f6f454cd6",
   "artifacts": {
-    "estate-publication.json": "sha256:a99eaec22902a0d030337e3b1e4830acf1cfbeb935cd1cb4a2c1fb6e5c9b0d78",
-    "circuit-projections.json": "sha256:15cf48ab280af230d9a3d2794c30d10605d0493840996d0996916e47c08b2514",
+    "estate-publication.json": "sha256:0d2fa3c037987b4a8b50df9340fe71b67ffbe001498c93c898c13de11db6ab8f",
+    "circuit-projections.json": "sha256:0333550be06dbee8ee47f8e95f8613f735a53ff9ea544d8403003ea4e88b4e43",
     "visual-publication.json": "sha256:5773657f6fc20ccb8165988532ff9490c5107b99594b620464e187e68ae6439a",
     "input-contracts.json": "sha256:e3080422ebbb18d06125298a9b8600d44fe155011125cee54713b0b50edcbfbf"
   }
