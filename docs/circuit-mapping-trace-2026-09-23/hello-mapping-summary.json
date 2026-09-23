@@ -1,0 +1,63 @@
+{
+  "run": {
+    "subject": "say-hello-world",
+    "events": 26,
+    "rawCursors": 26,
+    "filledFromNormalized": 0,
+    "cellTestimony": 6,
+    "edgeTestimony": 5,
+    "unbound": 0
+  },
+  "graphAltitudeKindPairs": {
+    "mechanic|mechanic": 5,
+    "scenario|scenario": 1
+  },
+  "cellMaterialTableKeysNeverInGraph": [
+    "provider|provider",
+    "physical|physical",
+    "mechanic|input",
+    "mechanic|event",
+    "mechanic|outcome",
+    "mechanic|authority",
+    "mechanic|validation",
+    "mechanic|evidence",
+    "mechanic|human-approval",
+    "mechanic|decision",
+    "mechanic|branch",
+    "mechanic|fan-out",
+    "mechanic|convergence",
+    "mechanic|rejection",
+    "mechanic|termination"
+  ],
+  "observedCellMaterialByDriver": {
+    "event <- generic default (event plate)": 5,
+    "outcome <- declared altitude|kind (scenario|scenario)": 1
+  },
+  "wordStemAssignments": {},
+  "defaultViewNodes": {
+    "nodes": 6,
+    "materials": {
+      "event": 5,
+      "outcome": 1
+    }
+  },
+  "drawnNodeChangesAcrossRun": 6,
+  "flowGrammar": {
+    "mechanic -sequence-> mechanic": 3,
+    "mechanic -return-> mechanic": 1,
+    "mechanic -return-> scenario": 1
+  },
+  "edgeDrawing": {
+    "drawn edge": 5
+  },
+  "operationsInCursorOrder": 1,
+  "operationsInterleaved": 0,
+  "rootOutcome": [
+    {
+      "cursor": 19,
+      "disposition": "completed",
+      "outcomeVariant": "TERMINAL",
+      "outcomeClassification": null
+    }
+  ]
+}

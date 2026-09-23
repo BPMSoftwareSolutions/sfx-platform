@@ -1,0 +1,1028 @@
+{
+  "subject": "say-hello-world",
+  "input": {},
+  "endpointHost": "127.0.0.1:8799",
+  "admittedAt": "2026-09-23T20:45:23.866Z",
+  "admission": {
+    "status": 202,
+    "ms": 45,
+    "receivedAt": "2026-09-23T20:45:23.911Z",
+    "body": {
+      "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+      "state": "executing",
+      "capability": {
+        "object": "capability",
+        "operation": "observe",
+        "subject": "say-hello-world"
+      },
+      "createdAt": "2026-09-23T20:45:23.890Z",
+      "startedAt": "2026-09-23T20:45:23.905Z",
+      "pid": 47904,
+      "cursor": 2,
+      "output": {
+        "available": false,
+        "bytes": 0,
+        "byteCap": 1048576,
+        "overflow": false
+      }
+    }
+  },
+  "pages": [
+    {
+      "status": 200,
+      "ms": 4,
+      "receivedAt": "2026-09-23T20:45:23.915Z",
+      "after": 0,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [
+          {
+            "cursor": 1,
+            "at": "2026-09-23T20:45:23.890Z",
+            "kind": "run.admitted",
+            "payload": {
+              "object": "capability",
+              "operation": "observe",
+              "subject": "say-hello-world"
+            }
+          },
+          {
+            "cursor": 2,
+            "at": "2026-09-23T20:45:23.905Z",
+            "kind": "run.started",
+            "payload": {
+              "pid": 47904
+            }
+          }
+        ],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 2,
+      "receivedAt": "2026-09-23T20:45:24.068Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 2,
+      "receivedAt": "2026-09-23T20:45:24.226Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 3,
+      "receivedAt": "2026-09-23T20:45:24.384Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 1,
+      "receivedAt": "2026-09-23T20:45:24.538Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 3,
+      "receivedAt": "2026-09-23T20:45:24.697Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 4,
+      "receivedAt": "2026-09-23T20:45:24.854Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 4,
+      "receivedAt": "2026-09-23T20:45:25.009Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 4,
+      "receivedAt": "2026-09-23T20:45:25.165Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 3,
+      "receivedAt": "2026-09-23T20:45:25.320Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 1,
+      "receivedAt": "2026-09-23T20:45:25.475Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 1,
+      "receivedAt": "2026-09-23T20:45:25.630Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 2,
+        "latestCursor": 2,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 2,
+      "receivedAt": "2026-09-23T20:45:25.786Z",
+      "after": 2,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [
+          {
+            "cursor": 3,
+            "at": "2026-09-23T20:45:25.694Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "readExecutionDelivery",
+              "status": "started",
+              "observedAt": "2026-09-23T20:45:25.693Z"
+            }
+          },
+          {
+            "cursor": 4,
+            "at": "2026-09-23T20:45:25.758Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "readExecutionDelivery",
+              "status": "completed",
+              "observedAt": "2026-09-23T20:45:25.757Z",
+              "durationMilliseconds": 63.8449
+            }
+          },
+          {
+            "cursor": 5,
+            "at": "2026-09-23T20:45:25.758Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "readAuthority",
+              "status": "started",
+              "observedAt": "2026-09-23T20:45:25.758Z"
+            }
+          }
+        ],
+        "nextCursor": 5,
+        "latestCursor": 5,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 2,
+      "receivedAt": "2026-09-23T20:45:25.942Z",
+      "after": 5,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [],
+        "nextCursor": 5,
+        "latestCursor": 5,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 4,
+      "receivedAt": "2026-09-23T20:45:26.099Z",
+      "after": 5,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "executing",
+        "terminal": false,
+        "events": [
+          {
+            "cursor": 6,
+            "at": "2026-09-23T20:45:25.970Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "readAuthority",
+              "status": "completed",
+              "observedAt": "2026-09-23T20:45:25.970Z",
+              "durationMilliseconds": 211.9268
+            }
+          },
+          {
+            "cursor": 7,
+            "at": "2026-09-23T20:45:25.971Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "executeDeclaredGraph",
+              "status": "started",
+              "observedAt": "2026-09-23T20:45:25.971Z"
+            }
+          }
+        ],
+        "nextCursor": 7,
+        "latestCursor": 7,
+        "hasMore": false
+      }
+    },
+    {
+      "status": 200,
+      "ms": 3,
+      "receivedAt": "2026-09-23T20:45:26.255Z",
+      "after": 7,
+      "body": {
+        "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+        "state": "completed",
+        "terminal": true,
+        "events": [
+          {
+            "cursor": 8,
+            "at": "2026-09-23T20:45:26.114Z",
+            "kind": "graph.captured",
+            "payload": {
+              "graphId": "graph:say-hello-world",
+              "canonicalGraphDigest": "sha256:8b859397e5bf18f8d24580ecfb3859fedc09f4150a69b40f7447273cbb014931"
+            }
+          },
+          {
+            "cursor": 9,
+            "at": "2026-09-23T20:45:26.117Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "cell-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.116Z",
+              "cellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:1",
+              "rootExecutionId": "execution:graph:say-hello-world",
+              "parentCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 0,
+              "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.contractId",
+              "cellAltitude": "mechanic",
+              "durationMilliseconds": 0.5601,
+              "startedAt": "2026-09-23T20:45:26.1155339Z",
+              "completedAt": "2026-09-23T20:45:26.1160939Z",
+              "outcomeContractId": "semantic-value.v1",
+              "semanticAddress": "say-hello-world-transform.v1#/expression/fields/contractId",
+              "disposition": "completed",
+              "outcomeVariant": "VALUE",
+              "occurrenceId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:1",
+              "providerProfileId": "sda-semantic-value-graph-provider.v1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression/fields/contractId"
+                }
+              }
+            },
+            "evidenceRef": {
+              "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:9",
+              "digest": "sha256:28d9b0592a1e445854aac860afca5a7992c8b8e07d9abcbbe789414a5d83dd1b",
+              "mediaType": "application/json",
+              "size": 1218,
+              "producer": "sda-api-host"
+            }
+          },
+          {
+            "cursor": 10,
+            "at": "2026-09-23T20:45:26.117Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "edge-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.117Z",
+              "sourceCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:1",
+              "logicalOrder": 1,
+              "edgeId": "cell:mechanic:say-hello-world.operation.1:expression:dependency:1",
+              "durationMilliseconds": 0.0211,
+              "startedAt": "2026-09-23T20:45:26.1175092Z",
+              "completedAt": "2026-09-23T20:45:26.1175305Z",
+              "destinationCellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message",
+              "admissionDisposition": "admitted",
+              "semanticAddress": "say-hello-world-transform.v1#/expression/fields/payload/fields/message",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression/fields/payload/fields/message",
+                  "admission": "admitted"
+                }
+              }
+            }
+          },
+          {
+            "cursor": 11,
+            "at": "2026-09-23T20:45:26.117Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "cell-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.117Z",
+              "cellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:1",
+              "rootExecutionId": "execution:graph:say-hello-world",
+              "parentCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 2,
+              "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message",
+              "cellAltitude": "mechanic",
+              "durationMilliseconds": 0.0419,
+              "startedAt": "2026-09-23T20:45:26.1176089Z",
+              "completedAt": "2026-09-23T20:45:26.1176509Z",
+              "outcomeContractId": "semantic-value.v1",
+              "semanticAddress": "say-hello-world-transform.v1#/expression/fields/payload/fields/message",
+              "disposition": "completed",
+              "outcomeVariant": "VALUE",
+              "occurrenceId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:1",
+              "providerProfileId": "sda-semantic-value-graph-provider.v1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression/fields/payload/fields/message"
+                }
+              }
+            },
+            "evidenceRef": {
+              "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:11",
+              "digest": "sha256:38a9b1a61bfca32e3011d059b1624546073679b4c2ef3eabcce973f66a99ff50",
+              "mediaType": "application/json",
+              "size": 1291,
+              "producer": "sda-api-host"
+            }
+          },
+          {
+            "cursor": 12,
+            "at": "2026-09-23T20:45:26.117Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "edge-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.117Z",
+              "sourceCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:1",
+              "logicalOrder": 3,
+              "edgeId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload:dependency:result",
+              "durationMilliseconds": 0.0163,
+              "startedAt": "2026-09-23T20:45:26.1177093Z",
+              "completedAt": "2026-09-23T20:45:26.1177255Z",
+              "destinationCellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload",
+              "admissionDisposition": "admitted",
+              "semanticAddress": "say-hello-world-transform.v1#/expression/fields/payload",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression/fields/payload",
+                  "admission": "admitted"
+                }
+              }
+            }
+          },
+          {
+            "cursor": 13,
+            "at": "2026-09-23T20:45:26.117Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "cell-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.117Z",
+              "cellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.payload:1",
+              "rootExecutionId": "execution:graph:say-hello-world",
+              "parentCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 4,
+              "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload",
+              "cellAltitude": "mechanic",
+              "durationMilliseconds": 0.0319,
+              "startedAt": "2026-09-23T20:45:26.1177551Z",
+              "completedAt": "2026-09-23T20:45:26.1177871Z",
+              "outcomeContractId": "semantic-value.v1",
+              "semanticAddress": "say-hello-world-transform.v1#/expression/fields/payload",
+              "disposition": "completed",
+              "outcomeVariant": "VALUE",
+              "occurrenceId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.payload:1",
+              "providerProfileId": "sda-semantic-value-graph-provider.v1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression/fields/payload"
+                }
+              }
+            },
+            "evidenceRef": {
+              "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:13",
+              "digest": "sha256:d1686c86a50bf9d6d3fab3b21e0a3ad2b38a45609f40acfbddd606b978c6ab59",
+              "mediaType": "application/json",
+              "size": 1218,
+              "producer": "sda-api-host"
+            }
+          },
+          {
+            "cursor": 14,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "edge-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.117Z",
+              "sourceCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression.fields.payload:1",
+              "logicalOrder": 5,
+              "edgeId": "cell:mechanic:say-hello-world.operation.1:expression:dependency:result",
+              "durationMilliseconds": 0.0156,
+              "startedAt": "2026-09-23T20:45:26.1178547Z",
+              "completedAt": "2026-09-23T20:45:26.1178703Z",
+              "destinationCellId": "cell:mechanic:say-hello-world.operation.1:expression",
+              "admissionDisposition": "admitted",
+              "semanticAddress": "say-hello-world-transform.v1#/expression",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression",
+                  "admission": "admitted"
+                }
+              }
+            }
+          },
+          {
+            "cursor": 15,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "cell-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.117Z",
+              "cellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression:1",
+              "rootExecutionId": "execution:graph:say-hello-world",
+              "parentCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 6,
+              "cellId": "cell:mechanic:say-hello-world.operation.1:expression",
+              "cellAltitude": "mechanic",
+              "durationMilliseconds": 0.0381,
+              "startedAt": "2026-09-23T20:45:26.1179093Z",
+              "completedAt": "2026-09-23T20:45:26.1179474Z",
+              "outcomeContractId": "semantic-value.v1",
+              "semanticAddress": "say-hello-world-transform.v1#/expression",
+              "disposition": "completed",
+              "outcomeVariant": "VALUE",
+              "occurrenceId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression:1",
+              "providerProfileId": "sda-semantic-value-graph-provider.v1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world-transform.v1#/expression"
+                }
+              }
+            },
+            "evidenceRef": {
+              "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:15",
+              "digest": "sha256:6d4f696708a559fee7ced74cfb1d15b315aba6bae353d8ef44876b82f2e3a896",
+              "mediaType": "application/json",
+              "size": 1206,
+              "producer": "sda-api-host"
+            }
+          },
+          {
+            "cursor": 16,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "edge-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.118Z",
+              "sourceCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:expression:1",
+              "logicalOrder": 7,
+              "edgeId": "edge:return:cell:mechanic:say-hello-world.operation.1:expression:cell:mechanic:say-hello-world.operation.1:0",
+              "durationMilliseconds": 0.0096,
+              "startedAt": "2026-09-23T20:45:26.1180091Z",
+              "completedAt": "2026-09-23T20:45:26.1180187Z",
+              "destinationCellId": "cell:mechanic:say-hello-world.operation.1",
+              "admissionDisposition": "admitted",
+              "semanticAddress": "say-hello-world/scenario/say-hello-world/operation/say-hello-world.operation.1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world/scenario/say-hello-world/operation/say-hello-world.operation.1",
+                  "admission": "admitted"
+                }
+              }
+            }
+          },
+          {
+            "cursor": 17,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "cell-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.118Z",
+              "cellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "rootExecutionId": "execution:graph:say-hello-world",
+              "parentCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 8,
+              "cellId": "cell:mechanic:say-hello-world.operation.1",
+              "cellAltitude": "mechanic",
+              "durationMilliseconds": 2.6543,
+              "startedAt": "2026-09-23T20:45:26.1155314Z",
+              "completedAt": "2026-09-23T20:45:26.1181857Z",
+              "outcomeContractId": "hello-world-greeting.v1",
+              "semanticAddress": "say-hello-world/scenario/say-hello-world/operation/say-hello-world.operation.1",
+              "disposition": "completed",
+              "outcomeVariant": "SUCCESS",
+              "occurrenceId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "providerProfileId": "sda-semantic-value-graph-provider.v1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world/scenario/say-hello-world/operation/say-hello-world.operation.1"
+                }
+              }
+            },
+            "evidenceRef": {
+              "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:17",
+              "digest": "sha256:0800ff03eb9c7de9ccf538466f8d873986b68b33f900988b5ad22e10a9875398",
+              "mediaType": "application/json",
+              "size": 1319,
+              "producer": "sda-api-host"
+            }
+          },
+          {
+            "cursor": 18,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "edge-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.118Z",
+              "sourceCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 9,
+              "edgeId": "edge:return:say-hello-world",
+              "durationMilliseconds": 0.0181,
+              "startedAt": "2026-09-23T20:45:26.1182750Z",
+              "completedAt": "2026-09-23T20:45:26.1182932Z",
+              "destinationCellId": "cell:scenario:say-hello-world",
+              "admissionDisposition": "admitted",
+              "semanticAddress": "say-hello-world/scenario/say-hello-world",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world/scenario/say-hello-world",
+                  "admission": "admitted"
+                }
+              }
+            }
+          },
+          {
+            "cursor": 19,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "observation",
+            "payload": {
+              "testimonyType": "cell-execution-testimony.v1",
+              "observedAt": "2026-09-23T20:45:26.118Z",
+              "cellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "rootExecutionId": "execution:graph:say-hello-world",
+              "parentCellExecutionId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "logicalOrder": 10,
+              "cellId": "cell:scenario:say-hello-world",
+              "cellAltitude": "scenario",
+              "durationMilliseconds": 0.0503,
+              "startedAt": "2026-09-23T20:45:26.1183348Z",
+              "completedAt": "2026-09-23T20:45:26.1183850Z",
+              "outcomeContractId": "hello-world-greeting.v1",
+              "semanticAddress": "say-hello-world/scenario/say-hello-world",
+              "disposition": "completed",
+              "outcomeVariant": "TERMINAL",
+              "occurrenceId": "execution:graph:say-hello-world:cell:mechanic:say-hello-world.operation.1:1",
+              "display": {
+                "entry": {
+                  "status": "completed",
+                  "text": "say-hello-world/scenario/say-hello-world"
+                }
+              }
+            },
+            "evidenceRef": {
+              "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:19",
+              "digest": "sha256:f852407f2b479e9895cc37b17d9bc55b73362566b1c4d8a06ab9ee527eb6accb",
+              "mediaType": "application/json",
+              "size": 1174,
+              "producer": "sda-api-host"
+            }
+          },
+          {
+            "cursor": 20,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "executeDeclaredGraph",
+              "status": "completed",
+              "observedAt": "2026-09-23T20:45:26.118Z",
+              "durationMilliseconds": 147.3255
+            }
+          },
+          {
+            "cursor": 21,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "observation-projection",
+              "status": "deferred",
+              "observedAt": "2026-09-23T20:45:26.118Z"
+            }
+          },
+          {
+            "cursor": 22,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "delivery-finalization",
+              "status": "started",
+              "observedAt": "2026-09-23T20:45:26.118Z"
+            }
+          },
+          {
+            "cursor": 23,
+            "at": "2026-09-23T20:45:26.118Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "delivery-finalization",
+              "status": "completed",
+              "observedAt": "2026-09-23T20:45:26.118Z"
+            }
+          },
+          {
+            "cursor": 24,
+            "at": "2026-09-23T20:45:26.119Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "session-teardown",
+              "status": "started",
+              "observedAt": "2026-09-23T20:45:26.119Z"
+            }
+          },
+          {
+            "cursor": 25,
+            "at": "2026-09-23T20:45:26.170Z",
+            "kind": "delivery-phase",
+            "payload": {
+              "observationType": "delivery-phase",
+              "phase": "session-teardown",
+              "status": "completed",
+              "observedAt": "2026-09-23T20:45:26.170Z",
+              "durationMilliseconds": 51.7223
+            }
+          },
+          {
+            "cursor": 26,
+            "at": "2026-09-23T20:45:26.185Z",
+            "kind": "run.exited",
+            "payload": {
+              "exitCode": 0,
+              "durationMs": 2280
+            }
+          }
+        ],
+        "nextCursor": 26,
+        "latestCursor": 26,
+        "hasMore": false
+      }
+    }
+  ],
+  "terminalAt": "2026-09-23T20:45:26.255Z",
+  "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+  "state": "completed",
+  "graph": {
+    "status": 200,
+    "ms": 2,
+    "receivedAt": "2026-09-23T20:45:26.257Z",
+    "json": {
+      "observationType": "execution-graph-captured.v1",
+      "graphId": "graph:say-hello-world",
+      "canonicalGraphDigest": "sha256:8b859397e5bf18f8d24580ecfb3859fedc09f4150a69b40f7447273cbb014931",
+      "cells": [
+        {
+          "cellId": "cell:mechanic:say-hello-world.operation.1",
+          "altitude": "mechanic",
+          "kind": "mechanic",
+          "parentCellId": "cell:scenario:say-hello-world",
+          "semanticAddress": "say-hello-world/scenario/say-hello-world/operation/say-hello-world.operation.1",
+          "ports": {
+            "input": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:input",
+              "contractId": "hello-world-request.v1"
+            },
+            "outcome": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:outcome",
+              "contractId": "hello-world-greeting.v1"
+            }
+          }
+        },
+        {
+          "cellId": "cell:mechanic:say-hello-world.operation.1:expression",
+          "altitude": "mechanic",
+          "kind": "mechanic",
+          "parentCellId": "cell:mechanic:say-hello-world.operation.1",
+          "semanticAddress": "say-hello-world-transform.v1#/expression",
+          "ports": {
+            "input": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression:input",
+              "contractId": "semantic-value.v1"
+            },
+            "outcome": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression:outcome",
+              "contractId": "semantic-value.v1"
+            }
+          }
+        },
+        {
+          "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.contractId",
+          "altitude": "mechanic",
+          "kind": "mechanic",
+          "parentCellId": "cell:mechanic:say-hello-world.operation.1",
+          "semanticAddress": "say-hello-world-transform.v1#/expression/fields/contractId",
+          "ports": {
+            "input": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:input",
+              "contractId": "semantic-value.v1"
+            },
+            "outcome": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:outcome",
+              "contractId": "semantic-value.v1"
+            }
+          }
+        },
+        {
+          "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload",
+          "altitude": "mechanic",
+          "kind": "mechanic",
+          "parentCellId": "cell:mechanic:say-hello-world.operation.1",
+          "semanticAddress": "say-hello-world-transform.v1#/expression/fields/payload",
+          "ports": {
+            "input": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload:input",
+              "contractId": "semantic-value.v1"
+            },
+            "outcome": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload:outcome",
+              "contractId": "semantic-value.v1"
+            }
+          }
+        },
+        {
+          "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message",
+          "altitude": "mechanic",
+          "kind": "mechanic",
+          "parentCellId": "cell:mechanic:say-hello-world.operation.1",
+          "semanticAddress": "say-hello-world-transform.v1#/expression/fields/payload/fields/message",
+          "ports": {
+            "input": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:input",
+              "contractId": "semantic-value.v1"
+            },
+            "outcome": {
+              "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:outcome",
+              "contractId": "semantic-value.v1"
+            }
+          }
+        },
+        {
+          "cellId": "cell:scenario:say-hello-world",
+          "altitude": "scenario",
+          "kind": "scenario",
+          "parentCellId": null,
+          "semanticAddress": "say-hello-world/scenario/say-hello-world",
+          "ports": {
+            "input": {
+              "portId": "cell:scenario:say-hello-world:input",
+              "contractId": "hello-world-request.v1"
+            },
+            "outcome": {
+              "portId": "cell:scenario:say-hello-world:outcome",
+              "contractId": "hello-world-greeting.v1"
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "cell:mechanic:say-hello-world.operation.1:expression:dependency:1",
+          "kind": "sequence",
+          "from": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.contractId",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:outcome"
+          },
+          "to": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:input"
+          }
+        },
+        {
+          "edgeId": "cell:mechanic:say-hello-world.operation.1:expression:dependency:result",
+          "kind": "sequence",
+          "from": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload:outcome"
+          },
+          "to": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression:input"
+          }
+        },
+        {
+          "edgeId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload:dependency:result",
+          "kind": "sequence",
+          "from": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:outcome"
+          },
+          "to": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression.fields.payload:input"
+          }
+        },
+        {
+          "edgeId": "edge:return:cell:mechanic:say-hello-world.operation.1:expression:cell:mechanic:say-hello-world.operation.1:0",
+          "kind": "return",
+          "from": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1:expression",
+            "portId": "cell:mechanic:say-hello-world.operation.1:expression:outcome"
+          },
+          "to": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1",
+            "portId": "cell:mechanic:say-hello-world.operation.1:outcome"
+          }
+        },
+        {
+          "edgeId": "edge:return:say-hello-world",
+          "kind": "return",
+          "from": {
+            "cellId": "cell:mechanic:say-hello-world.operation.1",
+            "portId": "cell:mechanic:say-hello-world.operation.1:outcome"
+          },
+          "to": {
+            "cellId": "cell:scenario:say-hello-world",
+            "portId": "cell:scenario:say-hello-world:outcome"
+          }
+        }
+      ]
+    },
+    "text": "{\"observationType\":\"execution-graph-captured.v1\",\"graphId\":\"graph:say-hello-world\",\"canonicalGraphDigest\":\"sha256:8b859397e5bf18f8d24580ecfb3859fedc09f4150a69b40f7447273cbb014931\",\"cells\":[{\"cellId\":\"cell:mechanic:say-hello-world.operation.1\",\"altitude\":\"mechanic\",\"kind\":\"mechanic\",\"parentCellId\":\"cell:scenario:say-hello-world\",\"semanticAddress\":\"say-hello-world/scenario/say-hello-world/operation/say-hello-world.operation.1\",\"ports\":{\"input\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:input\",\"contractId\":\"hello-world-request.v1\"},\"outcome\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:outcome\",\"contractId\":\"hello-world-greeting.v1\"}}},{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression\",\"altitude\":\"mechanic\",\"kind\":\"mechanic\",\"parentCellId\":\"cell:mechanic:say-hello-world.operation.1\",\"semanticAddress\":\"say-hello-world-transform.v1#/expression\",\"ports\":{\"input\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression:input\",\"contractId\":\"semantic-value.v1\"},\"outcome\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression:outcome\",\"contractId\":\"semantic-value.v1\"}}},{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.contractId\",\"altitude\":\"mechanic\",\"kind\":\"mechanic\",\"parentCellId\":\"cell:mechanic:say-hello-world.operation.1\",\"semanticAddress\":\"say-hello-world-transform.v1#/expression/fields/contractId\",\"ports\":{\"input\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:input\",\"contractId\":\"semantic-value.v1\"},\"outcome\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:outcome\",\"contractId\":\"semantic-value.v1\"}}},{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload\",\"altitude\":\"mechanic\",\"kind\":\"mechanic\",\"parentCellId\":\"cell:mechanic:say-hello-world.operation.1\",\"semanticAddress\":\"say-hello-world-transform.v1#/expression/fields/payload\",\"ports\":{\"input\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload:input\",\"contractId\":\"semantic-value.v1\"},\"outcome\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload:outcome\",\"contractId\":\"semantic-value.v1\"}}},{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message\",\"altitude\":\"mechanic\",\"kind\":\"mechanic\",\"parentCellId\":\"cell:mechanic:say-hello-world.operation.1\",\"semanticAddress\":\"say-hello-world-transform.v1#/expression/fields/payload/fields/message\",\"ports\":{\"input\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:input\",\"contractId\":\"semantic-value.v1\"},\"outcome\":{\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:outcome\",\"contractId\":\"semantic-value.v1\"}}},{\"cellId\":\"cell:scenario:say-hello-world\",\"altitude\":\"scenario\",\"kind\":\"scenario\",\"parentCellId\":null,\"semanticAddress\":\"say-hello-world/scenario/say-hello-world\",\"ports\":{\"input\":{\"portId\":\"cell:scenario:say-hello-world:input\",\"contractId\":\"hello-world-request.v1\"},\"outcome\":{\"portId\":\"cell:scenario:say-hello-world:outcome\",\"contractId\":\"hello-world-greeting.v1\"}}}],\"edges\":[{\"edgeId\":\"cell:mechanic:say-hello-world.operation.1:expression:dependency:1\",\"kind\":\"sequence\",\"from\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.contractId\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.contractId:outcome\"},\"to\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:input\"}},{\"edgeId\":\"cell:mechanic:say-hello-world.operation.1:expression:dependency:result\",\"kind\":\"sequence\",\"from\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload:outcome\"},\"to\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression:input\"}},{\"edgeId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload:dependency:result\",\"kind\":\"sequence\",\"from\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message:outcome\"},\"to\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression.fields.payload:input\"}},{\"edgeId\":\"edge:return:cell:mechanic:say-hello-world.operation.1:expression:cell:mechanic:say-hello-world.operation.1:0\",\"kind\":\"return\",\"from\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1:expression\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:expression:outcome\"},\"to\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:outcome\"}},{\"edgeId\":\"edge:return:say-hello-world\",\"kind\":\"return\",\"from\":{\"cellId\":\"cell:mechanic:say-hello-world.operation.1\",\"portId\":\"cell:mechanic:say-hello-world.operation.1:outcome\"},\"to\":{\"cellId\":\"cell:scenario:say-hello-world\",\"portId\":\"cell:scenario:say-hello-world:outcome\"}}]}"
+  },
+  "output": {
+    "status": 200,
+    "ms": 1,
+    "receivedAt": "2026-09-23T20:45:26.258Z",
+    "json": {
+      "contractId": "hello-world-greeting.v1",
+      "payload": {
+        "message": "Hello, World!"
+      }
+    },
+    "text": "{\"contractId\":\"hello-world-greeting.v1\",\"payload\":{\"message\":\"Hello, World!\"}}\n"
+  },
+  "evidence": {
+    "status": 200,
+    "ms": 2,
+    "receivedAt": "2026-09-23T20:45:26.260Z",
+    "json": {
+      "runId": "d077fcab-14bf-4158-b6fc-8a98dbe5b031",
+      "references": [
+        {
+          "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:9",
+          "digest": "sha256:28d9b0592a1e445854aac860afca5a7992c8b8e07d9abcbbe789414a5d83dd1b",
+          "mediaType": "application/json",
+          "size": 1218,
+          "producer": "sda-api-host"
+        },
+        {
+          "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:11",
+          "digest": "sha256:38a9b1a61bfca32e3011d059b1624546073679b4c2ef3eabcce973f66a99ff50",
+          "mediaType": "application/json",
+          "size": 1291,
+          "producer": "sda-api-host"
+        },
+        {
+          "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:13",
+          "digest": "sha256:d1686c86a50bf9d6d3fab3b21e0a3ad2b38a45609f40acfbddd606b978c6ab59",
+          "mediaType": "application/json",
+          "size": 1218,
+          "producer": "sda-api-host"
+        },
+        {
+          "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:15",
+          "digest": "sha256:6d4f696708a559fee7ced74cfb1d15b315aba6bae353d8ef44876b82f2e3a896",
+          "mediaType": "application/json",
+          "size": 1206,
+          "producer": "sda-api-host"
+        },
+        {
+          "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:17",
+          "digest": "sha256:0800ff03eb9c7de9ccf538466f8d873986b68b33f900988b5ad22e10a9875398",
+          "mediaType": "application/json",
+          "size": 1319,
+          "producer": "sda-api-host"
+        },
+        {
+          "ref": "urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:19",
+          "digest": "sha256:f852407f2b479e9895cc37b17d9bc55b73362566b1c4d8a06ab9ee527eb6accb",
+          "mediaType": "application/json",
+          "size": 1174,
+          "producer": "sda-api-host"
+        }
+      ]
+    },
+    "text": "{\"runId\":\"d077fcab-14bf-4158-b6fc-8a98dbe5b031\",\"references\":[{\"ref\":\"urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:9\",\"digest\":\"sha256:28d9b0592a1e445854aac860afca5a7992c8b8e07d9abcbbe789414a5d83dd1b\",\"mediaType\":\"application/json\",\"size\":1218,\"producer\":\"sda-api-host\"},{\"ref\":\"urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:11\",\"digest\":\"sha256:38a9b1a61bfca32e3011d059b1624546073679b4c2ef3eabcce973f66a99ff50\",\"mediaType\":\"application/json\",\"size\":1291,\"producer\":\"sda-api-host\"},{\"ref\":\"urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:13\",\"digest\":\"sha256:d1686c86a50bf9d6d3fab3b21e0a3ad2b38a45609f40acfbddd606b978c6ab59\",\"mediaType\":\"application/json\",\"size\":1218,\"producer\":\"sda-api-host\"},{\"ref\":\"urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:15\",\"digest\":\"sha256:6d4f696708a559fee7ced74cfb1d15b315aba6bae353d8ef44876b82f2e3a896\",\"mediaType\":\"application/json\",\"size\":1206,\"producer\":\"sda-api-host\"},{\"ref\":\"urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:17\",\"digest\":\"sha256:0800ff03eb9c7de9ccf538466f8d873986b68b33f900988b5ad22e10a9875398\",\"mediaType\":\"application/json\",\"size\":1319,\"producer\":\"sda-api-host\"},{\"ref\":\"urn:sda-api:run-event:d077fcab-14bf-4158-b6fc-8a98dbe5b031:19\",\"digest\":\"sha256:f852407f2b479e9895cc37b17d9bc55b73362566b1c4d8a06ab9ee527eb6accb\",\"mediaType\":\"application/json\",\"size\":1174,\"producer\":\"sda-api-host\"}]}"
+  }
+}

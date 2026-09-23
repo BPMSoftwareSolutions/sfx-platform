@@ -1,0 +1,80 @@
+{
+  "run": {
+    "subject": "resolve-equity-market-price-evidence",
+    "events": 1079,
+    "rawCursors": 1079,
+    "filledFromNormalized": 0,
+    "cellTestimony": 529,
+    "edgeTestimony": 528,
+    "unbound": 0
+  },
+  "graphAltitudeKindPairs": {
+    "mechanic|mechanic": 803,
+    "mechanic|junction": 41,
+    "physical|physical": 14,
+    "provider|provider": 14,
+    "scenario|scenario": 1
+  },
+  "cellMaterialTableKeysNeverInGraph": [
+    "mechanic|input",
+    "mechanic|event",
+    "mechanic|outcome",
+    "mechanic|authority",
+    "mechanic|validation",
+    "mechanic|evidence",
+    "mechanic|human-approval",
+    "mechanic|decision",
+    "mechanic|branch",
+    "mechanic|fan-out",
+    "mechanic|convergence",
+    "mechanic|rejection",
+    "mechanic|termination"
+  ],
+  "observedCellMaterialByDriver": {
+    "input <- name word-stem": 329,
+    "input <- composite member-altitude rule": 14,
+    "provider-port <- declared altitude|kind (provider|provider)": 14,
+    "provider <- declared altitude|kind (physical|physical)": 14,
+    "provider-port <- composite member-altitude rule": 14,
+    "evidence <- name word-stem": 66,
+    "branch <- junction route kinds": 28,
+    "decision <- name word-stem": 43,
+    "decision <- composite member-altitude rule": 6,
+    "outcome <- declared altitude|kind (scenario|scenario)": 1
+  },
+  "wordStemAssignments": {
+    "input <- name word-stem \"request\" in \"request\"": 329,
+    "evidence <- name word-stem \"evidence\" in \"evidence\"": 66,
+    "decision <- name word-stem \"select\" in \"select\"": 43
+  },
+  "defaultViewNodes": {
+    "nodes": 15,
+    "materials": {
+      "provider-port (collapsed)": 14,
+      "outcome (collapsed)": 1
+    }
+  },
+  "drawnNodeChangesAcrossRun": 29,
+  "flowGrammar": {
+    "mechanic -sequence-> mechanic": 450,
+    "mechanic -return-> mechanic": 21,
+    "provider -sequence-> physical": 14,
+    "physical -return-> mechanic": 14,
+    "mechanic -selection[FALSE]-> mechanic": 28,
+    "mechanic -return-> scenario": 1
+  },
+  "edgeDrawing": {
+    "internal to a drawn node (not drawn)": 500,
+    "drawn edge": 28
+  },
+  "operationsInCursorOrder": 35,
+  "operationsInterleaved": 0,
+  "rootOutcome": [
+    {
+      "cursor": 1072,
+      "disposition": "completed",
+      "outcomeVariant": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+      "outcomeClassification": "success"
+    }
+  ]
+}
