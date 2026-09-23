@@ -1,6 +1,7 @@
 import {
   SdaApiProblem,
   SdaEventPage,
+  SdaRunGraph,
   SdaRunResource,
   type ScenarioOutput,
   type SdaRunEvent,
@@ -95,6 +96,18 @@ export async function readRunEvents(runId: string, after: number): Promise<SdaRe
   if (!result.ok) return result;
   const parsed = SdaEventPage.safeParse(result.value);
   if (!parsed.success) return { ok: false, status: 0, code: 'BAD_RESPONSE', message: 'The SDA run API returned an event page this site could not read.' };
+  return { ok: true, value: parsed.data };
+}
+
+/**
+ * Read the run's declared public graph projection. Without a graph the platform cannot bind an
+ * event to a node, so this is a first-class call at run start, not a decoration.
+ */
+export async function readRunGraph(runId: string): Promise<SdaResult<SdaRunGraph>> {
+  const result = await requestJson(`/v1/runs/${encodeURIComponent(runId)}/graph`);
+  if (!result.ok) return result;
+  const parsed = SdaRunGraph.safeParse(result.value);
+  if (!parsed.success) return { ok: false, status: 0, code: 'BAD_RESPONSE', message: 'The SDA run API returned a run graph this site could not read.' };
   return { ok: true, value: parsed.data };
 }
 

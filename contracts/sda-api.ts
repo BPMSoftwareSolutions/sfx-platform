@@ -59,6 +59,49 @@ export const SdaApiProblem = z.object({
 });
 export type SdaApiProblem = z.infer<typeof SdaApiProblem>;
 
+/**
+ * The declared public run-graph projection — `GET /v1/runs/{runId}/graph`.
+ *
+ * Never the captured plan: cells carry identity, altitude, kind, the enclosing cell and declared
+ * ports only; edges carry endpoints, route kind and selection. No configuration, no source
+ * pointers, no bindings.
+ */
+export const SdaRunGraphCell = z.object({
+  cellId: z.string(),
+  altitude: z.string().nullable().optional(),
+  kind: z.string().nullable().optional(),
+  parentCellId: z.string().nullable().optional(),
+  semanticAddress: z.unknown().optional(),
+  ports: z.unknown().optional(),
+}).loose();
+export type SdaRunGraphCell = z.infer<typeof SdaRunGraphCell>;
+
+/** An edge endpoint: the declared projection may spell it bare or as `{cellId, portId}`. */
+export const SdaRunGraphEndpoint = z.union([z.string(), z.object({ cellId: z.string() }).loose()]);
+export type SdaRunGraphEndpoint = z.infer<typeof SdaRunGraphEndpoint>;
+
+export const SdaRunGraphEdge = z.object({
+  edgeId: z.string(),
+  kind: z.string().nullable().optional(),
+  from: SdaRunGraphEndpoint,
+  to: SdaRunGraphEndpoint,
+  selectsVariant: z.union([z.string(), z.boolean()]).nullable().optional(),
+  groupId: z.string().nullable().optional(),
+}).loose();
+export type SdaRunGraphEdge = z.infer<typeof SdaRunGraphEdge>;
+
+export const SdaRunGraph = z.object({
+  graphId: z.string(),
+  canonicalGraphDigest: z.string(),
+  cells: z.array(SdaRunGraphCell),
+  edges: z.array(SdaRunGraphEdge),
+}).loose();
+export type SdaRunGraph = z.infer<typeof SdaRunGraph>;
+
+export type RunGraphResult =
+  | { ok: true; value: SdaRunGraph }
+  | { ok: false; code: string; message: string };
+
 /** What the run action returns to the client. Serializable across the server-action boundary. */
 export type RunAdmission =
   | { ok: true; runId: string; state: SdaRunState }

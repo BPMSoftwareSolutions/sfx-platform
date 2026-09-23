@@ -2,14 +2,17 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
-import type { RunAdmission, RunAdvance, SdaRunEvent, SdaRunState } from '@/contracts/sda-api';
-import { applyEvents, emptyTrace, settleTrace, type LiveNodeState, type LiveTransition } from '@/lib/live-trace';
+import type { RunAdmission, RunAdvance, RunGraphResult, SdaRunEvent, SdaRunState } from '@/contracts/sda-api';
+import { applyEvents, emptyTrace, type LiveNodeState, type LiveTransition } from '@/lib/live-trace';
+import { buildRunGraphView, normalizeRunGraph, type RunGraphView } from '@/lib/run-graph';
 
 /**
- * Live run context — §6 item 2, minimal v1.
+ * Live run context — §6 item 2, trace plan §4.2.
  *
- * Admit a run, advance the cursor, map observed events onto circuit nodes and hold the lean
- * output. Cursor polling only (T1); no timeline framework and no replay.
+ * Admit a run, fetch the run's declared public graph (the id-binding skeleton) at run start,
+ * advance the cursor, bind each testimony to its cell or edge by id and hold the lean output.
+ * Node states change only when the node's own testimony arrives; the graph is never invented.
+ * Cursor polling only (T1); no timeline framework and no replay.
  */
 
 export type LivePhase = 'idle' | 'admitting' | 'polling' | 'complete' | 'failed';
@@ -19,8 +22,15 @@ export interface LiveRunView {
   runId?: string;
   terminalState?: SdaRunState;
   events: SdaRunEvent[];
+  graph?: RunGraphView;
+  graphError?: { code: string; message: string };
+  /** Drawn node id -> aggregated observed state. Planned nodes are `planned`, drawn unlit. */
   states: Record<string, LiveNodeState>;
+  /** Drawn edge id -> observed state. */
+  edgeStates: Record<string, LiveNodeState>;
   transitions: LiveTransition[];
+  /** Testimony whose id has no membership entry in the run graph. Never lit, never dropped. */
+  unmatched: string[];
   output?: unknown;
   outputText?: string;
   error?: { code: string; message: string };
@@ -32,6 +42,10 @@ interface LiveRunApi extends LiveRunView {
 }
 
 const POLL_INTERVAL_MS = 300;
+const GRAPH_FETCH_ATTEMPTS = 12;
+const GRAPH_FETCH_DELAY_MS = 250;
+/** The graph is emitted at compile time; until then the host reports no capture yet. */
+const GRAPH_PENDING_CODES = new Set(['GRAPH_UNAVAILABLE', 'RUN_NOT_FOUND', 'RUN_NOT_TERMINAL', 'CONFLICT', 'NOT_FOUND']);
 
 const LiveRunContext = createContext<LiveRunApi | undefined>(undefined);
 
@@ -67,29 +81,47 @@ function logTransitions(transitions: LiveTransition[], from: number): void {
   }
 }
 
+/** The graph can lag admission; retry only while the host reports the run has not compiled yet. */
+async function readGraphWithRetry(
+  readGraph: (runId: string) => Promise<RunGraphResult>,
+  runId: string,
+  cancelled: () => boolean
+): Promise<RunGraphResult> {
+  let last: RunGraphResult = { ok: false, code: 'UNREACHABLE', message: 'The run graph could not be read.' };
+  for (let attempt = 0; attempt < GRAPH_FETCH_ATTEMPTS; attempt += 1) {
+    if (cancelled()) return last;
+    last = await readGraph(runId);
+    if (last.ok || !GRAPH_PENDING_CODES.has(last.code)) return last;
+    await new Promise((resolve) => setTimeout(resolve, GRAPH_FETCH_DELAY_MS));
+  }
+  return last;
+}
+
 export function LiveRunProvider({
   admit: admitAction,
   advance,
+  graph: graphAction,
   children,
 }: {
   admit: (namespace: string, capabilityId: string, input: string) => Promise<RunAdmission>;
   advance: (runId: string, after: number) => Promise<RunAdvance>;
+  graph: (runId: string) => Promise<RunGraphResult>;
   children: ReactNode;
 }) {
-  const [view, setView] = useState<LiveRunView>({ phase: 'idle', events: [], states: {}, transitions: [] });
+  const [view, setView] = useState<LiveRunView>({ phase: 'idle', events: [], states: {}, edgeStates: {}, transitions: [], unmatched: [] });
   const runToken = useRef(0);
 
   useEffect(() => () => { runToken.current += 1; }, []);
 
   const reset = useCallback(() => {
     runToken.current += 1;
-    setView({ phase: 'idle', events: [], states: {}, transitions: [] });
+    setView({ phase: 'idle', events: [], states: {}, edgeStates: {}, transitions: [], unmatched: [] });
   }, []);
 
   const admit = useCallback(
     (namespace: string, capabilityId: string, input: string) => {
       const request = ++runToken.current;
-      setView({ phase: 'admitting', events: [], states: {}, transitions: [] });
+      setView({ phase: 'admitting', events: [], states: {}, edgeStates: {}, transitions: [], unmatched: [] });
       void (async () => {
         const admission = await admitAction(namespace, capabilityId, input);
         if (runToken.current !== request) return;
@@ -98,11 +130,24 @@ export function LiveRunProvider({
           return;
         }
 
-        let trace = emptyTrace();
+        // Bind by id: without the run graph, no event has a node to light. Fetch it first.
+        const graphResult = await readGraphWithRetry(graphAction, admission.runId, () => runToken.current !== request);
+        if (runToken.current !== request) return;
+        const graph = graphResult.ok ? buildRunGraphView(normalizeRunGraph(graphResult.value)) : undefined;
+
+        let trace = emptyTrace(graph);
         let events: SdaRunEvent[] = [];
         let cursor = 0;
         let logged = 0;
-        setView((current) => ({ ...current, phase: 'polling', runId: admission.runId }));
+        setView((current) => ({
+          ...current,
+          phase: 'polling',
+          runId: admission.runId,
+          graph,
+          graphError: graphResult.ok ? undefined : { code: graphResult.code, message: graphResult.message },
+          states: trace.states,
+          edgeStates: trace.edgeStates,
+        }));
 
         for (;;) {
           const page = await advance(admission.runId, cursor);
@@ -113,12 +158,11 @@ export function LiveRunProvider({
           }
 
           events = events.concat(page.events);
-          trace = applyEvents(trace, page.events);
+          trace = applyEvents(trace, page.events, graph);
           cursor = page.nextCursor;
           // The terminal page can still carry more events than one page holds; drain them before
-          // settling so the trace is complete and the cursor closes on the last observed event.
+          // reporting terminal so the cursor closes on the last observed event.
           const drained = page.terminal && page.hasMore !== true;
-          if (drained) trace = settleTrace(trace, page.state, page.latestCursor);
           logTransitions(trace.transitions, logged);
           logged = trace.transitions.length;
 
@@ -127,8 +171,12 @@ export function LiveRunProvider({
             runId: admission.runId,
             terminalState: drained ? page.state : undefined,
             events,
+            graph,
+            graphError: graphResult.ok ? undefined : { code: graphResult.code, message: graphResult.message },
             states: trace.states,
+            edgeStates: trace.edgeStates,
             transitions: trace.transitions,
+            unmatched: trace.unmatched,
             output: page.output?.document,
             outputText: page.output?.text,
             error: drained && page.state !== 'completed' ? failureOf(events) ?? { code: 'RUN_FAILED', message: 'The run reached a failed terminal state.' } : undefined,
@@ -138,7 +186,7 @@ export function LiveRunProvider({
         }
       })();
     },
-    [admitAction, advance]
+    [admitAction, advance, graphAction]
   );
 
   const value = useMemo<LiveRunApi>(() => ({ ...view, admit, reset }), [view, admit, reset]);

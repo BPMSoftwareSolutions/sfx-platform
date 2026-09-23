@@ -18,7 +18,7 @@ const unknownable = <T extends z.ZodTypeAny>(inner: T) => inner.nullable();
 export const Digest = z.string().regex(/^sha256:[0-9a-f]{64}$/, 'expected a sha256 digest');
 
 /** §12.2 — how much of the circuit the source actually qualifies. */
-export const GraphFidelity = z.enum(['FULL', 'BOUNDARY', 'PARTIAL_BOUNDARY']);
+export const GraphFidelity = z.enum(['FULL', 'BOUNDARY', 'PARTIAL_BOUNDARY', 'RUN_GRAPH']);
 export type GraphFidelity = z.infer<typeof GraphFidelity>;
 
 /** §12.5 / §11.5 — image production status. A placeholder is a transient state, not fulfillment. */
@@ -89,7 +89,22 @@ export type ScenarioFace = z.infer<typeof ScenarioFace>;
 /** §12.3 — canonical primitives this renderer carries. */
 export const CircuitNode = z.object({
   id: z.string(),
-  primitive: z.enum(['INPUT', 'EVENT', 'RESPONSIBILITY', 'OUTCOME', 'PROVIDER_SLOT', 'UNRESOLVED']),
+  primitive: z.enum([
+    'INPUT',
+    'EVENT',
+    'RESPONSIBILITY',
+    'OUTCOME',
+    'PROVIDER_SLOT',
+    'UNRESOLVED',
+    /**
+     * Run-graph altitudes. A cell from the composed execution graph of a run carries its
+     * altitude; an altitude with no declared primitive renders UNRESOLVED as a finding.
+     */
+    'SCENARIO',
+    'MECHANIC',
+    'PROVIDER',
+    'PHYSICAL',
+  ]),
   label: z.string(),
   /** Source identity behind the label, shown on demand in the inspector. */
   sourceId: unknownable(z.string()),

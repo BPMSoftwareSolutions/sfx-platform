@@ -18,7 +18,7 @@ import { EDGE_STYLES, FIDELITY_COPY, PRIMITIVE_STYLES } from './scl-theme';
  */
 
 /** Observed execution state for one node, applied as an explicit class and data attribute. */
-export type LiveNodeState = 'active' | 'done' | 'failed';
+export type LiveNodeState = 'planned' | 'active' | 'done' | 'failed';
 
 interface Props {
   circuit: CircuitProjection;
@@ -27,9 +27,11 @@ interface Props {
   onSelectNode?: (nodeId: string | undefined) => void;
   /** Live trace overlay: node id to observed state. Declared route is never recoloured as observed otherwise. */
   liveNodes?: Partial<Record<string, LiveNodeState>>;
+  /** Live trace overlay for drawn edges: edge id to observed state. */
+  liveEdges?: Partial<Record<string, LiveNodeState>>;
 }
 
-export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes }: Props) {
+export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes, liveEdges }: Props) {
   const layout = useMemo(() => layoutCircuit(circuit), [circuit]);
   const [internalSelection, setInternalSelection] = useState<string | undefined>(undefined);
   const [playing, setPlaying] = useState(false);
@@ -120,10 +122,13 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
             {layout.edges.map((edge) => {
               const source = circuit.edges.find((e) => e.id === edge.id);
               const style = EDGE_STYLES[source?.family ?? 'SUPPORT'];
+              const liveEdge = liveEdges?.[edge.id];
               return (
                 <g key={edge.id}>
                   <path
                     d={edge.path}
+                    className={liveEdge ? `circuit-edge circuit-edge--${liveEdge}` : 'circuit-edge'}
+                    data-live={liveEdge}
                     fill="none"
                     stroke={style.stroke}
                     strokeWidth={1.5}

@@ -60,6 +60,34 @@ export const PRIMITIVE_STYLES: Record<CircuitNode['primitive'], PrimitiveStyle> 
     fill: 'var(--color-ink-2)',
     text: 'var(--color-muted)',
   },
+  SCENARIO: {
+    label: 'Scenario',
+    shape: 'terminal-in',
+    stroke: 'var(--color-signal)',
+    fill: 'color-mix(in srgb, var(--color-signal) 12%, var(--color-ink-2))',
+    text: 'var(--color-text)',
+  },
+  MECHANIC: {
+    label: 'Mechanic',
+    shape: 'process',
+    stroke: 'var(--color-authority)',
+    fill: 'color-mix(in srgb, var(--color-authority) 8%, var(--color-ink-2))',
+    text: 'var(--color-text)',
+  },
+  PROVIDER: {
+    label: 'Provider',
+    shape: 'slot',
+    stroke: 'var(--color-telemetry)',
+    fill: 'color-mix(in srgb, var(--color-telemetry) 10%, var(--color-ink-2))',
+    text: 'var(--color-text)',
+  },
+  PHYSICAL: {
+    label: 'Physical',
+    shape: 'process',
+    stroke: 'var(--color-projection)',
+    fill: 'color-mix(in srgb, var(--color-projection) 10%, var(--color-ink-2))',
+    text: 'var(--color-text)',
+  },
 };
 
 /** §12.3 — route families keep their type; a support link is not execution flow. */
@@ -83,5 +111,10 @@ export const FIDELITY_COPY = {
     label: 'Partial boundary view',
     explanation:
       'Partial boundary view — one or more boundary members are not declared in this generation. Unresolved slots are shown as unresolved rather than filled in.',
+  },
+  RUN_GRAPH: {
+    label: 'Run graph',
+    explanation:
+      'The composed execution graph of this run. Every planned cell is drawn unlit; a cell lights only when its own testimony arrives. Authored circuits are comparison candidates and are never shown as observed execution.',
   },
 } as const;

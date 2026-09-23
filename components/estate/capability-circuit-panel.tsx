@@ -4,29 +4,32 @@ import { useEffect, useRef, useState } from 'react';
 
 import { CircuitViewer } from '@/components/circuit/circuit-viewer';
 import type { CircuitProjection } from '@/contracts/estate';
+import { runGraphViewProjection } from '@/lib/run-graph';
 import { CircuitFrame } from './circuit-frame';
-import { useLiveRunOptional } from './live-run';
+import { useLiveRunOptional, type LiveRunView } from './live-run';
 
 /**
- * Scenario and node selection — §5.17, §12.4.
+ * Scenario and node selection — §5.17, §12.4, trace plan §4.3.
+ *
+ * The trace surface is the run's declared public graph, drawn planned and lit only by its own
+ * testimony. An authored bundle is never the trace surface: it renders only as a labelled
+ * comparison candidate beside the trace, with its provenance stated. The declared boundary
+ * projection remains the static surface before any run exists.
  *
  * Selection is shareable URL state, but it is held in component state rather than read through
  * `useSearchParams`. That keeps the circuit and its text outline in the server-rendered HTML, so
  * public reading works without JavaScript; the URL is synchronised after hydration and a shared
  * link restores the same view.
- *
- * Live run state is applied to the nodes as explicit classes. When this panel sits inside a
- * collapsed disclosure, an admitted run opens it so the observed trace is visible.
  */
-export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjection[] }) {
+export function CapabilityCircuitPanel({ circuits, liveOverride }: { circuits: CircuitProjection[]; liveOverride?: LiveRunView }) {
   const first = circuits[0];
   const [scenarioId, setScenarioId] = useState(first?.scenarioId ?? '');
   const [nodeId, setNodeId] = useState<string | undefined>(undefined);
   const rootRef = useRef<HTMLDivElement>(null);
-  const live = useLiveRunOptional();
-  const liveNodes = live?.states;
+  const contextLive = useLiveRunOptional();
+  const live = liveOverride ?? contextLive;
 
-  const traceActive = Boolean(live && (live.phase === 'admitting' || live.phase === 'polling' || Object.keys(live.states).length > 0));
+  const traceActive = Boolean(live?.graph || (live && Object.keys(live.states).length > 0));
   useEffect(() => {
     if (traceActive) rootRef.current?.closest('details')?.setAttribute('open', '');
   }, [traceActive]);
@@ -61,12 +64,36 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
     );
   }
 
-  // §12.2 — the live topology decides the renderer. An authored circuit bundle is rendered as
-  // the authored circuit; the source-backed boundary outline stays available as its text
-  // equivalent. A boundary projection must state that no authored circuit exists.
+  // §12.2 — an authored bundle is a teaching/comparison artifact. It is labelled as such and is
+  // never rendered as the trace surface.
   const renderer = circuit.renderer;
   const authoredUrl = renderer?.kind === 'AUTHORED_CIRCUIT' && renderer.url ? renderer.url : null;
   const absent = circuit.diagnostics.some((d) => d.code === 'NO_AUTHORED_CIRCUIT');
+
+  const graphView = live?.graph;
+  const trace = graphView
+    ? runGraphViewProjection(graphView, { capabilityId: circuit.capabilityId, scenarioId: circuit.scenarioId })
+    : undefined;
+
+  const authoredComparison = authoredUrl ? (
+    <details className="authored-comparison mt-4 rounded-lg bg-ink-2 p-4">
+      <summary className="font-display text-sm font-semibold">
+        Authored circuit — labelled comparison candidate (not observed execution)
+      </summary>
+      <div className="mt-3">
+        <CircuitFrame
+          key={authoredUrl}
+          src={authoredUrl}
+          title={`${circuit.capabilityId} / ${circuit.scenarioId ?? 'capability'} — authored comparison candidate`}
+        />
+        <p className="mt-2 text-xs text-muted">
+          Authored bundle from the live topology ({renderer?.subjectKind?.toLowerCase()} bundle{' '}
+          {renderer?.bundleRevision?.slice(0, 12)}…{renderer?.topologyViews ? ` · ${renderer.topologyViews} views` : ''}).
+          Provenance: authored, not observed. The trace beside it lights only from this run&rsquo;s testimony.
+        </p>
+      </div>
+    </details>
+  ) : null;
 
   return (
     <div className="circuit-surface" ref={rootRef}>
@@ -98,33 +125,52 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
         </div>
       ) : null}
 
-      {authoredUrl ? (
+      {trace && graphView ? (
         <>
-          <CircuitFrame
-            key={authoredUrl}
-            src={authoredUrl}
-            title={`${circuit.capabilityId} / ${circuit.scenarioId ?? 'capability'} — authored circuit`}
-          />
-          <p className="mt-2 text-xs text-muted">
-            Authored circuit from the live topology ({renderer?.subjectKind?.toLowerCase()} bundle{' '}
-            {renderer?.bundleRevision?.slice(0, 12)}…{renderer?.topologyViews ? ` · ${renderer.topologyViews} views` : ''}).
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded border border-signal/50 px-2 py-0.5 font-mono text-xs text-signal">
+              Live execution trace
+            </span>
+            <span className="font-mono text-xs text-muted">
+              run {live?.runId?.slice(0, 8)} · {graphView.nodes.length} of {graphView.totalCells} cells drawn
+              {graphView.collapsed ? ` · collapsed at limit ${graphView.detailCellLimit}` : ''}
+            </span>
+          </div>
+          <p className="mb-3 text-sm text-muted">
+            Every drawn cell is planned and unlit until its own testimony arrives; an edge lights
+            only from its own edge testimony. Nothing is inferred from process exit or elapsed time.
           </p>
-          <details className="mt-3 rounded-lg border border-grid-line bg-ink-2 p-4">
-            <summary className="cursor-pointer font-display text-sm font-semibold">
-              Source-backed boundary outline
-            </summary>
-            <div className="mt-3">
-              <CircuitViewer
-                circuit={circuit}
-                selectedNodeId={nodeId}
-                liveNodes={liveNodes}
-                onSelectNode={(next) => {
-                  setNodeId(next);
-                  syncUrl(circuit.scenarioId??'', next);
-                }}
-              />
+          {live?.graphError ? (
+            <div className="mb-3 rounded-lg border border-failure/40 bg-ink-2 p-4 text-sm text-muted" role="status">
+              The run graph was not served for this run ({live.graphError.code}). The trace cannot
+              bind by cell id, so no node is lit from these events.
             </div>
-          </details>
+          ) : null}
+          <CircuitViewer
+            circuit={trace}
+            selectedNodeId={nodeId}
+            liveNodes={live?.states}
+            liveEdges={live?.edgeStates}
+            onSelectNode={(next) => {
+              setNodeId(next);
+              syncUrl(circuit.scenarioId??'', next);
+            }}
+          />
+          {live && live.unmatched.length > 0 ? (
+            <details className="mt-4 rounded-lg border border-failure/40 bg-ink-2 p-4">
+              <summary className="cursor-pointer font-display text-sm font-semibold">
+                Unmatched testimony ({live.unmatched.length}) — no node in this run graph
+              </summary>
+              <p className="mt-3 text-sm text-muted">
+                These ids were observed on the lane but carry no membership in the run graph. They
+                are shown here rather than dropped, and they never light a node.
+              </p>
+              <ul className="mt-2 space-y-1 font-mono text-xs text-muted">
+                {live.unmatched.map((id) => <li key={id}>{id}</li>)}
+              </ul>
+            </details>
+          ) : null}
+          {authoredComparison}
         </>
       ) : (
         <>
@@ -138,12 +184,14 @@ export function CapabilityCircuitPanel({ circuits }: { circuits: CircuitProjecti
           <CircuitViewer
             circuit={circuit}
             selectedNodeId={nodeId}
-            liveNodes={liveNodes}
+            liveNodes={live?.states}
+            liveEdges={live?.edgeStates}
             onSelectNode={(next) => {
               setNodeId(next);
               syncUrl(circuit.scenarioId??'', next);
             }}
           />
+          {authoredComparison}
         </>
       )}
 

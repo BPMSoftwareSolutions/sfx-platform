@@ -11,7 +11,7 @@ import { pageMetadata } from '@/lib/seo';
 import { getCapabilityExample } from '@/lib/capability-examples';
 import { getInputContract } from '@/lib/input-contracts';
 import { LiveRunProvider } from '@/components/estate/live-run';
-import { admitCapabilityRun, advanceCapabilityRun } from './actions';
+import { admitCapabilityRun, advanceCapabilityRun, readCapabilityRunGraph } from './actions';
 interface Params { params: Promise<{namespace:string;capabilityId:string}> }
 export async function generateMetadata({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
@@ -24,7 +24,7 @@ export default async function CapabilityDetailPage({params}:Params){
  const {namespace,capabilityId}=await params,capability=findCapability(namespace,capabilityId);
  if(!capability)notFound();
  const edition=getEdition(capability.semanticObjectDefinitionPk),circuits=getCircuitsForCapability(capability.entityId),storedCircuits=getStoredCircuits(capability.semanticObjectDefinitionPk),example=getCapabilityExample(capability.entityId),contract=getInputContract(capability.entityId);
- return <LiveRunProvider admit={admitCapabilityRun} advance={advanceCapabilityRun}>
+ return <LiveRunProvider admit={admitCapabilityRun} advance={advanceCapabilityRun} graph={readCapabilityRunGraph}>
   <section className="capability-hero page-width">
    <div><Link className="kicker" href="/capabilities">The capability estate / {capability.title}</Link>
     <h1>{edition?.storyTitle??capability.title}</h1>

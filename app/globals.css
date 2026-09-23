@@ -133,11 +133,20 @@ body>header>nav { max-width: var(--page-width); padding-inline: var(--page-gutte
 .circuit-surface select { color:var(--color-text); }
 /* Live observed-execution overlay: explicit classes only. The declared route is never
    recoloured as observed, and the state stays legible with motion suppressed (§12.4). */
+.circuit-node--planned rect { opacity: .55; }
+.circuit-node--planned { opacity: .8; }
 .circuit-node--active rect { stroke-dasharray: 7 4; }
 .circuit-node--active { animation: circuit-node-pulse 1.4s ease-in-out infinite; }
 .circuit-node--done rect { stroke-width: 2.5; }
 .circuit-node--failed rect { stroke: var(--color-failure); stroke-width: 2.5; }
+.circuit-edge--planned { opacity: .35; }
+.circuit-edge--active { stroke-dasharray: 7 4; }
+.circuit-edge--done { stroke-width: 2.5; }
+.circuit-edge--failed { stroke: var(--color-failure); stroke-width: 2.5; }
 @keyframes circuit-node-pulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }
+/* Authored bundles are comparison candidates: labelled, set beside the trace, never traced. */
+.authored-comparison { border: 1px dashed var(--color-grid-line); }
+.authored-comparison summary { cursor: pointer; }
 @media(max-width: 1000px) {
  .landing-hero { gap: 32px; padding-block: 60px; }
  .landing-intro h1 { font-size: 43px; }

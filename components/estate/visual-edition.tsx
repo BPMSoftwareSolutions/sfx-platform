@@ -8,5 +8,5 @@ export function EditionFilm({edition}:{edition:VisualEdition}){
 }
 export function EditionCircuit({edition}:{edition:VisualEdition}){
  if(!edition.circuitUrl)return null;
- return <div className="edition-circuit"><CircuitFrame src={edition.circuitUrl} title={`${edition.storyTitle} — interactive SideFX circuit`}/><div className="circuit-caption"><span>{edition.circuitCount} authored views · Base / Material · Play / Inspect</span><a href={edition.circuitUrl} target="_blank" rel="noreferrer">Open circuit workbench ↗</a></div></div>;
+ return <div className="edition-circuit"><CircuitFrame src={edition.circuitUrl} title={`${edition.storyTitle} — interactive SideFX circuit`}/><div className="circuit-caption"><span>Authored comparison candidate — not observed execution. {edition.circuitCount} authored views · Base / Material · Play / Inspect</span><a href={edition.circuitUrl} target="_blank" rel="noreferrer">Open circuit workbench ↗</a></div></div>;
 }

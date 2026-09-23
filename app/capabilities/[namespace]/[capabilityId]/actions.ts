@@ -2,9 +2,9 @@
 
 import { headers } from 'next/headers';
 
-import type { RunAdmission, RunAdvance } from '@/contracts/sda-api';
+import type { RunAdmission, RunAdvance, RunGraphResult } from '@/contracts/sda-api';
 import { findCapability } from '@/lib/estate';
-import { admitCapabilityRun as admitSdaRun, readRunEvents, readRunOutput } from '@/lib/sda-api';
+import { admitCapabilityRun as admitSdaRun, readRunEvents, readRunGraph, readRunOutput } from '@/lib/sda-api';
 
 /**
  * Capability run actions — §13.1, SDA run API v1.
@@ -79,4 +79,17 @@ export async function advanceCapabilityRun(runId: string, after: number): Promis
     if (output.ok) advance.output = output.value;
   }
   return advance;
+}
+
+/**
+ * Read the run graph the trace binds to. The browser holds the run id only; the token and the
+ * graph fetch stay server-side, like every other SDA call on this site.
+ */
+export async function readCapabilityRunGraph(runId: string): Promise<RunGraphResult> {
+  if (typeof runId !== 'string' || !/^[0-9a-fA-F-]{36}$/.test(runId)) {
+    return { ok: false, code: 'INVALID_RUN', message: 'The run identity is not one this site can read a graph for.' };
+  }
+  const result = await readRunGraph(runId);
+  if (!result.ok) return { ok: false, code: result.code, message: result.message };
+  return { ok: true, value: result.value };
 }
