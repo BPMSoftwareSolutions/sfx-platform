@@ -139,6 +139,13 @@ export const CircuitNode = z.object({
    * place of the material. Absent for authored projections, which keep `primitive` styling.
    */
   material: MaterialToken.optional(),
+  /**
+   * Run graphs only: the nearest drawn enclosing cell (nearest-enclosing membership). A composite
+   * whose drawn children are also drawn is laid out as a container around them.
+   */
+  parent: z.string().nullable().optional(),
+  /** True when this drawn cell encloses other cells: a composite, drawn as a container. */
+  container: z.boolean().optional(),
 });
 export type CircuitNode = z.infer<typeof CircuitNode>;
 
@@ -156,6 +163,12 @@ export const CircuitEdge = z.object({
   kind: z.string().optional(),
   /** The canonical material resolved from the engine's route kind (run graphs only). */
   material: MaterialToken.optional(),
+  /**
+   * The engine's declared arm variant for a selection/recurrence route (`selectsVariant`), passed
+   * through verbatim. It is data, not a decision: the viewer labels only an arm with its own
+   * observed state, and an unwalked arm stays unlit and unlabelled.
+   */
+  selectsVariant: z.union([z.string(), z.boolean()]).nullable().optional(),
 });
 export type CircuitEdge = z.infer<typeof CircuitEdge>;
 

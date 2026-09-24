@@ -222,6 +222,30 @@ test('drawn edges keep junction arms distinct by their declared variant', () => 
   assert.equal(view.edgeMembership['edge:arm:false:again'], 'edge:arm:false', 'the same variant collapses into one drawn edge');
   assert.equal(selectionEdges[0]!.memberEdgeIds.length, 2);
   assert.equal(selectionEdges[1]!.memberEdgeIds.length, 1);
+  // The declared arm variant travels onto the renderer projection as data, verbatim: the viewer
+  // labels only an arm with its own observed state, so unwalked arms read this value and stay unlit.
+  const projection = runGraphViewProjection(view, { capabilityId: 'demo' });
+  const projectedSelection = projection.edges.filter((edge) => edge.kind === 'selection');
+  assert.deepEqual(
+    projectedSelection.map((edge) => edge.selectsVariant),
+    ['FALSE', 'TRUE'],
+    'the drawn arm keeps its declared variant on the projected edge'
+  );
+});
+
+test('a declared boolean arm variant travels onto the projection unchanged', () => {
+  const graph = graphOf(
+    [
+      { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
+      { cellId: 'cell:mechanic:selection', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
+      { cellId: 'cell:mechanic:target', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
+    ],
+    [{ edgeId: 'edge:arm:boolean', from: 'cell:mechanic:selection', to: 'cell:mechanic:target', kind: 'selection' }]
+  );
+  graph.edges[0]!.selectsVariant = false;
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
+  const projection = runGraphViewProjection(view, { capabilityId: 'demo' });
+  assert.equal(projection.edges[0]!.selectsVariant, false);
 });
 
 test('altitude maps to a primitive; an undeclared altitude is visibly unresolved', () => {
@@ -398,7 +422,13 @@ test('the run-graph projection carries a declared material per drawn cell and ro
   assert.equal(mechanic?.material, 'event');
   assert.ok(projection.edges.every((edge) => edge.material === 'event'), 'fixture routes are declared sequences');
   assert.ok(projection.edges.every((edge) => edge.kind === 'sequence'), 'the engine route kind travels with the projection');
+  assert.ok(projection.edges.every((edge) => edge.selectsVariant === undefined), 'a route with no declared arm carries no variant');
   assert.ok(!projection.nodes.some((node) => node.id === 'cell:provider:m0.p0'), 'a collapsed provider is drawn inside its mechanic');
+  // Containment travels as data for the viewer's container frames: the scenario draws the frame
+  // around the operations it encloses, and each operation names its nearest drawn enclosing cell.
+  assert.equal(root?.parent, null, 'the scenario root has no drawn parent');
+  assert.equal(root?.container, true, 'the scenario encloses drawn children, so it draws a container frame');
+  assert.equal(mechanic?.parent, 'cell:scenario:root', 'an operation names its nearest drawn enclosing cell');
 });
 
 test('the engine-compiled capability surface collapses by the same id rule and names no run', () => {

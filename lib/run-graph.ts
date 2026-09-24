@@ -491,6 +491,11 @@ export function runGraphViewProjection(
       kind: edge.kind ?? undefined,
       /** The route kind's declared material; a miss stays unresolved rather than a family guess. */
       material: edge.material ?? undefined,
+      /**
+       * The declared arm variant, passed through verbatim. Nothing here decides by name or
+       * variant: the viewer labels only an arm with its own observed state, never an unwalked one.
+       */
+      selectsVariant: edge.selectsVariant ?? undefined,
     })),
     diagnostics: [],
   };
