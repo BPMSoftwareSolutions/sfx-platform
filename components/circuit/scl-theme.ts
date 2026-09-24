@@ -1,4 +1,5 @@
 import type { CircuitEdge, CircuitNode, MaterialToken } from '@/contracts/estate';
+import type { BoundaryRole, CircuitPresentationPolicy } from '@/contracts/circuit-presentation';
 
 /**
  * Explicit mapping from SCL semantic types to shell palette tokens — §6.2.
@@ -97,31 +98,6 @@ export const EDGE_STYLES: Record<CircuitEdge['family'], { label: string; stroke:
   SUPPORT: { label: 'Support', stroke: 'var(--color-muted)', dash: '4 4' },
 };
 
-/**
- * §12.3 — the family fallback for a connector's material. Every route has a family even when the
- * engine declares no route kind, so a connector is never an untextured generic line: execution
- * routes carry the event plate, product transfers the outcome plate, and support links evidence.
- * This is the same single material vocabulary the nodes resolve through.
- */
-export const EDGE_FAMILY_MATERIAL: Record<CircuitEdge['family'], MaterialToken> = {
-  EXECUTION: 'event',
-  PRODUCT_TRANSFER: 'outcome',
-  SUPPORT: 'evidence',
-};
-
-/**
- * §12.3 — the material interpreter for the engine's native execution graph.
- *
- * The dynamic trace is compiled by the engine and publishes cells as `altitude` + `kind` plus an
- * edge `kind` (§11.3; the engine's own model names the same vocabulary). That vocabulary is coarser
- * than the fifteen canonical infographic materials, so this module is the single, table-driven
- * interpreter between them. It is deliberately data, not conditionals: one exact-key table, one
- * structural junction table, and one word table for operation semantics — no capability-specific
- * code. The estates's authored bundles resolve the same primitives from declared node kinds; when
- * the engine declares a native primitive profile on its cells the exact-key table can be replaced
- * by that declared mapping without touching the renderer (see KNOWN DEFECT in lib/run-graph.ts).
- */
-
 export type MaterialShape =
   | 'rounded-rectangle'
   | 'beveled-rectangle'
@@ -169,52 +145,9 @@ export const MATERIAL_STYLES: Record<MaterialToken, MaterialStyle> = {
 };
 
 /**
- * Exact interpreter keys: `altitude|kind` of a drawn cell as the engine publishes them.
- * `scenario` closes every route of its scenario, so it reads as the scenario outcome;
- * a `mechanic` cell is the execution of a responsibility (`event`); a provider cell is the
- * declared responsibility boundary (`provider-port`); its realized physical cell is the
- * fulfiller (`provider`). A `junction` is classified structurally, below.
- *
- * The engine may also declare the operation's primitive directly as the cell `kind`; those
- * exact keys keep the mapping table the single place a silhouette is chosen.
- */
-export const CELL_MATERIAL: Record<string, MaterialToken> = {
-  'scenario|scenario': 'outcome',
-  'mechanic|mechanic': 'event',
-  'provider|provider': 'provider-port',
-  'physical|physical': 'provider',
-  'mechanic|input': 'input',
-  'mechanic|event': 'event',
-  'mechanic|outcome': 'outcome',
-  'mechanic|authority': 'authority',
-  'mechanic|validation': 'validation',
-  'mechanic|evidence': 'evidence',
-  'mechanic|human-approval': 'human-approval',
-  'mechanic|decision': 'decision',
-  'mechanic|branch': 'branch',
-  'mechanic|fan-out': 'fan-out',
-  'mechanic|convergence': 'convergence',
-  'mechanic|rejection': 'rejection',
-  'mechanic|termination': 'termination',
-};
-
-/**
- * Junction cells carry no sub-kind in the public projection; the route kinds around them do.
- * The engine's edge kinds are `sequence | selection | broadcast | join | recurrence | return |
- * failure | cancellation | testimony` (model.d.ts). First matching rule wins.
- */
-export const JUNCTION_MATERIAL: Array<{ out: string[]; in: string[]; token: MaterialToken }> = [
-  { out: ['failure', 'cancellation'], in: [], token: 'rejection' },
-  { out: ['broadcast'], in: [], token: 'fan-out' },
-  { out: ['selection', 'recurrence'], in: [], token: 'branch' },
-  { out: [], in: ['join'], token: 'convergence' },
-  { out: [], in: ['broadcast'], token: 'convergence' },
-];
-
-/**
- * Primitive fallback silhouettes. A run graph resolves its material through `CELL_MATERIAL`
- * above; an authored projection (or an unresolved run cell) still draws the same kind of plate,
- * never a uniform card. This is the one table the renderer consults for a primitive's shape.
+ * Primitive fallback silhouettes. An authored projection (or an unresolved run cell) still draws
+ * the same kind of plate, never a uniform card. This is the one table the renderer consults for a
+ * primitive's shape; it asserts silhouette, not meaning, so it cannot decide a cell's material.
  */
 export const PRIMITIVE_MATERIAL: Record<CircuitNode['primitive'], MaterialToken> = {
   INPUT: 'input',
@@ -229,134 +162,43 @@ export const PRIMITIVE_MATERIAL: Record<CircuitNode['primitive'], MaterialToken>
   PHYSICAL: 'provider',
 };
 
-/** The engine's edge kind → the canonical material the route is drawn over. */
-export const EDGE_MATERIAL: Array<{ needle: string; token: MaterialToken }> = [
-  { needle: 'product', token: 'outcome' },
-  { needle: 'support', token: 'evidence' },
-  { needle: 'failure', token: 'rejection' },
-  { needle: 'cancellation', token: 'rejection' },
-  { needle: 'broadcast', token: 'fan-out' },
-  { needle: 'join', token: 'convergence' },
-  { needle: 'selection', token: 'branch' },
-  { needle: 'recurrence', token: 'branch' },
-  { needle: 'return', token: 'outcome' },
-  { needle: 'testimony', token: 'evidence' },
-  { needle: 'sequence', token: 'event' },
-];
-
 /**
- * Operation semantics, in order. The mechanic name lives in the cell's semantic address
- * (`validate-semantic-carrier/...`, `select-equity-price-route#/expression`); these word stems are
- * matched against it so a validating mechanic draws Validation and a sealing one Authority. This
- * is generic vocabulary, not a capability list.
+ * §12.3 — the declared material maps (`circuit-presentation.v1`, read through the estate's
+ * `read-circuit-presentation` and published into `generated/circuit-presentation.json`).
+ *
+ * Every assignment is an exact key in a declared map: the scenario cell's three boundary roles
+ * through `materials.boundary`, every other cell through `materials.byAuthority` (its verbatim
+ * `execution.authorityId`), and every route through `materials.byEdgeKind`. No map falls back to
+ * another, nothing is matched by substring, prefix or word stem, and a miss resolves to `null` —
+ * which the projection draws as the visible UNRESOLVED primitive, never a guessed plate.
  */
-export const MATERIAL_WORDS: Array<{ token: MaterialToken; stems: string[] }> = [
-  { token: 'human-approval', stems: ['approv', 'signoff', 'human'] },
-  { token: 'rejection', stems: ['reject', 'deny', 'refus', 'hold', 'cancel'] },
-  { token: 'termination', stems: ['terminat', 'finali', 'complet'] },
-  { token: 'authority', stems: ['authorit', 'authoriz', 'policy', 'govern', 'seal', 'admit'] },
-  { token: 'validation', stems: ['validat', 'verif', 'conform', 'certif', 'conformance'] },
-  { token: 'evidence', stems: ['evidence', 'proof', 'prove', 'receipt', 'testimony', 'attest'] },
-  { token: 'decision', stems: ['select', 'choose', 'decision', 'adjudicat'] },
-  { token: 'branch', stems: ['branch', 'otherwise', 'alternative'] },
-  { token: 'fan-out', stems: ['fanout', 'fan', 'broadcast', 'parallel', 'spread'] },
-  { token: 'convergence', stems: ['converge', 'merge', 'quorum', 'aggregat'] },
-  { token: 'input', stems: ['input', 'request', 'intake', 'inquir', 'enquir'] },
-  { token: 'outcome', stems: ['outcome', 'result', 'disposition', 'response', 'output'] },
-  { token: 'provider-port', stems: ['port', 'slot', 'binding'] },
-  { token: 'provider', stems: ['provider', 'implement', 'adapter', 'invoc'] },
-];
+export type DeclaredMaterials = NonNullable<CircuitPresentationPolicy['materials']>;
 
-/**
- * Composite operation bodies (the mapping hole of §4.2): a drawn cell that encloses other cells
- * is the operation's envelope, not a leaf. Its material is read from its declared body — the
- * mechanic roots of its expression members through MATERIAL_WORDS — or, when the body is a
- * provider leg (a provider cell and its realized physical cell, with no expression root of its
- * own), from the boundary the leg binds. Keyed by the member altitudes the body declares; the
- * first rule whose members are all present wins.
- */
-export const COMPOSITE_MATERIAL: Array<{ members: string[]; token: MaterialToken }> = [
-  { members: ['provider', 'physical'], token: 'provider-port' },
-];
-
-/**
- * The declared operation identity of an address is its mechanic root: the part before the
- * expression path (`build-equity-price-binding-request#/expression/fields/…`). The field and
- * binding names after `#` are expression-language vocabulary, not capability semantics, and are
- * never matched against MATERIAL_WORDS.
- */
-function operationRootOf(address: string): string {
-  const hash = address.indexOf('#');
-  return hash === -1 ? address : address.slice(0, hash);
+/** The declared maps a validated policy carries, or `null` when it declares none. */
+export function materialsFromPolicy(policy: CircuitPresentationPolicy | null | undefined): DeclaredMaterials | null {
+  return policy?.materials ?? null;
 }
 
-function wordsOf(address: string): string[] {
-  return operationRootOf(address).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+/** Resolve one drawn cell to its declared material. A miss stays unresolved. */
+export function resolveCellMaterial(
+  input: {
+    /** The cell's verbatim `execution.authorityId`; null when the record predates it. */
+    authorityId: string | null;
+    /** A scenario cell is drawn as its boundary role rather than by authority. */
+    boundaryRole?: BoundaryRole | null;
+  },
+  materials: DeclaredMaterials | null
+): MaterialToken | null {
+  if (!materials) return null;
+  if (input.boundaryRole) return materials.boundary[input.boundaryRole] ?? null;
+  if (!input.authorityId) return null;
+  return materials.byAuthority[input.authorityId] ?? null;
 }
 
-function wordMaterial(addresses: string[]): MaterialToken | null {
-  const words = addresses.flatMap(wordsOf);
-  for (const entry of MATERIAL_WORDS) {
-    if (words.some((word) => entry.stems.some((stem) => word.startsWith(stem)))) return entry.token;
-  }
-  return null;
-}
-
-function junctionMaterial(routeKinds: { in: string[]; out: string[] }): MaterialToken {
-  const inKinds = new Set(routeKinds.in);
-  const outKinds = new Set(routeKinds.out);
-  for (const rule of JUNCTION_MATERIAL) {
-    if (rule.out.some((kind) => outKinds.has(kind)) || rule.in.some((kind) => inKinds.has(kind))) return rule.token;
-  }
-  // A junction with no outgoing route ends its path; anything else compares and selects.
-  return outKinds.size === 0 ? 'termination' : 'decision';
-}
-
-/** Resolve one drawn cell to its canonical material. Unknown vocabulary stays unresolved. */
-export function resolveCellMaterial(input: {
-  altitude: string | null;
-  kind: string | null;
-  /** Semantic addresses of the cell and the members it draws (collapsed view). */
-  semanticHints: string[];
-  /** Route kinds touching the cell itself, used to classify a junction. */
-  routeKinds: { in: string[]; out: string[] };
-  /** True when the drawn cell encloses other cells: an operation composite, not a leaf. */
-  composite?: boolean;
-  /** Declared mechanic roots of a composite's body (the addresses before `#`). */
-  operationRoots?: string[];
-  /** Altitudes of the cells drawn inside a composite. */
-  memberAltitudes?: string[];
-}): MaterialToken | null {
-  const altitude = input.altitude?.toLowerCase() ?? '';
-  const kind = input.kind?.toLowerCase() ?? '';
-  if (kind === 'junction') return junctionMaterial(input.routeKinds);
-  const exact = CELL_MATERIAL[`${altitude}|${kind}`];
-  if (exact) {
-    // A mechanic's own name refines the generic execution plate; scopes and bindings stay fixed.
-    if (exact !== 'event') return exact;
-    // Only the declared operation identity is vocabulary. A composite reads its body's mechanic
-    // roots; a leaf reads the hint addresses' roots. Field and binding names are excluded.
-    const fromName = wordMaterial(input.composite ? input.operationRoots ?? [] : input.semanticHints);
-    if (fromName) return fromName;
-    if (input.composite) {
-      const altitudes = new Set(input.memberAltitudes ?? []);
-      for (const rule of COMPOSITE_MATERIAL) {
-        if (rule.members.every((member) => altitudes.has(member))) return rule.token;
-      }
-    }
-    return exact;
-  }
-  return null;
-}
-
-/** Resolve one drawn route to the material its conduit is textured with. */
-export function resolveEdgeMaterial(kind: string | null): MaterialToken | null {
-  const value = kind?.toLowerCase() ?? '';
-  if (!value) return null;
-  for (const entry of EDGE_MATERIAL) {
-    if (value.includes(entry.needle)) return entry.token;
-  }
-  return null;
+/** Resolve one drawn route to its declared material. A miss stays unresolved. */
+export function resolveEdgeMaterial(kind: string | null, materials: DeclaredMaterials | null): MaterialToken | null {
+  if (!materials || !kind) return null;
+  return materials.byEdgeKind[kind] ?? null;
 }
 
 export const FIDELITY_COPY = {

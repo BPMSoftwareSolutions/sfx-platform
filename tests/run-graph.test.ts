@@ -2,9 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import type { SdaRunGraph } from '../contracts/sda-api';
+import { CircuitPresentationPolicy } from '../contracts/circuit-presentation';
+import policyJson from './fixtures/circuit/circuit-presentation-policy.json' with { type: 'json' };
 import {
   MATERIAL_STYLES,
   PRIMITIVE_MATERIAL,
+  materialsFromPolicy,
   resolveCellMaterial,
   resolveEdgeMaterial,
 } from '../components/circuit/scl-theme';
@@ -17,6 +20,10 @@ import {
   runGraphViewProjection,
   semanticAddressText,
 } from '../lib/run-graph';
+
+/** The declared policy fixture the platform renders: exact maps, no platform tables. */
+const policy = CircuitPresentationPolicy.parse(policyJson);
+const materials = materialsFromPolicy(policy)!;
 
 /**
  * Run-graph view — the declared granularity rule before layout.
@@ -191,105 +198,79 @@ test('a record captured before the declared identities normalizes them as absent
   assert.equal(cell.outcomeClassifications, null);
 });
 
-test('the material interpreter resolves altitude/kind exactly and refines a mechanic by its name', () => {
-  const none = { in: [], out: [] };
-  assert.equal(resolveCellMaterial({ altitude: 'scenario', kind: 'scenario', semanticHints: [], routeKinds: none }), 'outcome');
-  assert.equal(resolveCellMaterial({ altitude: 'mechanic', kind: 'mechanic', semanticHints: [], routeKinds: none }), 'event');
-  assert.equal(resolveCellMaterial({ altitude: 'provider', kind: 'provider', semanticHints: [], routeKinds: none }), 'provider-port');
-  assert.equal(resolveCellMaterial({ altitude: 'physical', kind: 'physical', semanticHints: [], routeKinds: none }), 'provider');
-  assert.equal(resolveCellMaterial({
-    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['validate-semantic-carrier/scenario/validate-carrier-source'], routeKinds: none,
-  }), 'validation');
-  assert.equal(resolveCellMaterial({
-    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['seal-capability-change/scenario/seal-capability-change'], routeKinds: none,
-  }), 'authority');
-  assert.equal(resolveCellMaterial({
-    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['select-equity-price-route#/expression/value/selection'], routeKinds: none,
-  }), 'decision');
-  assert.equal(resolveCellMaterial({
-    altitude: 'mechanic', kind: 'mechanic', semanticHints: ['hold-unsealable-capability-change.v1#/expression'], routeKinds: none,
-  }), 'rejection');
-  assert.equal(resolveCellMaterial({ altitude: 'quantum', kind: 'quantum', semanticHints: [], routeKinds: none }), null);
-  assert.equal(resolveCellMaterial({ altitude: null, kind: null, semanticHints: [], routeKinds: none }), null);
+test('the declared maps resolve cells by exact authorityId, never by name', () => {
+  assert.equal(resolveCellMaterial({ authorityId: 'operation:sda-authority-transformation-port.v1' }, materials), 'event');
+  assert.equal(resolveCellMaterial({ authorityId: 'operation:sda-external-credential-reference-binding-port.v1' }, materials), 'provider-port');
+  assert.equal(resolveCellMaterial({ authorityId: 'operation:sda-governed-http-exchange-port.v1' }, materials), 'provider');
+  assert.equal(resolveCellMaterial({ authorityId: 'provider:sda-governed-http-exchange-port.v1' }, materials), 'provider-port');
+  assert.equal(resolveCellMaterial({ authorityId: 'physical:sda-governed-http-exchange-port.v1' }, materials), 'provider');
+  assert.equal(resolveCellMaterial({ authorityId: 'mechanic:let.v1' }, materials), 'event');
+  assert.equal(resolveCellMaterial({ authorityId: 'junction:boolean-selection.v1' }, materials), 'branch');
 });
 
-test('expression field and binding names are not capability semantics: no termination or rejection false positives', () => {
-  const none = { in: [], out: [] };
-  const material = (address: string) =>
-    resolveCellMaterial({ altitude: 'mechanic', kind: 'mechanic', semanticHints: [address], routeKinds: none });
-  assert.equal(material('select-equity-price-route#/expression/bindings/completed'), 'decision', 'a completed binding is not termination');
-  assert.equal(material('select-equity-price-route#/expression/bindings/completed/left'), 'decision');
-  assert.equal(material('normalize-equity-price-evidence#/expression/bindings/completed'), 'evidence');
-  assert.equal(material('normalize-equity-price-evidence#/expression/bindings/conforming'), 'evidence');
-  assert.equal(material('build-equity-price-exchange-request#/expression/fields/cancellationScopeReference'), 'input', 'a scope reference is not rejection');
+test('the credential binding and the governed HTTP exchange get different declared materials', () => {
+  const credential = resolveCellMaterial({ authorityId: 'operation:sda-external-credential-reference-binding-port.v1' }, materials);
+  const exchange = resolveCellMaterial({ authorityId: 'operation:sda-governed-http-exchange-port.v1' }, materials);
+  assert.equal(credential, 'provider-port');
+  assert.equal(exchange, 'provider');
+  assert.notEqual(credential, exchange);
 });
 
-test('an operation composite resolves from its declared body, not the generic event plate', () => {
+test('an unmapped identity or kind is UNRESOLVED, never a fallback', () => {
+  assert.equal(resolveCellMaterial({ authorityId: 'mechanic:if.v1' }, materials), null);
+  assert.equal(resolveCellMaterial({ authorityId: 'quantum:x' }, materials), null);
+  assert.equal(resolveCellMaterial({ authorityId: null }, materials), null);
+  assert.equal(resolveCellMaterial({ authorityId: 'operation:sda-authority-transformation-port.v1' }, null), null);
+  assert.equal(resolveEdgeMaterial('product-transfer', materials), null);
+  assert.equal(resolveEdgeMaterial('support-link', materials), null);
+  assert.equal(resolveEdgeMaterial(null, materials), null);
+});
+
+test('the scenario boundary roles resolve through the declared boundary map', () => {
+  assert.equal(resolveCellMaterial({ authorityId: null, boundaryRole: 'input' }, materials), 'input');
+  assert.equal(resolveCellMaterial({ authorityId: null, boundaryRole: 'event' }, materials), 'event');
+  assert.equal(resolveCellMaterial({ authorityId: null, boundaryRole: 'outcome' }, materials), 'outcome');
+});
+
+test('route kinds resolve by exact declared key', () => {
+  assert.equal(resolveEdgeMaterial('sequence', materials), 'event');
+  assert.equal(resolveEdgeMaterial('selection', materials), 'branch');
+  assert.equal(resolveEdgeMaterial('broadcast', materials), 'fan-out');
+  assert.equal(resolveEdgeMaterial('join', materials), 'convergence');
+  assert.equal(resolveEdgeMaterial('recurrence', materials), 'branch');
+  assert.equal(resolveEdgeMaterial('return', materials), 'outcome');
+  assert.equal(resolveEdgeMaterial('failure', materials), 'rejection');
+});
+
+test('a drawn cell resolves by its own declared authority, collapsed or not', () => {
   const graph = graphOf([
     { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
     { cellId: 'cell:mechanic:op', altitude: 'mechanic', parentCellId: 'cell:scenario:root', semanticAddress: 'cap/scenario/cap/operation/cap.operation.1' },
     { cellId: 'cell:mechanic:op:expression', altitude: 'mechanic', parentCellId: 'cell:mechanic:op', semanticAddress: 'build-equity-price-binding-request#/expression' },
-    { cellId: 'cell:mechanic:prov', altitude: 'mechanic', parentCellId: 'cell:scenario:root', semanticAddress: 'cap/scenario/cap/operation/cap.operation.2' },
-    { cellId: 'cell:provider:prov', altitude: 'provider', parentCellId: 'cell:mechanic:prov' },
-    { cellId: 'cell:physical:prov', altitude: 'physical', parentCellId: 'cell:mechanic:prov' },
+    { cellId: 'cell:provider:leg', altitude: 'provider', parentCellId: 'cell:mechanic:op', semanticAddress: 'cap/scenario/cap/operation/cap.operation.1/provider' },
+    { cellId: 'cell:physical:leg', altitude: 'physical', parentCellId: 'cell:mechanic:op', semanticAddress: 'cap/scenario/cap/operation/cap.operation.1/physical' },
   ]);
-  const view = buildRunGraphView(normalizeRunGraph(graph));
-  assert.equal(view.nodes.find((node) => node.id === 'cell:mechanic:op')!.material, 'input', 'an expression body resolves through its mechanic root');
-  assert.equal(view.nodes.find((node) => node.id === 'cell:mechanic:prov')!.material, 'provider-port', 'a provider-leg body resolves to the boundary it binds');
-  assert.equal(view.nodes.find((node) => node.id === 'cell:physical:prov')!.material, 'provider');
+  graph.cells[0]!.authorityId = 'resolve-equity-market-price-evidence.v1';
+  graph.cells[1]!.authorityId = 'operation:sda-authority-transformation-port.v1';
+  graph.cells[2]!.authorityId = 'mechanic:let.v1';
+  graph.cells[3]!.authorityId = 'provider:sda-external-credential-reference-binding-port.v1';
+  graph.cells[4]!.authorityId = 'physical:sda-external-credential-reference-binding-port.v1';
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
+  assert.equal(view.nodes.find((node) => node.id === 'cell:scenario:root')!.material, 'outcome', 'the scenario is its declared outcome face');
+  assert.equal(view.nodes.find((node) => node.id === 'cell:mechanic:op')!.material, 'event');
+  assert.equal(view.nodes.find((node) => node.id === 'cell:provider:leg')!.material, 'provider-port');
+  assert.equal(view.nodes.find((node) => node.id === 'cell:physical:leg')!.material, 'provider');
 });
 
-test('junction cells take their material from the route kinds touching them', () => {
-  const junction = (routeKinds: { in: string[]; out: string[] }) =>
-    resolveCellMaterial({ altitude: 'mechanic', kind: 'junction', semanticHints: [], routeKinds });
-  assert.equal(junction({ in: [], out: ['selection', 'selection'] }), 'branch');
-  assert.equal(junction({ in: [], out: ['selection'] }), 'branch');
-  assert.equal(junction({ in: [], out: ['broadcast'] }), 'fan-out');
-  assert.equal(junction({ in: ['join'], out: [] }), 'convergence');
-  assert.equal(junction({ in: [], out: ['failure'] }), 'rejection');
-  assert.equal(junction({ in: ['sequence'], out: [] }), 'termination');
-});
-
-test('route kinds resolve to the material their conduit is textured with', () => {
-  assert.equal(resolveEdgeMaterial('sequence'), 'event');
-  assert.equal(resolveEdgeMaterial('selection'), 'branch');
-  assert.equal(resolveEdgeMaterial('broadcast'), 'fan-out');
-  assert.equal(resolveEdgeMaterial('join'), 'convergence');
-  assert.equal(resolveEdgeMaterial('failure'), 'rejection');
-  assert.equal(resolveEdgeMaterial('return'), 'outcome');
-  assert.equal(resolveEdgeMaterial('product-transfer'), 'outcome');
-  assert.equal(resolveEdgeMaterial('support-link'), 'evidence');
-  assert.equal(resolveEdgeMaterial(null), null);
-});
-
-test('the mapping table keys the engine’s own primitive kinds directly, with no capability code', () => {
-  const none = { in: [], out: [] };
-  for (const token of [
-    'input',
-    'event',
-    'outcome',
-    'authority',
-    'validation',
-    'evidence',
-    'human-approval',
-    'decision',
-    'branch',
-    'fan-out',
-    'convergence',
-    'rejection',
-    'termination',
-  ] as const) {
-    assert.equal(
-      resolveCellMaterial({ altitude: 'mechanic', kind: token, semanticHints: [], routeKinds: none }),
-      token,
-      `a declared mechanic|${token} keeps its material`
-    );
-  }
-  assert.equal(
-    resolveCellMaterial({ altitude: 'mechanic', kind: 'junction', semanticHints: [], routeKinds: { in: [], out: ['recurrence'] } }),
-    'branch',
-    'a recurrence junction is a branch, not a guess'
-  );
+test('a cell the policy does not declare draws as the visible UNRESOLVED primitive', () => {
+  const graph = graphOf([{ cellId: 'cell:mechanic:unknown', altitude: 'mechanic', parentCellId: null }]);
+  graph.cells[0]!.authorityId = 'mechanic:not-declared.v1';
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
+  assert.equal(view.nodes[0]!.material, null);
+  const projection = runGraphViewProjection(view, { capabilityId: 'demo' });
+  assert.equal(projection.nodes[0]!.primitive, 'UNRESOLVED');
+  assert.equal(projection.nodes[0]!.material, undefined);
+  assert.match(projection.nodes[0]!.state.readable, /UNRESOLVED/);
 });
 
 test('every canonical material keeps a unique silhouette and every primitive selects one', () => {
@@ -305,9 +286,15 @@ test('every canonical material keeps a unique silhouette and every primitive sel
   assert.equal(PRIMITIVE_MATERIAL.UNRESOLVED, 'rejection');
 });
 
-test('the run-graph projection carries a material per drawn cell and route, collapsed counts unchanged', () => {
+test('the run-graph projection carries a declared material per drawn cell and route', () => {
   const graph = deepGraph();
-  const view = buildRunGraphView(normalizeRunGraph(graph));
+  for (const cell of graph.cells) {
+    if (cell.altitude === 'scenario') cell.authorityId = 'resolve-equity-market-price-evidence.v1';
+    else if (cell.altitude === 'mechanic') cell.authorityId = 'operation:sda-authority-transformation-port.v1';
+    else if (cell.altitude === 'provider') cell.authorityId = 'provider:sda-governed-http-exchange-port.v1';
+    else if (cell.altitude === 'physical') cell.authorityId = 'physical:sda-governed-http-exchange-port.v1';
+  }
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
   const projection = runGraphViewProjection(view, { capabilityId: 'demo', scenarioId: null });
   assert.equal(projection.nodes.length, view.nodes.length);
   assert.equal(projection.edges.length, view.edges.length);
@@ -319,13 +306,13 @@ test('the run-graph projection carries a material per drawn cell and route, coll
   const mechanic = projection.nodes.find((node) => node.id === 'cell:mechanic:m0');
   assert.equal(root?.material, 'outcome');
   assert.equal(mechanic?.material, 'event');
-  assert.ok(projection.edges.every((edge) => edge.material === 'event'), 'fixture routes are sequences');
+  assert.ok(projection.edges.every((edge) => edge.material === 'event'), 'fixture routes are declared sequences');
   assert.ok(projection.edges.every((edge) => edge.kind === 'sequence'), 'the engine route kind travels with the projection');
   assert.ok(!projection.nodes.some((node) => node.id === 'cell:provider:m0.p0'), 'a collapsed provider is drawn inside its mechanic');
 });
 
 test('the engine-compiled capability surface collapses by the same id rule and names no run', () => {
-  const surface = compiledGraphSurface(deepGraph(), 'demo');
+  const surface = compiledGraphSurface(deepGraph(), 'demo', policy);
   assert.equal(surface.projection.fidelity, 'COMPILED_GRAPH');
   assert.equal(surface.projection.nodes.length, surface.stats.drawnNodes);
   assert.equal(surface.projection.edges.length, surface.stats.drawnEdges);

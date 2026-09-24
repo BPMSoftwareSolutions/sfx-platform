@@ -4,29 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 
 import {
   CircuitViewer,
-  type LiveNodeState as ViewerLiveState,
-  type LiveTrailStep as ViewerTrailStep,
 } from '@/components/circuit/circuit-viewer';
 import type { CircuitProjection } from '@/contracts/estate';
-import { testimonyTrail, type LiveNodeState } from '@/lib/live-trace';
+import type { CircuitPresentationPolicy } from '@/contracts/circuit-presentation';
+import { testimonyTrail } from '@/lib/live-trace';
 import { runGraphViewProjection, type CapabilityGraphSurface } from '@/lib/run-graph';
 import { CircuitFrame } from './circuit-frame';
 import { useLiveRunOptional, type LiveRunView } from './live-run';
-
-/**
- * The viewer declares its drawn-state vocabulary as the four resting states. The trace carries
- * one more — `held`, a declared non-success attempt superseded by a later route — and the viewer
- * renders whatever state it is handed as a `circuit-node--<state>` / `data-live` pair. The
- * literals pass through unchanged; the cast names that contract at the binding boundary until the
- * viewer's local union is replaced by the trace's own type (layout lane).
- */
-function viewerStates(states: Record<string, LiveNodeState> | undefined): Partial<Record<string, ViewerLiveState>> | undefined {
-  return states as Partial<Record<string, ViewerLiveState>> | undefined;
-}
-
-function viewerTrail(steps: Array<{ id: string; state: LiveNodeState }>): ViewerTrailStep[] {
-  return steps as ViewerTrailStep[];
-}
 
 /**
  * Scenario and node selection — §5.17, §12.4, trace plan §4.3.
@@ -47,6 +31,7 @@ export function CapabilityCircuitPanel({
   capabilityGraph,
   liveOverride,
   materials,
+  presentation,
 }: {
   circuits: CircuitProjection[];
   /** The compiled capability graph (no run) or the engine's compile failure, from the server. */
@@ -54,6 +39,8 @@ export function CapabilityCircuitPanel({
   liveOverride?: LiveRunView;
   /** Canonical material token to its published `/media/materials/...` asset. */
   materials?: Record<string, string>;
+  /** The declared `circuit-presentation.v1` policy the server read; the grain and materials. */
+  presentation?: CircuitPresentationPolicy | null;
 }) {
   const first = circuits[0];
   const [scenarioId, setScenarioId] = useState(first?.scenarioId ?? '');
@@ -163,7 +150,9 @@ export function CapabilityCircuitPanel({
             </span>
             <span className="font-mono text-xs text-muted">
               run {live?.runId?.slice(0, 8)} · {graphView.nodes.length} of {graphView.totalCells} cells drawn
-              {graphView.collapsed ? ` · collapsed at limit ${graphView.detailCellLimit}` : ''}
+              {graphView.collapsed
+                ? ` · grouped at the declared ${graphView.grain ?? presentation?.granularity?.node ?? 'undeclared'} grain`
+                : ''}
             </span>
           </div>
           <p className="mb-3 text-sm text-muted">
@@ -180,9 +169,9 @@ export function CapabilityCircuitPanel({
           <CircuitViewer
             circuit={trace}
             selectedNodeId={nodeId}
-            liveNodes={viewerStates(live?.states)}
-            liveEdges={viewerStates(live?.edgeStates)}
-            liveTrail={viewerTrail(testimonyTrail(live?.transitions ?? []))}
+            liveNodes={live?.states}
+            liveEdges={live?.edgeStates}
+            liveTrail={testimonyTrail(live?.transitions ?? [])}
             onSelectNode={selectNode}
             materials={materials}
           />
@@ -211,7 +200,10 @@ export function CapabilityCircuitPanel({
             <span className="font-mono text-xs text-muted">
               {capabilityGraph.stats.drawnNodes} of {capabilityGraph.stats.totalCells} cells drawn ·{' '}
               {capabilityGraph.stats.drawnEdges} of {capabilityGraph.stats.totalEdges} routes
-              {capabilityGraph.stats.collapsed ? ` · collapsed at limit ${capabilityGraph.stats.detailCellLimit}` : ''} · no run
+              {capabilityGraph.stats.collapsed
+                ? ` · grouped at the declared ${capabilityGraph.stats.grain ?? presentation?.granularity?.node ?? 'undeclared'} grain`
+                : ''}{' '}
+              · no run
             </span>
           </div>
           <p className="mb-3 text-sm text-muted">

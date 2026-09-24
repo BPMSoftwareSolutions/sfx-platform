@@ -13,10 +13,15 @@ import { fileURLToPath } from 'node:url';
  * The committed summaries in docs/circuit-mapping-trace-2026-09-23/ must regenerate byte for
  * byte from the durable captures in tests/fixtures/circuit/. A capture is the raw run.json
  * shape; it embeds the run graph, so no machine-local input is needed.
- * Both summaries report `filledFromNormalized: 0`, so the normalized events file is not
- * needed either, and neither summary needs the optional graph-source argument.
- * (equity-operations.json does need it, but the declared graph source is a machine-local
- * database read, so it stays out of the fixtures.)
+ *
+ * Materials now come from the declared policy fixture (circuit-presentation-policy.json, copied
+ * from the estate's `read-circuit-presentation`), and the captures — taken before the kernel
+ * emitted each cell's declared `execution.authorityId` (SDA 1322d1f) — are joined to the
+ * declared-bindings fixture named after the run's subject (derive-declared-bindings.mjs, derived
+ * from the declared graph source; configuration stripped). The generator discovers both; the
+ * machine-local graph source itself stays out of the fixtures.
+ *
+ * Both summaries report `filledFromNormalized: 0`, so the normalized events file is not needed.
  *
  * Comparisons are on Buffers, not parsed JSON: the generator emits a fixed key order from
  * cursor-ordered rows, and the outputs carry no absolute paths, so byte equality is stable.

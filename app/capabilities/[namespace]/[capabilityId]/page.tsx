@@ -11,6 +11,7 @@ import { pageMetadata } from '@/lib/seo';
 import { getCapabilityExample } from '@/lib/capability-examples';
 import { getInputContract } from '@/lib/input-contracts';
 import { readCapabilityGraph } from '@/lib/sda-api';
+import { getCircuitPresentation } from '@/lib/circuit-presentation';
 import { compiledGraphSurface, type CapabilityGraphSurface } from '@/lib/run-graph';
 import { LiveRunProvider } from '@/components/estate/live-run';
 import { admitCapabilityRun, advanceCapabilityRun, readCapabilityRunGraph } from './actions';
@@ -36,10 +37,12 @@ export default async function CapabilityDetailPage({params}:Params){
  const authoredCircuits=circuits.filter(c=>c.renderer?.kind==='AUTHORED_CIRCUIT');
  // The compiled graph is fetched with the capability, unrelated to any run. A compile the engine
  // cannot complete becomes the panel's explicit absence card carrying the engine's reason.
- const compiled = await readCapabilityGraph(capability.entityId);
- const capabilityGraph: CapabilityGraphSurface = compiled.ok
-  ? compiledGraphSurface(compiled.value, capability.entityId)
-  : { error: { code: compiled.code, message: compiled.message } };
+  // The declared circuit presentation policy (D3) decides the drawing's grain and materials.
+  const presentation=getCircuitPresentation();
+  const compiled = await readCapabilityGraph(capability.entityId);
+  const capabilityGraph: CapabilityGraphSurface = compiled.ok
+   ? compiledGraphSurface(compiled.value, capability.entityId, presentation)
+   : { error: { code: compiled.code, message: compiled.message } };
  // The dynamic trace draws its component plates from this generation's reviewed materials.
  const materials=getMaterials();
  return <LiveRunProvider admit={admitCapabilityRun} advance={advanceCapabilityRun} graph={readCapabilityRunGraph}>
@@ -55,7 +58,7 @@ export default async function CapabilityDetailPage({params}:Params){
   {edition?<div className="page-width"><div className="experience-strip">{Object.entries(edition.experience).map(([label,text],i)=><div key={label}><span className="kicker">0{i+1} / {label}</span><p>{text}</p></div>)}</div></div>:null}
   <section className="page-width editorial-section" id="circuit" aria-labelledby="capability-circuit-title">
    <div className="editorial-heading"><div><p className="kicker">01 / Open the capability</p><h2 id="capability-circuit-title">Meaning you can<br/><em>move through.</em></h2></div><p>Inspect the inputs, responsibilities and outcomes. Each view preserves its source and evidence scope.</p></div>
-   <CapabilityCircuitPanel circuits={authoredCircuits} capabilityGraph={capabilityGraph} materials={materials}/>
+   <CapabilityCircuitPanel circuits={authoredCircuits} capabilityGraph={capabilityGraph} materials={materials} presentation={presentation}/>
    {storedCircuits.length||edition?.circuitUrl?<details className="mt-6 border-t border-grid-line pt-5"><summary className="cursor-pointer text-sm">Authored circuit — labelled comparison candidate (not observed execution)</summary><div className="mt-5">{storedCircuits.length?<StoredCircuitPanel circuits={storedCircuits}/>:null}{edition?.circuitUrl?<EditionCircuit edition={edition}/>:null}</div></details>:null}
   </section>
   <section className="page-width editorial-section" aria-labelledby="scenario-title">

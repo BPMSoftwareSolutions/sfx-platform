@@ -8,34 +8,61 @@
     "edgeTestimony": 5,
     "unbound": 0
   },
+  "policy": {
+    "policyType": "circuit-presentation.v1",
+    "grain": "operation",
+    "detailCellLimit": 30,
+    "boundary": {
+      "input": "input",
+      "event": "event",
+      "outcome": "outcome"
+    },
+    "authorities": 72,
+    "edgeKinds": 7
+  },
+  "declaredBindings": {
+    "capabilityId": "say-hello-world",
+    "scenarios": 2,
+    "operations": 2
+  },
   "graphAltitudeKindPairs": {
     "mechanic|mechanic": 5,
     "scenario|scenario": 1
   },
-  "cellMaterialTableKeysNeverInGraph": [
-    "provider|provider",
-    "physical|physical",
-    "mechanic|input",
-    "mechanic|event",
-    "mechanic|outcome",
-    "mechanic|authority",
-    "mechanic|validation",
-    "mechanic|evidence",
-    "mechanic|human-approval",
-    "mechanic|decision",
-    "mechanic|branch",
-    "mechanic|fan-out",
-    "mechanic|convergence",
-    "mechanic|rejection",
-    "mechanic|termination"
-  ],
-  "observedCellMaterialByDriver": {
-    "event <- generic default (event plate)": 5,
-    "outcome <- declared altitude|kind (scenario|scenario)": 1
+  "cellMaterialByDriver": {
+    "event <- declared": 5,
+    "outcome <- declared": 1
   },
-  "wordStemAssignments": {},
+  "unresolvedAuthorities": [],
+  "boundaryRoles": [
+    {
+      "cursor": 19,
+      "cellId": "cell:scenario:say-hello-world",
+      "roles": {
+        "input": {
+          "id": null,
+          "label": null,
+          "material": null,
+          "driver": "UNRESOLVED"
+        },
+        "event": {
+          "id": null,
+          "label": null,
+          "material": null,
+          "driver": "UNRESOLVED"
+        },
+        "outcome": {
+          "id": null,
+          "label": null,
+          "material": null,
+          "driver": "UNRESOLVED"
+        }
+      }
+    }
+  ],
   "defaultViewNodes": {
     "nodes": 6,
+    "grain": null,
     "materials": {
       "event": 5,
       "outcome": 1

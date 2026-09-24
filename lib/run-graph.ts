@@ -1,28 +1,27 @@
 import type { SdaRunGraph, SdaRunGraphEndpoint } from '@/contracts/sda-api';
+import type { BoundaryRole, CircuitPresentationPolicy } from '@/contracts/circuit-presentation';
 import type { CircuitEdge, CircuitProjection, CircuitNode, MaterialToken } from '@/contracts/estate';
-import { EDGE_FAMILY_MATERIAL, resolveCellMaterial, resolveEdgeMaterial } from '@/components/circuit/scl-theme';
+import { materialsFromPolicy, resolveCellMaterial, resolveEdgeMaterial } from '@/components/circuit/scl-theme';
+import { getCircuitPresentation } from '@/lib/circuit-presentation';
 
 /**
  * Run-graph view model — the platform half of the id binding.
  *
  * The run graph is the composed execution graph the run actually compiled, served as a declared
- * public projection. This module normalises it, collapses it to fit `DETAIL_CELL_LIMIT` and
- * converts the collapsed view into the renderer's projection. No capability vocabulary lives here:
+ * public record. This module normalises it, collapses it to fit the declared presentation limit
+ * and converts the view into the renderer's projection. No capability vocabulary lives here:
  * binding is by `cellId` and `edgeId` alone.
  *
- * KNOWN DEFECT (review §15 item 4): the collapse rule, the limit and the altitude-to-primitive
- * table below are platform code, not declared authority. The declared homes are the estate's
- * `read-capability-circuit` view (nearest-enclosing-cell membership) and
- * `read-circuit-presentation` (`granularity.detailCellLimit`). Revisit when the declared view
- * serves membership per run (review §15 item 3) or the primitive mapping is declared (Phase 3).
+ * Materials come from the declared presentation policy (`read-circuit-presentation`,
+ * `circuit-presentation.v1`), by exact key only: a cell resolves through `materials.byAuthority`
+ * (its verbatim `execution.authorityId`), a route through `materials.byEdgeKind`, and the
+ * scenario cell through `materials.boundary.outcome`. A miss is `UNRESOLVED`, drawn as the
+ * visible unresolved primitive — never a guessed plate.
  *
- * The material interpreter in `components/circuit/scl-theme.ts` is the same kind of platform
- * table applied to the engine's native `altitude`/`kind` vocabulary; it is the one place that
- * mapping lives, and it is consumed only here and by the viewer.
+ * KNOWN DEFECT (review finding 3, phase 3): the collapse rule and the limit are still platform
+ * code. `read-circuit-presentation` now declares `granularity.node: "operation"`; the next phase
+ * groups by that declared grain along the `parentCellId` chain and deletes this collapse.
  */
-
-/** Presentation cap mirrored from `read-circuit-presentation` (declared value 30); see KNOWN DEFECT. */
-export const DETAIL_CELL_LIMIT = 30;
 
 export interface RunGraphCell {
   cellId: string;
@@ -59,7 +58,7 @@ export interface RunGraph {
   edges: RunGraphEdge[];
 }
 
-/** One drawn node: either a raw cell or the nearest enclosing cell several cells collapsed into. */
+/** One drawn node: a raw cell, several cells collapsed into their operation, or a boundary role. */
 export interface RunGraphViewNode {
   id: string;
   label: string;
@@ -71,11 +70,17 @@ export interface RunGraphViewNode {
   semanticAddress: string | null;
   memberCellIds: string[];
   collapsed: boolean;
-  /** Canonical component material resolved from altitude/kind and the cell's own topology. */
+  /** Set on the scenario cell's three boundary role nodes. */
+  boundaryRole: BoundaryRole | null;
+  /** Canonical component material resolved from the declared policy; null is UNRESOLVED. */
   material: MaterialToken | null;
+  /** The node's own cell outcome variants, when the record declares them. */
+  outcomeVariants: string[];
+  /** The node's own cell variant classifications, when the record declares them. */
+  outcomeClassifications: Record<string, string> | null;
 }
 
-/** One drawn edge: the collapsed route between drawn nodes. */
+/** One drawn edge: the route between drawn nodes, distinct per declared variant. */
 export interface RunGraphViewEdge {
   id: string;
   kind: string | null;
@@ -85,18 +90,24 @@ export interface RunGraphViewEdge {
   groupId: string | null;
   memberEdgeIds: string[];
   collapsed: boolean;
+  /** Canonical route material resolved from the declared policy; null is UNRESOLVED. */
+  material: MaterialToken | null;
 }
 
 export interface RunGraphView {
   graphId: string;
   canonicalGraphDigest: string;
-  detailCellLimit: number;
+  /** The declared grain this view was drawn at; null when no policy declared one. */
+  grain: string | null;
+  /** The declared terminal-renderer limit, retained as the policy value; never a grouping cap. */
+  detailCellLimit: number | null;
   totalCells: number;
   totalEdges: number;
+  /** True when at least one raw cell is drawn as part of another node rather than as itself. */
   collapsed: boolean;
-  /** The drawn nodes, in declared cell order. */
+  /** The drawn nodes, in declared cell order (scenario boundary roles follow their scenario). */
   nodes: RunGraphViewNode[];
-  /** The drawn edges, in declared edge order, self-loops of the collapse removed. */
+  /** The drawn edges, in declared edge order, routes internal to one drawn node removed. */
   edges: RunGraphViewEdge[];
   /** Raw `cellId` -> drawn node id. The binding key of every cell testimony. */
   membership: Record<string, string>;
@@ -107,6 +118,13 @@ export interface RunGraphView {
    * to that node, but not drawn; its testimony is never reported as unmatched.
    */
   internalEdgeNode: Record<string, string>;
+}
+
+export interface RunGraphViewOptions {
+  /** The declared policy; defaults to the published `circuit-presentation.v1`. */
+  policy?: CircuitPresentationPolicy | null;
+  /** Draw every cell as its own node: the measuring instrument's full view, not a grain. */
+  full?: boolean;
 }
 
 function endpointCellId(endpoint: SdaRunGraphEndpoint): string {
@@ -161,7 +179,7 @@ function labelForCell(cell: RunGraphCell): string {
   return cleaned;
 }
 
-/** Normalise a parsed public projection into the platform's working shape. */
+/** Normalise a parsed public record into the platform's working shape. */
 export function normalizeRunGraph(graph: SdaRunGraph): RunGraph {
   return {
     graphId: graph.graphId,
@@ -190,33 +208,49 @@ export function normalizeRunGraph(graph: SdaRunGraph): RunGraph {
       to: endpointCellId(edge.to),
       selectsVariant: edge.selectsVariant ?? null,
       groupId: asString(edge.groupId),
-    })),  };
+    })),
+  };
 }
 
+const SCENARIO_ALTITUDE = 'scenario';
+
+/** Presentation cap mirrored from `read-circuit-presentation` (declared value 30); see KNOWN DEFECT. */
+export const DETAIL_CELL_LIMIT = 30;
+
 /**
- * The platform's collapse (not declared; see KNOWN DEFECT): when the graph carries more cells than the detail limit, redraw
- * with the nearest enclosing cells only — walk each drawn cell up its `parentCellId` chain until
- * the drawn set fits the limit. Cells with no parent stay drawn. A flat graph that cannot
- * collapse is drawn whole rather than truncated; `collapsed` records which happened.
+ * Draw the graph whole (`full`, the measuring instrument's view) or collapsed to the detail
+ * limit. Membership is nearest-enclosing along the `parentCellId` chain; a route between two
+ * different drawn nodes is drawn, a route inside one is bound to that node and not drawn.
  */
-export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): RunGraphView {
+export function buildRunGraphView(
+  graph: RunGraph,
+  options: RunGraphViewOptions | number = {}
+): RunGraphView {
+  const explicit = typeof options === 'number' ? {} : options;
+  const full = typeof options === 'number' ? true : options.full === true;
+  const policy = explicit.policy ?? (typeof options === 'number' ? null : getCircuitPresentation());
+  const materials = materialsFromPolicy(policy);
+  const limit = policy?.granularity?.detailCellLimit ?? DETAIL_CELL_LIMIT;
+
   const byId = new Map(graph.cells.map((cell) => [cell.cellId, cell]));
   let drawn = new Set(byId.keys());
 
-  while (drawn.size > limit) {
-    const promoted = new Set<string>();
-    let promotedAny = false;
-    for (const cellId of drawn) {
-      const parent = byId.get(cellId)?.parentCellId ?? null;
-      if (parent && byId.has(parent) && parent !== cellId) {
-        promoted.add(parent);
-        promotedAny = true;
-      } else {
-        promoted.add(cellId);
+  if (!full) {
+    while (drawn.size > limit) {
+      const promoted = new Set<string>();
+      let promotedAny = false;
+      for (const cellId of drawn) {
+        const parent = byId.get(cellId)?.parentCellId ?? null;
+        if (parent && byId.has(parent) && parent !== cellId) {
+          promoted.add(parent);
+          promotedAny = true;
+        } else {
+          promoted.add(cellId);
+        }
       }
+      if (!promotedAny || promoted.size >= drawn.size) break;
+      drawn = promoted;
     }
-    if (!promotedAny || promoted.size >= drawn.size) break;
-    drawn = promoted;
   }
 
   const nearestDrawn = (cellId: string): string | null => {
@@ -242,67 +276,14 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
     membersByNode.set(target, members);
   }
 
-  // Route kinds touching each raw cell, so a drawn junction can be classified structurally even
-  // though the public projection publishes no junction sub-kind.
-  const inKindsByCell = new Map<string, string[]>();
-  const outKindsByCell = new Map<string, string[]>();
-  const pushKind = (map: Map<string, string[]>, cellId: string, kind: string | null) => {
-    if (!kind) return;
-    const kinds = map.get(cellId) ?? [];
-    kinds.push(kind);
-    map.set(cellId, kinds);
-  };
-  for (const edge of graph.edges) {
-    if (!byId.has(edge.from) || !byId.has(edge.to)) continue;
-    pushKind(outKindsByCell, edge.from, edge.kind);
-    pushKind(inKindsByCell, edge.to, edge.kind);
-  }
-
-  // Composites are identified structurally: a drawn cell that encloses other graph cells. Its
-  // body's declared mechanic roots and member altitudes are passed to the material table so an
-  // operation resolves as its operation, not as the generic event plate.
-  const childrenByCell = new Map<string, string[]>();
-  for (const cell of graph.cells) {
-    if (!cell.parentCellId || !byId.has(cell.parentCellId)) continue;
-    const children = childrenByCell.get(cell.parentCellId) ?? [];
-    children.push(cell.cellId);
-    childrenByCell.set(cell.parentCellId, children);
-  }
-  const bodyOf = (cellId: string) => {
-    const roots: string[] = [];
-    const altitudes = new Set<string>();
-    const walk = (id: string) => {
-      for (const childId of childrenByCell.get(id) ?? []) {
-        const child = byId.get(childId);
-        if (!child) continue;
-        if (child.altitude) altitudes.add(child.altitude);
-        const address = child.semanticAddress ?? '';
-        if (address.includes('#')) roots.push(address.slice(0, address.indexOf('#')));
-        walk(childId);
-      }
-    };
-    walk(cellId);
-    return { roots, altitudes: [...altitudes] };
-  };
-
   const nodes: RunGraphViewNode[] = [];
   for (const cell of graph.cells) {
     if (!drawn.has(cell.cellId) || !membership[cell.cellId]) continue;
     if (nodes.some((node) => node.id === cell.cellId)) continue;
     const members = membersByNode.get(cell.cellId) ?? [cell.cellId];
-    const body = bodyOf(cell.cellId);
-    const composite = members.length > 1 || body.altitudes.length > 0;
     const label = labelForCell(cell);
-    // Only expression addresses name the operation behind a cell; the enclosing path repeats the
-    // capability slug (e.g. `…-evidence/operation/…`) and structural tails (`/provider`, `/physical`)
-    // carry no operation semantics. Exact altitude/kind resolution does not depend on any of this.
-    const semanticHints = [
-      cell.semanticAddress ?? '',
-      ...members
-        .filter((memberId) => memberId !== cell.cellId)
-        .map((memberId) => byId.get(memberId)?.semanticAddress ?? ''),
-    ].filter((address) => /#|:expression/.test(address));
     const parentDrawn = cell.parentCellId ? membership[cell.parentCellId] ?? null : null;
+    const isScenario = cell.altitude?.toLowerCase() === SCENARIO_ALTITUDE;
     nodes.push({
       id: cell.cellId,
       label: members.length > 1 ? `${label} · ${members.length} cells` : label,
@@ -313,18 +294,13 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
       semanticAddress: cell.semanticAddress,
       memberCellIds: members,
       collapsed: members.length > 1,
-      material: resolveCellMaterial({
-        altitude: cell.altitude,
-        kind: cell.kind,
-        semanticHints,
-        routeKinds: {
-          in: inKindsByCell.get(cell.cellId) ?? [],
-          out: outKindsByCell.get(cell.cellId) ?? [],
-        },
-        composite,
-        operationRoots: body.roots,
-        memberAltitudes: body.altitudes,
-      }),
+      boundaryRole: null,
+      material: resolveCellMaterial(
+        { authorityId: cell.authorityId, boundaryRole: isScenario ? 'outcome' : null },
+        materials
+      ),
+      outcomeVariants: cell.outcomeVariants,
+      outcomeClassifications: cell.outcomeClassifications,
     });
   }
 
@@ -335,7 +311,7 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
   for (const edge of graph.edges) {
     const from = membership[edge.from];
     const to = membership[edge.to];
-    // Only a route between two distinct drawn nodes is drawn. A route whose endpoints collapsed
+    // Only a route between two distinct drawn nodes is drawn. A route whose endpoints collapse
     // into the same drawn node is internal to it: bound to that node, not drawn. An endpoint
     // outside the graph leaves the edge unbound.
     if (!from || !to) continue;
@@ -355,6 +331,7 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
         groupId: edge.groupId,
         memberEdgeIds: [],
         collapsed: false,
+        material: resolveEdgeMaterial(edge.kind, materials),
       };
       edgeByKey.set(key, viewEdge);
       drawnEdges.push(viewEdge);
@@ -367,13 +344,16 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
     viewEdge.collapsed = viewEdge.memberEdgeIds.length > 1;
   }
 
+  const groupedCells = graph.cells.filter((cell) => membership[cell.cellId] && membership[cell.cellId] !== cell.cellId).length;
+
   return {
     graphId: graph.graphId,
     canonicalGraphDigest: graph.canonicalGraphDigest,
+    grain: null,
     detailCellLimit: limit,
     totalCells: graph.cells.length,
     totalEdges: graph.edges.length,
-    collapsed: drawn.size < byId.size,
+    collapsed: groupedCells > 0,
     nodes,
     edges: drawnEdges,
     membership,
@@ -395,6 +375,12 @@ export function primitiveForAltitude(altitude: string | null): CircuitNode['prim
   return ALTITUDE_PRIMITIVE[altitude.toLowerCase()] ?? 'UNRESOLVED';
 }
 
+/** A drawn node's primitive: its altitude, or UNRESOLVED when no declared material resolved. */
+function primitiveForNode(node: RunGraphViewNode): CircuitNode['primitive'] {
+  if (!node.material) return 'UNRESOLVED';
+  return primitiveForAltitude(node.altitude);
+}
+
 function familyForEdge(kind: string | null): CircuitEdge['family'] {
   const value = kind?.toLowerCase() ?? '';
   if (value.includes('product')) return 'PRODUCT_TRANSFER';
@@ -403,8 +389,9 @@ function familyForEdge(kind: string | null): CircuitEdge['family'] {
 }
 
 /**
- * Build the renderer projection for the collapsed run graph. The viewer's live classes are the
- * only state; this projection is the declared skeleton drawn unlit.
+ * Build the renderer projection for the drawn run graph. The viewer's live classes are the only
+ * state; this projection is the declared skeleton drawn unlit. A node whose material the declared
+ * policy does not carry is drawn as the visible UNRESOLVED primitive — never a fallback plate.
  *
  * A capability graph compiled by the engine with no run uses `COMPILED_GRAPH` copy; a graph bound
  * to an observed run keeps `RUN_GRAPH`. Everything else is identical: ids, altitude primitives and
@@ -420,6 +407,7 @@ export function runGraphViewProjection(
   }
 ): CircuitProjection {
   const fidelity = options.fidelity ?? 'RUN_GRAPH';
+  const containerIds = new Set(view.nodes.map((node) => node.parentDrawnId).filter((id): id is string => Boolean(id)));
   return {
     capabilityId: options.capabilityId,
     scenarioId: options.scenarioId ?? null,
@@ -432,44 +420,46 @@ export function runGraphViewProjection(
     fidelity,
     nodes: view.nodes.map((node) => ({
       id: node.id,
-      primitive: primitiveForAltitude(node.altitude),
+      primitive: primitiveForNode(node),
       label: node.label,
       sourceId: node.semanticAddress ?? node.id,
       state: {
-        value: node.altitude,
-        readable: node.collapsed
-          ? `Planned view cell enclosing ${node.memberCellIds.length} raw cells; lit only by their testimony.`
-          : `Planned ${node.altitude ?? 'unresolved'} cell; lit only by its own testimony.`,
+        value: node.boundaryRole ?? node.altitude,
+        readable: node.material
+          ? node.collapsed
+            ? `Planned ${node.altitude ?? 'unresolved'} cell enclosing ${node.memberCellIds.length} raw cells; lit only by their testimony.`
+            : `Planned ${node.altitude ?? 'unresolved'} cell; lit only by its own testimony.`
+          : `No declared material resolved this cell: UNRESOLVED. Lit only by its own testimony.`,
       },
       material: node.material ?? undefined,
       parent: node.parentDrawnId,
-      container: node.collapsed || node.memberCellIds.length > 1,
+      container: node.collapsed || containerIds.has(node.id),
     })),
-    edges: view.edges.map((edge) => {
-      const family = familyForEdge(edge.kind);
-      return {
-        id: edge.id,
-        from: edge.from,
-        to: edge.to,
-        family,
-        /** The engine's own route kind, so the layout can draw loop-backs and join channels. */
-        kind: edge.kind ?? undefined,
-        /** The route kind's material, or the family's: a connector always has its family shape. */
-        material: resolveEdgeMaterial(edge.kind) ?? EDGE_FAMILY_MATERIAL[family],
-      };
-    }),
+    edges: view.edges.map((edge) => ({
+      id: edge.id,
+      from: edge.from,
+      to: edge.to,
+      family: familyForEdge(edge.kind),
+      /** The engine's own route kind, so the layout can draw loop-backs and join channels. */
+      kind: edge.kind ?? undefined,
+      /** The route kind's declared material; a miss stays unresolved rather than a family guess. */
+      material: edge.material ?? undefined,
+    })),
     diagnostics: [],
   };
 }
 
-/** The collapsed-view measurements the compiled surface states beside its badge. */
+/** The view measurements the surfaces state beside their badge. */
 export interface RunGraphViewStats {
   totalCells: number;
   totalEdges: number;
   drawnNodes: number;
   drawnEdges: number;
+  /** Raw cells drawn as part of another node rather than as themselves. */
+  groupedCells: number;
   collapsed: boolean;
-  detailCellLimit: number;
+  detailCellLimit: number | null;
+  grain: string | null;
 }
 
 export interface CompiledGraphSurface {
@@ -486,18 +476,24 @@ function viewStats(view: RunGraphView): RunGraphViewStats {
     totalEdges: view.totalEdges,
     drawnNodes: view.nodes.length,
     drawnEdges: view.edges.length,
+    groupedCells: view.totalCells - view.nodes.filter((node) => !node.boundaryRole).length,
     collapsed: view.collapsed,
     detailCellLimit: view.detailCellLimit,
+    grain: view.grain,
   };
 }
 
 /**
- * The engine-compiled capability graph, collapsed by the same id-binding rule a run uses and
- * rendered unlit. No run exists: nothing on this surface is observed, and an engine that cannot
- * compile returns the absence, never a substitute circuit.
+ * The engine-compiled capability graph, drawn at the declared grain and rendered unlit. No run
+ * exists: nothing on this surface is observed, and an engine that cannot compile returns the
+ * absence, never a substitute circuit.
  */
-export function compiledGraphSurface(graph: SdaRunGraph, capabilityId: string): CompiledGraphSurface {
-  const view = buildRunGraphView(normalizeRunGraph(graph));
+export function compiledGraphSurface(
+  graph: SdaRunGraph,
+  capabilityId: string,
+  policy?: CircuitPresentationPolicy | null
+): CompiledGraphSurface {
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
   return {
     projection: runGraphViewProjection(view, {
       capabilityId,

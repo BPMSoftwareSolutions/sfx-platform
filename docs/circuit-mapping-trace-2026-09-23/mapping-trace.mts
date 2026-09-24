@@ -1,17 +1,30 @@
 /**
- * Event -> graph element -> material -> drawn element -> flow step, for one captured run.
- * Uses the platform's own view builder and material tables (sfx-platform working tree).
- * Usage (cwd sfx-platform): node --import tsx docs/circuit-mapping-trace-2026-09-23/mapping-trace.mts <run.json> <outDir> <events.jsonl> [graph-source.json]
+ * Event -> graph element -> declared material -> drawn element -> flow step, for one captured run.
+ * Uses the platform's own view builder and the declared circuit-presentation policy (working tree).
+ *
+ * Usage (cwd sfx-platform):
+ *   node --import tsx docs/circuit-mapping-trace-2026-09-23/mapping-trace.mts <run.json> <outDir> [events.jsonl] [declared-bindings.json]
+ *
+ * Materials come from the estate policy fixture, by exact declared key only. Captures taken
+ * before the kernel carried `execution.authorityId` (SDA 1322d1f) are joined to the declared
+ * bindings fixture named after the run's subject
+ * (`tests/fixtures/circuit/<subject>-declared-bindings.json`, derived by
+ * derive-declared-bindings.mjs) or to the explicit 5th argument. The join is measurement only:
+ * every authority is the declared identity the current record carries.
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const root = new URL('../../', import.meta.url).href; // repository root
 const { buildRunGraphView, normalizeRunGraph } = await import(new URL('lib/run-graph.ts', root).href);
-const theme = await import(new URL('components/circuit/scl-theme.ts', root).href);
-const { CELL_MATERIAL, MATERIAL_WORDS } = theme;
+
+const policy = JSON.parse(
+  readFileSync(new URL('../../tests/fixtures/circuit/circuit-presentation-policy.json', import.meta.url), 'utf8')
+);
 
 const [runPath, outDir] = process.argv.slice(2);
+if (!runPath || !outDir) throw new Error('usage: mapping-trace.mts <run.json> <outDir> [events.jsonl] [declared-bindings.json]');
+mkdirSync(outDir, { recursive: true });
+
 const run = JSON.parse(readFileSync(runPath, 'utf8'));
 const graph = run.graph?.json ?? run.graph;
 const byCursor = new Map<number, any>();
@@ -20,7 +33,7 @@ const rawCursors = byCursor.size;
 // Cursors the raw page walk did not reach come from the normalized events file (no classification field).
 const normalizedPath = process.argv[4];
 let filled = 0;
-if (normalizedPath) {
+if (normalizedPath && existsSync(normalizedPath)) {
   for (const line of readFileSync(normalizedPath, 'utf8').split('\n')) {
     if (!line.trim()) continue;
     const row = JSON.parse(line);
@@ -33,40 +46,103 @@ if (normalizedPath) {
 const events = [...byCursor.values()].sort((a, b) => a.cursor - b.cursor);
 if (!graph?.cells || events.length === 0) throw new Error(`unexpected run shape: graph ${!!graph?.cells}, events ${events.length}`);
 
-const cells = new Map<string, any>(graph.cells.map((c: any) => [c.cellId, c]));
-const edges = new Map<string, any>(graph.edges.map((e: any) => [e.edgeId, e]));
-const full = buildRunGraphView(normalizeRunGraph(graph), Number.MAX_SAFE_INTEGER); // every cell drawn: its own material
-const view = buildRunGraphView(normalizeRunGraph(graph)); // the platform's default drawn view
-const fullNode = new Map<string, any>(full.nodes.map((n: any) => [n.id, n]));
-const viewNode = new Map<string, any>(view.nodes.map((n: any) => [n.id, n]));
+// The declared bindings the capture predates: an explicit path, or the fixture named after the subject.
+function locateBindings() {
+  const explicit = process.argv[5];
+  if (explicit) return explicit;
+  const subject = String(run.subject ?? '');
+  const candidate = new URL(`../../tests/fixtures/circuit/${subject}-declared-bindings.json`, import.meta.url);
+  return existsSync(candidate) ? candidate : null;
+}
+const bindingsPath = locateBindings();
+const bindings = bindingsPath ? JSON.parse(readFileSync(bindingsPath, 'utf8')) : null;
 
-const rootOf = (address: string | null) => (address ?? '').split('#')[0];
-const wordsOf = (address: string | null) => rootOf(address).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-function stemHit(address: string | null) {
-  const words = wordsOf(address);
-  for (const entry of MATERIAL_WORDS) {
-    for (const stem of entry.stems) {
-      const word = words.find((w: string) => w.startsWith(stem));
-      if (word) return { token: entry.token, stem, word };
+/**
+ * The declared `execution.authorityId` of a captured cell: taken verbatim when the record carries
+ * one, else joined from the declared graph source. A cell the join cannot name stays unresolved.
+ */
+function declaredAuthorityOf(cell: any, cells: Map<string, any>): string | null {
+  if (typeof cell.authorityId === 'string' && cell.authorityId.length > 0) return cell.authorityId;
+  if (!bindings) return null;
+  const altitude = (cell.altitude ?? '').toLowerCase();
+  const kind = (cell.kind ?? '').toLowerCase();
+  const scenarioIdOf = (candidate: any): string | null => {
+    let cursor = candidate;
+    const seen = new Set<string>();
+    while (cursor && !seen.has(cursor.cellId)) {
+      seen.add(cursor.cellId);
+      const parent = cursor.parentCellId ? cells.get(cursor.parentCellId) : undefined;
+      if (!parent) return null;
+      if ((parent.altitude ?? '').toLowerCase() === 'scenario') {
+        return parent.cellId.replace(/^cell:scenario:/, '');
+      }
+      cursor = parent;
     }
+    return null;
+  };
+  const operationOf = (candidate: any) =>
+    (candidate.cellId.match(/\.operation\.(\d+)$/) ?? [])[1] ?? null;
+  const bindingFor = (candidate: any) => {
+    if (!bindings.operations) return null;
+    const scenarioId = scenarioIdOf(candidate);
+    const index = operationOf(candidate);
+    if (!scenarioId || !index) return null;
+    return (
+      bindings.operations.find(
+        (operation: any) => operation.owningScenarioId === scenarioId && operation.index === Number(index)
+      ) ?? null
+    );
+  };
+
+  if (kind === 'junction') return 'junction:boolean-selection.v1';
+  if (altitude === 'scenario') {
+    const scenario = (bindings.scenarios ?? []).find((entry: any) => `cell:scenario:${entry.scenarioId}` === cell.cellId);
+    return scenario?.event?.executionAuthorityId ?? null;
+  }
+  if (altitude === 'provider' || altitude === 'physical') {
+    const parent = cell.parentCellId ? cells.get(cell.parentCellId) : undefined;
+    const binding = parent ? bindingFor(parent) : null;
+    return binding?.platformCapabilityId ? `${altitude}:${binding.platformCapabilityId}` : null;
+  }
+  if (altitude === 'mechanic') {
+    const address = typeof cell.semanticAddress === 'string' ? cell.semanticAddress : '';
+    const hash = address.indexOf('#');
+    if (hash >= 0) {
+      const transformationId = address.slice(0, hash);
+      const pointer = address.slice(hash + 2);
+      const op = bindings.transformations?.[transformationId]?.[pointer];
+      // The compiler realizes an `if` node as `junction:boolean-selection.v1` (the `/selection`
+      // cell) plus its own `mechanic:identity.v1` result cell; it never emits `mechanic:if.v1`.
+      const declared = op === 'if' ? 'identity' : op;
+      return declared ? `mechanic:${declared}.v1` : null;
+    }
+    const binding = bindingFor(cell);
+    return binding?.platformCapabilityId ? `operation:${binding.platformCapabilityId}` : null;
   }
   return null;
 }
+
+const capturedCells = new Map<string, any>(graph.cells.map((cell: any) => [cell.cellId, cell]));
+const declaredCells = graph.cells.map((cell: any) => ({
+  ...cell,
+  authorityId: declaredAuthorityOf(cell, capturedCells),
+}));
+const declaredGraph = { ...graph, cells: declaredCells };
+const declaredById = new Map<string, any>(declaredCells.map((cell: any) => [cell.cellId, cell]));
+const edges = new Map<string, any>(graph.edges.map((edge: any) => [edge.edgeId, edge]));
+
+const full = buildRunGraphView(normalizeRunGraph(declaredGraph), { policy, full: true }); // every cell its own node
+const view = buildRunGraphView(normalizeRunGraph(declaredGraph), { policy }); // the declared operation grain
+const fullNode = new Map<string, any>(full.nodes.map((node: any) => [node.id, node]));
+const viewNode = new Map<string, any>(view.nodes.map((node: any) => [node.id, node]));
+const viewEdge = new Map<string, any>(view.edges.map((edge: any) => [edge.id, edge]));
+
 function operationOf(cellId: string) {
-  let cursor = cells.get(cellId);
-  while (cursor && cursor.parentCellId && cells.get(cursor.parentCellId)?.altitude !== 'scenario') cursor = cells.get(cursor.parentCellId);
+  let cursor = capturedCells.get(cellId);
+  while (cursor && cursor.parentCellId && capturedCells.get(cursor.parentCellId)?.altitude !== 'scenario') {
+    cursor = capturedCells.get(cursor.parentCellId);
+  }
   return cursor && cursor.altitude !== 'scenario' ? cursor.cellId : null;
-}
-function driverOf(cell: any, material: string | null) {
-  const altitude = (cell.altitude ?? '').toLowerCase();
-  const kind = (cell.kind ?? '').toLowerCase();
-  if (kind === 'junction') return 'junction route kinds';
-  const exact = CELL_MATERIAL[`${altitude}|${kind}`];
-  if (!exact) return 'unmapped altitude|kind';
-  if (exact !== 'event') return `declared altitude|kind (${altitude}|${kind})`;
-  if (material === 'event') return 'generic default (event plate)';
-  const hit = stemHit(cell.semanticAddress);
-  return hit && hit.token === material ? `name word-stem "${hit.stem}" in "${hit.word}"` : 'composite member-altitude rule';
 }
 
 const rows: any[] = [];
@@ -75,27 +151,40 @@ let drawnMoves = 0;
 for (const event of events) {
   const p = event.payload ?? {};
   const row: any = { cursor: event.cursor, eventKind: event.kind };
-  if (p.testimonyType === 'cell-execution-testimony.v1' && cells.has(p.cellId)) {
-    const cell = cells.get(p.cellId);
+  if (p.testimonyType === 'cell-execution-testimony.v1' && capturedCells.has(p.cellId)) {
+    const cell = declaredById.get(p.cellId);
     const own = fullNode.get(p.cellId);
     const drawnId = view.membership[p.cellId] ?? null;
     Object.assign(row, {
       element: 'cell', id: p.cellId, altitude: cell.altitude, graphKind: cell.kind,
-      operation: operationOf(p.cellId), declaredRoot: rootOf(cell.semanticAddress),
-      ownMaterial: own?.material ?? null, materialDriver: driverOf(cell, own?.material ?? null),
+      authorityId: cell.authorityId ?? null,
+      operation: operationOf(p.cellId),
+      ownMaterial: own?.material ?? null,
+      materialDriver: own?.material ? 'declared' : 'UNRESOLVED',
       drawnNode: drawnId, drawnNodeMaterial: drawnId ? viewNode.get(drawnId)?.material ?? null : null,
       disposition: p.disposition ?? null, outcomeVariant: p.outcomeVariant ?? null, outcomeClassification: p.outcomeClassification ?? null,
     });
+    if ((cell.altitude ?? '').toLowerCase() === 'scenario') {
+      row.boundaryRoles = Object.fromEntries(
+        (['input', 'event', 'outcome'] as const).map((role) => {
+          const node = view.nodes.find(
+            (candidate: any) => candidate.boundaryRole === role && candidate.parentCellId === p.cellId
+          );
+          return [role, { id: node?.id ?? null, label: node?.label ?? null, material: node?.material ?? null, driver: node?.material ? 'declared' : 'UNRESOLVED' }];
+        })
+      );
+    }
     if (drawnId && drawnId !== previousDrawn) { drawnMoves += 1; previousDrawn = drawnId; }
   } else if (p.testimonyType === 'edge-execution-testimony.v1' && edges.has(p.edgeId)) {
     const edge = edges.get(p.edgeId);
     const from = edge.from.cellId, to = edge.to.cellId;
     Object.assign(row, {
       element: 'edge', id: p.edgeId, edgeKind: edge.kind, selectsVariant: edge.selectsVariant ?? null,
-      from, to, fromAltitude: cells.get(from)?.altitude, toAltitude: cells.get(to)?.altitude,
+      from, to, fromAltitude: capturedCells.get(from)?.altitude, toAltitude: capturedCells.get(to)?.altitude,
       admission: p.admissionDisposition ?? null,
       drawnEdge: view.edgeMembership[p.edgeId] ?? null,
       internalTo: view.internalEdgeNode[p.edgeId] ?? null,
+      drawnEdgeMaterial: view.edgeMembership[p.edgeId] ? viewEdge.get(view.edgeMembership[p.edgeId])?.material ?? null : null,
     });
   } else if (p.testimonyType && (p.cellId || p.edgeId)) {
     Object.assign(row, { element: 'UNBOUND', id: p.cellId ?? p.edgeId });
@@ -112,10 +201,14 @@ const count = (list: any[], key: (r: any) => string) => list.reduce((acc: any, r
 const cellRows = rows.filter((r) => r.element === 'cell');
 const edgeRows = rows.filter((r) => r.element === 'edge');
 const graphPairs = count(graph.cells, (c: any) => `${c.altitude}|${c.kind}`);
-const materialByDriver = count(cellRows, (r) => `${r.ownMaterial} <- ${r.materialDriver.replace(/ "[^"]*" in "[^"]*"/, '')}`);
-const stems = count(cellRows.filter((r) => r.materialDriver.startsWith('name')), (r) => `${r.ownMaterial} <- ${r.materialDriver}`);
-const deadTableKeys = Object.keys(CELL_MATERIAL).filter((k) => !graphPairs[k]);
-const drawnMaterials = count(view.nodes, (n: any) => `${n.material}${n.collapsed ? ' (collapsed)' : ''}`);
+const materialByDriver = count(cellRows, (r) => `${r.ownMaterial} <- ${r.materialDriver}`);
+const unresolvedAuthorities = [
+  ...new Set(cellRows.filter((r) => r.materialDriver === 'UNRESOLVED').map((r) => r.authorityId ?? '(no declared authority)')),
+];
+const drawnMaterials = count(view.nodes, (n: any) => `${n.material}${n.collapsed ? ' (grouped)' : ''}`);
+const boundaryRoles = cellRows
+  .filter((r) => r.boundaryRoles)
+  .map((r) => ({ cursor: r.cursor, cellId: r.id, roles: r.boundaryRoles }));
 // Flow grammar: consecutive cell altitudes joined by the edge kind between them
 const grammar = count(edgeRows, (r) => `${r.fromAltitude} -${r.edgeKind}${r.selectsVariant ? `[${r.selectsVariant}]` : ''}-> ${r.toAltitude}`);
 const edgeDrawing = count(edgeRows, (r) => (r.drawnEdge ? 'drawn edge' : r.internalTo ? 'internal to a drawn node (not drawn)' : 'unbound'));
@@ -128,34 +221,60 @@ for (const r of cellRows) {
 const operations = [...perOperation.entries()].map(([id, v]) => ({ id: id.replace(/^.*\.operation\./, 'op.'), ...v }));
 const interleaved = operations.filter((a, i) => operations.some((b, j) => j !== i && b.first > a.first && b.first < a.last));
 const summary = {
-  run: { subject: run.subject, events: events.length, rawCursors, filledFromNormalized: filled, cellTestimony: cellRows.length, edgeTestimony: edgeRows.length, unbound: rows.filter((r) => r.element === 'UNBOUND').length },
+  run: {
+    subject: run.subject, events: events.length, rawCursors, filledFromNormalized: filled,
+    cellTestimony: cellRows.length, edgeTestimony: edgeRows.length,
+    unbound: rows.filter((r) => r.element === 'UNBOUND').length,
+  },
+  policy: {
+    policyType: policy.policyType,
+    grain: policy.granularity?.node ?? null,
+    detailCellLimit: policy.granularity?.detailCellLimit ?? null,
+    boundary: policy.materials?.boundary ?? null,
+    authorities: Object.keys(policy.materials?.byAuthority ?? {}).length,
+    edgeKinds: Object.keys(policy.materials?.byEdgeKind ?? {}).length,
+  },
+  declaredBindings: bindings
+    ? { capabilityId: bindings.capabilityId ?? null, scenarios: bindings.scenarios.length, operations: bindings.operations.length }
+    : null,
   graphAltitudeKindPairs: graphPairs,
-  cellMaterialTableKeysNeverInGraph: deadTableKeys,
-  observedCellMaterialByDriver: materialByDriver,
-  wordStemAssignments: stems,
-  defaultViewNodes: { nodes: view.nodes.length, materials: drawnMaterials },
+  cellMaterialByDriver: materialByDriver,
+  unresolvedAuthorities,
+  boundaryRoles,
+  defaultViewNodes: { nodes: view.nodes.length, grain: view.grain, materials: drawnMaterials },
   drawnNodeChangesAcrossRun: drawnMoves,
   flowGrammar: grammar,
   edgeDrawing,
   operationsInCursorOrder: operations.length,
   operationsInterleaved: interleaved.length,
-  rootOutcome: cellRows.filter((r) => r.altitude === 'scenario').map((r) => ({ cursor: r.cursor, disposition: r.disposition, outcomeVariant: r.outcomeVariant, outcomeClassification: r.outcomeClassification })),
+  rootOutcome: cellRows
+    .filter((r) => r.altitude === 'scenario')
+    .map((r) => ({ cursor: r.cursor, disposition: r.disposition, outcomeVariant: r.outcomeVariant, outcomeClassification: r.outcomeClassification })),
 };
-const sourcePath = process.argv[5];
 const opTable: any[] = [];
-if (sourcePath) {
-  const src = JSON.parse(readFileSync(sourcePath, 'utf8'));
-  const bindings = new Map<string, any>(src.interfaceAuthority.portBindings.map((b: any) => [b.portId, b]));
-  const ops = src.executionAuthorities[0].operations;
-  const opCells = graph.cells.filter((c: any) => c.altitude === 'mechanic' && cells.get(c.parentCellId)?.altitude === 'scenario');
-  ops.forEach((op: any, index: number) => {
-    const cellId = opCells.find((c: any) => c.cellId.endsWith(`.operation.${index + 1}`))?.cellId;
+if (bindings) {
+  const operationsByScenario = new Map<string, any[]>();
+  for (const operation of bindings.operations) {
+    const list = operationsByScenario.get(operation.owningScenarioId) ?? [];
+    list.push(operation);
+    operationsByScenario.set(operation.owningScenarioId, list);
+  }
+  const opCells = graph.cells.filter((c: any) => c.altitude === 'mechanic' && capturedCells.get(c.parentCellId)?.altitude === 'scenario');
+  const operationBindings = [...operationsByScenario.entries()].flatMap(([scenarioId, list]) =>
+    list.map((operation: any) => ({ ...operation, scenarioId }))
+  );
+  operationBindings.forEach((operation: any) => {
+    const cellId = opCells.find((c: any) => c.cellId.endsWith(`.operation.${operation.index}`) && c.parentCellId === `cell:scenario:${operation.scenarioId}`)?.cellId;
     const own = cellId ? rows.filter((r) => r.element === 'cell' && r.id === cellId) : [];
     const leg = cellId ? rows.filter((r) => r.element === 'cell' && r.operation === cellId && (r.altitude === 'provider' || r.altitude === 'physical')) : [];
     const junctions = cellId ? rows.filter((r) => r.element === 'cell' && r.operation === cellId && r.graphKind === 'junction').length : 0;
     const drawn = cellId ? view.membership[cellId] : null;
     opTable.push({
-      op: index + 1, portId: op.portId, binding: bindings.get(op.portId)?.platformCapabilityId ?? null,
+      scenarioId: operation.scenarioId,
+      op: operation.index,
+      portId: operation.portId,
+      binding: operation.platformCapabilityId,
+      authorityId: operation.platformCapabilityId ? `operation:${operation.platformCapabilityId}` : null,
       opCellMaterialInDefaultView: drawn ? viewNode.get(drawn)?.material ?? null : null,
       drawnAs: drawn === cellId ? 'own node' : drawn ? 'inside ' + drawn.replace(/^cell:/, '') : null,
       opMaterialAsLeafDrawn: cellId ? fullNode.get(cellId)?.material ?? null : null,
@@ -169,8 +288,6 @@ if (sourcePath) {
   });
   writeFileSync(`${outDir}/operations.json`, JSON.stringify(opTable, null, 2));
 }
-mkdirSync(outDir, { recursive: true });
 writeFileSync(`${outDir}/mapping-trace.jsonl`, rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
-mkdirSync(outDir, { recursive: true });
 writeFileSync(`${outDir}/mapping-summary.json`, JSON.stringify(summary, null, 2));
 console.log(JSON.stringify(summary, null, 2));

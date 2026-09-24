@@ -8,6 +8,23 @@
     "edgeTestimony": 528,
     "unbound": 0
   },
+  "policy": {
+    "policyType": "circuit-presentation.v1",
+    "grain": "operation",
+    "detailCellLimit": 30,
+    "boundary": {
+      "input": "input",
+      "event": "event",
+      "outcome": "outcome"
+    },
+    "authorities": 72,
+    "edgeKinds": 7
+  },
+  "declaredBindings": {
+    "capabilityId": "resolve-equity-market-price-evidence",
+    "scenarios": 1,
+    "operations": 35
+  },
   "graphAltitudeKindPairs": {
     "mechanic|mechanic": 803,
     "mechanic|junction": 41,
@@ -15,43 +32,47 @@
     "provider|provider": 14,
     "scenario|scenario": 1
   },
-  "cellMaterialTableKeysNeverInGraph": [
-    "mechanic|input",
-    "mechanic|event",
-    "mechanic|outcome",
-    "mechanic|authority",
-    "mechanic|validation",
-    "mechanic|evidence",
-    "mechanic|human-approval",
-    "mechanic|decision",
-    "mechanic|branch",
-    "mechanic|fan-out",
-    "mechanic|convergence",
-    "mechanic|rejection",
-    "mechanic|termination"
+  "cellMaterialByDriver": {
+    "event <- declared": 458,
+    "provider-port <- declared": 21,
+    "provider <- declared": 21,
+    "branch <- declared": 28,
+    "outcome <- declared": 1
+  },
+  "unresolvedAuthorities": [],
+  "boundaryRoles": [
+    {
+      "cursor": 1072,
+      "cellId": "cell:scenario:resolve-equity-market-price-evidence",
+      "roles": {
+        "input": {
+          "id": null,
+          "label": null,
+          "material": null,
+          "driver": "UNRESOLVED"
+        },
+        "event": {
+          "id": null,
+          "label": null,
+          "material": null,
+          "driver": "UNRESOLVED"
+        },
+        "outcome": {
+          "id": null,
+          "label": null,
+          "material": null,
+          "driver": "UNRESOLVED"
+        }
+      }
+    }
   ],
-  "observedCellMaterialByDriver": {
-    "input <- name word-stem": 329,
-    "input <- composite member-altitude rule": 14,
-    "provider-port <- declared altitude|kind (provider|provider)": 14,
-    "provider <- declared altitude|kind (physical|physical)": 14,
-    "provider-port <- composite member-altitude rule": 14,
-    "evidence <- name word-stem": 66,
-    "branch <- junction route kinds": 28,
-    "decision <- name word-stem": 43,
-    "decision <- composite member-altitude rule": 6,
-    "outcome <- declared altitude|kind (scenario|scenario)": 1
-  },
-  "wordStemAssignments": {
-    "input <- name word-stem \"request\" in \"request\"": 329,
-    "evidence <- name word-stem \"evidence\" in \"evidence\"": 66,
-    "decision <- name word-stem \"select\" in \"select\"": 43
-  },
   "defaultViewNodes": {
     "nodes": 15,
+    "grain": null,
     "materials": {
-      "provider-port (collapsed)": 14,
-      "outcome (collapsed)": 1
+      "provider-port (grouped)": 7,
+      "provider (grouped)": 7,
+      "outcome (grouped)": 1
     }
   },
   "drawnNodeChangesAcrossRun": 29,
