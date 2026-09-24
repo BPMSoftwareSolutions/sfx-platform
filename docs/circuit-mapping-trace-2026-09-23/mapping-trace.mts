@@ -12,6 +12,7 @@
  * derive-declared-bindings.mjs) or to the explicit 5th argument. The join is measurement only:
  * every authority is the declared identity the current record carries.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any -- this generator walks untyped machine-local JSON captures and assembles dynamic measurement rows */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const root = new URL('../../', import.meta.url).href; // repository root

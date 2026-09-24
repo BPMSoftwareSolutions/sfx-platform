@@ -228,12 +228,15 @@ const BOUNDARY_PRIMITIVE: Record<BoundaryRole, CircuitNode['primitive']> = {
  * topmost declared cell, and two siblings never merge into an invented parent.
  */
 function groupingTarget(byId: Map<string, RunGraphCell>, cell: RunGraphCell): string {
-  let cursor: RunGraphCell | undefined = cell;
+  let cursor: RunGraphCell = cell;
   let top = cell.cellId;
   const seen = new Set<string>();
-  while (cursor && cursor.parentCellId && byId.has(cursor.parentCellId) && !seen.has(cursor.cellId)) {
+  while (!seen.has(cursor.cellId)) {
     seen.add(cursor.cellId);
-    const parent = byId.get(cursor.parentCellId)!;
+    const parentId = cursor.parentCellId;
+    if (!parentId) break;
+    const parent: RunGraphCell | undefined = byId.get(parentId);
+    if (!parent) break;
     if (parent.altitude?.toLowerCase() === SCENARIO_ALTITUDE) return cursor.cellId;
     cursor = parent;
     top = parent.cellId;
