@@ -347,34 +347,53 @@ All 28 observed selections were FALSE; this capture does not prove TRUE-branch, 
 fan-out or convergence playback. Thirty-four inter-operation transitions target a composite
 whose child testifies next; this is entry/descent, not a broken destination identity.
 
-The inspected platform view collapses the graph to 15 nodes and 28 routes, including one
-831-member scenario node. This hides the operation/branch structure before layout. The state
-and material corrections in baseline §8 are retained: the corrected displayed states are
-5 done, 10 held and 0 failed. Those corrections do not establish an altitude view.
+The pre-implementation platform view collapsed the graph to 15 nodes and 28 routes, including
+one 831-member scenario node; this hid the operation/branch structure before layout. Phase 3
+(`7f809a7`) deleted that count collapse and draws the declared operation grain instead: the
+presentation policy's `granularity.node: "operation"` groups every expression, binding, field
+and selection cell into its nearest enclosing operation. For equity the committed trace summary
+(`docs/circuit-mapping-trace-2026-09-23/equity-mapping-summary.json`) measures 39 drawn nodes —
+the scenario, its Input/Event/Outcome boundary roles and all 35 operations — with 35 drawn edges
+of 528 walked (493 internal to one operation) and the lit node changing 36 times: once per
+operation op.1 → op.35, then the scenario root. Those counts follow the declared graph, not the
+retired collapse.
+
+The baseline's §8 state rule (root completion from `run.exited`; displayed states 5 done,
+10 held and 0 failed) is kept here only as the pre-decision baseline: it contradicted this
+document's §5 and OA5/OA6 (review finding 4) and is superseded by this revision, 2026-09-23
+(plan §3 D1). The D1 rules are:
+
+- The root shows its own testified outcome (variant and classification).
+- `run.exited` sets the run status only.
+- A failed attempt shows as failed, with its variant.
+- Nothing is marked superseded; no declared rule says a later route superseded an attempt.
+- A completed sibling never overrides a member's failure.
 
 The two JSONL traces establish event identity, order and graph joins; they do not by themselves
-contain the complete altitude → drawn node/route → material → geometry mapping in §6.
-The captures are machine-local and are not a durable regression fixture. Retain a reviewed,
-sanitized fixture and its graph/source digests in a durable test location before using it as
-release evidence; do not make tests depend on a temporary directory.
+contain the complete altitude → drawn node/route → material → geometry mapping in §6. The
+captures were machine-local; durable fixtures and a regression test now regenerate the committed
+summaries byte for byte on a clean checkout — `tests/fixtures/circuit/` and
+`tests/mapping-trace.test.mjs`, committed as `d7109ae` (the derived declared-bindings and
+presentation-policy fixtures followed in `9cdaf84`). The raw graph source remains machine-local
+and uncommitted; the declared-bindings fixture derived from it strips configuration.
 
-For this capability page, the immediate view work concerns OA3–OA8: qualify the capability
-view, scenario network/cell, execution authority, mechanics and provider realization. OA0–OA2
-remain required product levels with separate estate/domain/assembly source requirements. Do not
-infer those upper levels from this one run or mark them implemented when the lower views work.
+For this capability page, the OA3–OA8 circuit view work is delivered; §8 records its evidence
+and what remains open. OA0–OA2 remain required product levels with separate estate/domain/assembly
+source requirements. Do not infer those upper levels from this one run or mark them implemented
+when the lower views work.
 
 ## 8. Delivery sequence and acceptance
 
-| Work | Completion evidence |
-| --- | --- |
-| **Vocabulary and documentation** | Nine stable levels, independent concepts, parent-context behavior and links from governing docs. Established by this decision. |
-| **Source and view authority** | Each level has an exact source adapter/mapping and typed boundary rules; absent source yields a named gap. Persist the view policy through the existing authority workflow. Open. |
-| **OA3–OA8 circuit view** | Replace arbitrary count collapse with declared focus, context and membership; preserve operation descent/return, alternatives and ports. Open. |
-| **OA0–OA2 estate view** | Resolve declared domain/assembly membership, backplane bindings, shared dependencies and cross-domain connections. Open. |
-| **Navigation and layout** | Select all supported levels; preserve identity/evidence context and back navigation; readable geometry and matching accessible outline at each level. Open. |
-| **Evidence and material mapping** | Persist the §6 mapping for each occurrence and view; retain repeated visits and separate context/summary states. Open. |
-| **Overlays** | Each supported property has scope, provenance, aggregation, units and unknown-state behavior. Open. |
-| **Regression and visual verification** | Durable representative fixtures and verified screenshots/geometry for the matrix below. Open. |
+| Work | Status (2026-09-23) | Completion evidence |
+| --- | --- | --- |
+| **Vocabulary and documentation** | Done | Nine stable levels, independent concepts, parent-context behavior and links from governing docs: this decision. The D5 rename and the authority documents were committed as `f0ad8eb`. |
+| **Source and view authority** | Open (partly installed) | The declared presentation-policy read is installed (`sfx-embody` `31a95ad`) and consumed by the platform (`9cdaf84`). The nine-level source adapters are not built: each level's exact source adapter/mapping and named gap for absent source remain owed. |
+| **OA3–OA8 circuit view** | Done | Declared identity and outcome variants reach the record (SDA `1322d1f`, `a55fa92`) and the run graph (`ca8bad2`); the declared operation grain and Input/Event/Outcome boundary replace the count collapse (`7f809a7`, `88c41b4`); D1 states (`b56ea2b`, `492f261`); variants and junction arms (`d29cf7d`, `4f58f8f`, `e20a449`, `a28736e`). Evidence: `docs/circuit-mapping-trace-2026-09-23/` — equity 39 drawn nodes, all 35 operations, 529/529 cells resolved. |
+| **OA0–OA2 estate view** | Open | Requires estate, domain/assembly and integration authority not contained in a single run graph (§1). |
+| **Navigation and layout** | Done | Rank by declared operation order, never a material band (review finding 8); the camera follows the active operation (M12): `69cc10e`, `tests/layout.test.mjs`. |
+| **Evidence and material mapping** | Done | Declared exact-key maps, no word-stem or composite fallback (`sfx-embody` `31a95ad`; `9cdaf84`); the mapping is recorded per occurrence, driver and drawn target (`d7109ae`). Equity: 529/529 cells declared, 0 word-stem assignments. |
+| **Overlays** | Open | No completion evidence yet; each supported property still owes scope, provenance, aggregation, units and unknown-state behavior. |
+| **Regression and visual verification** | Done | Durable fixtures and byte-for-byte regeneration (`tests/fixtures/circuit/`, `tests/mapping-trace.test.mjs`, `d7109ae`); state replays and geometry are asserted by `tests/live-trace.test.ts` (`492f261`) and `tests/layout.test.mjs` (`69cc10e`). Screenshot-based verification is not part of the committed evidence for this work. |
 
 Acceptance must demonstrate:
 
@@ -409,3 +428,20 @@ or runtime cell kinds do not silently create new observation altitudes.
 Implementation work must update the delivery status and link its view contracts and
 verification evidence here. Editing this document alone does not close implementation gates
 or admit a capability, blueprint, binding or provider.
+
+### Revisions
+
+**2026-09-23 — D1 state semantics; D5 vocabulary.** Plan §3 D1 (ratified) resolved the
+state-rule contradiction between §7's retained baseline §8 rule and §5/OA5/OA6 (review
+finding 4): the root shows its own testified outcome (variant and classification), `run.exited`
+sets the run status only, a failed attempt shows as failed with its variant, nothing is marked
+superseded, and a completed sibling never overrides a member's failure. D5 renamed the display
+sense of "projection" to view/grain/grouping. No altitude was added, removed, renumbered or
+redefined.
+
+**Migration:** stored selections and mappings are unaffected — the stable IDs and §2 meanings
+are unchanged, and no stored selection or mapping encoded the superseded state rule.
+
+**Implementation evidence:** `b56ea2b` and `492f261` (D1 in `lib/live-trace.ts` and
+`tests/live-trace.test.ts`), `f0ad8eb` (D5 and the authority documents), with each phase commit
+listed in §8.

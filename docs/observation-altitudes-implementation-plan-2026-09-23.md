@@ -1,6 +1,6 @@
 # Observation altitudes — implementation plan (2026-09-23)
 
-**Status:** In progress. The owner said "get this done", so D1–D3 are taken as ratified in the recommended form. D4 and D5 are decided (2026-09-23): D4 replaces the C#-only `--plan-only` flag with a declared compile-only verb in the command operations authority, so Node and Python flag parity is no longer owed; D5 renames the display sense of "projection" to view/grain/grouping in obs (done 2026-09-23). Wave 1 lanes are running (phases 0, 1, 4, 8, the website half of 7, and the estate half of 2–3; see the §5 change-surface map). Wave 2 (the website halves of 1–3, and 5) follows.
+**Status:** Complete (2026-09-23). The owner said "get this done", so D1–D3 were taken as ratified in the recommended form. D4 and D5 are decided (2026-09-23): D4 replaced the C#-only `--plan-only` flag with a declared compile-only verb in the command operations authority, so Node and Python flag parity is no longer owed; D5 renamed the display sense of "projection" to view/grain/grouping in obs (done 2026-09-23). Phases 0–8 are implemented and committed across the three repositories; the phase→commit map is in §8.
 **Governing decision:** `docs/observation-altitudes.md` ("obs"). The work follows its §8 delivery sequence.
 **Basis:** the circuit mapping trace `docs/circuit-mapping-trace-2026-09-23/` ("the trace") and its review `docs/observation-altitudes-review.md` ("the review").
 **Grounding:** `sfx-embody/docs/sidefx-architecture-decision-rubric.md`, `target-architecture.md` and `transistor-model.md`:
@@ -248,3 +248,20 @@ Phases 2, 3, 5 and 6 touch them. Before any of those phases starts, its owner ha
 - No unwalked arm lit and no join invented (layout plan non-goals stand).
 - No evidence or receipts on the outcome path. Provider exchange evidence stays behind its evidence reference, on the observation lane.
 - No configuration, credential locator or invocation input in the circuit record.
+
+## 8. Phase → commit map (2026-09-23)
+
+Hashes verified against the three logs; `sfx-platform` unless the repository is named.
+
+| Phase | Commits |
+| --- | --- |
+| 0 Instrument | `d7109ae` (generator, three captures, byte-for-byte regression test); derived fixtures followed in `9cdaf84` |
+| 1 Declared semantics | SDA `1322d1f` (schema, C#/Node/Python emitters, authority), SDA `a55fa92` (declared id grammar; live record validates); `ca8bad2` (website run graph) |
+| 2 Materials | sfx-embody `31a95ad` (policy maps, `granularity.node`); `9cdaf84` (exact-key resolution, policy read, panel/page) |
+| 3 Grain | `7f809a7` (declared operation grain; count collapse deleted), `88c41b4` (walker typing, lint) |
+| 4 States (D1) | `b56ea2b` (states in `lib/live-trace.ts`), `492f261` (tests re-pinned; D1 acceptance unchanged) |
+| 5 Variants | `d29cf7d` (drawn-edge key), `4f58f8f` (viewer), `e20a449` (data/containment), `a28736e` (panel wiring) |
+| 6 Layout | `69cc10e` (declared order, never a material band; camera follows the active operation) |
+| 7 Graph binding (D4) | sfx-embody `93d65eb` (declared verb), SDA `ed97d67` (verb replaces the flag), SDA `8559084` (Node/Python parity), sfx-embody `462f48a` (kernel switched to the declared-verb build); `dac063e` (website binds on `graph.captured`) |
+| 8 Drain | `b56ea2b` (read every page before terminal) |
+| Decision record | `f0ad8eb` (D5 rename, D4 decision, authority documents committed) |
