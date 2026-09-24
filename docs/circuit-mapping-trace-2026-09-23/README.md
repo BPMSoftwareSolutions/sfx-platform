@@ -2,7 +2,7 @@
 
 **Purpose:** Before any layout or renderer work, establish from the data alone what each observed event is, which declared element it belongs to, which material the declared presentation policy gives it, which drawn element it lights, and in what order.
 **Runs:** `resolve-equity-market-price-evidence` (1,079 events) and `say-hello-world` (26 events, the control).
-**Code used:** the platform's own `buildRunGraphView` (`lib/run-graph.ts`) and the declared `circuit-presentation.v1` policy (`read-circuit-presentation`, committed as `tests/fixtures/circuit/circuit-presentation-policy.json`). The captures were taken before the kernel emitted each cell's declared `execution.authorityId` (SDA `1322d1f`); the generator joins that declared identity back from the declared-bindings fixture derived by `derive-declared-bindings.mjs`. Nothing is re-implemented.
+**Code used:** the platform's own `buildRunGraphView` (`lib/run-graph.ts`) and the declared `circuit-presentation.v1` policy (`read-circuit-presentation`, committed as `tests/fixtures/circuit/circuit-presentation-policy.json`). The captures were re-captured on the host-invariant U3 kernel (SDA `e398cd5`, installed kernel `3224b653…`) and carry each cell's declared `execution.authorityId` (SDA `1322d1f`) verbatim; for a capture that predates it the generator joins the declared identity back from the declared-bindings fixture derived by `derive-declared-bindings.mjs`. Nothing is re-implemented.
 
 ## Files
 

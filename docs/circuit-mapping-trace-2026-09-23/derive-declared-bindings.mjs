@@ -2,8 +2,9 @@
 /**
  * Derive the declared bindings a run capture predates.
  *
- * The committed run captures were taken before the kernel emitted each cell's declared
- * `execution.authorityId` (SDA commit 1322d1f). The mapping trace measures the platform as it is,
+ * A run capture taken before the kernel emitted each cell's declared `execution.authorityId`
+ * (SDA commit 1322d1f) needs this join; the committed captures (re-captured on the U3 kernel,
+ * SDA e398cd5) now carry it verbatim. The mapping trace measures the platform as it is,
  * so it joins the declared identities back onto the captured cells. This script derives that join
  * from the declared graph source and strips every configuration value:
  *

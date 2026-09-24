@@ -15,8 +15,9 @@ import { fileURLToPath } from 'node:url';
  * shape; it embeds the run graph, so no machine-local input is needed.
  *
  * Materials now come from the declared policy fixture (circuit-presentation-policy.json, copied
- * from the estate's `read-circuit-presentation`), and the captures — taken before the kernel
- * emitted each cell's declared `execution.authorityId` (SDA 1322d1f) — are joined to the
+ * from the estate's `read-circuit-presentation`), and the captures — re-captured on the
+ * host-invariant U3 kernel (SDA e398cd5, installed kernel 3224b653…) — carry each cell's declared
+ * `execution.authorityId` (SDA 1322d1f) verbatim. A capture that predates it is joined to the
  * declared-bindings fixture named after the run's subject (derive-declared-bindings.mjs, derived
  * from the declared graph source; configuration stripped). The generator discovers both; the
  * machine-local graph source itself stays out of the fixtures.

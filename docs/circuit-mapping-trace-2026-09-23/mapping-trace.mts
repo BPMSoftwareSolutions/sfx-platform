@@ -5,9 +5,9 @@
  * Usage (cwd sfx-platform):
  *   node --import tsx docs/circuit-mapping-trace-2026-09-23/mapping-trace.mts <run.json> <outDir> [events.jsonl] [declared-bindings.json]
  *
- * Materials come from the estate policy fixture, by exact declared key only. Captures taken
- * before the kernel carried `execution.authorityId` (SDA 1322d1f) are joined to the declared
- * bindings fixture named after the run's subject
+ * Materials come from the estate policy fixture, by exact declared key only. The committed capture
+ * now carries `execution.authorityId` (SDA 1322d1f) verbatim; a capture taken before the kernel
+ * carried it is joined to the declared bindings fixture named after the run's subject
  * (`tests/fixtures/circuit/<subject>-declared-bindings.json`, derived by
  * derive-declared-bindings.mjs) or to the explicit 5th argument. The join is measurement only:
  * every authority is the declared identity the current record carries.
@@ -47,7 +47,7 @@ if (normalizedPath && existsSync(normalizedPath)) {
 const events = [...byCursor.values()].sort((a, b) => a.cursor - b.cursor);
 if (!graph?.cells || events.length === 0) throw new Error(`unexpected run shape: graph ${!!graph?.cells}, events ${events.length}`);
 
-// The declared bindings the capture predates: an explicit path, or the fixture named after the subject.
+// The declared bindings for a capture that predates authorityId: an explicit path, or the fixture named after the subject.
 function locateBindings() {
   const explicit = process.argv[5];
   if (explicit) return explicit;
