@@ -20,10 +20,14 @@ import { buildRunGraphView, compiledGraphSurface, normalizeRunGraph, runGraphVie
  * A cell lights because its `cellId` has a membership entry in the run graph; an edge lights
  * because its `edgeId` does. Kernel step ids, delivery phases and cell altitudes are inert: they
  * name no node. Failure testimony marks; process exit does not.
+ *
+ * The view is drawn at the declared operation grain: a raw cell may be a member of a drawn node
+ * rather than a node itself. A member's testimony lights its node and counts when failed, but only
+ * the node's own cell testifies for its state and outcome.
  */
 
 function graphOf(
-  cells: Array<{ cellId: string; altitude: string; parentCellId: string | null }>,
+  cells: Array<{ cellId: string; altitude: string; parentCellId: string | null; authorityId?: string | null }>,
   edges: Array<{ edgeId: string; from: string; to: string }> = []
 ): SdaRunGraph {
   return {
@@ -33,6 +37,7 @@ function graphOf(
       cellId: cell.cellId,
       altitude: cell.altitude,
       kind: cell.altitude,
+      authorityId: cell.authorityId ?? undefined,
       parentCellId: cell.parentCellId,
       semanticAddress: `fixture/${cell.cellId}`,
       ports: {
@@ -81,12 +86,18 @@ function sseEvents(text: string): SdaRunEvent[] {
   return events.sort((a, b) => a.cursor - b.cursor);
 }
 
+/**
+ * The hand-built record declares what a current capture declares: a verbatim `execution.authorityId`
+ * per cell (the scenario's is its Event identity) and the scenario's own ports as its Input and
+ * Outcome boundary. The mechanics name declared policy authorities so their material resolves; the
+ * provider names the governed HTTP exchange authority.
+ */
 const fixture = graphOf(
   [
-    { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
-    { cellId: 'cell:mechanic:a', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
-    { cellId: 'cell:mechanic:b', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
-    { cellId: 'cell:provider:a.p', altitude: 'provider', parentCellId: 'cell:mechanic:a' },
+    { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null, authorityId: 'fixture.requested' },
+    { cellId: 'cell:mechanic:a', altitude: 'mechanic', parentCellId: 'cell:scenario:root', authorityId: 'mechanic:identity.v1' },
+    { cellId: 'cell:mechanic:b', altitude: 'mechanic', parentCellId: 'cell:scenario:root', authorityId: 'mechanic:identity.v1' },
+    { cellId: 'cell:provider:a.p', altitude: 'provider', parentCellId: 'cell:mechanic:a', authorityId: 'provider:sda-governed-http-exchange-port.v1' },
   ],
   [
     { edgeId: 'edge:return:a', from: 'cell:mechanic:a', to: 'cell:scenario:root' },
@@ -95,7 +106,11 @@ const fixture = graphOf(
   ]
 );
 
+/** The declared operation grain: the provider is drawn inside its mechanic, with the scenario's
+ *  Input / Event / Outcome boundary roles beside it. */
 const view = buildRunGraphView(normalizeRunGraph(fixture));
+/** The full-fidelity view: every raw cell is its own drawn node, no boundary roles. */
+const fullView = buildRunGraphView(normalizeRunGraph(fixture), { full: true });
 const event = (cursor: number, kind: string, payload: unknown): SdaRunEvent => ({ cursor, at: '2026-09-23T00:00:00.000Z', kind, payload });
 const cellTestimony = (cursor: number, cellId: string, facts: Record<string, unknown> = {}) =>
   event(cursor, 'cell-execution-testimony.v1', { testimonyType: 'cell-execution-testimony.v1', cellId, disposition: 'completed', ...facts });
@@ -107,10 +122,15 @@ test('cell testimony lights its bound drawn node in execution order', () => {
     cellTestimony(3, 'cell:mechanic:b'),
     cellTestimony(4, 'cell:scenario:root'),
   ], view);
-  assert.equal(trace.states['cell:mechanic:a'], 'done');
+  assert.equal(trace.states['cell:mechanic:a'], 'done', 'the drawn node is lit by its own testimony, never a member’s');
   assert.equal(trace.states['cell:mechanic:b'], 'done');
   assert.equal(trace.states['cell:scenario:root'], 'done');
-  assert.equal(trace.states['cell:provider:a.p'], 'planned');
+  // The provider is grouped into its mechanic at the declared operation grain; with no testimony
+  // of its own it has no observed state and lights nothing.
+  assert.equal(trace.cells['cell:provider:a.p'], undefined);
+  for (const boundary of ['cell:scenario:root:input', 'cell:scenario:root:event', 'cell:scenario:root:outcome']) {
+    assert.equal(trace.states[boundary], 'planned', 'a boundary role is identity, never an executed cell');
+  }
   assert.deepEqual(
     trace.transitions.map((transition) => `${transition.cursor} ${transition.nodeId} ${transition.from ?? 'idle'}>${transition.to}`),
     [
@@ -125,13 +145,19 @@ test('planned-unobserved is drawn unlit and distinguishable from observed', () =
   const before = emptyTrace(view);
   assert.deepEqual(before.states, {
     'cell:scenario:root': 'planned',
+    'cell:scenario:root:input': 'planned',
+    'cell:scenario:root:event': 'planned',
+    'cell:scenario:root:outcome': 'planned',
     'cell:mechanic:a': 'planned',
     'cell:mechanic:b': 'planned',
-    'cell:provider:a.p': 'planned',
   });
   const after = applyEvents(before, [cellTestimony(1, 'cell:provider:a.p')], view);
-  assert.equal(after.states['cell:provider:a.p'], 'done');
-  assert.equal(after.states['cell:mechanic:a'], 'planned', 'a parent does not light from a child testimony');
+  // The member's own state is raw testimony; the drawn node it groups into is lit active but is
+  // not testified for by its member and records no member outcome as its own.
+  assert.equal(after.cells['cell:provider:a.p'], 'done');
+  assert.equal(after.states['cell:mechanic:a'], 'active', 'a member lights the node but does not testify for it');
+  assert.equal(after.outcomes['cell:mechanic:a'], undefined);
+  assert.equal(after.states['cell:mechanic:b'], 'planned');
   assert.equal(after.transitions.length, 1);
 });
 
@@ -153,11 +179,14 @@ test('a completed cell whose own outcome is classified failure is a failed attem
       display: { entry: { status: 'failed' } },
     }),
   ], view);
-  assert.equal(classified.states['cell:provider:a.p'], 'failed');
+  assert.equal(classified.cells['cell:provider:a.p'], 'failed');
   // Completion and outcome are distinct facts: the variant and classification stay recorded.
   assert.deepEqual(classified.cellOutcomes['cell:provider:a.p'], { variant: 'retained-non-success', classification: 'failure' });
-  // A parent does not inherit a child's state from testimony unless the collapse drew them together.
-  assert.equal(classified.states['cell:mechanic:a'], 'planned');
+  // The failed attempt is a member of the drawn mechanic: it lights the node and is counted, never
+  // inherited as the node's own state.
+  assert.equal(classified.states['cell:mechanic:a'], 'active');
+  assert.equal(classified.failedMembers['cell:mechanic:a'], 1);
+  assert.equal(classified.states['cell:mechanic:b'], 'planned');
   // No rule produces `held`; it stays in the union only because renderer code names it.
   for (const state of Object.values(classified.states)) assert.notEqual(state, 'held');
 });
@@ -170,12 +199,12 @@ test('a declared failure disposition stays failed regardless of display status',
       display: { entry: { status: 'completed' } },
     }),
   ], view);
-  assert.equal(classified.states['cell:provider:a.p'], 'failed');
+  assert.equal(classified.cells['cell:provider:a.p'], 'failed');
 });
 
 test('a member failure is counted on the drawn node and never becomes the node’s own state', () => {
-  const collapsed = buildRunGraphView(normalizeRunGraph(fixture), 2);
-  assert.equal(collapsed.membership['cell:provider:a.p'], 'cell:mechanic:a', 'the collapse draws the provider beside its mechanic');
+  assert.equal(view.membership['cell:provider:a.p'], 'cell:mechanic:a', 'the declared operation grain groups the provider under its mechanic');
+  const collapsed = view;
   const afterMemberFailure = applyEvents(emptyTrace(collapsed), [
     cellTestimony(1, 'cell:provider:a.p', {
       disposition: 'completed',
@@ -185,9 +214,13 @@ test('a member failure is counted on the drawn node and never becomes the node�
   ], collapsed);
   assert.equal(afterMemberFailure.states['cell:mechanic:a'], 'active', 'a member lights the node but does not testify for it');
   assert.equal(afterMemberFailure.failedMembers['cell:mechanic:a'], 1, 'the member failure is counted');
-  const afterOwnCompletion = applyEvents(afterMemberFailure, [cellTestimony(2, 'cell:mechanic:a')], collapsed);
+  assert.deepEqual(afterMemberFailure.transitions.map((transition) => transition.nodeId), ['cell:mechanic:a'], 'the member failure is bound to the drawn node, not a node of its own');
+  const afterOwnCompletion = applyEvents(afterMemberFailure, [
+    cellTestimony(2, 'cell:mechanic:a', { outcomeVariant: 'SUCCESS', outcomeClassification: 'success' }),
+  ], collapsed);
   assert.equal(afterOwnCompletion.states['cell:mechanic:a'], 'done', 'the node shows its own testified outcome');
   assert.equal(afterOwnCompletion.failedMembers['cell:mechanic:a'], 1, 'the member failure stays counted');
+  assert.deepEqual(afterOwnCompletion.outcomes['cell:mechanic:a'], { variant: 'SUCCESS', classification: 'success' }, 'the node carries its own outcome, never the member’s');
 });
 
 test('run.exited sets the run status only; it never completes or fails a node', () => {
@@ -270,9 +303,9 @@ test('testimony without a membership entry is recorded and never lit', () => {
 });
 
 test('a route collapsed inside one drawn node is bound, not reported as unmatched', () => {
-  const collapsedView = buildRunGraphView(normalizeRunGraph(fixture), 1);
+  const collapsedView = view;
   assert.equal(collapsedView.edgeMembership['edge:sequence:a.p'], undefined, 'an internal route is not drawn');
-  assert.ok(collapsedView.internalEdgeNode['edge:sequence:a.p'], 'an internal route is bound to its node');
+  assert.equal(collapsedView.internalEdgeNode['edge:sequence:a.p'], 'cell:mechanic:a', 'an internal route is bound to its node');
   const trace = applyEvents(emptyTrace(collapsedView), [
     event(1, 'edge-execution-testimony.v1', { testimonyType: 'edge-execution-testimony.v1', edgeId: 'edge:sequence:a.p', admissionDisposition: 'admitted' }),
     event(2, 'edge-execution-testimony.v1', { testimonyType: 'edge-execution-testimony.v1', edgeId: 'edge:not-in-this-graph', admissionDisposition: 'admitted' }),
@@ -297,7 +330,9 @@ test('binding is identical for two capabilities with no shared vocabulary', () =
 });
 
 test('the viewer renders planned, observed and failed states and live edges', () => {
-  const projection = runGraphViewProjection(view, { capabilityId: 'fixture', scenarioId: null });
+  // The viewer takes whatever drawn nodes it is handed; the full view draws every raw cell so the
+  // provider is a node of its own to fail.
+  const projection = runGraphViewProjection(fullView, { capabilityId: 'fixture', scenarioId: null });
   const markup = renderToStaticMarkup(createElement(CircuitViewer, {
     circuit: projection,
     liveNodes: {
@@ -318,7 +353,7 @@ test('the viewer renders planned, observed and failed states and live edges', ()
 
 test('a failure-classified attempt renders as failed, never as held', () => {
   const trace = applyEvents(emptyTrace(view), [
-    cellTestimony(1, 'cell:provider:a.p', {
+    cellTestimony(1, 'cell:mechanic:a', {
       disposition: 'completed',
       outcomeClassification: 'failure',
       outcomeVariant: 'retained-non-success',
@@ -389,7 +424,7 @@ test('an authored bundle is a labelled comparison candidate beside the trace, ne
   assert.match(markup, /not observed/);
 });
 
-test('the trace surface shows the collapsed view with the declared limit', () => {
+test('the trace surface groups at the declared operation grain, not a count collapse', () => {
   const deepCells: Array<{ cellId: string; altitude: string; parentCellId: string | null }> = [
     { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
   ];
@@ -405,10 +440,15 @@ test('the trace surface shows the collapsed view with the declared limit', () =>
     circuits: [authoredCircuit],
     liveOverride: liveView(deepView),
   }));
-  assert.match(markup, /collapsed at limit 30/);
-  assert.match(markup, /9 of 73 cells drawn/);
+  // 73 raw cells draw as the scenario, its three boundary roles and the 8 operations each
+  // enclosing its 8 providers — the declared grain, with no limit used as a grouping cap.
+  assert.match(markup, /12 of 73 cells drawn/);
+  assert.match(markup, /grouped at the declared operation grain/);
+  assert.doesNotMatch(markup, /collapsed at limit/);
+  assert.match(markup, /m0 · 9 cells/);
+  assert.match(markup, /m7 · 9 cells/);
   const nodeCount = (markup.match(/class="circuit-node circuit-node--/g) ?? []).length;
-  assert.ok(nodeCount <= 30, `expected at most 30 drawn nodes, saw ${nodeCount}`);
+  assert.equal(nodeCount, 12, `expected the scenario, its boundary roles and 8 operations, saw ${nodeCount}`);
 });
 
 test('the trace surface reports unmatched testimony rather than dropping it', () => {
@@ -429,11 +469,18 @@ test('the compiled capability graph is drawn planned and unlit with no run', () 
     capabilityGraph: surface,
   }));
   assert.match(markup, /Compiled execution graph/);
-  assert.match(markup, /4 of 4 cells drawn/);
+  // 4 raw cells draw as 6 nodes: the scenario, its declared Input / Event / Outcome boundary roles
+  // and the two operations (the provider groups into its mechanic).
+  assert.equal(surface.stats.totalCells, 4);
+  assert.equal(surface.stats.drawnNodes, 6);
+  assert.match(markup, /6 of 4 cells drawn/);
   assert.match(markup, /no run/);
+  assert.match(markup, /Input: fixture\.v1/, 'the scenario draws its Input from the declared port contract');
+  assert.match(markup, /Event: fixture\.requested/, 'the scenario draws its Event from the declared authorityId');
+  assert.match(markup, /Outcome: fixture\.v1/, 'the scenario draws its Outcome from the declared port contract');
   assert.match(markup, /class="circuit-node circuit-node--planned"[^>]*data-live="planned"/);
   const nodeCount = (markup.match(/class="circuit-node circuit-node--/g) ?? []).length;
-  assert.equal(nodeCount, 4);
+  assert.equal(nodeCount, 6);
   assert.doesNotMatch(markup, /boundary/i);
   // The authored bundle stays a labelled comparison candidate, never the trace surface.
   assert.match(markup, /Authored circuit — labelled comparison candidate \(not observed execution\)/);
@@ -489,8 +536,9 @@ test('without materials the trace keeps the shaped primitive rendering and refer
     capabilityGraph: compiledGraphSurface(fixture, 'fixture'),
   }));
   assert.doesNotMatch(markup, /\/media\/materials\//);
-  // Every drawn node still carries its silhouette: a shaped contour path, never a plain card.
-  assert.equal((markup.match(/class="circuit-node-contour"/g) ?? []).length, 4);
+  // Every drawn node but the scenario's container frame still carries its silhouette: a shaped
+  // contour path, never a plain card. 6 nodes = root container + Input + Event + Outcome + a + b.
+  assert.equal((markup.match(/class="circuit-node-contour"/g) ?? []).length, 5);
   const silhouettes = [...markup.matchAll(/<path d="([^"]+)" fill="color-mix/g)].map((match) => match[1]);
   assert.equal(new Set(silhouettes).size, silhouettes.length, 'primitive silhouettes are distinct');
 });
@@ -544,14 +592,27 @@ test('the equity replay shows every failed route attempt as failed with its own 
   assert.deepEqual(equityResolved.outcomes[operationCellId(15)], { variant: 'EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', classification: 'success' });
 });
 
-test('the equity replay counts failed members on the drawn root without failing it', () => {
+test('the equity replay draws each failed attempt as its own node and counts failed members without failing the root', () => {
+  // 1 scenario + its 3 boundary roles + 35 operations, per the declared operation grain.
+  assert.equal(equityDrawn.nodes.length, 39);
+  assert.equal(equityDrawn.nodes.filter((node) => !node.boundaryRole).length, 36);
   const rootNode = equityDrawn.nodes.find((node) => node.id === rootCellId);
   assert.ok(rootNode, 'the scenario root is always a drawn node');
-  const failedMembers = rootNode.memberCellIds.filter((member) => member !== rootCellId && equityDrawnReplay.cells[member] === 'failed');
-  assert.ok(failedMembers.length > 0, 'the resolved root still carries its failed attempts as members');
-  assert.equal(equityDrawnReplay.failedMembers[rootCellId], failedMembers.length, 'member failures are counted, never inherited');
+  // The declared grain draws the failed routes as operation nodes, not as members of the root:
+  // the root shows its own testified success and counts no failed member.
+  assert.deepEqual(rootNode.memberCellIds, [rootCellId]);
   assert.equal(equityDrawnReplay.states[rootCellId], 'done', 'the node shows its own testified success');
   assert.deepEqual(equityDrawnReplay.outcomes[rootCellId], { variant: 'EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', classification: 'success' });
+  assert.equal(equityDrawnReplay.failedMembers[rootCellId], 0);
+  // The failed attempts stay visible: drawn failed by their own testimony, with the failed members
+  // inside them counted on the drawn node, never inherited as its state.
+  assert.equal(equityDrawnReplay.states[operationCellId(4)], 'failed');
+  const counted = equityDrawn.nodes.filter((node) => equityDrawnReplay.failedMembers[node.id] > 0);
+  assert.ok(counted.length > 0, 'the resolved run still carries failed attempts inside drawn operations');
+  for (const node of counted) {
+    const failedMembers = node.memberCellIds.filter((member) => member !== node.id && equityDrawnReplay.cells[member] === 'failed');
+    assert.equal(equityDrawnReplay.failedMembers[node.id], failedMembers.length, `${node.id} counts exactly its failed members`);
+  }
 });
 
 test('the rejected equity replay fails the root by its own testimony; exit 0 completes nothing', () => {
@@ -564,14 +625,15 @@ test('the rejected equity replay fails the root by its own testimony; exit 0 com
   for (const state of Object.values(rejected.states)) assert.notEqual(state, 'held');
 });
 
-test('the hello-world replay is unchanged: six planned nodes, all completed', () => {
+test('the hello-world replay is unchanged: every cell completed, boundary roles drawn unlit', () => {
   const helloCapture = JSON.parse(fixtureText('run-say-hello-world.json')) as {
     graph: { json: SdaRunGraph };
     pages?: Array<{ body?: { events?: SdaRunEvent[] } }>;
   };
   const helloView = buildRunGraphView(normalizeRunGraph(helloCapture.graph.json));
   const trace = applyEvents(emptyTrace(helloView), captureEvents(helloCapture), helloView);
-  assert.deepEqual(trace.states, {
+  // The testimony is untouched: all six raw cells completed.
+  assert.deepEqual(trace.cells, {
     'cell:scenario:say-hello-world': 'done',
     'cell:mechanic:say-hello-world.operation.1': 'done',
     'cell:mechanic:say-hello-world.operation.1:expression': 'done',
@@ -579,8 +641,19 @@ test('the hello-world replay is unchanged: six planned nodes, all completed', ()
     'cell:mechanic:say-hello-world.operation.1:expression.fields.payload': 'done',
     'cell:mechanic:say-hello-world.operation.1:expression.fields.payload.fields.message': 'done',
   });
+  // The declared operation grain draws the operation (its five member cells) and the scenario; the
+  // scenario's Input / Event / Outcome boundary roles are drawn planned and unlit, never cells.
+  assert.deepEqual(trace.states, {
+    'cell:mechanic:say-hello-world.operation.1': 'done',
+    'cell:scenario:say-hello-world': 'done',
+    'cell:scenario:say-hello-world:input': 'planned',
+    'cell:scenario:say-hello-world:event': 'planned',
+    'cell:scenario:say-hello-world:outcome': 'planned',
+  });
   assert.deepEqual(trace.outcomes['cell:scenario:say-hello-world'], { variant: 'TERMINAL', classification: null });
-  assert.deepEqual(Object.values(trace.failedMembers), [0, 0, 0, 0, 0, 0]);
+  assert.deepEqual(trace.outcomes['cell:mechanic:say-hello-world.operation.1'], { variant: 'SUCCESS', classification: null });
+  assert.equal(Object.keys(trace.failedMembers).length, helloView.nodes.length);
+  assert.ok(Object.values(trace.failedMembers).every((count) => count === 0));
   assert.equal(trace.unmatched.length, 0);
   assert.deepEqual(trace.run, { state: 'exited', exitCode: 0 });
 });
