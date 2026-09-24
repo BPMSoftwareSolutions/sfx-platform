@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { CircuitProjection, MaterialToken } from '@/contracts/estate';
+import type { LiveOutcome } from '@/lib/live-trace';
 
-import { layoutCircuit } from './layout';
+import { focusViewport, layoutCircuit } from './layout';
 import { materialGeometry, type MaterialGeometry } from './material-geometry';
 import {
   EDGE_STYLES,
@@ -19,23 +20,45 @@ import {
  * Circuit viewer — §12.2, §12.4, §6.6.
  *
  * Topology, labels, status and evidence come from the deterministic projection. The viewer adds
- * selection, an equivalent text outline, a legend, a node inspector and opt-in illustrative flow.
+ * selection, an equivalent text outline, a legend, a node inspector and one observed token.
  *
  * A node carrying a canonical `material` is drawn as the component plate inside its defining
  * shape, with the state affordances layered over the material — the observed class never replaces
  * what the component is. Nodes without a material (authored projections) keep the primitive rect.
+ *
+ * A run's own testimony leaves a trail (`liveTrail`): one circular token advances along the exact
+ * compiled path, shape to shape, in cursor order. It never walks a route no testimony named, and
+ * a compiled view with no run has no trail at all — the two modes are the same drawing.
  *
  * The SVG and the text outline are both server-rendered, so public reading and the text
  * explanation remain available without JavaScript; only the controls require it.
  */
 
 /** Observed execution state for one node, applied as an explicit class and data attribute. */
-export type LiveNodeState = 'planned' | 'active' | 'done' | 'failed';
+export type LiveNodeState = 'planned' | 'active' | 'done' | 'held' | 'failed';
+
+/** One observed step, in cursor order: a drawn node or edge whose testimony advanced. */
+export interface LiveTrailStep {
+  /** Drawn node id or drawn edge id. */
+  id: string;
+  state: LiveNodeState;
+}
 
 /** `url(#…)` fragments must not carry cell-id punctuation. */
 const fragmentId = (value: string) => `circuit-${value.replace(/[^a-zA-Z0-9]+/g, '-')}`;
 const clipId = (nodeId: string) => fragmentId(`clip-${nodeId}`);
 const edgePatternId = (token: string) => fragmentId(`edge-${token}`);
+
+/**
+ * The outcome badge text: the testified variant and classification, clipped to the node's width.
+ * The inspector and the text outline carry the full value, and the clip is visible on the badge
+ * itself, so a long variant is never silently turned into a different one.
+ */
+function outcomeBadge(outcome: LiveOutcome, availableWidth: number): string {
+  const text = [outcome.variant ?? 'outcome', outcome.classification].filter(Boolean).join(' · ');
+  const maxChars = Math.max(8, Math.floor((availableWidth - 8) / 5.4));
+  return text.length > maxChars ? `${text.slice(0, maxChars - 1)}…` : text;
+}
 
 interface Props {
   circuit: CircuitProjection;
@@ -46,21 +69,57 @@ interface Props {
   liveNodes?: Partial<Record<string, LiveNodeState>>;
   /** Live trace overlay for drawn edges: edge id to observed state. */
   liveEdges?: Partial<Record<string, LiveNodeState>>;
+  /**
+   * Drawn node id -> the outcome its own cell testified (the trace's `outcomes`). A node with a
+   * testified outcome shows the variant and classification it reached; a node without one shows
+   * nothing — an outcome is never inferred from a declared variant or a sibling's testimony.
+   */
+  liveOutcomes?: Partial<Record<string, LiveOutcome>>;
+  /**
+   * Drawn edge id -> its declared selection/recurrence variant (`RunGraphViewEdge.selectsVariant`).
+   * A walked arm (an edge with its own observed state) is labelled with the variant it walked; an
+   * unwalked arm carries no state and no label.
+   */
+  edgeVariants?: Partial<Record<string, string | boolean | null>>;
+  /**
+   * The run's observed trail in cursor order. The token follows it node/edge by node/edge; with
+   * no trail (compiled view, authored circuit) it never renders.
+   */
+  liveTrail?: LiveTrailStep[];
   /** Canonical material token to its published `/media/materials/...` asset. */
   materials?: Record<string, string>;
 }
 
-export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes, liveEdges, materials }: Props) {
+export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes, liveEdges, liveOutcomes, edgeVariants, liveTrail, materials }: Props) {
   const layout = useMemo(() => layoutCircuit(circuit), [circuit]);
+  // The focused camera for live watching (M12): the active drawn node keeps itself in view. Only
+  // the camera moves — the drawing is never trimmed and every drawn id stays bound.
+  const activeNodeId = useMemo(() => {
+    if (!liveNodes) return undefined;
+    for (const [id, state] of Object.entries(liveNodes)) if (state === 'active') return id;
+    return undefined;
+  }, [liveNodes]);
+  const camera = useMemo(() => (activeNodeId ? focusViewport(layout, activeNodeId) : null), [layout, activeNodeId]);
   const [internalSelection, setInternalSelection] = useState<string | undefined>(undefined);
-  const [playing, setPlaying] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
+  const tokenRef = useRef<SVGGElement>(null);
+  const pathRefs = useRef(new Map<string, SVGPathElement>());
+  const trailRef = useRef<LiveTrailStep[]>([]);
+  const playedRef = useRef(0);
+  const runningRef = useRef(false);
+  const rafRef = useRef(0);
+  const lastPosRef = useRef<{ x: number; y: number } | undefined>(undefined);
+  const trailLength = liveTrail?.length ?? 0;
+
+  // The running token reads the latest observed trail without restarting: a ref may not be
+  // written during render, so an effect keeps it current (declared before the animation effect).
+  useEffect(() => {
+    trailRef.current = liveTrail ?? [];
+  });
 
   const selected = selectedNodeId ?? internalSelection;
   const select = (id: string | undefined) => {
-    // §12.4 — node inspection pauses playback.
-    setPlaying(false);
     setInternalSelection(id);
     onSelectNode?.(id);
   };
@@ -73,15 +132,99 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
     return () => query.removeEventListener('change', update);
   }, []);
 
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  // One token per run, advancing only through the observed trail. The animation writes the token
+  // group's transform directly (no per-frame React state), stops when the trail is exhausted and
+  // resumes when later testimony lengthens it. A compiled view has no trail and shows no token.
   useEffect(() => {
-    if (!playing) return;
-    // §12.4 — hiding or leaving the page stops motion.
-    const onVisibility = () => {
-      if (document.hidden) setPlaying(false);
+    const setTokenAt = (x: number, y: number, visible = true) => {
+      const token = tokenRef.current;
+      if (!token) return;
+      token.style.display = visible ? '' : 'none';
+      token.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
+      lastPosRef.current = { x, y };
     };
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [playing]);
+    if (trailLength === 0) {
+      playedRef.current = 0;
+      runningRef.current = false;
+      cancelAnimationFrame(rafRef.current);
+      lastPosRef.current = undefined;
+      setTokenAt(0, 0, false);
+      return;
+    }
+    if (runningRef.current) return;
+    runningRef.current = true;
+
+    const edgeById = new Map(layout.edges.map((edge) => [edge.id, edge]));
+    let motion:
+      | { kind: 'edge'; path: SVGPathElement; length: number; startedAt: number; duration: number }
+      | { kind: 'node'; from: { x: number; y: number }; to: { x: number; y: number }; startedAt: number; duration: number }
+      | undefined;
+
+    const startNext = (now: number): boolean => {
+      while (playedRef.current < trailRef.current.length) {
+        const step = trailRef.current[playedRef.current];
+        playedRef.current += 1;
+        if (!step) continue;
+        const edge = edgeById.get(step.id);
+        if (edge) {
+          const path = pathRefs.current.get(edge.id);
+          if (!path) continue;
+          const length = path.getTotalLength();
+          const end = path.getPointAtLength(length);
+          if (reducedMotion) {
+            setTokenAt(end.x, end.y);
+            continue;
+          }
+          const start = path.getPointAtLength(0);
+          setTokenAt(start.x, start.y);
+          motion = {
+            kind: 'edge',
+            path,
+            length,
+            startedAt: now,
+            // Longer routes take longer, bounded so a multi-step page still trails the lane.
+            duration: Math.max(320, Math.min(1400, 240 + length * 0.65)),
+          };
+          return true;
+        }
+        const node = layout.nodeById[step.id];
+        if (!node) continue;
+        const to = { x: node.x + node.width / 2, y: node.y + node.height / 2 };
+        if (reducedMotion) {
+          setTokenAt(to.x, to.y);
+          continue;
+        }
+        motion = { kind: 'node', from: lastPosRef.current ?? to, to, startedAt: now, duration: 260 };
+        return true;
+      }
+      return false;
+    };
+
+    const tick = (now: number) => {
+      if (!motion && !startNext(now)) {
+        runningRef.current = false;
+        return;
+      }
+      if (motion) {
+        const progress = motion.duration > 0 ? Math.min(1, (now - motion.startedAt) / motion.duration) : 1;
+        if (motion.kind === 'edge') {
+          const point = motion.path.getPointAtLength(motion.length * progress);
+          setTokenAt(point.x, point.y);
+        } else {
+          setTokenAt(
+            motion.from.x + (motion.to.x - motion.from.x) * progress,
+            motion.from.y + (motion.to.y - motion.from.y) * progress
+          );
+        }
+        if (progress >= 1) motion = undefined;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+  }, [trailLength, layout, reducedMotion]);
 
   // Every drawn node carries a material silhouette. A run cell resolves its own material; an
   // authored projection falls back to the primitive's table entry. The plate image is layered
@@ -128,14 +271,6 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
             SCL {circuit.sclVersion} · {circuit.sourceProfile}
           </span>
           <div className="ml-auto flex gap-2">
-            <button
-              type="button"
-              onClick={() => setPlaying((v) => !v)}
-              aria-pressed={playing}
-              className="rounded border border-grid-line px-3 py-1 text-xs hover:border-signal"
-            >
-              {playing ? 'Pause flow' : 'Play flow'}
-            </button>
             {selected ? (
               <button
                 type="button"
@@ -156,11 +291,16 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
         >
           <svg
             ref={svgRef}
-            viewBox={`0 0 ${layout.width} ${layout.height}`}
+            viewBox={
+              camera
+                ? `${camera.x} ${camera.y} ${camera.width} ${camera.height}`
+                : `0 0 ${layout.width} ${layout.height}`
+            }
+            data-following={camera ? activeNodeId : undefined}
             width="100%"
             role="img"
             aria-labelledby={`${titleId} ${descId}`}
-            className="min-w-[520px]"
+            style={{ minWidth: layout.width }}
           >
             <title id={titleId}>{`Circuit: ${circuit.capabilityId} / ${circuit.scenarioId}`}</title>
             <desc id={descId}>
@@ -212,6 +352,10 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
               const style = EDGE_STYLES[source?.family ?? 'SUPPORT'];
               const liveEdge = liveEdges?.[edge.id];
               const edgeToken = source?.material && materials?.[source.material] ? source.material : undefined;
+              // A walked selection/recurrence arm shows the variant it walked. An unwalked arm
+              // carries no observed state, so it is never labelled and never lit.
+              const variant = edgeVariants?.[edge.id];
+              const walked = liveEdge === 'active' || liveEdge === 'done';
               // A loop-back route reads as a loop: dashed at rest; state still layers over it.
               const dash = edge.back ? '6 4' : style.dash === '1 0' ? undefined : style.dash;
               return (
@@ -232,6 +376,11 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                     </>
                   ) : null}
                   <path
+                    ref={(element) => {
+                      // The token samples this same compiled path; no second geometry is derived.
+                      if (element) pathRefs.current.set(edge.id, element);
+                      else pathRefs.current.delete(edge.id);
+                    }}
                     d={edge.path}
                     className={liveEdge ? `circuit-edge circuit-edge--${liveEdge}` : 'circuit-edge'}
                     data-live={liveEdge}
@@ -253,28 +402,26 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                       strokeWidth={1}
                     />
                   ))}
-                  {playing && !reducedMotion ? (
-                    // Illustrative flow only. It follows the exact compiled path (§12.4).
-                    <circle r={5} fill="var(--color-text)" opacity={0.9}>
-                      <animateMotion dur="1.6s" repeatCount="indefinite" path={edge.path} />
-                    </circle>
-                  ) : null}
-                  {playing && reducedMotion ? (
-                    <circle
-                      cx={edge.midpoint.x}
-                      cy={edge.midpoint.y}
-                      r={5}
-                      fill="var(--color-text)"
-                      opacity={0.9}
-                    />
+                  {variant !== undefined && variant !== null && walked ? (
+                    <text
+                      className="circuit-arm-label"
+                      x={edge.midpoint.x}
+                      y={edge.midpoint.y - 7}
+                      textAnchor="middle"
+                      fontSize={9.5}
+                      fontFamily="var(--font-mono)"
+                      aria-hidden="true"
+                    >
+                      {typeof variant === 'boolean' ? (variant ? 'TRUE' : 'FALSE') : String(variant)}
+                    </text>
                   ) : null}
                 </g>
               );
             })}
 
-            {circuit.nodes.map((node) => {
-              const box = layout.nodeById[node.id];
-              if (!box) return null;
+            {layout.nodes.map((box) => {
+              const node = circuit.nodes.find((candidate) => candidate.id === box.id);
+              if (!node) return null;
               const visual = nodeVisuals.get(node.id);
               const primitiveStyle = PRIMITIVE_STYLES[node.primitive];
               const style = node.material && visual ? visual.style : primitiveStyle;
@@ -290,15 +437,26 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                 node.material && visual
                   ? { fill: visual.style.fill, stroke: visual.style.stroke }
                   : { fill: primitiveStyle.fill, stroke: primitiveStyle.stroke };
+              const stateStroke = isSelected ? 'var(--color-signal)' : colors.stroke;
+              // The node's own testified outcome, when the trace carries one: variant and
+              // classification, never inferred from a declared variant or a member's testimony.
+              const outcome = liveOutcomes?.[node.id];
+              const outcomeText = outcome
+                ? [outcome.variant ?? 'outcome', outcome.classification].filter(Boolean).join(' · ')
+                : '';
+              // A container's header badge is a silhouette, so it always needs a material shape.
+              const containerShape =
+                visual?.style.shape ?? MATERIAL_STYLES[PRIMITIVE_MATERIAL[node.primitive]].shape;
               return (
                 <g
                   key={node.id}
                   className={live ? `circuit-node circuit-node--${live}` : 'circuit-node'}
                   data-live={live}
+                  data-container={box.container ? 'true' : undefined}
                   role="button"
                   tabIndex={0}
                   aria-pressed={isSelected}
-                  aria-label={`${style.label}: ${node.label}`}
+                  aria-label={`${style.label}: ${node.label}${outcomeText ? ` — ${outcomeText}` : ''}`}
                   onClick={() => select(isSelected ? undefined : node.id)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
@@ -308,7 +466,72 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                   }}
                   style={{ cursor: 'pointer' }}
                 >
-                  {geometry && plateUrl && crop ? (
+                  {box.container ? (
+                    <>
+                      {/* A composite is drawn as a frame around its children: containment is geometry. */}
+                      <rect
+                        className="circuit-container-frame"
+                        x={box.x}
+                        y={box.y}
+                        width={box.width}
+                        height={box.height}
+                        rx={16}
+                        fill="color-mix(in srgb, #07131e 72%, transparent)"
+                        stroke={stateStroke}
+                        strokeWidth={isSelected ? 2.5 : 1.4}
+                        strokeDasharray="9 5"
+                      />
+                      <rect
+                        x={box.x}
+                        y={box.y}
+                        width={box.width}
+                        height={box.headerHeight ?? 34}
+                        rx={16}
+                        fill={colors.fill}
+                        stroke={stateStroke}
+                        strokeWidth={isSelected ? 2.5 : 1.4}
+                      />
+                      {/* The container's own material keeps its defining silhouette as a header badge. */}
+                      <path
+                        className="circuit-container-badge"
+                        d={materialGeometry(containerShape, { x: box.x + 12, y: box.y + 9, width: 38, height: 16 }).silhouette}
+                        fill={colors.fill}
+                        stroke={colors.stroke}
+                        strokeWidth={1.2}
+                      />
+                      <text
+                        x={box.x + 58}
+                        y={box.y + 14}
+                        fill={style.stroke}
+                        fontSize={10}
+                        fontFamily="var(--font-mono)"
+                        letterSpacing="0.08em"
+                      >
+                        {style.label.toUpperCase()}
+                      </text>
+                      <text
+                        x={box.x + 58}
+                        y={box.y + 29}
+                        fill={style.text}
+                        fontSize={13}
+                        fontFamily="var(--font-sans)"
+                      >
+                        {box.displayLines[0] ?? node.label}
+                      </text>
+                      {outcome ? (
+                        <text
+                          className={`circuit-outcome circuit-outcome--${outcome.classification ?? 'unclassified'}`}
+                          x={box.x + box.width - 14}
+                          y={box.y + box.height - 8}
+                          textAnchor="end"
+                          fontSize={9.5}
+                          fontFamily="var(--font-mono)"
+                        >
+                          {outcomeBadge(outcome, box.width - 28)}
+                        </text>
+                      ) : null}
+                    </>
+                  ) : geometry && plateUrl && crop ? (
                     <>
                       {/* The material plate inside the token's defining shape; state layers over it. */}
                       <path d={geometry.silhouette} fill="#07131e" opacity={0.6} />
@@ -407,31 +630,52 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                       strokeWidth={isSelected ? 2.5 : 1.5}
                     />
                   )}
-                  <text
-                    x={box.x + inset}
-                    y={box.y + 20}
-                    fill={style.stroke}
-                    fontSize={10}
-                    fontFamily="var(--font-mono)"
-                    letterSpacing="0.08em"
-                  >
-                    {style.label.toUpperCase()}
-                  </text>
-                  {(box.displayLines ?? box.lines).map((line, index) => (
-                    <text
-                      key={`${node.id}-line-${index}`}
-                      x={box.x + inset}
-                      y={box.y + 40 + index * 19}
-                      fill={style.text}
-                      fontSize={13}
-                      fontFamily="var(--font-sans)"
-                    >
-                      {line}
-                    </text>
-                  ))}
+                  {box.container ? null : (
+                    <>
+                      <text
+                        x={box.x + inset}
+                        y={box.y + 20}
+                        fill={style.stroke}
+                        fontSize={10}
+                        fontFamily="var(--font-mono)"
+                        letterSpacing="0.08em"
+                      >
+                        {style.label.toUpperCase()}
+                      </text>
+                      {(box.displayLines ?? box.lines).map((line, index) => (
+                        <text
+                          key={`${node.id}-line-${index}`}
+                          x={box.x + inset}
+                          y={box.y + 40 + index * 19}
+                          fill={style.text}
+                          fontSize={13}
+                          fontFamily="var(--font-sans)"
+                        >
+                          {line}
+                        </text>
+                      ))}
+                      {outcome ? (
+                        <text
+                          className={`circuit-outcome circuit-outcome--${outcome.classification ?? 'unclassified'}`}
+                          x={box.x + inset}
+                          y={box.y + box.height - 7}
+                          fontSize={9.5}
+                          fontFamily="var(--font-mono)"
+                        >
+                          {outcomeBadge(outcome, box.width - inset * 2)}
+                        </text>
+                      ) : null}
+                    </>
+                  )}
                 </g>
               );
             })}
+
+            {/* The observed token: one per run, moved only by its own testimony. */}
+            <g ref={tokenRef} className="circuit-token" aria-hidden="true" style={{ display: 'none' }}>
+              <circle r={7} className="circuit-token-halo" />
+              <circle r={3.6} className="circuit-token-core" />
+            </g>
           </svg>
         </div>
 
@@ -460,6 +704,7 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
           <ol className="mt-3 space-y-2">
             {circuit.nodes.map((node) => {
               const style = node.material ? MATERIAL_STYLES[node.material] : PRIMITIVE_STYLES[node.primitive];
+              const outcome = liveOutcomes?.[node.id];
               return (
                 <li key={node.id}>
                   <button
@@ -474,6 +719,11 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                       {style.label}
                     </span>
                     <span className="block">{node.label}</span>
+                    {outcome ? (
+                      <span className="mt-0.5 block font-mono text-[10px] text-telemetry">
+                        {[outcome.variant ?? 'outcome', outcome.classification].filter(Boolean).join(' · ')}
+                      </span>
+                    ) : null}
                   </button>
                 </li>
               );
@@ -512,6 +762,17 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
                   ) : null}
                 </dd>
               </div>
+              {liveOutcomes?.[selectedNode.id] ? (
+                <div>
+                  <dt className="text-xs text-muted">Testified outcome</dt>
+                  <dd className="font-mono text-xs">
+                    {liveOutcomes[selectedNode.id]?.variant ?? 'outcome'}
+                    {liveOutcomes[selectedNode.id]?.classification
+                      ? ` · ${liveOutcomes[selectedNode.id]?.classification}`
+                      : ''}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
           ) : (
             <p className="mt-3 text-sm text-muted">
@@ -542,8 +803,11 @@ export function CircuitViewer({ circuit, selectedNodeId, onSelectNode, liveNodes
             ))}
           </ul>
           <p className="mt-3 text-xs text-muted">
-            Playback is labelled <strong>illustrative flow</strong>. It shows the declared route
-            order; it is not observed execution and invokes no provider.
+            The token advances only as testimony arrives: node to node along the declared route,
+            in cursor order. It is not a spinner — no route is walked without its own observed
+            step, and a compiled view with no run shows no token at all. During a live run the
+            camera follows the active operation; the drawing itself is never trimmed, so every
+            drawn id stays bound and covered.
           </p>
         </div>
 

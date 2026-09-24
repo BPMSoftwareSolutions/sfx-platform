@@ -149,6 +149,16 @@ body>header>nav { max-width: var(--page-width); padding-inline: var(--page-gutte
 .circuit-node--done .circuit-node-contour { stroke-width: 2.5; }
 .circuit-node--failed .circuit-node-contour { stroke: var(--color-failure); stroke-width: 2.5; }
 .circuit-node--failed .circuit-node-detail { stroke: var(--color-failure); }
+/* A declared non-success attempt superseded by a later route: held is its own state, never failed. */
+.circuit-node--held .circuit-node-plate { opacity: .8; }
+.circuit-node--held .circuit-node-contour { stroke: var(--color-telemetry); stroke-dasharray: 4 3; stroke-width: 2; }
+.circuit-node--held .circuit-node-detail { stroke: var(--color-telemetry); }
+.circuit-node--held rect { stroke: var(--color-telemetry); stroke-dasharray: 4 3; stroke-width: 2; }
+/* A composite drawn as a container frame around its children; state still layers over it. */
+.circuit-container-frame { transition: opacity .3s ease; }
+.circuit-node--planned .circuit-container-frame { opacity: .5; }
+.circuit-node--held .circuit-container-frame { stroke: var(--color-telemetry); stroke-dasharray: 4 3; }
+.circuit-node--failed .circuit-container-frame { stroke: var(--color-failure); }
 .circuit-edge--planned { opacity: .35; }
 .circuit-edge--active { stroke-dasharray: 7 4; }
 .circuit-edge--done { stroke-width: 2.5; }
@@ -158,6 +168,17 @@ body>header>nav { max-width: var(--page-width); padding-inline: var(--page-gutte
 .circuit-edge-material--active { opacity: .7; }
 .circuit-edge-material--done { opacity: .6; }
 .circuit-edge-material--failed { opacity: .45; }
+/* The observed token: one per run, moved only when testimony arrives. */
+.circuit-token { pointer-events: none; }
+.circuit-token-halo { fill: color-mix(in srgb, var(--color-signal) 35%, transparent); }
+.circuit-token-core { fill: var(--color-text); }
+/* The testified outcome beside the node it belongs to: its own variant and classification. */
+.circuit-outcome { font-weight: 600; letter-spacing: .04em; paint-order: stroke; stroke: #07131e; stroke-width: 2px; }
+.circuit-outcome--success { fill: #72e1ad; }
+.circuit-outcome--failure { fill: var(--color-failure); }
+.circuit-outcome--unclassified { fill: var(--color-muted); }
+/* A walked junction arm shows the variant it walked; an unwalked arm carries no state or label. */
+.circuit-arm-label { fill: var(--color-text); font-weight: 600; paint-order: stroke; stroke: #07131e; stroke-width: 3px; }
 @keyframes circuit-node-pulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }
 /* Authored bundles are comparison candidates: labelled, set beside the trace, never traced. */
 .authored-comparison { border: 1px dashed var(--color-grid-line); }
