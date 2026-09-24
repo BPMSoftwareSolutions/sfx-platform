@@ -28,9 +28,19 @@ export interface RunGraphCell {
   cellId: string;
   altitude: string | null;
   kind: string | null;
+  /** The declared `execution.authorityId`, verbatim; null when the record predates it. */
+  authorityId: string | null;
   parentCellId: string | null;
   semanticAddress: string | null;
   ports: unknown;
+  /** The declared input port contract, as the scenario's Input identity. */
+  inputContractId: string | null;
+  /** The declared outcome port contract, as the scenario's Outcome identity. */
+  outcomeContractId: string | null;
+  /** The outcome port's declared variants, verbatim, in declaration order. */
+  outcomeVariants: string[];
+  /** The outcome port's declared variant classifications, verbatim; null when undeclared. */
+  outcomeClassifications: Record<string, string> | null;
 }
 
 export interface RunGraphEdge {
@@ -56,6 +66,8 @@ export interface RunGraphViewNode {
   altitude: string | null;
   kind: string | null;
   parentCellId: string | null;
+  /** The nearest drawn enclosing cell; null for a root. Container frames wrap their children. */
+  parentDrawnId: string | null;
   semanticAddress: string | null;
   memberCellIds: string[];
   collapsed: boolean;
@@ -105,6 +117,24 @@ function asString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value : null;
 }
 
+function stringsOf(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.length > 0) : [];
+}
+
+function classificationsOf(value: unknown): Record<string, string> | null {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return null;
+  const entries = Object.entries(value as Record<string, unknown>).filter(
+    (entry): entry is [string, string] => typeof entry[1] === 'string'
+  );
+  return entries.length > 0 ? Object.fromEntries(entries) : null;
+}
+
+function portRecord(ports: unknown, key: 'input' | 'outcome'): Record<string, unknown> {
+  if (ports === null || typeof ports !== 'object') return {};
+  const port = (ports as Record<string, unknown>)[key];
+  return port !== null && typeof port === 'object' ? (port as Record<string, unknown>) : {};
+}
+
 /**
  * A cell's semantic address may be published as a string or as the declared address object.
  * Either way it is preserved; a label is derived from it without asserting structure.
@@ -136,14 +166,23 @@ export function normalizeRunGraph(graph: SdaRunGraph): RunGraph {
   return {
     graphId: graph.graphId,
     canonicalGraphDigest: graph.canonicalGraphDigest,
-    cells: graph.cells.map((cell) => ({
-      cellId: cell.cellId,
-      altitude: asString(cell.altitude),
-      kind: asString(cell.kind),
-      parentCellId: asString(cell.parentCellId),
-      semanticAddress: semanticAddressText(cell.semanticAddress),
-      ports: cell.ports,
-    })),
+    cells: graph.cells.map((cell) => {
+      const input = portRecord(cell.ports, 'input');
+      const outcome = portRecord(cell.ports, 'outcome');
+      return {
+        cellId: cell.cellId,
+        altitude: asString(cell.altitude),
+        kind: asString(cell.kind),
+        authorityId: asString(cell.authorityId),
+        parentCellId: asString(cell.parentCellId),
+        semanticAddress: semanticAddressText(cell.semanticAddress),
+        ports: cell.ports,
+        inputContractId: asString(input.contractId),
+        outcomeContractId: asString(outcome.contractId),
+        outcomeVariants: stringsOf(outcome.variants),
+        outcomeClassifications: classificationsOf(outcome.variantClassifications),
+      };
+    }),
     edges: graph.edges.map((edge) => ({
       edgeId: edge.edgeId,
       kind: asString(edge.kind),
@@ -263,12 +302,14 @@ export function buildRunGraphView(graph: RunGraph, limit = DETAIL_CELL_LIMIT): R
         .filter((memberId) => memberId !== cell.cellId)
         .map((memberId) => byId.get(memberId)?.semanticAddress ?? ''),
     ].filter((address) => /#|:expression/.test(address));
+    const parentDrawn = cell.parentCellId ? membership[cell.parentCellId] ?? null : null;
     nodes.push({
       id: cell.cellId,
       label: members.length > 1 ? `${label} · ${members.length} cells` : label,
       altitude: cell.altitude,
       kind: cell.kind,
       parentCellId: cell.parentCellId,
+      parentDrawnId: parentDrawn && parentDrawn !== cell.cellId ? parentDrawn : null,
       semanticAddress: cell.semanticAddress,
       memberCellIds: members,
       collapsed: members.length > 1,
@@ -401,6 +442,8 @@ export function runGraphViewProjection(
           : `Planned ${node.altitude ?? 'unresolved'} cell; lit only by its own testimony.`,
       },
       material: node.material ?? undefined,
+      parent: node.parentDrawnId,
+      container: node.collapsed || node.memberCellIds.length > 1,
     })),
     edges: view.edges.map((edge) => {
       const family = familyForEdge(edge.kind);

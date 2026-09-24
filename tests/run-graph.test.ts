@@ -159,6 +159,38 @@ test('a declared address object is preserved as text without asserting its struc
   assert.equal(semanticAddressText(undefined), null);
 });
 
+test('normalization carries the declared authorityId, port contracts and outcome variants', () => {
+  const graph = graphOf([{ cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null }]);
+  graph.cells[0]!.authorityId = 'resolve-equity-market-price-evidence.v1';
+  graph.cells[0]!.ports = {
+    input: { portId: 'cell:scenario:root:input', contractId: 'live-equity-price-request.v1' },
+    outcome: {
+      portId: 'cell:scenario:root:outcome',
+      contractId: 'equity-market-price-evidence.v1',
+      variants: ['EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED'],
+      variantClassifications: { EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED: 'success', NATIVE_MARKET_PRICE_TESTIMONY_REJECTED: 'failure' },
+    },
+  };
+  const normalized = normalizeRunGraph(graph);
+  const cell = normalized.cells[0]!;
+  assert.equal(cell.authorityId, 'resolve-equity-market-price-evidence.v1');
+  assert.equal(cell.inputContractId, 'live-equity-price-request.v1');
+  assert.equal(cell.outcomeContractId, 'equity-market-price-evidence.v1');
+  assert.deepEqual(cell.outcomeVariants, ['EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED']);
+  assert.deepEqual(cell.outcomeClassifications, {
+    EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED: 'success',
+    NATIVE_MARKET_PRICE_TESTIMONY_REJECTED: 'failure',
+  });
+});
+
+test('a record captured before the declared identities normalizes them as absent, never guessed', () => {
+  const normalized = normalizeRunGraph(graphOf([{ cellId: 'cell:mechanic:old', altitude: 'mechanic' }]));
+  const cell = normalized.cells[0]!;
+  assert.equal(cell.authorityId, null);
+  assert.deepEqual(cell.outcomeVariants, []);
+  assert.equal(cell.outcomeClassifications, null);
+});
+
 test('the material interpreter resolves altitude/kind exactly and refines a mechanic by its name', () => {
   const none = { in: [], out: [] };
   assert.equal(resolveCellMaterial({ altitude: 'scenario', kind: 'scenario', semanticHints: [], routeKinds: none }), 'outcome');

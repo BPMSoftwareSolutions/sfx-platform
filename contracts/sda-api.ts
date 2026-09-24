@@ -60,16 +60,43 @@ export const SdaApiProblem = z.object({
 export type SdaApiProblem = z.infer<typeof SdaApiProblem>;
 
 /**
- * The declared public run-graph projection — `GET /v1/runs/{runId}/graph`.
+ * The declared public run-graph record — `GET /v1/runs/{runId}/graph`.
  *
- * Never the captured plan: cells carry identity, altitude, kind, the enclosing cell and declared
- * ports only; edges carry endpoints, route kind and selection. No configuration, no source
- * pointers, no bindings.
+ * Never the captured plan: cells carry declared identity, altitude, kind, the enclosing cell and
+ * declared ports only; edges carry endpoints, route kind and selection. No configuration, no
+ * source pointers, no provider bindings.
+ *
+ * The kernel record (SDA commit 1322d1f) carries two declared identities per cell: the verbatim
+ * `execution.authorityId`, and the compiled outcome port's `variants` / `variantClassifications`.
+ * They are optional here only so records captured before that kernel change stay readable; a
+ * current record declares them and normalization carries them through.
  */
+export const SdaRunGraphInputPort = z.object({
+  portId: z.string(),
+  contractId: z.string(),
+}).loose();
+export type SdaRunGraphInputPort = z.infer<typeof SdaRunGraphInputPort>;
+
+export const SdaRunGraphOutcomePort = SdaRunGraphInputPort.extend({
+  /** The declared outcome variants, verbatim and in declaration order. */
+  variants: z.array(z.string()).optional(),
+  /** The declared variant classifications, verbatim; an unclassified variant is absent. */
+  variantClassifications: z.record(z.string(), z.string()).optional(),
+}).loose();
+export type SdaRunGraphOutcomePort = z.infer<typeof SdaRunGraphOutcomePort>;
+
+export const SdaRunGraphPorts = z.object({
+  input: SdaRunGraphInputPort,
+  outcome: SdaRunGraphOutcomePort,
+}).loose();
+export type SdaRunGraphPorts = z.infer<typeof SdaRunGraphPorts>;
+
 export const SdaRunGraphCell = z.object({
   cellId: z.string(),
   altitude: z.string().nullable().optional(),
   kind: z.string().nullable().optional(),
+  /** The canonical `execution.authorityId`, copied verbatim (required on current records). */
+  authorityId: z.string().optional(),
   parentCellId: z.string().nullable().optional(),
   semanticAddress: z.unknown().optional(),
   ports: z.unknown().optional(),
