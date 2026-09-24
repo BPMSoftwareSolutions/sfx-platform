@@ -46,36 +46,39 @@
       "cellId": "cell:scenario:resolve-equity-market-price-evidence",
       "roles": {
         "input": {
-          "id": null,
-          "label": null,
-          "material": null,
-          "driver": "UNRESOLVED"
+          "id": "cell:scenario:resolve-equity-market-price-evidence:input",
+          "label": "live-equity-price-request.v1",
+          "material": "input",
+          "driver": "declared"
         },
         "event": {
-          "id": null,
-          "label": null,
-          "material": null,
-          "driver": "UNRESOLVED"
+          "id": "cell:scenario:resolve-equity-market-price-evidence:event",
+          "label": "resolve-equity-market-price-evidence.v1",
+          "material": "event",
+          "driver": "declared"
         },
         "outcome": {
-          "id": null,
-          "label": null,
-          "material": null,
-          "driver": "UNRESOLVED"
+          "id": "cell:scenario:resolve-equity-market-price-evidence:outcome",
+          "label": "equity-market-price-evidence.v1",
+          "material": "outcome",
+          "driver": "declared"
         }
       }
     }
   ],
   "defaultViewNodes": {
-    "nodes": 15,
-    "grain": null,
+    "nodes": 39,
+    "grain": "operation",
     "materials": {
+      "event (grouped)": 21,
       "provider-port (grouped)": 7,
       "provider (grouped)": 7,
-      "outcome (grouped)": 1
+      "outcome": 2,
+      "input": 1,
+      "event": 1
     }
   },
-  "drawnNodeChangesAcrossRun": 29,
+  "drawnNodeChangesAcrossRun": 36,
   "flowGrammar": {
     "mechanic -sequence-> mechanic": 450,
     "mechanic -return-> mechanic": 21,
@@ -85,8 +88,8 @@
     "mechanic -return-> scenario": 1
   },
   "edgeDrawing": {
-    "internal to a drawn node (not drawn)": 500,
-    "drawn edge": 28
+    "internal to a drawn node (not drawn)": 493,
+    "drawn edge": 35
   },
   "operationsInCursorOrder": 35,
   "operationsInterleaved": 0,

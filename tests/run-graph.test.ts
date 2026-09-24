@@ -12,7 +12,6 @@ import {
   resolveEdgeMaterial,
 } from '../components/circuit/scl-theme';
 import {
-  DETAIL_CELL_LIMIT,
   buildRunGraphView,
   compiledGraphSurface,
   normalizeRunGraph,
@@ -86,30 +85,41 @@ function deepGraph(): SdaRunGraph {
   return graphOf(cells, edges);
 }
 
-test('a graph within the detail limit is drawn whole and uncollapsed', () => {
+test('the declared operation grain draws one node per operation plus the scenario boundary', () => {
   const view = buildRunGraphView(normalizeRunGraph(graphOf([
     { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
     { cellId: 'cell:mechanic:work', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
   ])));
   assert.equal(view.totalCells, 2);
-  assert.equal(view.collapsed, false);
-  assert.deepEqual(view.nodes.map((node) => node.id), ['cell:scenario:root', 'cell:mechanic:work']);
+  assert.equal(view.grain, 'operation');
+  assert.deepEqual(view.nodes.map((node) => node.id), [
+    'cell:scenario:root',
+    'cell:scenario:root:input',
+    'cell:scenario:root:event',
+    'cell:scenario:root:outcome',
+    'cell:mechanic:work',
+  ]);
   assert.equal(view.membership['cell:mechanic:work'], 'cell:mechanic:work');
 });
 
-test('a deep graph collapses to the nearest enclosing cells before layout', () => {
+test('the declared grain groups expression and provider cells into their enclosing operation', () => {
   const view = buildRunGraphView(normalizeRunGraph(deepGraph()));
   assert.equal(view.totalCells, 41);
-  assert.ok(view.nodes.length <= DETAIL_CELL_LIMIT, `expected <= ${DETAIL_CELL_LIMIT} drawn nodes, got ${view.nodes.length}`);
+  assert.equal(view.grain, 'operation');
   assert.equal(view.collapsed, true);
-  // Every provider collapses into its mechanic; the root stays unchanged.
+  // Every provider belongs to its mechanic operation; the root keeps its own node.
+  assert.deepEqual(
+    view.nodes.filter((node) => !node.boundaryRole).map((node) => node.id),
+    ['cell:scenario:root', 'cell:mechanic:m0', 'cell:mechanic:m1', 'cell:mechanic:m2', 'cell:mechanic:m3']
+  );
   assert.equal(view.membership['cell:provider:m2.p7'], 'cell:mechanic:m2');
   assert.equal(view.membership['cell:scenario:root'], 'cell:scenario:root');
-  const collapsed = view.nodes.find((node) => node.id === 'cell:mechanic:m2');
-  assert.ok(collapsed && collapsed.memberCellIds.length === 10);
+  const grouped = view.nodes.find((node) => node.id === 'cell:mechanic:m2');
+  assert.ok(grouped && grouped.memberCellIds.length === 10);
+  assert.equal(grouped.parentDrawnId, 'cell:scenario:root');
 });
 
-test('collapsed edges remap onto drawn nodes and internal routes are not drawn', () => {
+test('routes internal to one drawn operation are not drawn; routes between operations are', () => {
   const view = buildRunGraphView(normalizeRunGraph(deepGraph()));
   assert.ok(view.edges.length > 0);
   for (const edge of view.edges) {
@@ -126,15 +136,65 @@ test('collapsed edges remap onto drawn nodes and internal routes are not drawn',
   assert.equal(returnEdge?.to, 'cell:scenario:root');
 });
 
-test('a flat graph beyond the limit is drawn whole rather than truncated', () => {
-  const cells = Array.from({ length: DETAIL_CELL_LIMIT + 5 }, (_, index) => ({
+test('cells with no operation ancestor draw as themselves at the declared grain', () => {
+  const cells = Array.from({ length: 35 }, (_, index) => ({
     cellId: `cell:mechanic:flat${index}`,
     altitude: 'mechanic',
     parentCellId: null,
   }));
   const view = buildRunGraphView(normalizeRunGraph(graphOf(cells)));
-  assert.equal(view.nodes.length, DETAIL_CELL_LIMIT + 5);
+  assert.equal(view.nodes.length, 35);
   assert.equal(view.collapsed, false);
+});
+
+test('the scenario is drawn with its declared Input, Event and Outcome from the phase 1 fields', () => {
+  const graph = graphOf([{ cellId: 'cell:scenario:equity', altitude: 'scenario', parentCellId: null }]);
+  graph.cells[0]!.authorityId = 'resolve-equity-market-price-evidence.v1';
+  graph.cells[0]!.ports = {
+    input: { portId: 'cell:scenario:equity:input', contractId: 'live-equity-price-request.v1' },
+    outcome: {
+      portId: 'cell:scenario:equity:outcome',
+      contractId: 'equity-market-price-evidence.v1',
+      variants: ['EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED'],
+      variantClassifications: { EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED: 'success' },
+    },
+  };
+  const view = buildRunGraphView(normalizeRunGraph(graph));
+  const role = (name: string) => view.nodes.find((node) => node.boundaryRole === name)!;
+  assert.equal(role('input').label, 'live-equity-price-request.v1');
+  assert.equal(role('input').material, 'input');
+  assert.equal(role('event').label, 'resolve-equity-market-price-evidence.v1', 'the Event role is the event execution authority');
+  assert.equal(role('event').material, 'event');
+  assert.equal(role('outcome').label, 'equity-market-price-evidence.v1');
+  assert.equal(role('outcome').material, 'outcome');
+  assert.deepEqual(role('outcome').outcomeVariants, ['EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED']);
+  assert.equal(role('outcome').parentDrawnId, 'cell:scenario:equity');
+  const projection = runGraphViewProjection(view, { capabilityId: 'equity' });
+  assert.equal(projection.nodes.find((node) => node.primitive === 'INPUT')?.label, 'live-equity-price-request.v1');
+  assert.equal(projection.nodes.find((node) => node.primitive === 'EVENT')?.label, 'resolve-equity-market-price-evidence.v1');
+  assert.equal(projection.nodes.find((node) => node.primitive === 'OUTCOME')?.label, 'equity-market-price-evidence.v1');
+});
+
+test('a scenario whose record predates the declared authority shows its Event role as UNRESOLVED', () => {
+  const view = buildRunGraphView(normalizeRunGraph(graphOf([{ cellId: 'cell:scenario:old', altitude: 'scenario', parentCellId: null }])));
+  const event = view.nodes.find((node) => node.boundaryRole === 'event')!;
+  assert.equal(event.label, 'UNRESOLVED');
+  assert.equal(event.material, 'event', 'the role is declared by the policy; the value is absent');
+});
+
+test('every operation is drawn: the equity shape is one scenario, three boundary roles and 35 operations', () => {
+  const cells: Array<{ cellId: string; altitude: string; parentCellId: string | null; kind?: string }> = [
+    { cellId: 'cell:scenario:x', altitude: 'scenario', parentCellId: null },
+  ];
+  for (let operation = 1; operation <= 35; operation += 1) {
+    const operationId = `cell:mechanic:x.operation.${operation}`;
+    cells.push({ cellId: operationId, altitude: 'mechanic', parentCellId: 'cell:scenario:x' });
+    cells.push({ cellId: `${operationId}:junction`, altitude: 'mechanic', kind: 'junction', parentCellId: operationId });
+  }
+  const view = buildRunGraphView(normalizeRunGraph(graphOf(cells)), { policy });
+  assert.equal(view.nodes.length, 39, '1 scenario + its Input/Event/Outcome + 35 operations');
+  assert.equal(view.nodes.filter((node) => node.boundaryRole).length, 3);
+  assert.equal(view.nodes.filter((node) => node.id.includes('.operation.')).length, 35);
 });
 
 test('altitude maps to a primitive; an undeclared altitude is visibly unresolved', () => {
@@ -154,7 +214,10 @@ test('the projection is the declared run-graph fidelity, filled from ids alone',
   assert.equal(projection.nodes.length, view.nodes.length);
   assert.equal(projection.edges.length, view.edges.length);
   for (const node of projection.nodes) {
-    assert.ok(['SCENARIO', 'MECHANIC', 'PROVIDER', 'PHYSICAL', 'UNRESOLVED'].includes(node.primitive));
+    assert.ok(
+      ['SCENARIO', 'MECHANIC', 'PROVIDER', 'PHYSICAL', 'INPUT', 'EVENT', 'OUTCOME', 'UNRESOLVED'].includes(node.primitive),
+      `declared primitive, got ${node.primitive}`
+    );
     assert.ok(node.state.readable.includes('testimony'), 'planned copy names its only source of light');
   }
 });
@@ -255,7 +318,7 @@ test('a drawn cell resolves by its own declared authority, collapsed or not', ()
   graph.cells[2]!.authorityId = 'mechanic:let.v1';
   graph.cells[3]!.authorityId = 'provider:sda-external-credential-reference-binding-port.v1';
   graph.cells[4]!.authorityId = 'physical:sda-external-credential-reference-binding-port.v1';
-  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy, full: true });
   assert.equal(view.nodes.find((node) => node.id === 'cell:scenario:root')!.material, 'outcome', 'the scenario is its declared outcome face');
   assert.equal(view.nodes.find((node) => node.id === 'cell:mechanic:op')!.material, 'event');
   assert.equal(view.nodes.find((node) => node.id === 'cell:provider:leg')!.material, 'provider-port');
@@ -298,7 +361,7 @@ test('the run-graph projection carries a declared material per drawn cell and ro
   const projection = runGraphViewProjection(view, { capabilityId: 'demo', scenarioId: null });
   assert.equal(projection.nodes.length, view.nodes.length);
   assert.equal(projection.edges.length, view.edges.length);
-  assert.equal(projection.nodes.length, 5, 'four mechanics collapse into the scenario root');
+  assert.equal(projection.nodes.length, 8, 'the scenario boundary plus four operations');
   assert.equal(view.collapsed, true);
   assert.equal(view.nodes.find((node) => node.id === 'cell:scenario:root')!.label, 'root');
   assert.match(view.nodes.find((node) => node.id === 'cell:mechanic:m0')!.label, /10 cells/);
@@ -316,7 +379,10 @@ test('the engine-compiled capability surface collapses by the same id rule and n
   assert.equal(surface.projection.fidelity, 'COMPILED_GRAPH');
   assert.equal(surface.projection.nodes.length, surface.stats.drawnNodes);
   assert.equal(surface.projection.edges.length, surface.stats.drawnEdges);
-  assert.ok(surface.stats.drawnNodes <= DETAIL_CELL_LIMIT);
+  assert.equal(surface.stats.drawnNodes, 8, 'the scenario boundary plus four operations');
+  assert.equal(surface.stats.groupedCells, 36);
+  assert.equal(surface.stats.grain, 'operation');
+  assert.equal(surface.projection.edges.length, surface.stats.drawnEdges);
   assert.equal(surface.stats.totalCells, 41);
   assert.equal(surface.stats.collapsed, true);
   assert.match(surface.projection.sourceProfile, /^capability-graph:/);

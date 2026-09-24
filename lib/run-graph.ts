@@ -8,19 +8,20 @@ import { getCircuitPresentation } from '@/lib/circuit-presentation';
  * Run-graph view model — the platform half of the id binding.
  *
  * The run graph is the composed execution graph the run actually compiled, served as a declared
- * public record. This module normalises it, collapses it to fit the declared presentation limit
- * and converts the view into the renderer's projection. No capability vocabulary lives here:
- * binding is by `cellId` and `edgeId` alone.
+ * public record. This module normalises it, draws it at the declared grain and converts the view
+ * into the renderer's projection. No capability vocabulary lives here: binding is by `cellId` and
+ * `edgeId` alone, and meaning comes from the declared presentation policy
+ * (`read-circuit-presentation`) — never a platform table.
  *
- * Materials come from the declared presentation policy (`read-circuit-presentation`,
- * `circuit-presentation.v1`), by exact key only: a cell resolves through `materials.byAuthority`
- * (its verbatim `execution.authorityId`), a route through `materials.byEdgeKind`, and the
- * scenario cell through `materials.boundary.outcome`. A miss is `UNRESOLVED`, drawn as the
- * visible unresolved primitive — never a guessed plate.
+ * The declared grain (`granularity.node: "operation"`) groups every expression, binding, field
+ * and selection cell into its nearest enclosing operation along the declared `parentCellId`
+ * chain. The scenario cell keeps its own node and is drawn with its declared boundary: its Input
+ * (input port contract), Event (its `authorityId`, the event's execution authority) and Outcome
+ * (outcome port contract) are drawn as three role nodes from the phase 1 record fields.
  *
- * KNOWN DEFECT (review finding 3, phase 3): the collapse rule and the limit are still platform
- * code. `read-circuit-presentation` now declares `granularity.node: "operation"`; the next phase
- * groups by that declared grain along the `parentCellId` chain and deletes this collapse.
+ * Materials resolve by exact key only: a boundary role through `materials.boundary`, a cell
+ * through `materials.byAuthority` (its verbatim `execution.authorityId`), a route through
+ * `materials.byEdgeKind`. A miss is `UNRESOLVED`, drawn as the visible unresolved primitive.
  */
 
 export interface RunGraphCell {
@@ -214,12 +215,60 @@ export function normalizeRunGraph(graph: SdaRunGraph): RunGraph {
 
 const SCENARIO_ALTITUDE = 'scenario';
 
-/** Presentation cap mirrored from `read-circuit-presentation` (declared value 30); see KNOWN DEFECT. */
-export const DETAIL_CELL_LIMIT = 30;
+const BOUNDARY_PRIMITIVE: Record<BoundaryRole, CircuitNode['primitive']> = {
+  input: 'INPUT',
+  event: 'EVENT',
+  outcome: 'OUTCOME',
+};
 
 /**
- * Draw the graph whole (`full`, the measuring instrument's view) or collapsed to the detail
- * limit. Membership is nearest-enclosing along the `parentCellId` chain; a route between two
+ * The declared grain: every cell that is not a scenario belongs to the operation that encloses
+ * it. The compiler places operations directly under their scenario cell, so the operation is the
+ * nearest ancestor whose parent is the scenario. A cell with no scenario ancestor draws at its
+ * topmost declared cell, and two siblings never merge into an invented parent.
+ */
+function groupingTarget(byId: Map<string, RunGraphCell>, cell: RunGraphCell): string {
+  let cursor: RunGraphCell | undefined = cell;
+  let top = cell.cellId;
+  const seen = new Set<string>();
+  while (cursor && cursor.parentCellId && byId.has(cursor.parentCellId) && !seen.has(cursor.cellId)) {
+    seen.add(cursor.cellId);
+    const parent = byId.get(cursor.parentCellId)!;
+    if (parent.altitude?.toLowerCase() === SCENARIO_ALTITUDE) return cursor.cellId;
+    cursor = parent;
+    top = parent.cellId;
+  }
+  return top;
+}
+
+function boundaryNode(
+  scenario: RunGraphCell,
+  role: BoundaryRole,
+  materials: ReturnType<typeof materialsFromPolicy>
+): RunGraphViewNode {
+  const contractId = role === 'input' ? scenario.inputContractId : role === 'outcome' ? scenario.outcomeContractId : scenario.authorityId;
+  const portId = portRecord(scenario.ports, role === 'input' ? 'input' : 'outcome').portId;
+  const id = role === 'event' ? `${scenario.cellId}:event` : (asString(portId) ?? `${scenario.cellId}:${role}`);
+  return {
+    id,
+    label: contractId ?? 'UNRESOLVED',
+    altitude: null,
+    kind: 'boundary',
+    parentCellId: scenario.cellId,
+    parentDrawnId: scenario.cellId,
+    semanticAddress: contractId,
+    memberCellIds: [id],
+    collapsed: false,
+    boundaryRole: role,
+    material: resolveCellMaterial({ authorityId: null, boundaryRole: role }, materials),
+    outcomeVariants: role === 'outcome' ? scenario.outcomeVariants : [],
+    outcomeClassifications: role === 'outcome' ? scenario.outcomeClassifications : null,
+  };
+}
+
+/**
+ * Draw the graph at the declared grain (default) or whole (`full`, the measuring instrument's
+ * view). Membership is nearest-enclosing along the `parentCellId` chain; a route between two
  * different drawn nodes is drawn, a route inside one is bound to that node and not drawn.
  */
 export function buildRunGraphView(
@@ -230,26 +279,15 @@ export function buildRunGraphView(
   const full = typeof options === 'number' ? true : options.full === true;
   const policy = explicit.policy ?? (typeof options === 'number' ? null : getCircuitPresentation());
   const materials = materialsFromPolicy(policy);
-  const limit = policy?.granularity?.detailCellLimit ?? DETAIL_CELL_LIMIT;
+  const grain = policy?.granularity?.node ?? null;
 
   const byId = new Map(graph.cells.map((cell) => [cell.cellId, cell]));
-  let drawn = new Set(byId.keys());
-
-  if (!full) {
-    while (drawn.size > limit) {
-      const promoted = new Set<string>();
-      let promotedAny = false;
-      for (const cellId of drawn) {
-        const parent = byId.get(cellId)?.parentCellId ?? null;
-        if (parent && byId.has(parent) && parent !== cellId) {
-          promoted.add(parent);
-          promotedAny = true;
-        } else {
-          promoted.add(cellId);
-        }
-      }
-      if (!promotedAny || promoted.size >= drawn.size) break;
-      drawn = promoted;
+  const drawn = new Set<string>();
+  if (full) {
+    for (const cellId of byId.keys()) drawn.add(cellId);
+  } else {
+    for (const cell of graph.cells) {
+      drawn.add(cell.altitude?.toLowerCase() === SCENARIO_ALTITUDE ? cell.cellId : groupingTarget(byId, cell));
     }
   }
 
@@ -302,6 +340,10 @@ export function buildRunGraphView(
       outcomeVariants: cell.outcomeVariants,
       outcomeClassifications: cell.outcomeClassifications,
     });
+    // The scenario cell is drawn with its declared boundary: Input, Event and Outcome roles.
+    if (isScenario && !full) {
+      for (const role of ['input', 'event', 'outcome'] as const) nodes.push(boundaryNode(cell, role, materials));
+    }
   }
 
   const edgeMembership: Record<string, string> = {};
@@ -349,8 +391,8 @@ export function buildRunGraphView(
   return {
     graphId: graph.graphId,
     canonicalGraphDigest: graph.canonicalGraphDigest,
-    grain: null,
-    detailCellLimit: limit,
+    grain,
+    detailCellLimit: policy?.granularity?.detailCellLimit ?? null,
     totalCells: graph.cells.length,
     totalEdges: graph.edges.length,
     collapsed: groupedCells > 0,
@@ -375,8 +417,9 @@ export function primitiveForAltitude(altitude: string | null): CircuitNode['prim
   return ALTITUDE_PRIMITIVE[altitude.toLowerCase()] ?? 'UNRESOLVED';
 }
 
-/** A drawn node's primitive: its altitude, or UNRESOLVED when no declared material resolved. */
+/** A drawn node's primitive: the declared boundary role, else its altitude, else UNRESOLVED. */
 function primitiveForNode(node: RunGraphViewNode): CircuitNode['primitive'] {
+  if (node.boundaryRole) return BOUNDARY_PRIMITIVE[node.boundaryRole];
   if (!node.material) return 'UNRESOLVED';
   return primitiveForAltitude(node.altitude);
 }

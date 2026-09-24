@@ -1,33 +1,35 @@
-# Circuit mapping trace — events → materials → diagram flow (2026-09-23)
+# Circuit mapping trace — events → declared materials → diagram flow (2026-09-23)
 
-**Purpose:** Before any layout or renderer work, establish from the data alone what each observed event is, which declared element it belongs to, which material the platform currently gives it and why, which drawn element it lights, and in what order.
+**Purpose:** Before any layout or renderer work, establish from the data alone what each observed event is, which declared element it belongs to, which material the declared presentation policy gives it, which drawn element it lights, and in what order.
 **Runs:** `resolve-equity-market-price-evidence` (1,079 events) and `say-hello-world` (26 events, the control).
-**Code used:** the platform's own `buildRunGraphView` and material tables (`lib/run-graph.ts`, `components/circuit/scl-theme.ts`, working tree at `7ac170c`). Nothing is re-implemented.
+**Code used:** the platform's own `buildRunGraphView` (`lib/run-graph.ts`) and the declared `circuit-presentation.v1` policy (`read-circuit-presentation`, committed as `tests/fixtures/circuit/circuit-presentation-policy.json`). The captures were taken before the kernel emitted each cell's declared `execution.authorityId` (SDA `1322d1f`); the generator joins that declared identity back from the declared-bindings fixture derived by `derive-declared-bindings.mjs`. Nothing is re-implemented.
 
 ## Files
 
 | File | What it is |
 | --- | --- |
-| `equity-mapping-trace.jsonl`, `hello-mapping-trace.jsonl` | One row per event in cursor order: element (cell / edge / evidence record / lifecycle), graph altitude and kind, owning operation, declared root, **own material and what decided it**, drawn node and its material, edge kind and variant, drawn or internal, testified disposition, variant and classification |
-| `equity-operations.json` | One row per declared operation: port, **declared binding**, material in the default view and when drawn alone, cells and junctions reached, the operation's own testified outcome, its provider leg |
-| `*-mapping-summary.json` | Aggregates: altitude/kind pairs in the graph, material ← driver counts, dead table keys, default-view nodes, flow grammar, root outcome |
+| `equity-mapping-trace.jsonl`, `hello-mapping-trace.jsonl` | One row per event in cursor order: element (cell / edge / evidence record / lifecycle), graph altitude and kind, **declared `authorityId`**, owning operation, own material and whether the policy declared it, drawn node and its material, edge kind and variant, drawn or internal, testified disposition, variant and classification. The scenario row also carries its three declared boundary roles. |
+| `equity-operations.json` | One row per declared operation: port, declared binding, declared `operation:<platformCapabilityId>` authority, material in the declared view and when drawn alone, cells and junctions reached, the operation's own testified outcome, its provider leg |
+| `*-mapping-summary.json` | Aggregates: policy identity, declared bindings provenance, altitude/kind pairs, material ← driver counts, unresolved authorities, boundary roles, default-view nodes, drawn-node changes, flow grammar, edge drawing, root outcome |
 | `mapping-trace.mts` | The generator |
+| `derive-declared-bindings.mjs` | Derives the declared-bindings fixture (scenario boundary, operation bindings, expression pointer → operator) from the declared graph source; configuration is stripped |
 
 **Reproduce** from the `sfx-platform` root:
 
 ```text
-node --import tsx docs/circuit-mapping-trace-2026-09-23/mapping-trace.mts <run.json> <outDir> <events.jsonl> [graph-source.json]
+node --import tsx docs/circuit-mapping-trace-2026-09-23/mapping-trace.mts <run.json> <outDir> [events.jsonl] [declared-bindings.json]
 ```
 
-- The inputs are machine-local. `run.json` is the raw run capture (all pages, with `outcomeClassification`, plus the run graph); `events.jsonl` is the normalized capture. Both are in `%TEMP%\opencode\baseline\`.
-- `graph-source.json` is the capability's declared graph source, read-only: `SELECT graph_source FROM analysis.capability_graph_source(N'<capabilityId>', 0, NULL)` inside a transaction ending in `ROLLBACK`.
-- All 1,079 equity cursors came from the raw pages; none had to be filled from the normalized file.
+- `run.json` is the raw run capture (all pages, with `outcomeClassification`, plus the run graph). The durable captures are in `tests/fixtures/circuit/`.
+- `declared-bindings.json` defaults to `tests/fixtures/circuit/<subject>-declared-bindings.json`; the machine-local graph source itself is never committed.
+- The generator writes `mapping-trace.jsonl`, `mapping-summary.json` and (with bindings) `operations.json`; the committed targets carry the run prefix.
+- All 1,079 equity cursors come from the raw pages; none is filled from a normalized file.
 
 ## 1. What the declared capability is (graph source)
 
 - **Scenario boundary:**
   - Input `live-equity-price-request` (`live-equity-price-request.v1`)
-  - Event `equity-market-price-evidence-requested` (authority `resolve-equity-market-price-evidence.v1`)
+  - Event `equity-market-price-evidence-requested` (execution authority `resolve-equity-market-price-evidence.v1`)
   - Outcome `equity-market-price-evidence` (`equity-market-price-evidence.v1`, terminal)
 - **35 operations = 7 provider routes × 5 declared steps**, each step an `invoke-port`:
 
@@ -73,65 +75,46 @@ The routes, in order: equity, fallback, finance15, finance15bodyproof, gemini, g
 - Each operation's own testimony comes after its members.
 - A port operation's leg runs provider → physical → return → operation.
 
-## 4. Current mapping: data → material (what decides each material)
+## 4. Declared grain (phase 3 acceptance, equity)
 
-**The circuit record carries only five altitude/kind pairs:** `mechanic|mechanic` 803, `mechanic|junction` 41, `provider|provider` 14, `physical|physical` 14, `scenario|scenario` 1.
+`read-circuit-presentation` declares `granularity.node: "operation"`; the view groups every expression, binding, field and selection cell into its nearest enclosing operation along the `parentCellId` chain.
 
-**13 of the 17 entries in `CELL_MATERIAL` can never match:** `mechanic|input`, `mechanic|event`, `mechanic|outcome`, `mechanic|authority`, `mechanic|validation`, `mechanic|evidence`, `mechanic|human-approval`, `mechanic|decision`, `mechanic|branch`, `mechanic|fan-out`, `mechanic|convergence`, `mechanic|rejection`, `mechanic|termination`. The compiler emits no such kinds.
+- **The default view draws 39 nodes:** 1 scenario + its Input, Event and Outcome boundary roles + 35 operations.
+  - The Input role is `live-equity-price-request.v1`; the Event role is the scenario cell's `authorityId` (`resolve-equity-market-price-evidence.v1`); the Outcome role is `equity-market-price-evidence.v1`.
+  - All 35 operations are drawn; all 7 selection operations are drawn, with their 28 walked junction arms internal to exactly one operation.
+- **Drawn edges:** 528 walked edges — 35 drawn (34 between operations and 1 closing the scenario), 493 internal to one drawn operation, 0 unbound.
+- **The lit node changes 36 times across the 529 cell testimonies:** once per operation op.1 → op.35, then the scenario root at cursor 1072.
+- Comparison with the retired count collapse: 15 nodes (14 provider-port sockets + the root), 28 drawn edges, and all 35 operations invisible inside the root. The counts were the platform's, never the estate's.
 
-**Observed cells (equity), material ← driver:**
+## 5. Declared materials (phase 2 acceptance)
+
+The policy maps are exact-key: `materials.boundary` (input/event/outcome), `materials.byAuthority` (72 authorities), `materials.byEdgeKind` (7 kinds). No fallback between maps and no substring or word-stem matching.
+
+**Equity (529 cells), material ← driver:**
 
 | Material | Driver | Cells |
 | --- | --- | ---: |
-| input | name word-stem **`request`** (`build-…-request` operations) | 329 |
-| input | composite member-altitude rule | 14 |
-| evidence | name word-stem **`evidence`** (`normalize-equity-price-evidence`) | 66 |
-| decision | name word-stem **`select`** (`select-…-route`) | 43 |
-| decision | composite member-altitude rule | 6 |
-| branch | junction route kinds | 28 |
-| provider-port | declared `provider\|provider` | 14 |
-| provider-port | composite member-altitude rule (port operation with a provider and physical member) | 14 |
-| provider | declared `physical\|physical` | 14 |
-| outcome | declared `scenario\|scenario` | 1 |
+| event | declared `byAuthority` (transformation, provider, physical, mechanic and expression authorities) | 458 |
+| provider-port | declared `byAuthority` (credential bindings and provider cells) | 21 |
+| provider | declared `byAuthority` (the governed HTTP exchange and its physical cells) | 21 |
+| branch | declared `byAuthority` (`junction:boolean-selection.v1`) | 28 |
+| outcome | declared `materials.boundary.outcome` (the scenario cell) | 1 |
 
-**Hello-world:** all 5 mechanic cells fall to the generic `event` plate; the root is `outcome`.
+- **0 word-stem assignments and 0 composite-rule assignments** (was 329 input, 66 evidence, 43 decision, 14 input, 6 decision, 28 provider-port by rule, 14 provider-port by rule, 14 branch, 14 provider, 1 outcome before the policy was read).
+- **The credential binding and the governed HTTP exchange now get different materials:** `operation:sda-external-credential-reference-binding-port.v1` → `provider-port`; `operation:sda-governed-http-exchange-port.v1` → `provider`.
+- **Hello-world is unchanged in shape (6 nodes) and now declared:** its five mechanic cells and the scenario resolve through `byAuthority`/`boundary` — the generic event plate is gone unless the policy declares `event` (it declares it for `operation:sda-authority-transformation-port.v1` and the expression mechanics).
+- Every cell is either `declared` or `UNRESOLVED`; the captures resolve 529/529 (equity) and 6/6 (hello).
 
-**The default drawn view (equity):** 15 nodes, which are 14 `provider-port` (one per port operation) and 1 `outcome` (the scenario root).
-- All 21 transformation operations (build, normalize, select) are inside the root node and never drawn.
-- 500 of 528 walked edges are internal; 28 are drawn.
-- The drawn node that lights changes 29 times across 529 cell testimonies.
+## 6. What the record lacked, and how it is carried now
 
-## 5. Mismatches between the data and the drawing
-
-1. **The capability's Input and Event are never drawn.** The only `input` material goes to 343 cells whose operation *name* contains `request` (outbound request builders). The declared Input, `live-equity-price-request.v1`, appears nowhere, and neither does the Event.
-2. **Mechanic meaning is guessed from names.** Every mechanic material except `branch` comes from word stems or the composite rule. The declared port binding that says what each operation is never reaches the circuit record.
-3. **The credential binding and the HTTP exchange look the same.** Both are `provider-port`, although the graph source binds them to different mechanics (`sda-external-credential-reference-binding-port.v1` and `sda-governed-http-exchange-port.v1`).
-4. **The orchestration is invisible.** The 7-route structure, the 7 select decisions and the success on route 3 are all inside the root. The drawing shows 14 identical sockets around an outcome capsule.
-5. **Outcomes aren't carried to the drawing.** The per-route results in §2 (the failed exchanges, the carried RESOLVED, the root's RESOLVED variant) exist in testimony, but no drawn element shows a variant.
-
-## 6. What the circuit record lacks, and where it exists
-
-| Needed for the mapping | Where it is declared | In the circuit record (`execution-graph-captured.v1`)? |
+| Needed for the mapping | Where it is declared | In the record |
 | --- | --- | --- |
-| Scenario Input / Event / Outcome identities and contracts | graph source `scenarios[].input/event/outcome` | Contracts only as port `contractId`s; no input/event/outcome roles |
-| Operation → declared port binding (`platformCapabilityId`) | graph source `interfaceAuthority.portBindings` | **No.** The record's projection drops `execution.configuration.binding`. |
-| Operation → port id | graph source `operations[].portId` | Only indirectly, as the root of `semanticAddress` |
-| Transformation id | port binding `configuration.transformationId` | No |
-| Junction arm variant | graph edges `selectsVariant` | Yes |
-| Outcome variant and classification | testimony | Yes (lane), not in the drawing |
-
-## 7. What this implies (for decision, not yet done)
-
-A mapping built from declared data needs the operation's declared binding and the scenario's Input/Event/Outcome roles alongside the cells. There are two ways to get them:
-
-- the circuit record carries each operation's `platformCapabilityId` and the scenario's boundary roles (a kernel change, owed in Node, Python and C#); or
-- a declared read serves them per capability (`read-capability-circuit` / graph source).
-
-With them, the material map could be declared per mechanic identity instead of guessed from names:
-- transformation → execution step
-- credential binding → provider port
-- governed HTTP exchange → provider port with a bound provider and a physical effect
-- junction → branch
-- scenario → Input / Event / Outcome
-
-Which way to go, and where that mapping is declared, is the owner's decision.
+| Scenario Input / Event / Outcome identities and contracts | graph source `scenarios[].input/event/outcome` | Input and Outcome as port `contractId`s; Event as the cell's `authorityId` (phase 1) |
+| Operation → declared binding (`platformCapabilityId`) | graph source `interfaceAuthority.portBindings` | `authorityId` `operation:<platformCapabilityId>` (phase 1) |
+| Transformation identity (`transformationId`) | port binding `configuration.transformationId` | Expression cells' `authorityId` `mechanic:<op>.v1`; the binding's transformation id is the expression address root |
+| Operation membership (cell → its operation) | the record's `parentCellId` chain; the grain is declared by `read-circuit-presentation` | Yes (as parent chain), drawn at the declared operation grain (phase 3) |
+| Declared operation order | graph source `operations[]` order; the record's `sequence` edges | Yes (edges) |
+| Junction arm variant | graph edges `selectsVariant` | Yes; distinct in the drawn edge key (phase 5) |
+| Outcome variant and classification | declared per capability; carried in testimony | Testimony lane, yes; declared variants on the outcome port (phase 1) |
+| Material per declared identity | `circuit-presentation.v1` `materials.*` | Read, published and rendered by exact key (phase 2) |
+| Grain | `circuit-presentation.v1` `granularity.node: "operation"` | Read and drawn (phase 3) |
