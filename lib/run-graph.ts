@@ -361,7 +361,8 @@ export function buildRunGraphView(
       internalEdgeNode[edge.edgeId] = from;
       continue;
     }
-    const key = `${from}|${to}|${edge.kind ?? ''}`;
+    // The declared variant is part of the route's identity: junction arms never merge.
+    const key = `${from}|${to}|${edge.kind ?? ''}|${JSON.stringify(edge.selectsVariant ?? null)}`;
     let viewEdge = edgeByKey.get(key);
     if (!viewEdge) {
       viewEdge = {

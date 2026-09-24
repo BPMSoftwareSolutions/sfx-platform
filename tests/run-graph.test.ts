@@ -197,6 +197,33 @@ test('every operation is drawn: the equity shape is one scenario, three boundary
   assert.equal(view.nodes.filter((node) => node.id.includes('.operation.')).length, 35);
 });
 
+test('drawn edges keep junction arms distinct by their declared variant', () => {
+  const graph = graphOf(
+    [
+      { cellId: 'cell:scenario:root', altitude: 'scenario', parentCellId: null },
+      { cellId: 'cell:mechanic:selection', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
+      { cellId: 'cell:mechanic:selection:arm', altitude: 'mechanic', parentCellId: 'cell:mechanic:selection' },
+      { cellId: 'cell:mechanic:target', altitude: 'mechanic', parentCellId: 'cell:scenario:root' },
+    ],
+    [
+      { edgeId: 'edge:arm:false', from: 'cell:mechanic:selection:arm', to: 'cell:mechanic:target', kind: 'selection' },
+      { edgeId: 'edge:arm:true', from: 'cell:mechanic:selection:arm', to: 'cell:mechanic:target', kind: 'selection' },
+      { edgeId: 'edge:arm:false:again', from: 'cell:mechanic:selection:arm', to: 'cell:mechanic:target', kind: 'selection' },
+    ]
+  );
+  graph.edges[0]!.selectsVariant = 'FALSE';
+  graph.edges[1]!.selectsVariant = 'TRUE';
+  graph.edges[2]!.selectsVariant = 'FALSE';
+  const view = buildRunGraphView(normalizeRunGraph(graph), { policy });
+  const selectionEdges = view.edges.filter((edge) => edge.kind === 'selection');
+  assert.equal(selectionEdges.length, 2, 'two variants between the same drawn nodes stay distinct');
+  assert.deepEqual(selectionEdges.map((edge) => edge.selectsVariant), ['FALSE', 'TRUE']);
+  assert.equal(view.edgeMembership['edge:arm:false'], 'edge:arm:false');
+  assert.equal(view.edgeMembership['edge:arm:false:again'], 'edge:arm:false', 'the same variant collapses into one drawn edge');
+  assert.equal(selectionEdges[0]!.memberEdgeIds.length, 2);
+  assert.equal(selectionEdges[1]!.memberEdgeIds.length, 1);
+});
+
 test('altitude maps to a primitive; an undeclared altitude is visibly unresolved', () => {
   assert.equal(primitiveForAltitude('scenario'), 'SCENARIO');
   assert.equal(primitiveForAltitude('mechanic'), 'MECHANIC');
