@@ -406,6 +406,8 @@ function liveView(graphView = view, overrides: Partial<LiveRunView> = {}): LiveR
     graph: graphView,
     states: trace.states,
     edgeStates: trace.edgeStates,
+    outcomes: trace.outcomes,
+    cellOutcomes: trace.cellOutcomes,
     transitions: trace.transitions,
     unmatched: trace.unmatched,
     ...overrides,

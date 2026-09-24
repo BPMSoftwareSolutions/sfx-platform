@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
-import { drainRunLane, graphCapturedDigest, type RunLaneProgress } from '../components/estate/live-run';
+import { CapabilityCircuitPanel } from '../components/estate/capability-circuit-panel';
+import { drainRunLane, graphCapturedDigest, type LiveRunView, type RunLaneProgress } from '../components/estate/live-run';
 import type { RunAdvance, RunGraphResult, SdaRunEvent, SdaRunGraph, SdaRunState } from '../contracts/sda-api';
+import type { CircuitProjection } from '../contracts/estate';
+import { applyEvents, emptyTrace } from '../lib/live-trace';
+import { buildRunGraphView, normalizeRunGraph } from '../lib/run-graph';
 
 /**
  * Live run binding — the `graph.captured` marker, not a timer.
@@ -10,11 +16,15 @@ import type { RunAdvance, RunGraphResult, SdaRunEvent, SdaRunGraph, SdaRunState 
  * The lane's own marker is the fetch trigger; a compiled graph with the marker's
  * `canonicalGraphDigest` is adopted without a fetch; a terminal run that never captured a graph
  * reports a visible error. Testimony read before the marker is rebound when the graph arrives.
+ *
+ * The drained progress also carries each cell's own testified outcome, and the panel hands it to
+ * the viewer: a drawn operation shows the variant it testified, and a walked selection arm names
+ * the variant it walked. An arm with no observed state is never lit and never labelled.
  */
 
 const DIGEST = 'sha256:' + 'a'.repeat(64);
 
-function graphOf(digest = DIGEST): SdaRunGraph {
+function graphOf(digest = DIGEST, edges: SdaRunGraph['edges'] = []): SdaRunGraph {
   return {
     graphId: 'graph:fixture',
     canonicalGraphDigest: digest,
@@ -22,9 +32,78 @@ function graphOf(digest = DIGEST): SdaRunGraph {
       { cellId: 'cell:scenario:root', altitude: 'scenario', kind: 'scenario', parentCellId: null, semanticAddress: 'fixture/scenario', ports: {} },
       { cellId: 'cell:mechanic:a', altitude: 'mechanic', kind: 'mechanic', parentCellId: 'cell:scenario:root', semanticAddress: 'fixture/mechanic', ports: {} }
     ],
-    edges: []
+    edges
   };
 }
+
+/**
+ * A compact junction fixture: two drawn operations and two declared selection arms between them.
+ * The arms differ only by `selectsVariant`, so the drawn edge key and the walked-arm label are
+ * what keep them apart.
+ */
+function junctionGraph(): SdaRunGraph {
+  const endpoint = (cellId: string) => ({ cellId, portId: `${cellId}:port` });
+  return {
+    graphId: 'graph:junction',
+    canonicalGraphDigest: 'sha256:' + 'd'.repeat(64),
+    cells: [
+      {
+        cellId: 'cell:scenario:fixture',
+        altitude: 'scenario',
+        kind: 'scenario',
+        parentCellId: null,
+        semanticAddress: 'fixture/scenario',
+        ports: {
+          input: { portId: 'cell:scenario:fixture:input', contractId: 'fixture-request.v1' },
+          outcome: {
+            portId: 'cell:scenario:fixture:outcome',
+            contractId: 'fixture-evidence.v1',
+            variants: ['EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED', 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED'],
+            variantClassifications: {
+              EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED: 'success',
+              NATIVE_MARKET_PRICE_TESTIMONY_REJECTED: 'failure'
+            }
+          }
+        }
+      },
+      { cellId: 'cell:mechanic:fixture.operation.1', altitude: 'mechanic', kind: 'mechanic', parentCellId: 'cell:scenario:fixture', semanticAddress: 'fixture/operation/1', ports: {} },
+      { cellId: 'cell:mechanic:fixture.operation.1:junction', altitude: 'mechanic', kind: 'junction', parentCellId: 'cell:mechanic:fixture.operation.1', semanticAddress: 'fixture/operation/1/junction', ports: {} },
+      { cellId: 'cell:mechanic:fixture.operation.2', altitude: 'mechanic', kind: 'mechanic', parentCellId: 'cell:scenario:fixture', semanticAddress: 'fixture/operation/2', ports: {} }
+    ],
+    edges: [
+      {
+        edgeId: 'edge:arm:false',
+        kind: 'selection',
+        from: endpoint('cell:mechanic:fixture.operation.1:junction'),
+        to: endpoint('cell:mechanic:fixture.operation.2'),
+        selectsVariant: false
+      },
+      {
+        edgeId: 'edge:arm:true',
+        kind: 'selection',
+        from: endpoint('cell:mechanic:fixture.operation.1:junction'),
+        to: endpoint('cell:mechanic:fixture.operation.2'),
+        selectsVariant: true
+      }
+    ]
+  };
+}
+
+/** The panel needs a circuit face; the live override is the surface under test. */
+const panelCircuit: CircuitProjection = {
+  capabilityId: 'fixture',
+  scenarioId: 'fixture',
+  sourceProfile: 'test',
+  sourceDigest: 'sha256:' + '0'.repeat(64),
+  graphDigest: 'sha256:' + '1'.repeat(64),
+  sclVersion: '1.0.0',
+  rendererVersion: 'test',
+  lens: 'SCENARIO',
+  fidelity: 'RUN_GRAPH',
+  nodes: [],
+  edges: [],
+  diagnostics: []
+};
 
 function event(cursor: number, kind: string, payload: unknown): SdaRunEvent {
   return { cursor, at: new Date(0).toISOString(), kind, payload };
@@ -141,6 +220,31 @@ test('a graph fetch failure at the marker is a visible error and never an empty 
   assert.equal(last.graphError?.message, 'not captured yet');
 });
 
+test('the drained lane carries each cell’s own testified outcome for the panel', async () => {
+  const { progress } = await drain([
+    page(
+      [
+        event(1, 'graph.captured', { canonicalGraphDigest: DIGEST }),
+        event(2, 'cell-execution-testimony.v1', {
+          testimonyType: 'cell-execution-testimony.v1',
+          cellId: 'cell:mechanic:a',
+          disposition: 'completed',
+          outcomeVariant: 'SUCCESS',
+          outcomeClassification: 'success'
+        })
+      ],
+      { terminal: true }
+    )
+  ]);
+  const last = progress[progress.length - 1]!;
+  assert.deepEqual(last.trace.cellOutcomes['cell:mechanic:a'], { variant: 'SUCCESS', classification: 'success' });
+  assert.deepEqual(
+    last.trace.outcomes['cell:mechanic:a'],
+    { variant: 'SUCCESS', classification: 'success' },
+    'the drawn node carries its own cell’s testified outcome'
+  );
+});
+
 test('a lane advance failure is a terminal failure carrying the declared cause', async () => {
   const progress: RunLaneProgress[] = [];
   await drainRunLane({
@@ -176,4 +280,65 @@ test('the provider module exposes no retry-timer graph reader', async () => {
   assert.equal('readGraphWithRetry' in module, false);
   assert.equal('GRAPH_FETCH_ATTEMPTS' in module, false);
   assert.equal('GRAPH_FETCH_DELAY_MS' in module, false);
+});
+
+test('the panel shows each drawn operation’s testified variant and labels only the walked arm', () => {
+  const graphView = buildRunGraphView(normalizeRunGraph(junctionGraph()));
+  const trace = applyEvents(
+    emptyTrace(graphView),
+    [
+      event(1, 'cell-execution-testimony.v1', {
+        testimonyType: 'cell-execution-testimony.v1',
+        cellId: 'cell:mechanic:fixture.operation.1',
+        disposition: 'completed',
+        outcomeVariant: 'EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED',
+        outcomeClassification: 'success'
+      }),
+      event(2, 'cell-execution-testimony.v1', {
+        testimonyType: 'cell-execution-testimony.v1',
+        cellId: 'cell:mechanic:fixture.operation.2',
+        disposition: 'completed',
+        outcomeVariant: 'NATIVE_MARKET_PRICE_TESTIMONY_REJECTED',
+        outcomeClassification: 'failure'
+      }),
+      event(3, 'edge-execution-testimony.v1', {
+        testimonyType: 'edge-execution-testimony.v1',
+        edgeId: 'edge:arm:false',
+        admissionDisposition: 'admitted'
+      })
+    ],
+    graphView
+  );
+  const live: LiveRunView = {
+    phase: 'complete',
+    runId: '11111111-1111-1111-1111-111111111111',
+    terminalState: 'completed',
+    events: [],
+    graph: graphView,
+    states: trace.states,
+    edgeStates: trace.edgeStates,
+    outcomes: trace.outcomes,
+    cellOutcomes: trace.cellOutcomes,
+    transitions: trace.transitions,
+    unmatched: trace.unmatched
+  };
+  const markup = renderToStaticMarkup(
+    createElement(CapabilityCircuitPanel, { circuits: [panelCircuit], liveOverride: live })
+  );
+  // Every drawn operation shows the variant its own cell testified: resolved and rejected alike.
+  assert.match(markup, /EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED · success/);
+  assert.match(markup, /NATIVE_MARKET_PRICE_TESTIMONY_REJECTED · failure/);
+  assert.match(markup, /circuit-outcome--failure/, 'the rejected outcome is drawn as its own failure, not done');
+  assert.match(markup, /class="circuit-node circuit-node--done"[^>]*data-live="done"/);
+  assert.match(markup, /class="circuit-node circuit-node--failed"[^>]*data-live="failed"/);
+  // The walked arm names the variant it walked; the unwalked arm is neither lit nor labelled.
+  assert.match(markup, />FALSE</);
+  assert.doesNotMatch(markup, />TRUE</);
+  assert.equal((markup.match(/class="circuit-arm-label"/g) ?? []).length, 1, 'only the walked arm is labelled');
+  assert.equal((markup.match(/class="circuit-edge circuit-edge--done"/g) ?? []).length, 1, 'only the walked arm is lit');
+  assert.equal(
+    (markup.match(/class="circuit-edge circuit-edge--planned"/g) ?? []).length,
+    1,
+    'the unwalked arm is drawn planned and unlit'
+  );
 });

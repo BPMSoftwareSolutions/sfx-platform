@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import type { RunAdmission, RunAdvance, RunGraphResult, SdaRunEvent, SdaRunGraph, SdaRunState } from '@/contracts/sda-api';
-import { applyEvents, emptyTrace, type LiveNodeState, type LiveTrace, type LiveTransition } from '@/lib/live-trace';
+import { applyEvents, emptyTrace, type LiveNodeState, type LiveOutcome, type LiveTrace, type LiveTransition } from '@/lib/live-trace';
 import { buildRunGraphView, normalizeRunGraph, type RunGraphView } from '@/lib/run-graph';
 
 /**
@@ -32,6 +32,10 @@ export interface LiveRunView {
   states: Record<string, LiveNodeState>;
   /** Drawn edge id -> observed state. */
   edgeStates: Record<string, LiveNodeState>;
+  /** Drawn node id -> the outcome its own cell testified; absent until that cell testifies one. */
+  outcomes: Record<string, LiveOutcome>;
+  /** Raw cell id -> the outcome that cell testified, before aggregation onto the drawn node. */
+  cellOutcomes: Record<string, LiveOutcome>;
   transitions: LiveTransition[];
   /** Testimony whose id has no membership entry in the run graph. Never lit, never dropped. */
   unmatched: string[];
@@ -216,20 +220,20 @@ export function LiveRunProvider({
   compiledGraph?: SdaRunGraph;
   children: ReactNode;
 }) {
-  const [view, setView] = useState<LiveRunView>({ phase: 'idle', events: [], states: {}, edgeStates: {}, transitions: [], unmatched: [] });
+  const [view, setView] = useState<LiveRunView>({ phase: 'idle', events: [], states: {}, edgeStates: {}, outcomes: {}, cellOutcomes: {}, transitions: [], unmatched: [] });
   const runToken = useRef(0);
 
   useEffect(() => () => { runToken.current += 1; }, []);
 
   const reset = useCallback(() => {
     runToken.current += 1;
-    setView({ phase: 'idle', events: [], states: {}, edgeStates: {}, transitions: [], unmatched: [] });
+    setView({ phase: 'idle', events: [], states: {}, edgeStates: {}, outcomes: {}, cellOutcomes: {}, transitions: [], unmatched: [] });
   }, []);
 
   const admit = useCallback(
     (namespace: string, capabilityId: string, input: string) => {
       const request = ++runToken.current;
-      setView({ phase: 'admitting', events: [], states: {}, edgeStates: {}, transitions: [], unmatched: [] });
+      setView({ phase: 'admitting', events: [], states: {}, edgeStates: {}, outcomes: {}, cellOutcomes: {}, transitions: [], unmatched: [] });
       void (async () => {
         const admission = await admitAction(namespace, capabilityId, input);
         if (runToken.current !== request) return;
@@ -243,6 +247,8 @@ export function LiveRunProvider({
           events: [],
           states: {},
           edgeStates: {},
+          outcomes: {},
+          cellOutcomes: {},
           transitions: [],
           unmatched: []
         });
@@ -267,6 +273,8 @@ export function LiveRunProvider({
               graphError: progress.graphError,
               states: progress.trace.states,
               edgeStates: progress.trace.edgeStates,
+              outcomes: progress.trace.outcomes,
+              cellOutcomes: progress.trace.cellOutcomes,
               transitions: progress.trace.transitions,
               unmatched: progress.trace.unmatched,
               output: progress.output,

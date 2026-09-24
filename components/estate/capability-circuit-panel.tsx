@@ -86,6 +86,17 @@ export function CapabilityCircuitPanel({
         scenarioId: circuit?.scenarioId ?? null,
       })
     : undefined;
+  // The projection carries each drawn route's declared arm variant as data. The viewer labels
+  // only an arm with its own observed state, so an unwalked arm is never lit or labelled.
+  const edgeVariants = trace
+    ? Object.fromEntries(
+        trace.edges.flatMap((edge) =>
+          edge.selectsVariant === undefined || edge.selectsVariant === null
+            ? []
+            : [[edge.id, edge.selectsVariant] as [string, string | boolean]]
+        )
+      )
+    : undefined;
 
   const authoredComparison = authoredUrl ? (
     <details className="authored-comparison mt-4 rounded-lg bg-ink-2 p-4">
@@ -171,6 +182,8 @@ export function CapabilityCircuitPanel({
             selectedNodeId={nodeId}
             liveNodes={live?.states}
             liveEdges={live?.edgeStates}
+            liveOutcomes={live?.outcomes}
+            edgeVariants={edgeVariants}
             liveTrail={testimonyTrail(live?.transitions ?? [])}
             onSelectNode={selectNode}
             materials={materials}
