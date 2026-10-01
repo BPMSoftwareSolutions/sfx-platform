@@ -16,11 +16,12 @@ to the existing observer; graph capture uses the API's validated graph. There is
 no synthetic scenario execution or animation event generator. The browser retains
 the same scenario clock, database rendering, component inspection and replay code.
 
-All staging routes except `/healthz` and `/readyz` require the existing
-`SDA_API_TOKEN`: API clients can send Bearer authentication; browsers use HTTP Basic
-with any username and that token as password. This also protects website actions
-which call the internal API with their server credential. External writes to the
-observer are refused. `/v1/runs` remains the invocation surface.
+The website and circuit demo are public and do not challenge browsers for a
+username or password. Direct `/v1/` API clients send the existing `SDA_API_TOKEN`
+as Bearer authentication, validated by the SDA API itself. The gateway forwards
+the caller's authorization unchanged and never substitutes its server credential.
+Website server actions retain their existing internal API credential. External
+writes to the observer are refused. `/v1/runs` remains the invocation surface.
 
 ## Vault custody and restart
 
@@ -48,8 +49,8 @@ concurrent vault writers require a separately verified storage coordination desi
 ## Published candidate, 2026-10-01
 
 - Azure app/slot: `sidefx/staging`, resource group `sidefx_group`.
-- Release: `sda-f50865d3feb4-r3`; ACR build `ca4w`.
-- Image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:3fdf2ca17e2256f86d1b550ec6ca52fbf1a7ee6ae1fe89add89ffbbf867cd2e9`.
+- Release: `sda-f50865d3feb4-r4`; ACR build `ca4x`.
+- Image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:4f5bb9a9783d1708bac9da2609d9d241b8fb6ae815b1bea389cf1ab038d6cfbb`.
 - Installed Linux C# kernel: `sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e`.
 - Previous image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:5686009cd7746d82f98303fc3235412ed6aa0823cffef6f9700cad679d73499b`.
 
@@ -57,6 +58,20 @@ Linux Node installation and vault defects were repaired and its real Hello World
 API invocation passes. The live estate currently pins some application digests to
 C# Unicode serialization, so Node correctly refuses those applications. That open
 SDA canonicalization issue is not bypassed. Linux C# is the selected release runtime.
+
+Release r4 removes the unrequested blanket HTTP Basic challenge introduced in r3.
+An empty browser context with no credentials loaded the website, circuit and live
+observer. Anonymous catalog and scenario reads returned 200; missing, invalid
+Bearer and Basic credentials returned the API's JSON 401, without a browser
+authentication challenge. External observer writes still returned 405.
+Authorized run `3d38272e-e835-4c60-b65c-e258572d5035` returned
+`EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED`; its anonymous viewer recorded the displayed
+provider under the live dot in 60 samples before process exit, with no JavaScript
+errors. Replay measured 1.0 and 0.1. The gateway-only change preserves the kernel
+installation and vault configuration. Evidence:
+[`public-access-acceptance-2026-10-01.json`](public-access-acceptance-2026-10-01.json).
+
+The following original deployment and restart checks were captured on r3:
 
 Hosted run `94a5415d-add9-4192-b881-e2ab7f91d8dc` completed the objective through the
 model and market provider, returning `EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED`.

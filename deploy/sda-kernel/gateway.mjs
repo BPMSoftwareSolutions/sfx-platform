@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawn, spawnSync } from 'node:child_process';
-import { timingSafeEqual, createHash } from 'node:crypto';
+import { createHash } from 'node:crypto';
 
 const release = JSON.parse(fs.readFileSync('/opt/sfx/release.json', 'utf8'));
 const unlock = process.env.SFX_VAULT_UNLOCK;
@@ -76,16 +76,6 @@ await waitFor('http://127.0.0.1:8799/v1/runs/ready', { authorization: `Bearer ${
 launch(process.execPath, ['server.js'], '/app', { PORT: '3001', HOSTNAME: '127.0.0.1', SDA_API_ENDPOINT: 'http://127.0.0.1:8799' });
 await waitFor('http://127.0.0.1:3001/readyz');
 
-function authorized(header) {
-  let supplied = '';
-  if (header?.startsWith('Bearer ')) supplied = header.slice(7);
-  else if (header?.startsWith('Basic ')) {
-    const credentials = Buffer.from(header.slice(6), 'base64').toString('utf8');
-    const split = credentials.indexOf(':');
-    if (split >= 0) supplied = credentials.slice(split + 1);
-  }
-  return timingSafeEqual(createHash('sha256').update(supplied).digest(), createHash('sha256').update(token).digest());
-}
 http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
   if (url.pathname === '/readyz' || url.pathname === '/healthz') {
@@ -94,15 +84,11 @@ http.createServer((request, response) => {
   }
   const api = url.pathname.startsWith('/v1/');
   const circuit = url.pathname === '/circuit' || url.pathname.startsWith('/circuit/') || url.pathname.startsWith('/api/circuit/') || url.pathname === '/events';
-  // The website can invoke the API with its server credential too. Protect the
-  // whole staging surface so an unprotected website action cannot bypass auth.
-  if (!authorized(request.headers.authorization)) {
-    response.writeHead(401, { 'www-authenticate': 'Basic realm="SideFX staging demo", charset="UTF-8"', 'cache-control': 'no-store' });
-    response.end('Staging access requires the SDA API token.'); return;
-  }
+  // Website and circuit reads are public. The SDA API validates the caller's
+  // own Bearer header; the gateway must never substitute its server credential.
   if (circuit && request.method !== 'GET') { response.writeHead(405); response.end(); return; }
   const upstream = http.request({ hostname: '127.0.0.1', port: api ? 8799 : circuit ? 8787 : 3001,
-    path: request.url, method: request.method, headers: { ...request.headers, host: 'localhost', ...(api ? { authorization: `Bearer ${token}` } : {}) } }, incoming => {
+    path: request.url, method: request.method, headers: { ...request.headers, host: 'localhost' } }, incoming => {
     response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(api || circuit ? { 'cache-control': 'no-store' } : {}) });
     incoming.pipe(response);
   });

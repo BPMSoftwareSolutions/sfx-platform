@@ -1,0 +1,132 @@
+{
+  "verificationType": "sfx-staging-public-access-acceptance.v1",
+  "verifiedAt": "2026-10-01T18:44:19.269Z",
+  "url": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "release": "sda-f50865d3feb4-r4",
+  "imageDigest": "sha256:4f5bb9a9783d1708bac9da2609d9d241b8fb6ae815b1bea389cf1ab038d6cfbb",
+  "build": "ca4x",
+  "change": "Remove blanket browser HTTP Basic challenge; pass caller authorization unchanged to the existing SDA API.",
+  "publicAccess": {
+    "verifiedAt": "2026-10-01T18:42:59.933Z",
+    "requests": [
+      {
+        "route": "/readyz",
+        "method": "GET",
+        "credentials": "none",
+        "status": 200,
+        "challenge": null,
+        "health": {
+          "ready": true,
+          "release": "sda-f50865d3feb4-r4",
+          "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e"
+        }
+      },
+      {
+        "route": "/",
+        "method": "GET",
+        "credentials": "none",
+        "status": 200,
+        "challenge": null
+      },
+      {
+        "route": "/circuit",
+        "method": "GET",
+        "credentials": "none",
+        "status": 200,
+        "challenge": null
+      },
+      {
+        "route": "/api/circuit/v1/capabilities",
+        "method": "GET",
+        "credentials": "none",
+        "status": 200,
+        "challenge": null,
+        "count": 348
+      },
+      {
+        "route": "/api/circuit/v1/scenario?capabilityId=request-capability-from-objective&namespaceId=sidefx%3Acapabilities&scenarioId=request-capability-from-objective",
+        "method": "GET",
+        "credentials": "none",
+        "status": 200,
+        "challenge": null
+      },
+      {
+        "route": "/v1/runs",
+        "method": "POST",
+        "credentials": "none",
+        "status": 401,
+        "challenge": null,
+        "response": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "A bearer token is required."
+          }
+        }
+      },
+      {
+        "route": "/v1/runs",
+        "method": "POST",
+        "credentials": "Bearer invalid",
+        "status": 401,
+        "challenge": null,
+        "response": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "A bearer token is required."
+          }
+        }
+      },
+      {
+        "route": "/v1/runs",
+        "method": "POST",
+        "credentials": "Basic invalid",
+        "status": 401,
+        "challenge": null,
+        "response": {
+          "error": {
+            "code": "UNAUTHORIZED",
+            "message": "A bearer token is required."
+          }
+        }
+      },
+      {
+        "route": "/events",
+        "method": "POST",
+        "credentials": "none",
+        "status": 405,
+        "challenge": null
+      }
+    ],
+    "browser": {
+      "homeTitle": "SideFX — Own the meaning. Build what follows.",
+      "homeText": "Skip to content\nSideFX\nExplore\n▾\nPlatform\n▾\nSolutions\n▾\nDocs\nAbout\nTalk to us\nBuild a capability\n\nSIDEFX / CAPABILITY ENGINEERING\n\nOwn the meaning.\nBu",
+      "components": 19,
+      "status": "Observer connected · 0 run(s) seen · 348 declared capabilities · Database read 2026-10-01T18:43:05.5705218Z",
+      "credentials": "none",
+      "deniedRequests": [],
+      "errors": []
+    }
+  },
+  "liveExecution": {
+    "browserCredentials": "none",
+    "apiAuthentication": "Bearer",
+    "runId": "3d38272e-e835-4c60-b65c-e258572d5035",
+    "state": "completed",
+    "terminal": "ADMITTED",
+    "domainOutcome": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+    "sampleCount": 817,
+    "providerCurrentBeforeExit": 60,
+    "providerDotSamples": 60,
+    "displayedProvidersObserved": [
+      "provider:ScenarioKernel.NodePlatform"
+    ],
+    "clocks": {
+      "normal": 1,
+      "slow": 0.09999999999999987,
+      "duration": 10411.426513671875,
+      "scenarioPosition": 2473.8500000953672
+    },
+    "pageErrors": []
+  },
+  "scope": "Gateway access policy only. Kernel, vault configuration and database declarations unchanged. Original installation and restart receipt remains acceptance-2026-10-01.json."
+}
