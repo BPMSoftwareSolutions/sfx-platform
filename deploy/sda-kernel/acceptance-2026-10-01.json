@@ -1,0 +1,66 @@
+{
+  "verificationType": "sfx-staging-deployment-acceptance.v1",
+  "verifiedAt": "2026-10-01T17:02:28.093Z",
+  "url": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "app": "sidefx",
+  "slot": "staging",
+  "release": "sda-f50865d3feb4-r3",
+  "imageDigest": "sha256:3fdf2ca17e2256f86d1b550ec6ca52fbf1a7ee6ae1fe89add89ffbbf867cd2e9",
+  "kernelLanguage": "csharp",
+  "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e",
+  "api": {
+    "runId": "94a5415d-add9-4192-b881-e2ab7f91d8dc",
+    "events": 1023,
+    "sseEvents": 1023,
+    "sseEventsBeforeExit": 1022,
+    "graphStatus": 200,
+    "outputStatus": 200,
+    "unauthorizedAdmission": 401,
+    "catalogCount": 348,
+    "outcome": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED"
+  },
+  "browser": {
+    "runId": "4664ec4b-2b61-43b1-af1a-4c0d681410e6",
+    "domainOutcome": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+    "samples": 898,
+    "providerDotsBeforeExit": 90,
+    "displayedProvidersObserved": [
+      "provider:ScenarioKernel.NodePlatform"
+    ],
+    "terminal": "ADMITTED",
+    "replayNormalRate": 1,
+    "replaySlowRate": 0.10000000000000005,
+    "scenarioMilliseconds": 12141.427490234375,
+    "processMilliseconds": 13890,
+    "pageErrors": [],
+    "navigation": {
+      "drilldown": {
+        "url": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit?capability=request-capability-from-objective&namespace=sidefx%3Acapabilities&scenario=request-capability-from-objective&page=scenario-1&detail=provider%3AScenarioKernel.NodePlatform&detailPage=detail-1",
+        "pages": 1,
+        "provider": "provider · Node Platform"
+      },
+      "market": {
+        "url": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit?capability=resolve-equity-market-price-evidence-v2&namespace=sidefx%3Acapabilities&scenario=resolve-equity-market-price-evidence-v2&page=scenario-2",
+        "pages": 4,
+        "providers": [
+          "Yahoo Finance Real Time",
+          "YH Finance (yahoo-finance15)"
+        ]
+      },
+      "errors": []
+    }
+  },
+  "vault": {
+    "persistent": true,
+    "ciphertextDigest": "sha256:cbdaf14496f02ca73e167876c1d6e39a5128220525b47fc9499e5138e1382b9e",
+    "oldRunAfterRestartStatus": 404,
+    "postRestartRun": "4664ec4b-2b61-43b1-af1a-4c0d681410e6",
+    "unlockCustody": "Azure Key Vault secret; staging managed identity scoped to that secret",
+    "credentialEnvironmentFallback": false
+  },
+  "findings": [
+    "Node installed Hello World and vault work; referenced application execution remains blocked by the existing cross-language Unicode canonical-digest mismatch. The deployment uses verified Linux C#.",
+    "The current database-rendered objective page displays one provider (Node Platform). That displayed provider receives the live dot; this is not a claim that every nested provider has a declared box.",
+    "The viewer reports NOT_FORMALLY_OBSERVABLE because captured graphs omit selected definition digests. This receipt proves the exercised delivery, live UI and replay behavior, not full generation equality or estate-wide execution coverage."
+  ]
+}
