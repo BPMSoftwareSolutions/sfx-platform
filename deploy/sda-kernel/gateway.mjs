@@ -57,7 +57,8 @@ for (let attempt = 0; attempt < 10 && !vaultReady; attempt++) {
   vaultReady = probe.status === 0 && probe.stdout.trim().length > 0;
 }
 if (!vaultReady) { stop(1); throw new Error('VAULT_MASTER_KEY_UNAVAILABLE'); }
-launch(process.execPath, ['demo/dispatch-pair/observe-server.mjs'], '/opt/sfx/estate', {}, ['SDA_API_TOKEN', 'IDENTITY_HEADER', 'MSI_SECRET']);
+launch(process.execPath, ['demo/dispatch-pair/observe-server.mjs'], '/opt/sfx/estate',
+  { SDA_API_ENDPOINT: 'http://127.0.0.1:8799' }, ['IDENTITY_HEADER', 'MSI_SECRET']);
 async function waitFor(url, headers = {}, expected = 200) {
   for (let i = 0; i < 60; i++) {
     try { const response = await fetch(url, { headers, signal: AbortSignal.timeout(1000) }); if (response.status === expected) return; } catch {}
@@ -86,9 +87,10 @@ http.createServer((request, response) => {
   const circuit = url.pathname === '/circuit' || url.pathname.startsWith('/circuit/') || url.pathname.startsWith('/api/circuit/') || url.pathname === '/events';
   // Website and circuit reads are public. The SDA API validates the caller's
   // own Bearer header; the gateway must never substitute its server credential.
-  if (circuit && request.method !== 'GET') { response.writeHead(405); response.end(); return; }
+  const observe = url.pathname === '/api/circuit/v1/runs' && request.method === 'POST';
+  if (circuit && request.method !== 'GET' && !observe) { response.writeHead(405); response.end(); return; }
   const upstream = http.request({ hostname: '127.0.0.1', port: api ? 8799 : circuit ? 8787 : 3001,
-    path: request.url, method: request.method, headers: { ...request.headers, host: 'localhost' } }, incoming => {
+    path: request.url, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
     response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(api || circuit ? { 'cache-control': 'no-store' } : {}) });
     incoming.pipe(response);
   });

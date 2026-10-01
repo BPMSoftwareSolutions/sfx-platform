@@ -1,0 +1,205 @@
+{
+  "verificationType": "sfx-circuit-api-observe-acceptance.v1",
+  "verifiedAt": "2026-10-01T21:06:19.407Z",
+  "release": "sda-f50865d3feb4-r6",
+  "build": "ca50",
+  "imageDigest": "sha256:2e001dcba0de2e553a4823cf5d99aee091a7b578627288c70884435e6ccbe9d6",
+  "sources": [
+    {
+      "source": "sfx-embody/demo/circuit/app.js",
+      "digest": "sha256:4f1e4d0ae1a85d0353356e908e7405873d209fae7f6a4a71ec3551789ef715ec"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/circuit-host.json",
+      "digest": "sha256:e94900373cfa86d560c75d9a9a8fa608715ef1fac8fc6d541e0bb6aecc362bf1"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/index.html",
+      "digest": "sha256:d155ac8429a0100337a7fece5c3b192b220f74d34ae13a88e0f2a0bea64e4d52"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/live-store.mjs",
+      "digest": "sha256:3ba09278c689b50004495445b18136628ce1ce7b0e294b5ac8e27354d1d38f09"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/observe-panel.js",
+      "digest": "sha256:6be0b4f862fc0bb67774bbe21e5ee471a00b6ab1dc64474aad88015c11812af4"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/run-api.mjs",
+      "digest": "sha256:df37d5da2321420e617ec74c7f4b258b4d16d9fef0c6843130ca4b138d5cbf43"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/deck-trace.js",
+      "digest": "sha256:46e2c4da760ef5a6d553761005ec9ffdee07c8abdf80ede00eda8b90558b96d1"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/execution-cursor.js",
+      "digest": "sha256:f006b94528af32b3acef3b3a4ae8a6fca0671c7a327903835990ad091872560e"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/circuit-viewer.js",
+      "digest": "sha256:a4f46feff06b447d78aec4b92a3060b3415e08393152e4a9fcdd65e984aeb939"
+    },
+    {
+      "source": "sfx-embody/demo/circuit/traversal.js",
+      "digest": "sha256:add1bde6caa9ef80db011d7d3ff965679d52973fe83be0e44c4152d195c5f0a8"
+    }
+  ],
+  "hosted": {
+    "base": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "status": "API run d5ee7d3f-68f5-4c06-9b4b-2fb45493ca25 · completed",
+    "output": {
+      "contractId": "invoke-database-capability-summary-result.v1",
+      "disposition": "ADMITTED",
+      "summary": "The market price for Broadcom Inc. (AVGO) is $343.64 USD. Please note that this is a delayed quote.",
+      "invocationDisposition": "MODEL_RESPONSE_OBTAINED"
+    },
+    "errors": [],
+    "postCount": 1,
+    "browserHasBearer": false,
+    "providers": [
+      "provider:google/gemini-select",
+      "provider:ScenarioKernel.NodePlatform",
+      "provider:google/gemini-summary"
+    ],
+    "providerSamples": 756,
+    "clocks": {
+      "normal": 1,
+      "slow": 0.1,
+      "duration": 16110.9365234375
+    },
+    "sampleCount": 1067
+  },
+  "local": {
+    "base": "http://localhost:8787",
+    "status": "API run d07846b5-e71d-40d2-96c7-e9cd7aa9322a · completed",
+    "output": {
+      "contractId": "invoke-database-capability-summary-result.v1",
+      "disposition": "ADMITTED",
+      "summary": "The market price for Broadcom Inc. (AVGO) is $343.64 USD. Please note that this is a delayed quote.",
+      "invocationDisposition": "MODEL_RESPONSE_OBTAINED"
+    },
+    "errors": [],
+    "postCount": 1,
+    "browserHasBearer": false,
+    "providers": [
+      "provider:google/gemini-select",
+      "provider:ScenarioKernel.NodePlatform",
+      "provider:google/gemini-summary"
+    ],
+    "providerSamples": 776,
+    "clocks": {
+      "normal": 1,
+      "slow": 0.10000000000000003,
+      "duration": 16662.771728515625
+    },
+    "sampleCount": 1099
+  },
+  "recovery": {
+    "before": "Run in progress · sda-api:urn:sda-api:run-event:dced6d67-3be3-4ec7-9a13-ad14fad29d8c:2 · 138 cell / 138 edge observations",
+    "after": "Run ended · exit 0 · sda-api:urn:sda-api:run-event:dced6d67-3be3-4ec7-9a13-ad14fad29d8c:2 · 941 cell / 934 edge observations",
+    "streams": [
+      "http://localhost:8787/api/circuit/v1/runs/dced6d67-3be3-4ec7-9a13-ad14fad29d8c/events/stream?after=0",
+      "http://localhost:8787/api/circuit/v1/runs/dced6d67-3be3-4ec7-9a13-ad14fad29d8c/events/stream?after=1894",
+      "http://localhost:8787/api/circuit/v1/runs/c283163d-28fc-47ba-9fee-84c099929868/events/stream?after=0"
+    ],
+    "postCount": 2,
+    "doubleClickAdmittedOnce": true,
+    "resumedWithoutAdmission": true,
+    "helloPayload": {
+      "contractId": "hello-world-request.v1",
+      "payload": {}
+    },
+    "helloOutput": {
+      "contractId": "hello-world-greeting.v1",
+      "payload": {
+        "message": "Hello, World!"
+      }
+    },
+    "draftRestored": true,
+    "errors": []
+  },
+  "emptyContract": {
+    "status": "API run d440d803-51bf-4243-91fa-5a0f058a907a · completed",
+    "input": {
+      "contractId": "hello-world-request.v1",
+      "payload": {}
+    },
+    "output": {
+      "contractId": "hello-world-greeting.v1",
+      "payload": {
+        "message": "Hello, World!"
+      }
+    },
+    "errors": []
+  },
+  "accessBoundaries": [
+    {
+      "route": "/api/circuit/v1/execution",
+      "method": "GET",
+      "status": 200,
+      "body": "{\"configured\":true,\"defaultNamespace\":\"sidefx:capabilities\"}"
+    },
+    {
+      "route": "/v1/runs",
+      "method": "POST",
+      "status": 401,
+      "body": "{\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"A bearer token is required.\"}}"
+    },
+    {
+      "route": "/events",
+      "method": "POST",
+      "status": 405,
+      "body": ""
+    },
+    {
+      "route": "/api/circuit/v1/runs",
+      "method": "POST",
+      "status": 403,
+      "body": "{\"error\":\"Observe requires a same-origin JSON request.\"}"
+    },
+    {
+      "route": "/api/circuit/v1/runs",
+      "method": "POST",
+      "status": 400,
+      "body": "{\"error\":\"Payload must be valid JSON.\"}"
+    }
+  ],
+  "liveConformance": {
+    "runId": "bf8c49a9-b2f0-4a0b-a2ad-279a6d53ea0a",
+    "actualApiEvents": 1894,
+    "checkedPrefixes": 1892,
+    "providerAdmissionsAndReturns": 3,
+    "usesReplayTimeline": false,
+    "sceneDigest": "sha256:2eb836dc6d38089bb186aeb110e5ee42538cea4b218c628e337db011502a80be",
+    "captureDigest": "sha256:93375987b9f09f6123803219018576a9890399b12cff2e8f255d04b239b2d754"
+  },
+  "omittedVariantsRegression": {
+    "runId": "4d56502b-1a12-462f-94a1-4a4dd94afceb",
+    "actualApiEvents": 26,
+    "checkedPrefixes": 19,
+    "noFabricatedOutcome": true,
+    "sceneDigest": "sha256:19cf6d46c7a2c276f3b1db36a2beaf5fbf16a66a0caee537ee6312c3fc9ecfb6",
+    "captureDigest": "sha256:8dc3d15fc9d84e2b0d6d3b4fb40c33882aed689b5212af01dfb11cc50097bd51"
+  },
+  "checks": [
+    "Invalid JSON produces no admission",
+    "One click/double click produces one admission",
+    "Browser sends no API Bearer token",
+    "Real API graph and testimony drive the existing traversal",
+    "Each submitting tab remains scoped to its returned run",
+    "Disconnect/resume reads the same cursor without submitting",
+    "Selected capability input contract and payload draft change together",
+    "Normal 1x and Slow 0.1x preserve captured scenario timestamps",
+    "Payload editor fits 390px viewport",
+    "Omitted variant arrays no longer crash traversal"
+  ],
+  "limits": [
+    "Functional integration and receipt-prefix checks; not a proof that every catalog capability executes",
+    "Existing graph omits selected definition digests: generation equality remains NOT_FORMALLY_OBSERVABLE",
+    "Missing declared outcome variants remain a reported circuit defect; no domain variant is invented",
+    "API executions continue after a tab disconnects; retained run history belongs to the API process",
+    "Detailed browser captures and screenshots are local acceptance evidence in artifacts/deployment/sda-linux-proof"
+  ]
+}

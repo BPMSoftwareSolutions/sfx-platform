@@ -20,8 +20,18 @@ The website and circuit demo are public and do not challenge browsers for a
 username or password. Direct `/v1/` API clients send the existing `SDA_API_TOKEN`
 as Bearer authentication, validated by the SDA API itself. The gateway forwards
 the caller's authorization unchanged and never substitutes its server credential.
-Website server actions retain their existing internal API credential. External
-writes to the observer are refused. `/v1/runs` remains the invocation surface.
+Website server actions retain their existing internal API credential. The circuit
+also offers a JSON payload editor and **Observe**, using a same-origin
+`POST /api/circuit/v1/runs` transport to the internal `/v1/runs` API. The observer
+receives the API endpoint and server token; its kernel reader children do not.
+The browser never receives that token. This public staging action intentionally
+permits visitor invocation under the configured SDA admission policy. Other
+external writes to the observer remain refused, including event injection.
+
+The selected API run streams directly to its submitting circuit tab, with cursor
+resumption and its own graph. The generic observer bridge remains available for
+CLI and other external runs. Input contracts are read through the database scene's
+navigation links; the viewer has no per-capability form or execution code.
 
 ## Vault custody and restart
 
@@ -49,15 +59,26 @@ concurrent vault writers require a separately verified storage coordination desi
 ## Published candidate, 2026-10-01
 
 - Azure app/slot: `sidefx/staging`, resource group `sidefx_group`.
-- Release: `sda-f50865d3feb4-r4`; ACR build `ca4x`.
-- Image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:4f5bb9a9783d1708bac9da2609d9d241b8fb6ae815b1bea389cf1ab038d6cfbb`.
+- Release: `sda-f50865d3feb4-r6`; ACR build `ca50`.
+- Image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:2e001dcba0de2e553a4823cf5d99aee091a7b578627288c70884435e6ccbe9d6`.
 - Installed Linux C# kernel: `sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e`.
-- Previous image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:5686009cd7746d82f98303fc3235412ed6aa0823cffef6f9700cad679d73499b`.
+- Previous stable image (r4): `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:4f5bb9a9783d1708bac9da2609d9d241b8fb6ae815b1bea389cf1ab038d6cfbb`.
 
 Linux Node installation and vault defects were repaired and its real Hello World
 API invocation passes. The live estate currently pins some application digests to
 C# Unicode serialization, so Node correctly refuses those applications. That open
 SDA canonicalization issue is not bypassed. Linux C# is the selected release runtime.
+
+Release r6 adds the circuit's API Observe action and handles omitted outcome
+variant lists in the generic viewer. Browser acceptance includes a real objective
+run, all three displayed providers while live, the admitted outcome, original
+1× and 0.1× replay timing, a second capability's different input contract,
+double-click suppression, and resuming a disconnected run without admitting it
+again. Input drafts survive capability switching. The token stays on the host;
+direct anonymous `/v1/runs` remains 401 and external event injection remains 405.
+No database declarations, kernel installation or vault configuration changed.
+See [`circuit-observe-acceptance-2026-10-01.json`](circuit-observe-acceptance-2026-10-01.json)
+for the run IDs, capture checks and limits of this verification.
 
 Release r4 removes the unrequested blanket HTTP Basic challenge introduced in r3.
 An empty browser context with no credentials loaded the website, circuit and live
