@@ -1,0 +1,8 @@
+# Extend the verified staging installation; preserve its kernel and vault.
+ARG STAGING_IMAGE
+FROM ${STAGING_IMAGE}
+USER root
+COPY runtime/ /opt/sfx/
+RUN chmod +x /opt/sfx/procedure-extract/procedure-extract && chown -R node:node /opt/sfx/procedure-extract /opt/sfx/host /opt/sfx/estate
+WORKDIR /opt/sfx
+CMD ["sh", "/opt/sfx/host/initialize.sh"]

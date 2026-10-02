@@ -1,0 +1,188 @@
+{
+  "release": {
+    "ready": true,
+    "release": "sda-f50865d3feb4-r8",
+    "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e"
+  },
+  "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:f4bca13e4ffbcbdf6d57f7ccdd49813292f892b2c01ab6ef8eeb0c726ab9de20",
+  "acrBuild": "ca53",
+  "verifiedAt": "2026-10-02T19:19:24Z",
+  "api": {
+    "release": {
+      "ready": true,
+      "release": "sda-f50865d3feb4-r8",
+      "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e"
+    },
+    "base": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "statuses": {
+      "anonymous": 401,
+      "invalid": 401,
+      "json": 200,
+      "writer": 403,
+      "unlisted": 403,
+      "excel": 200
+    },
+    "resultSets": [
+      {
+        "name": "provider_canonical_body",
+        "rows": 1,
+        "columns": 9
+      },
+      {
+        "name": "provider_canonical_body_rows",
+        "rows": 10,
+        "columns": 4
+      },
+      {
+        "name": "provider_semantic_rows",
+        "rows": 68,
+        "columns": 8
+      },
+      {
+        "name": "provider_chain_semantics_rows",
+        "rows": 1196,
+        "columns": 9
+      },
+      {
+        "name": "provider_update_targets",
+        "rows": 752,
+        "columns": 7
+      },
+      {
+        "name": "provider_semantic_summary",
+        "rows": 1,
+        "columns": 9
+      },
+      {
+        "name": "provider_reference_rows",
+        "rows": 4,
+        "columns": 11
+      },
+      {
+        "name": "provider_reference_matches",
+        "rows": 20,
+        "columns": 8
+      }
+    ],
+    "providerDigest": "6cc29f2dbc6ae7880c801ddb92d1261f3f1cd1001370e7cb300acf256734e7cc",
+    "excelBytes": 98245,
+    "verifiedAt": "2026-10-02T19:18:02Z"
+  },
+  "inspector": {
+    "release": {
+      "ready": true,
+      "release": "sda-f50865d3feb4-r8",
+      "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e"
+    },
+    "verifiedAt": "2026-10-02T19:19:24Z",
+    "snapshotDigest": "16ada14486d5d12afa6167589fd2c92325a773add04c036fb44524bed4a540db",
+    "providers": [
+      {
+        "providerId": "google/gemini-select",
+        "definitionDigest": "6cc29f2dbc6ae7880c801ddb92d1261f3f1cd1001370e7cb300acf256734e7cc",
+        "resultSets": [
+          {
+            "name": "provider_canonical_body",
+            "rows": 1
+          },
+          {
+            "name": "provider_canonical_body_rows",
+            "rows": 10
+          },
+          {
+            "name": "provider_semantic_rows",
+            "rows": 68
+          },
+          {
+            "name": "provider_chain_semantics_rows",
+            "rows": 1196
+          },
+          {
+            "name": "provider_update_targets",
+            "rows": 752
+          },
+          {
+            "name": "provider_semantic_summary",
+            "rows": 1
+          },
+          {
+            "name": "provider_reference_rows",
+            "rows": 4
+          },
+          {
+            "name": "provider_reference_matches",
+            "rows": 20
+          }
+        ]
+      },
+      {
+        "providerId": "google/gemini-summary",
+        "definitionDigest": "bde3ffa5e47367615ab0979b9a0cc29d9e2931005363641e7d6706bc8c648e75",
+        "resultSets": [
+          {
+            "name": "provider_canonical_body",
+            "rows": 1
+          },
+          {
+            "name": "provider_canonical_body_rows",
+            "rows": 10
+          },
+          {
+            "name": "provider_semantic_rows",
+            "rows": 68
+          },
+          {
+            "name": "provider_chain_semantics_rows",
+            "rows": 1196
+          },
+          {
+            "name": "provider_update_targets",
+            "rows": 752
+          },
+          {
+            "name": "provider_semantic_summary",
+            "rows": 1
+          },
+          {
+            "name": "provider_reference_rows",
+            "rows": 4
+          },
+          {
+            "name": "provider_reference_matches",
+            "rows": 20
+          }
+        ]
+      }
+    ],
+    "statuses": {
+      "missingSelection": {
+        "status": 400,
+        "error": "CIRCUIT_SELECTION_REQUIRED"
+      },
+      "staleSelection": {
+        "status": 409,
+        "error": "LIVE_CIRCUIT_SNAPSHOT_CHANGED"
+      },
+      "operationSelection": {
+        "status": 422,
+        "error": "DECLARED_PROVIDER_REQUIRED"
+      },
+      "website": 200,
+      "circuit": 200,
+      "anonymousKernelAPI": 401
+    }
+  },
+  "browser": {
+    "javascriptErrors": 0,
+    "canonicalRowExpanded": true,
+    "resultSetsVisible": 8,
+    "page": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit?capability=request-capability-from-objective-v3&namespace=sidefx%3Acapabilities&scenario=request-capability-from-objective-v3&page=scenario-1&detail=provider%3Agoogle%2Fgemini-select"
+  },
+  "scope": [
+    "Existing generated-DAL HTTP API hosted, then provider inspection wired",
+    "No database declaration or installed kernel changes",
+    "Current database inspection is separate from execution testimony",
+    "Direct API authentication and read allowlist checked",
+    "Does not claim execution coverage for every capability or add authoring UI"
+  ]
+}

@@ -11,7 +11,7 @@ on Linux so kernel permissions and internal symbolic links survive the tar archi
 Supply `WEBSITE_IMAGE` as an exact image digest to the Docker build.
 
 The gateway listens on port 3000. The website listens internally on 3001, the SDA
-API on 8799 and the observer on 8787. API events are forwarded in received order
+API on 8799, the observer on 8787 and procedure extraction on 8791. API events are forwarded in received order
 to the existing observer; graph capture uses the API's validated graph. There is
 no synthetic scenario execution or animation event generator. The browser retains
 the same scenario clock, database rendering, component inspection and replay code.
@@ -56,7 +56,60 @@ read through the declared vault; database and provider secret environment fallba
 are not used. The current file vault is a single-instance deployment: multi-instance
 concurrent vault writers require a separately verified storage coordination design.
 
-## Published candidate, 2026-10-01
+## Database retrieval API
+
+The self-contained Linux `procedure-extract` service uses the generated DAL to
+call stored procedures and return their result sets. The gateway exposes
+`POST /procedure-extract/json` and `POST /procedure-extract/excel`; both take
+`{"procedure":"<schema.name>","parameters":{...}}`. External clients use the
+existing SDA API Bearer token. Missing/invalid tokens return 401 without a Basic
+authentication challenge. Only procedures in `retrieval-policy.json` are admitted;
+writer requests return 403. The service listens only on loopback.
+
+The staging slot setting `PROCEDURE_EXTRACT_CONNECTION_STRING` is a Key Vault
+reference to `sidefx-staging-procedure-extract-database` in
+`aiengine-kv-20260406`. The staging managed identity has Secrets User access scoped
+to that secret. The gateway removes the setting from inherited child environments
+and supplies its resolved value only to the retrieval service as
+`sidefx-connection-string`. This service credential is separate from the SDA
+kernel's existing encrypted vault and provider credentials.
+
+The observer receives `PROCEDURE_EXTRACT_ENDPOINT=http://127.0.0.1:8791`.
+Its same-origin provider-inspection route validates the selected database scene,
+calls the declared reader, and checks the returned provider ID and definition
+digest. The circuit browser receives data only, with no API token or database
+connection. The read panel does not execute the update-call text in result sets.
+
+To package a revision, publish `sfx-providers/providers/procedure-extract` for
+`linux-x64` with `--self-contained true`, then run:
+
+```
+node deploy/sda-kernel/prepare-retrieval.mjs <published-directory> <previous-release.json> <fresh-context-directory> <release-id> [estate-directory]
+```
+
+The optional estate directory supplies the three inspector transport files.
+Build from the fresh context directory using its `Dockerfile`, passing the exact
+previous staging image digest as `STAGING_IMAGE`. No source checkout, credentials
+or new kernel build enters the runtime image. Set the slot's `linuxFxVersion` to
+the resulting exact image digest. This retains the existing website, admitted
+kernel and persistent vault.
+
+## Published candidate, 2026-10-02
+
+- Azure app/slot: `sidefx/staging`, resource group `sidefx_group`.
+- Release: `sda-f50865d3feb4-r8`; ACR build `ca53`.
+- Image: `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:f4bca13e4ffbcbdf6d57f7ccdd49813292f892b2c01ab6ef8eeb0c726ab9de20`.
+- Installed kernel: unchanged from r6, digest below.
+- Previous image (API only, r7): `bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:56cb8d19fb3ed2644c3ec8dd6acca2b2f30702c8e40dd307af68f3501fd422c1`.
+
+The existing API was first hosted and verified as r7, then wired into provider
+inspection as r8. Remote JSON and Excel checks passed; two selected providers
+returned all eight result sets with matching definition digests. Stale selection,
+wrong component kind, unauthorized API requests and writer requests were refused.
+The website and circuit remain public. See
+[`retrieval-acceptance-2026-10-02.json`](retrieval-acceptance-2026-10-02.json).
+
+## Previous candidate, 2026-10-01
 
 - Azure app/slot: `sidefx/staging`, resource group `sidefx_group`.
 - Release: `sda-f50865d3feb4-r6`; ACR build `ca50`.

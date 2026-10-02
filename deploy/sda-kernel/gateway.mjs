@@ -3,11 +3,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawn, spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, timingSafeEqual } from 'node:crypto';
 
 const release = JSON.parse(fs.readFileSync('/opt/sfx/release.json', 'utf8'));
 const unlock = process.env.SFX_VAULT_UNLOCK;
 const token = process.env.SDA_API_TOKEN;
+const retrievalConnection = process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
+delete process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
 if (!unlock || unlock.startsWith('@Microsoft.KeyVault(') || !token) throw new Error('VAULT_OR_API_AUTH_NOT_CONFIGURED');
 delete process.env.SFX_VAULT_UNLOCK;
 const data = path.join(process.env.HOME, '.local/share');
@@ -57,8 +59,14 @@ for (let attempt = 0; attempt < 10 && !vaultReady; attempt++) {
   vaultReady = probe.status === 0 && probe.stdout.trim().length > 0;
 }
 if (!vaultReady) { stop(1); throw new Error('VAULT_MASTER_KEY_UNAVAILABLE'); }
+if (!retrievalConnection || retrievalConnection.startsWith('@Microsoft.KeyVault(')) throw new Error('RETRIEVAL_CONNECTION_NOT_CONFIGURED');
+const retrievalPolicy = JSON.parse(fs.readFileSync('/opt/sfx/host/retrieval-policy.json', 'utf8'));
+launch('/opt/sfx/procedure-extract/procedure-extract', ['--serve', '--url', 'http://127.0.0.1:8791'], '/opt/sfx/procedure-extract', {
+  'sidefx-connection-string': retrievalConnection,
+  PROCEDURE_EXTRACT_ALLOWED_PROCEDURES: retrievalPolicy.allowedProcedures.join(',')
+}, ['SDA_API_TOKEN', 'IDENTITY_HEADER', 'MSI_SECRET']);
 launch(process.execPath, ['demo/dispatch-pair/observe-server.mjs'], '/opt/sfx/estate',
-  { SDA_API_ENDPOINT: 'http://127.0.0.1:8799' }, ['IDENTITY_HEADER', 'MSI_SECRET']);
+  { SDA_API_ENDPOINT: 'http://127.0.0.1:8799', PROCEDURE_EXTRACT_ENDPOINT: 'http://127.0.0.1:8791' }, ['IDENTITY_HEADER', 'MSI_SECRET']);
 async function waitFor(url, headers = {}, expected = 200) {
   for (let i = 0; i < 60; i++) {
     try { const response = await fetch(url, { headers, signal: AbortSignal.timeout(1000) }); if (response.status === expected) return; } catch {}
@@ -68,6 +76,7 @@ async function waitFor(url, headers = {}, expected = 200) {
   throw new Error('SERVICE_START_TIMEOUT');
 }
 await waitFor('http://127.0.0.1:8787/health');
+await waitFor('http://127.0.0.1:8791/health');
 launch(process.execPath, ['/opt/sfx/host/api.mjs'], '/opt/sfx', {
   SDA_ESTATE_DIR: '/opt/sfx/estate', SDA_API_HOST: '127.0.0.1', SDA_API_PORT: '8799',
   SDA_API_AUTHORITY: '/opt/sfx/api/interfaces/sda-api/sda-api-v1.authority.json', SDA_RUN_EVENT_RETENTION: '20000',
@@ -84,14 +93,26 @@ http.createServer((request, response) => {
     response.end(JSON.stringify({ ready: !stopping, release: release.id, kernelDigest: release.kernelDigest })); return;
   }
   const api = url.pathname.startsWith('/v1/');
+  const retrieval = url.pathname.startsWith('/procedure-extract/');
+  if (retrieval) {
+    const supplied = createHash('sha256').update(request.headers.authorization || '').digest();
+    const expected = createHash('sha256').update(`Bearer ${token}`).digest();
+    if (!timingSafeEqual(supplied, expected)) {
+      response.writeHead(401, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ error: 'UNAUTHORIZED' })); return;
+    }
+    if (request.method !== 'POST' || !['/procedure-extract/json', '/procedure-extract/excel'].includes(url.pathname)) {
+      response.writeHead(404); response.end(); return;
+    }
+  }
   const circuit = url.pathname === '/circuit' || url.pathname.startsWith('/circuit/') || url.pathname.startsWith('/api/circuit/') || url.pathname === '/events';
   // Website and circuit reads are public. The SDA API validates the caller's
   // own Bearer header; the gateway must never substitute its server credential.
   const observe = url.pathname === '/api/circuit/v1/runs' && request.method === 'POST';
   if (circuit && request.method !== 'GET' && !observe) { response.writeHead(405); response.end(); return; }
-  const upstream = http.request({ hostname: '127.0.0.1', port: api ? 8799 : circuit ? 8787 : 3001,
-    path: request.url, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
-    response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(api || circuit ? { 'cache-control': 'no-store' } : {}) });
+  const upstream = http.request({ hostname: '127.0.0.1', port: retrieval ? 8791 : api ? 8799 : circuit ? 8787 : 3001,
+    path: retrieval ? url.pathname.slice('/procedure-extract'.length) : request.url, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
+    response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(api || circuit || retrieval ? { 'cache-control': 'no-store' } : {}) });
     incoming.pipe(response);
   });
   upstream.on('error', () => { if (!response.headersSent) response.writeHead(502); response.end(); });

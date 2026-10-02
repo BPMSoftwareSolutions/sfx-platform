@@ -1,0 +1,10 @@
+{
+  "allowedProcedures": [
+    "analysis.read_provider_canonical_body",
+    "analysis.read_provider_details",
+    "analysis.read_provider_bindings",
+    "analysis.read_provider_ports",
+    "analysis.read_capability_operations",
+    "analysis.read_capability_providers"
+  ]
+}
