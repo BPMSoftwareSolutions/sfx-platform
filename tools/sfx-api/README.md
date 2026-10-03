@@ -1,5 +1,10 @@
 # sfx-api
 
+The wrapper also supplies `sfx login`, `sfx whoami`, and `sfx logout`.
+See [CLI login client](../../docs/cli-login-client.md) for source, secure session
+storage, installation, live verification and remaining Azure/authorization work.
+Local `sfx capability` commands still use the existing local launcher.
+
 Command-line access to the SDA Run API. The installed client submits a capability
 invocation, waits for the remote result and prints its JSON.
 

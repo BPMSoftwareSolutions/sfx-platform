@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>sfx-login-input</AssemblyName>
+    <LoginInputProviderProject Condition="'$(LoginInputProviderProject)' == ''">../../../../sfx-providers/providers/cli-login-input-provider/CliLoginInputProvider.csproj</LoginInputProviderProject>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="$(LoginInputProviderProject)" /></ItemGroup>
+</Project>

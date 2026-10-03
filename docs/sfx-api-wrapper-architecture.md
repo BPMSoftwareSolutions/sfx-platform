@@ -1,6 +1,13 @@
 # sfx-api wrapper architecture
 
-Implementation reviewed on October 1, 2026.
+Implementation updated on October 3, 2026.
+
+The wrapper supports human login and shared user sessions. See
+[CLI login client](cli-login-client.md) for implementation and verification.
+User authentication takes precedence once selected and never falls back to a
+machine token. The machine-token profile described below remains available for
+existing clients or explicit `--auth machine`. Azure authentication hosting and
+per-principal Run API authorization remain separate server work.
 
 `sfx-api` gives the SDA Kernel API a command-line entry point. It translates a
 command into an HTTP submission, waits for the remote run, and prints the
@@ -132,8 +139,10 @@ Configuration precedence is explicit:
 
 | Setting | Selection order |
 | --- | --- |
-| API endpoint | `--endpoint`, then `SFX_API_ENDPOINT`, then profile `endpoint`. |
-| API token | `SFX_API_TOKEN`, then `SDA_API_TOKEN`, then the matching Windows profile credential. |
+| API endpoint | `--endpoint`, then `SFX_API_ENDPOINT`, then selected user endpoint (outside explicit machine mode), then profile `endpoint`. |
+| Authentication | Explicit `--auth user` or `--auth machine`; otherwise selected user mode, otherwise legacy machine mode. |
+| User bearer | Exact endpoint's OS-protected user session; no machine fallback. |
+| Machine token | Machine mode only: `SFX_API_TOKEN`, then `SDA_API_TOKEN`, then matching Windows profile credential. |
 | Profile file | `SFX_API_CONFIG`; otherwise the installed default profile. |
 | Trace directory | `SFX_API_TRACE_DIRECTORY`; otherwise the client data root's `traces` directory. |
 | Client wait | `--timeout` in seconds; default `630`, maximum `86400`. |

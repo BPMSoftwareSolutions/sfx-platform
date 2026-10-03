@@ -17,7 +17,7 @@ if ($TokenFromStdin) {
     $plain = $null
 } else { $secure = Read-Host 'SDA API token' -AsSecureString }
 $credential = [System.Management.Automation.PSCredential]::new('sda-api', $secure)
-$files = @('sfx-api.mjs', 'credential.ps1')
+$files = @('sfx-api.mjs', 'credential.ps1', 'auth.mjs', 'session-store.mjs', 'session-store.ps1')
 $hashes = ($files | ForEach-Object { (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $PSScriptRoot $_)).Hash }) -join ''
 $version = $hashes.Substring(0, 16).ToLowerInvariant()
 $destination = Join-Path $InstallRoot $version

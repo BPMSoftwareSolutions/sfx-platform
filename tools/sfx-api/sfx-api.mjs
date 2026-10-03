@@ -7,22 +7,27 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import { randomUUID } from 'node:crypto';
+import { sessionStore } from './session-store.mjs';
+import { authenticate, authCommands, authHelp, parseAuth } from './auth.mjs';
 
 const help = `Usage:
   sfx-api capability observe <identity> --input <text|JSON|@file.json> --json [--trace]
   sfx-api run <runId> --json [--trace]
+  sfx-api login|whoami|logout [--endpoint <HTTPS URL>] [--json]
 
 Options:
   --input-type text|json   Explicit input encoding; otherwise JSON is detected
   --namespace <name>      Optional namespace accepted by the SDA API
   --endpoint <URL>        Override SFX_API_ENDPOINT or the installed profile
+  --auth user|machine    Explicit credential profile (selected user session wins by default)
   --timeout <seconds>     Client wait limit (default 630); does not cancel the server
   --idempotency-key <key> Reuse a retained API admission instead of starting another
   --trace                 Save received API events to a per-run NDJSON file
   --json                  Print the unchanged scenario JSON (default output)
   --help                  Show this help
 
-SFX_API_TOKEN (or SDA_API_TOKEN) overrides the Windows encrypted profile token.
+Machine mode uses SFX_API_TOKEN, SDA_API_TOKEN or the encrypted machine profile.
+User mode never falls back to a machine token, including after expiry or logout.
 SFX_API_CONFIG selects a profile; SFX_API_TRACE_DIRECTORY selects the trace folder.
 The installed command has no checkout, database or local kernel dependency.
 `;
@@ -30,11 +35,12 @@ The installed command has no checkout, database or local kernel dependency.
 export function parseCommand(argv) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: {
     input: { type: 'string' }, 'input-type': { type: 'string' }, namespace: { type: 'string' },
-    endpoint: { type: 'string' }, timeout: { type: 'string', default: '630' },
+    endpoint: { type: 'string' }, auth: { type: 'string' }, timeout: { type: 'string', default: '630' },
     'idempotency-key': { type: 'string' }, json: { type: 'boolean' }, trace: { type: 'boolean' },
     help: { type: 'boolean', short: 'h' }
   } });
   if (values.help) return { help: true };
+  if (values.auth && !['user', 'machine'].includes(values.auth)) throw new Error('--auth must be user or machine.');
   const resume = positionals[0] === 'run' && positionals.length === 2;
   if (!resume && !(positionals.length === 3 && positionals[0] === 'capability' && positionals[1] === 'observe'))
     throw new Error('Use: sfx-api capability observe <identity> --input <text> --json [--trace]');
@@ -64,13 +70,20 @@ export function normalizeEndpoint(value) {
   return url.href.replace(/\/+$/, '');
 }
 
-function configuration(options) {
+export function configuration(options, sessions = sessionStore()) {
   const root = path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), '.local/share'), 'sfx', 'api-client');
   const configPath = process.env.SFX_API_CONFIG || path.join(root, 'config.json');
   const profile = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8').replace(/^\uFEFF/, '')) : {};
-  const endpointValue = options.endpoint || process.env.SFX_API_ENDPOINT || profile.endpoint;
+  const selected = sessions.selected();
+  const endpointValue = options.endpoint || process.env.SFX_API_ENDPOINT || (options.auth !== 'machine' && selected?.endpoint) || profile.endpoint;
   if (!endpointValue) throw new Error('Set SFX_API_ENDPOINT or install an API profile.');
   const endpoint = normalizeEndpoint(endpointValue);
+  const authentication = options.auth || (selected?.authentication === 'user' ? 'user' : 'machine');
+  if (authentication === 'user') {
+    if (!endpoint.startsWith('https:')) throw new Error('HTTPS_ENDPOINT_REQUIRED');
+    const session = sessions.read(endpoint);
+    return { endpoint, token: session.token, authentication, traceDirectory: process.env.SFX_API_TRACE_DIRECTORY || path.join(root, 'traces') };
+  }
   let token = process.env.SFX_API_TOKEN || process.env.SDA_API_TOKEN;
   if (!token && process.platform === 'win32' && profile.credentialFile && profile.endpoint && normalizeEndpoint(profile.endpoint) === endpoint) {
     token = execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File',
@@ -78,7 +91,17 @@ function configuration(options) {
       { encoding: 'utf8', windowsHide: true, env: { ...process.env, PSModulePath: undefined }, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   }
   if (!token) throw new Error('No API token for this endpoint. Set SFX_API_TOKEN or install its encrypted profile.');
-  return { endpoint, token, traceDirectory: process.env.SFX_API_TRACE_DIRECTORY || path.join(root, 'traces') };
+  return { endpoint, token, authentication, traceDirectory: process.env.SFX_API_TRACE_DIRECTORY || path.join(root, 'traces') };
+}
+
+export function configuredEndpoint(options, sessions = sessionStore()) {
+  if (options.endpoint) return options.endpoint;
+  if (process.env.SFX_API_ENDPOINT) return process.env.SFX_API_ENDPOINT;
+  if (sessions.selected()?.endpoint) return sessions.selected().endpoint;
+  const root = path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), '.local/share'), 'sfx', 'api-client');
+  const configPath = process.env.SFX_API_CONFIG || path.join(root, 'config.json');
+  if (fs.existsSync(configPath)) return JSON.parse(fs.readFileSync(configPath, 'utf8').replace(/^\uFEFF/, '')).endpoint;
+  throw new Error('HTTPS_ENDPOINT_REQUIRED: Use --endpoint.');
 }
 
 export async function execute(options, config, io = { out: value => process.stdout.write(value), err: value => process.stderr.write(value) }) {
@@ -161,8 +184,18 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     // PowerShell 5.1 loses JSON quotes in native argv; the shim carries argv intact.
     const argv = process.env.SFX_API_ARGV_B64 ? JSON.parse(Buffer.from(process.env.SFX_API_ARGV_B64, 'base64').toString('utf8')) : process.argv.slice(2);
     delete process.env.SFX_API_ARGV_B64;
-    const options = parseCommand(argv);
-    if (options.help) process.stdout.write(help);
-    else process.exitCode = (await execute(options, configuration(options))).exitCode;
-  } catch (error) { process.stderr.write(`[sfx-api] ${error.message}\n`); process.exitCode = 1; }
+    if (authCommands.has(argv[0])) {
+      const options = parseAuth(argv);
+      if (options.help) process.stdout.write(authHelp);
+      else {
+        const result = await authenticate(options, configuredEndpoint(options));
+        process.stdout.write(options.json ? JSON.stringify(result) + '\n' : `${result.disposition} · ${result.endpoint}${result.principalId ? ' · ' + result.principalId : ''}\n`);
+        process.exitCode = result.remoteRevocationConfirmed === false ? 1 : 0;
+      }
+    } else {
+      const options = parseCommand(argv);
+      if (options.help) process.stdout.write(help);
+      else process.exitCode = (await execute(options, configuration(options))).exitCode;
+    }
+  } catch (error) { process.stderr.write(`[sfx-api] ${error.message}\n`); process.exitCode = error.message === 'LOGIN_CANCELLED' ? 130 : 1; }
 }

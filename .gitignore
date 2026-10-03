@@ -8,6 +8,8 @@ next-env.d.ts
 .env.*
 !.env.example
 artifacts/
+tools/sfx-api/login-input/bin/
+tools/sfx-api/login-input/obj/
 
 # The media publication is generated content that SQL retains in full and can rebuild byte for
 # byte. It is restored before a build (`npm run restore:media`), never committed.
