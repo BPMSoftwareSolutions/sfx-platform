@@ -1,0 +1,15 @@
+{
+  "capability": "authenticate-ide-user",
+  "inputContract": "ide-login-observation-request.v1",
+  "outcomeContract": "ide-authentication-result.v1",
+  "realm": "sfx-ide-local",
+  "providerOrigin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "routes": [
+    { "method": "POST", "path": "/auth/v1/login" },
+    { "method": "GET", "path": "/auth/v1/session" },
+    { "method": "POST", "path": "/auth/v1/logout" },
+    { "method": "POST", "path": "/auth/v1/provider/resolve" },
+    { "method": "POST", "path": "/auth/v1/provider/verify" },
+    { "method": "POST", "path": "/auth/v1/provider/establish" }
+  ]
+}

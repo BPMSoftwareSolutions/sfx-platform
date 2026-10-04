@@ -9,7 +9,11 @@ const release = JSON.parse(fs.readFileSync('/opt/sfx/release.json', 'utf8'));
 const unlock = process.env.SFX_VAULT_UNLOCK;
 const token = process.env.SDA_API_TOKEN;
 const retrievalConnection = process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
+const identityConnection = process.env.SFX_IDENTITY_CONNECTION_STRING;
+const identityServiceKey = process.env.SFX_IDENTITY_SERVICE_KEY;
 delete process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
+delete process.env.SFX_IDENTITY_CONNECTION_STRING;
+delete process.env.SFX_IDENTITY_SERVICE_KEY;
 if (!unlock || unlock.startsWith('@Microsoft.KeyVault(') || !token) throw new Error('VAULT_OR_API_AUTH_NOT_CONFIGURED');
 delete process.env.SFX_VAULT_UNLOCK;
 const data = path.join(process.env.HOME, '.local/share');
@@ -77,6 +81,20 @@ async function waitFor(url, headers = {}, expected = 200) {
 }
 await waitFor('http://127.0.0.1:8787/health');
 await waitFor('http://127.0.0.1:8791/health');
+if (!identityConnection || identityConnection.startsWith('@Microsoft.KeyVault(') || !/^[a-fA-F0-9]{64}$/.test(identityServiceKey || ''))
+  throw new Error('IDENTITY_SERVICE_NOT_CONFIGURED');
+const identityPolicy = JSON.parse(fs.readFileSync('/opt/sfx/host/identity-policy.json', 'utf8'));
+launch('/opt/sfx/identity/sfx-identity-host', [], '/opt/sfx/identity', {
+  ASPNETCORE_URLS: 'http://127.0.0.1:8793', SDA_ESTATE_DIR: '/opt/sfx/estate',
+  SFX_IDENTITY_CAPABILITY: identityPolicy.capability,
+  SFX_IDENTITY_INPUT_CONTRACT: identityPolicy.inputContract,
+  SFX_IDENTITY_OUTCOME_CONTRACT: identityPolicy.outcomeContract,
+  SFX_IDENTITY_REALM: identityPolicy.realm,
+  SFX_IDENTITY_PROVIDER_ORIGIN: identityPolicy.providerOrigin,
+  SFX_OBSERVER_ENDPOINT: 'http://127.0.0.1:8787/events', SFX_IDENTITY_LOCAL_GATEWAY: '1',
+  SFX_IDENTITY_CONNECTION_STRING: identityConnection, SFX_IDENTITY_SERVICE_KEY: identityServiceKey
+}, ['SDA_API_TOKEN', 'IDENTITY_HEADER', 'MSI_SECRET']);
+await waitFor('http://127.0.0.1:8793/health');
 launch(process.execPath, ['/opt/sfx/host/api.mjs'], '/opt/sfx', {
   SDA_ESTATE_DIR: '/opt/sfx/estate', SDA_API_HOST: '127.0.0.1', SDA_API_PORT: '8799',
   SDA_API_AUTHORITY: '/opt/sfx/api/interfaces/sda-api/sda-api-v1.authority.json', SDA_RUN_EVENT_RETENTION: '20000',
@@ -93,6 +111,10 @@ http.createServer((request, response) => {
     response.end(JSON.stringify({ ready: !stopping, release: release.id, kernelDigest: release.kernelDigest })); return;
   }
   const api = url.pathname.startsWith('/v1/');
+  const identity = url.pathname.startsWith('/auth/');
+  if (identity && !identityPolicy.routes.some(route => route.method === request.method && route.path === url.pathname)) {
+    response.writeHead(404, { 'cache-control': 'no-store' }); response.end(); return;
+  }
   const retrieval = url.pathname.startsWith('/procedure-extract/');
   if (retrieval) {
     const supplied = createHash('sha256').update(request.headers.authorization || '').digest();
@@ -110,9 +132,9 @@ http.createServer((request, response) => {
   // own Bearer header; the gateway must never substitute its server credential.
   const observe = url.pathname === '/api/circuit/v1/runs' && request.method === 'POST';
   if (circuit && request.method !== 'GET' && !observe) { response.writeHead(405); response.end(); return; }
-  const upstream = http.request({ hostname: '127.0.0.1', port: retrieval ? 8791 : api ? 8799 : circuit ? 8787 : 3001,
+  const upstream = http.request({ hostname: '127.0.0.1', port: identity ? 8793 : retrieval ? 8791 : api ? 8799 : circuit ? 8787 : 3001,
     path: retrieval ? url.pathname.slice('/procedure-extract'.length) : request.url, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
-    response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(api || circuit || retrieval ? { 'cache-control': 'no-store' } : {}) });
+    response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(identity || api || circuit || retrieval ? { 'cache-control': 'no-store' } : {}) });
     incoming.pipe(response);
   });
   upstream.on('error', () => { if (!response.headersSent) response.writeHead(502); response.end(); });

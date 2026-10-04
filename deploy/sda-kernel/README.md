@@ -11,7 +11,8 @@ on Linux so kernel permissions and internal symbolic links survive the tar archi
 Supply `WEBSITE_IMAGE` as an exact image digest to the Docker build.
 
 The gateway listens on port 3000. The website listens internally on 3001, the SDA
-API on 8799, the observer on 8787 and procedure extraction on 8791. API events are forwarded in received order
+API on 8799, the observer on 8787, procedure extraction on 8791 and private
+identity service on 8793. API events are forwarded in received order
 to the existing observer; graph capture uses the API's validated graph. There is
 no synthetic scenario execution or animation event generator. The browser retains
 the same scenario clock, database rendering, component inspection and replay code.
@@ -94,7 +95,17 @@ or new kernel build enters the runtime image. Set the slot's `linuxFxVersion` to
 the resulting exact image digest. This retains the existing website, admitted
 kernel and persistent vault.
 
-## Published candidate, 2026-10-02
+## Published login candidate, 2026-10-04 UTC
+
+Release `sda-f50865d3feb4-r9` adds the private login API and updated live circuit
+assets, retaining the same installed kernel. The [login runbook](identity-login.md)
+contains the exact image, routes, credential custody, command loop and rollback.
+The Windows CLI's 12 remote checks passed both before and after a container
+restart. Browser sampling observed the dot on all three identity providers while
+the runs were open, across all three pages, ending on `AUTHENTICATED`.
+See [acceptance receipt](identity-acceptance-2026-10-04.json).
+
+## Previous candidate, 2026-10-02
 
 - Azure app/slot: `sidefx/staging`, resource group `sidefx_group`.
 - Release: `sda-f50865d3feb4-r8`; ACR build `ca53`.

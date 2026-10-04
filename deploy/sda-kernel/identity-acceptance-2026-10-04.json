@@ -1,0 +1,102 @@
+{
+  "verifiedAt": "2026-10-04T01:35:11.346Z",
+  "release": {
+    "id": "sda-f50865d3feb4-r9",
+    "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e",
+    "kernelLanguage": "csharp",
+    "builtAt": "2026-10-04T01:14:02.594Z",
+    "retrieval": {
+      "executable": "sha256:d86ff8a28a9951ee52c44fc45f6bb388bc7f9ca81e8b9b4cc7bb45ebb692c537",
+      "dal": "sha256:6788030836b0942f570a6928d5801af278cf590d41b70f4e874d0cf93ebdebbe",
+      "circuitWired": true
+    },
+    "identity": {
+      "executable": "sha256:df81ddf2d13d73ff45368f4ae3b38c8a994b2382d0b0b650bdba9951bc99fcbe",
+      "dal": "sha256:6491f6add55dc15092565a679dbbf294cb639d9fd937189fea7cc046143e84f4",
+      "policy": "sha256:3b1758116c774c1577f8c1b4c5e255cd26f54f6ceee7eb46dcd4eec8e714b47b",
+      "traversal": "sha256:85debd4c1c4106ceb32e9679245fc27a69c6730edfb34ffbcfee8f99719173df"
+    }
+  },
+  "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:7b9bbfba5fe84ac650ccedb57461a7951577c34a9424b138a8ebc789ad11d772",
+  "acrBuild": "ca54",
+  "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "realm": "sfx-ide-local",
+  "remote": {
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "realm": "sfx-ide-local",
+    "checkedAt": "2026-10-04T01:29:57.9137076+00:00",
+    "liveEvents": 848,
+    "providerExchangeReceipts": 6,
+    "cliPassed": true,
+    "credentialsAbsent": true
+  },
+  "cli": {
+    "checks": [
+      "Installed interactive Ctrl+C restores prompt and creates no session",
+      "Installed interactive login uses hidden provider prompt, real HTTPS and real database",
+      "Real HTTPS login persisted with Windows DPAPI",
+      "sfx-api selects the same exact user bearer",
+      "Installed whoami validates real session from outside checkout",
+      "Installed logout confirms server revocation and local deletion",
+      "Identity database rejects revoked session",
+      "Installed whoami fails after logout",
+      "Installed login refuses redirected input",
+      "Installed CLI refuses password flags without echoing their values",
+      "Installed login help works outside an estate",
+      "CLI output and persisted metadata contain no password or bearer"
+    ],
+    "count": 12,
+    "inputMode": "Windows ConPTY installed command",
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net"
+  },
+  "browser": {
+    "checkedAt": "2026-10-04T01:29:58.935Z",
+    "cliCode": 0,
+    "errors": [],
+    "sampleCount": 1515,
+    "liveProviderSamples": 44,
+    "providers": [
+      "Identity principal",
+      "Password credential",
+      "IDE session"
+    ],
+    "pages": [
+      "scenario-1",
+      "scenario-2",
+      "scenario-3"
+    ],
+    "outcome": [
+      {
+        "id": "variant:authenticate-ide-user:AUTHENTICATED",
+        "kind": "variant",
+        "label": "authenticated"
+      }
+    ]
+  },
+  "restart": {
+    "tested": true,
+    "vaultDigestUnchanged": true,
+    "vaultDigest": "2dc758d5a52dac01ecf600aa264541bf7dbeaa03445e174c0e6438a068653085",
+    "remoteCliRetested": true
+  },
+  "vault": {
+    "existingEncryptedEntriesPreserved": 4,
+    "publicCredentialWriterUnchanged": true,
+    "databaseTransactionRolledBack": true
+  },
+  "http": {
+    "health": 200,
+    "website": 200,
+    "circuit": 200,
+    "catalog": 200,
+    "anonymousSession": 401,
+    "anonymousRunAdmission": 401,
+    "externalEventInjection": 405,
+    "browserBasicChallenge": false
+  },
+  "limitations": [
+    "Graph capture lacks selected definition digests; NOT_FORMALLY_OBSERVABLE remains accurate.",
+    "Native macOS acceptance and per-principal Run API authorization remain separate work."
+  ],
+  "rawEvidence": "artifacts/deployment/identity-proof/"
+}

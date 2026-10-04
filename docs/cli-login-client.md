@@ -27,8 +27,10 @@ session identity before printing its allowlisted metadata.
 
 These commands require a running private identity host and an enrolled account.
 The local integration harness uses a disposable account and removes it afterward.
-The Azure staging image does **not yet host `/auth/v1/*`**. Installing this client
-does not deploy that host, enroll a real user, or grant capability access.
+Azure staging now hosts `/auth/v1/*` in release `sda-f50865d3feb4-r9`.
+Installing this client does not enroll a real user or grant capability access.
+The [staging login runbook](../deploy/sda-kernel/identity-login.md) includes the
+hosted circuit URL, command loop, deployed identities and acceptance evidence.
 
 ## Source and topology
 
