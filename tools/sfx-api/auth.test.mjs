@@ -24,14 +24,16 @@ function response(data, status = 200, realm = 'client-unit-test') {
   return new Response(JSON.stringify(data), { status, headers: { 'x-sfx-identity-realm': realm, 'content-type': 'application/json' } });
 }
 test('password arguments are refused without echoing supplied values; only HTTPS accepted', () => {
-  for (const args of [['login','--password','secret-canary'], ['login','--input','secret-canary'], ['logout','--username','someone']])
+  for (const args of [['login','--password','secret-canary'], ['login','--input','secret-canary'], ['enroll','--password','secret-canary'], ['enroll','--input','secret-canary'], ['logout','--username','someone']])
     assert.throws(() => parseAuth(args), error => !error.message.includes('secret-canary'));
   for (const value of ['http://localhost:8793', 'https://user:secret@example.test', 'https://example.test/?secret'])
     assert.throws(() => authEndpoint(value), /HTTPS_ENDPOINT_REQUIRED/);
   assert.equal(authEndpoint('https://example.test/'), 'https://example.test');
+  assert.equal(parseAuth(['enroll','--username','pilot','--json']).command, 'enroll');
 });
 test('noninteractive login has no secret input fallback', async () => {
   if (!process.stdin.isTTY || !process.stderr.isTTY) await assert.rejects(privateLogin(endpoint), /INTERACTIVE_LOGIN_REQUIRED/);
+  if (!process.stdin.isTTY || !process.stderr.isTTY) await assert.rejects(privateLogin(endpoint, 'pilot', 'operator-fixture'), /INTERACTIVE_LOGIN_REQUIRED/);
 });
 test('login saves metadata-only profile, scopes secret to endpoint/realm/principal/session', async t => {
   const { root, store, data } = fixture(t); const value = issued();

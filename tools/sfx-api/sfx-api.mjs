@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import { randomUUID } from 'node:crypto';
 import { sessionStore } from './session-store.mjs';
-import { authenticate, authCommands, authHelp, parseAuth } from './auth.mjs';
+import { authenticate, authCommands, authHelp, parseAuth, privateLogin, authEndpoint } from './auth.mjs';
 
 const help = `Usage:
   sfx-api capability observe <identity> --input <text|JSON|@file.json> --json [--trace]
@@ -188,9 +188,19 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       const options = parseAuth(argv);
       if (options.help) process.stdout.write(authHelp);
       else {
-        const result = await authenticate(options, configuredEndpoint(options));
-        process.stdout.write(options.json ? JSON.stringify(result) + '\n' : `${result.disposition} · ${result.endpoint}${result.principalId ? ' · ' + result.principalId : ''}\n`);
-        process.exitCode = result.remoteRevocationConfirmed === false ? 1 : 0;
+        let result;
+        if (options.command === 'enroll') {
+          const config = configuration({ ...options, auth: 'machine' });
+          const reply = await privateLogin(authEndpoint(config.endpoint), options.username, config.token);
+          const enrollment = reply?.enrollment;
+          if (!enrollment || typeof enrollment.contractId !== 'string' ||
+              !['ENROLLED', 'ALREADY_ENROLLED', 'ENROLLMENT_REJECTED'].includes(enrollment.disposition))
+            throw new Error('ENROLLMENT_RESPONSE_INVALID');
+          result = enrollment;
+          if (result.disposition !== 'ENROLLED') process.exitCode = 1;
+        } else result = await authenticate(options, configuredEndpoint(options));
+        process.stdout.write(options.json ? JSON.stringify(result) + '\n' : `${result.disposition}${result.endpoint ? ' · ' + result.endpoint : ''}${result.principalId ? ' · ' + result.principalId : ''}\n`);
+        process.exitCode = result.remoteRevocationConfirmed === false || (options.command === 'enroll' && result.disposition !== 'ENROLLED') ? 1 : 0;
       }
     } else {
       const options = parseCommand(argv);

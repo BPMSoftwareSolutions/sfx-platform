@@ -1,0 +1,303 @@
+{
+  "checkedAt": "2026-10-04T02:45:20.155Z",
+  "capabilityId": "enroll-ide-user",
+  "namespaceId": "sidefx:capabilities",
+  "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "realm": "sfx-ide-local",
+  "release": {
+    "id": "sda-f50865d3feb4-r12",
+    "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e",
+    "kernelLanguage": "csharp",
+    "builtAt": "2026-10-04T02:39:40.135Z",
+    "retrieval": {
+      "executable": "sha256:d86ff8a28a9951ee52c44fc45f6bb388bc7f9ca81e8b9b4cc7bb45ebb692c537",
+      "dal": "sha256:6788030836b0942f570a6928d5801af278cf590d41b70f4e874d0cf93ebdebbe",
+      "circuitWired": true
+    },
+    "identity": {
+      "executable": "sha256:7c173cda12edfa86d6332a9e880f52981e00d61b25ed28658d99aeb9c1c5d6de",
+      "dal": "sha256:2bd22193ac383a5bff196ee4feaaedea993509dfe21496aa6d8af9bd772649ab",
+      "policy": "sha256:5f716838969e097c148728783a4a4b4f6d3a2f1a91295f53be8048d6a69d0e50",
+      "traversal": "sha256:47287b70d8dcbf45a3ef707d687541ad3e811407e14a60d77d2b46cb80796d20"
+    }
+  },
+  "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:f1cf1ca49ed629eaf8b0bccd322189b7d4b297a442c4d16b2a51fdb667e24515",
+  "acrRun": "ca58",
+  "migrationSha256": "a03fc7ea90edd5dde9bbb2e623ad3751d5bf8786c7584a58312d484a91a7e1f1",
+  "preflight": {
+    "checkedAt": "2026-10-04T02:27:12.6292242+00:00",
+    "mode": "--preflight",
+    "passed": [
+      "Installed identity writer exists in sfx-identity",
+      "Anonymous enrollment refused before execution",
+      "Caller cannot select realm",
+      "Plaintext enrollment refused",
+      "Operator bearer cannot invoke private provider",
+      "Declared outcome ENROLLMENT_REJECTED (HTTP 422)",
+      "Rejected password creates no principal or credential",
+      "Declared outcome ENROLLED (HTTP 201)",
+      "Enrollment atomically creates principal, credential and audit",
+      "Declared outcome ALREADY_ENROLLED (HTTP 409)",
+      "Duplicate enrollment makes no additional identity writes",
+      "Original password remains valid after duplicate enrollment",
+      "Private inputs, verifier and operator/service secrets absent from evidence"
+    ],
+    "observationCount": 3
+  },
+  "installed": {
+    "checkedAt": "2026-10-04T02:31:36.958078+00:00",
+    "mode": "--installed",
+    "passed": [
+      "Installed identity writer exists in sfx-identity",
+      "Anonymous enrollment refused before execution",
+      "Caller cannot select realm",
+      "Plaintext enrollment refused",
+      "Operator bearer cannot invoke private provider",
+      "Declared outcome ENROLLMENT_REJECTED (HTTP 422)",
+      "Rejected password creates no principal or credential",
+      "Declared outcome ENROLLED (HTTP 201)",
+      "Enrollment atomically creates principal, credential and audit",
+      "Declared outcome ALREADY_ENROLLED (HTTP 409)",
+      "Duplicate enrollment makes no additional identity writes",
+      "Original password remains valid after duplicate enrollment",
+      "Private inputs, verifier and operator/service secrets absent from evidence",
+      "Installed kernel emits genuine enrollment observations"
+    ],
+    "observationCount": 921
+  },
+  "remote": {
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "realm": "sfx-ide-local",
+    "checkedAt": "2026-10-04T02:43:55.7650713+00:00",
+    "liveEvents": 1769,
+    "providerExchangeReceipts": 12,
+    "cliPassed": true,
+    "credentialsAbsent": true
+  },
+  "cli": {
+    "checks": [
+      "Enrollment Ctrl+C exits without submission",
+      "Enrollment confirms password privately and refuses mismatch",
+      "Real circuit rejects short password",
+      "Installed CLI enrolls through staging API and real circuit",
+      "Duplicate returns declared outcome and nonzero CLI exit",
+      "New enrollment completes installed CLI login, whoami and logout"
+    ],
+    "count": 6,
+    "login": {
+      "checks": [
+        "Installed interactive Ctrl+C restores prompt and creates no session",
+        "Installed interactive login uses hidden provider prompt, real HTTPS and real database",
+        "Real HTTPS login persisted with Windows DPAPI",
+        "sfx-api selects the same exact user bearer",
+        "Installed whoami validates real session from outside checkout",
+        "Installed logout confirms server revocation and local deletion",
+        "Identity database rejects revoked session",
+        "Installed whoami fails after logout",
+        "Installed login refuses redirected input",
+        "Installed CLI refuses password flags without echoing their values",
+        "Installed login help works outside an estate",
+        "CLI output and persisted metadata contain no password or bearer"
+      ],
+      "count": 12,
+      "inputMode": "Windows ConPTY installed command",
+      "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net"
+    },
+    "inputMode": "Installed Windows ConPTY command",
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net"
+  },
+  "browser": {
+    "checkedAt": "2026-10-04T02:43:56.944Z",
+    "cliCode": 0,
+    "errors": [],
+    "sampleCount": 3368,
+    "liveProviderSamples": 31,
+    "providers": [
+      "Password credential",
+      "Identity principal"
+    ],
+    "pages": [
+      "scenario-1",
+      "scenario-2"
+    ],
+    "liveThroughout": true,
+    "outcome": [
+      {
+        "id": "variant:enroll-ide-user:ALREADY_ENROLLED",
+        "kind": "variant",
+        "label": "already enrolled"
+      }
+    ]
+  },
+  "liveLocations": {
+    "capture": "C:\\lab\\repos\\sfx-platform\\artifacts\\deployment\\enrollment-proof\\capture.sse",
+    "checkedPrefixes": 903,
+    "calls": [
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:389",
+        "nodeId": "operation:enroll-ide-user.v1:5",
+        "provider": "provider:password-credential-provider",
+        "admissionAt": "2026-10-04T02:43:23.193Z",
+        "returnAt": "2026-10-04T02:43:23.211Z",
+        "providerReturnMatched": true,
+        "receivedIntervalMs": 18
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:389",
+        "nodeId": "operation:enroll-ide-user.v1:10",
+        "provider": "provider:identity-principal-provider",
+        "admissionAt": "2026-10-04T02:43:23.405Z",
+        "returnAt": "2026-10-04T02:43:23.428Z",
+        "providerReturnMatched": false,
+        "receivedIntervalMs": 23
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:658",
+        "nodeId": "operation:enroll-ide-user.v1:5",
+        "provider": "provider:password-credential-provider",
+        "admissionAt": "2026-10-04T02:43:29.577Z",
+        "returnAt": "2026-10-04T02:43:29.888Z",
+        "providerReturnMatched": true,
+        "receivedIntervalMs": 311
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:658",
+        "nodeId": "operation:enroll-ide-user.v1:10",
+        "provider": "provider:identity-principal-provider",
+        "admissionAt": "2026-10-04T02:43:30.096Z",
+        "returnAt": "2026-10-04T02:43:30.110Z",
+        "providerReturnMatched": true,
+        "receivedIntervalMs": 14
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:979",
+        "nodeId": "operation:enroll-ide-user.v1:5",
+        "provider": "provider:password-credential-provider",
+        "admissionAt": "2026-10-04T02:43:36.427Z",
+        "returnAt": "2026-10-04T02:43:36.561Z",
+        "providerReturnMatched": true,
+        "receivedIntervalMs": 134
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:979",
+        "nodeId": "operation:enroll-ide-user.v1:10",
+        "provider": "provider:identity-principal-provider",
+        "admissionAt": "2026-10-04T02:43:36.797Z",
+        "returnAt": "2026-10-04T02:43:36.802Z",
+        "providerReturnMatched": true,
+        "receivedIntervalMs": 5
+      }
+    ],
+    "results": [
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:389",
+        "outcome": "variant:enroll-ide-user:ENROLLMENT_REJECTED"
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:658",
+        "outcome": "variant:enroll-ide-user:ENROLLED"
+      },
+      {
+        "runId": "sfx-observer:0ea412ee87b7e59d297c768c:979",
+        "outcome": "variant:enroll-ide-user:ALREADY_ENROLLED"
+      }
+    ],
+    "noReplayTimeline": true
+  },
+  "traversal": {
+    "capture": "C:\\lab\\repos\\sfx-platform\\artifacts\\deployment\\enrollment-proof\\capture.sse",
+    "runId": "sfx-observer:0ea412ee87b7e59d297c768c:979",
+    "findings": [],
+    "payload": {
+      "start": [
+        150,
+        370
+      ],
+      "currentAtEntry": true
+    },
+    "traversal": {
+      "operations": 12,
+      "samples": 4800,
+      "providerTrips": 2,
+      "childTrips": 0,
+      "providerCurrentSamples": 18,
+      "calleeCurrentSamples": 0,
+      "portBusyWhileBeyond": 18
+    },
+    "terminal": {
+      "kind": "variant",
+      "nodeId": "variant:enroll-ide-user:ALREADY_ENROLLED",
+      "variantId": "ALREADY_ENROLLED",
+      "code": null,
+      "reported": null
+    },
+    "clock": [
+      {
+        "rate": 1,
+        "capturedMs": 549.974853515625,
+        "wallMs": 549.974853515625
+      },
+      {
+        "rate": 0.1,
+        "capturedMs": 549.974853515625,
+        "wallMs": 5499.74853515625
+      }
+    ],
+    "pauseStepSpeed": true,
+    "declaredVariantRouting": {
+      "basis": "altered copies; routing logic only, not execution testimony",
+      "routing": [
+        {
+          "variant": "ALREADY_ENROLLED",
+          "classification": "failure",
+          "routed": true
+        },
+        {
+          "variant": "ENROLLED",
+          "classification": "success",
+          "routed": true
+        },
+        {
+          "variant": "ENROLLMENT_REJECTED",
+          "classification": "failure",
+          "routed": true
+        },
+        {
+          "variant": "IDENTITY_UNAVAILABLE",
+          "classification": "failure",
+          "routed": true
+        }
+      ]
+    },
+    "defects": {
+      "basis": "altered copies; defect behaviour only",
+      "unknownVariant": "outcome:enroll-ide-user/reported-variant",
+      "mismatchedContract": "outcome:enroll-ide-user/reported-variant",
+      "missingReturn": "outcome:enroll-ide-user/reported-variant"
+    },
+    "heldTraversal": true
+  },
+  "deck": {
+    "path": "sfx-providers/outputs/capability-estate/enroll-ide-user/presentation.pptx",
+    "sha256": "d9249d47adb0f1c6109d3a0aa950b4af24f8aa2970cf08584e36466b18639297",
+    "snapshotDigest": "5f0dc7369444418333d3aef9f824d68a7de281ac9a247818714ab9e483ca62b4",
+    "errors": 0,
+    "warnings": 5
+  },
+  "rawEvidence": {
+    "observerSha256": "4c51ec48e3129238bada62f397035928051c3f0be1f0cbbde6c306c67fc58e73",
+    "browserSamplesSha256": "a5909345f73e273ae4c4ddf5b907c489ef5b2b5a34e935e5870e24d97ea63eba"
+  },
+  "limits": [
+    "Native macOS enrollment not exercised",
+    "Static deck retains five evidence warnings; runtime verification is not full formal observability",
+    "A live call shorter than one rendered browser frame may only be visible in receipt history; no artificial dwell is added"
+  ],
+  "personalAccountModified": false,
+  "executedMigrationSha256": "a5ecd6b4f2f2ee334e4a827df009751cb1d4e5f8ae21b04aceabeb805b25781a",
+  "migrationNormalization": "CRLF normalized to LF on SQL statement lines outside literals after installation; no semantic change",
+  "sourceCommits": {
+    "sfx-embody": "caa682edb3273509d71d353c08b95569e4ff7d67",
+    "sfx-providers": "41f970e87e6ab48327886dd98224108e37b8236b"
+  }
+}

@@ -3,11 +3,13 @@ import { spawn } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import { sessionStore } from './session-store.mjs';
 
-export const authCommands = new Set(['login', 'whoami', 'logout']);
+export const authCommands = new Set(['login', 'whoami', 'logout', 'enroll']);
 export const authHelp = `Usage: sfx login [--endpoint <HTTPS URL>] [--username <identifier>] [--json]
        sfx whoami [--endpoint <HTTPS URL>] [--json]
        sfx logout [--endpoint <HTTPS URL>] [--json]
+       sfx-api enroll [--endpoint <HTTPS URL>] [--username <identifier>] [--json]
 Passwords are entered only at the hidden interactive prompt.
+Enrollment requires the endpoint's configured machine credential and confirms the password.
 Session credentials use the OS secure store. No admin-token fallback.
 `;
 export function parseAuth(argv) {
@@ -16,7 +18,7 @@ export function parseAuth(argv) {
     endpoint: { type: 'string' }, username: { type: 'string' }, json: { type: 'boolean' }, help: { type: 'boolean', short: 'h' }
   } }); } catch { throw new Error('LOGIN_ARGUMENT_INVALID: Use sfx login --help. Password flags and --input are not accepted.'); }
   const { values, positionals } = parsed;
-  if (positionals.length !== 1 || !authCommands.has(positionals[0]) || (positionals[0] !== 'login' && values.username !== undefined))
+  if (positionals.length !== 1 || !authCommands.has(positionals[0]) || (!['login', 'enroll'].includes(positionals[0]) && values.username !== undefined))
     throw new Error('LOGIN_ARGUMENT_INVALID');
   return { ...values, command: positionals[0] };
 }
@@ -26,13 +28,14 @@ export function authEndpoint(value) {
   if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) throw new Error('HTTPS_ENDPOINT_REQUIRED');
   return url.href.replace(/\/+$/, '');
 }
-export async function privateLogin(endpoint, username) {
+export async function privateLogin(endpoint, username, enrollmentToken) {
   if (!process.stdin.isTTY || !process.stderr.isTTY) throw new Error('INTERACTIVE_LOGIN_REQUIRED');
   const binary = fileURLToPath(new URL(`./login-input/sfx-login-input${process.platform === 'win32' ? '.exe' : ''}`, import.meta.url));
   const environment = { ...process.env };
   for (const name of Object.keys(environment)) if (/TOKEN|PASSWORD|CONNECTION_STRING|SERVICE_KEY|SFX_API_ARGV/i.test(name)) delete environment[name];
+  if (enrollmentToken) environment.SFX_ENROLLMENT_TOKEN = enrollmentToken;
   return new Promise((resolve, reject) => {
-    const child = spawn(binary, [endpoint, ...(username === undefined ? [] : [username])], { env: environment, stdio: ['inherit', 'pipe', 'inherit'], windowsHide: true });
+    const child = spawn(binary, [endpoint, ...(enrollmentToken ? [username || '', 'enroll'] : username === undefined ? [] : [username])], { env: environment, stdio: ['inherit', 'pipe', 'inherit'], windowsHide: true });
     const chunks = []; let size = 0;
     child.stdout.on('data', chunk => { size += chunk.length; if (size > 8192) child.kill(); else chunks.push(chunk); });
     child.on('error', () => reject(new Error('LOGIN_INPUT_PROVIDER_UNAVAILABLE: Install the published login input provider.')));
