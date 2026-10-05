@@ -1,0 +1,274 @@
+{
+  "checkedAt": "2026-10-05T11:15:40.930Z",
+  "release": {
+    "id": "sda-f50865d3feb4-r14",
+    "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e",
+    "kernelLanguage": "csharp",
+    "builtAt": "2026-10-05T11:11:54.779Z",
+    "retrieval": {
+      "executable": "sha256:d86ff8a28a9951ee52c44fc45f6bb388bc7f9ca81e8b9b4cc7bb45ebb692c537",
+      "dal": "sha256:6788030836b0942f570a6928d5801af278cf590d41b70f4e874d0cf93ebdebbe",
+      "circuitWired": true
+    },
+    "identity": {
+      "executable": "sha256:7c173cda12edfa86d6332a9e880f52981e00d61b25ed28658d99aeb9c1c5d6de",
+      "dal": "sha256:2bd22193ac383a5bff196ee4feaaedea993509dfe21496aa6d8af9bd772649ab",
+      "policy": "sha256:5f716838969e097c148728783a4a4b4f6d3a2f1a91295f53be8048d6a69d0e50",
+      "traversal": "sha256:507db3e43b222f922d3068059a184ad01e6afde2da457c2b04e500e4bf62cd5e"
+    },
+    "circuit": {
+      "app": "sha256:64b8c71e2e3138094d272ddfe5ab5f47930c55f6f0d26673e5e948db499fc102",
+      "traversal": "sha256:507db3e43b222f922d3068059a184ad01e6afde2da457c2b04e500e4bf62cd5e"
+    }
+  },
+  "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:273fe3912c49fe3a3e7fc9dbf17519049486f733933483bbdf73297f414b5bbc",
+  "acrRun": "ca5a",
+  "scope": "Generic circuit replay consumes captured provider-child intervals and prepares its first render before starting the clock",
+  "databaseChanges": false,
+  "kernelChanges": false,
+  "providerChanges": false,
+  "before": {
+    "run": "sfx-observer:0ea412ee87b7e59d297c768c:1310",
+    "capturedAt": "2026-10-04T02:43:44.5009268+00:00",
+    "duration": 1137.74609375,
+    "spans": [
+      {
+        "operation": "operation:authenticate-ide-user.v1:5",
+        "callee": "provider:identity-principal-provider",
+        "operationMs": 236.22705078125,
+        "providerMs": 234.987897,
+        "pieces": [
+          {
+            "t0": 92.9072265625,
+            "t1": 329.13427734375,
+            "d0": 0,
+            "d1": 1599.1420000000003,
+            "basis": "captured own-operation start/end; schematic path progress"
+          }
+        ],
+        "approximateDotAtProviderMs": 9.9215361328125
+      },
+      {
+        "operation": "operation:authenticate-ide-user.v1:10",
+        "callee": "provider:password-credential-provider",
+        "operationMs": 274.512451171875,
+        "providerMs": 272.961825,
+        "pieces": [
+          {
+            "t0": 485.138916015625,
+            "t1": 759.6513671875,
+            "d0": 0,
+            "d1": 1256.286,
+            "basis": "captured own-operation start/end; schematic path progress"
+          }
+        ],
+        "approximateDotAtProviderMs": 14.2746474609375
+      },
+      {
+        "operation": "operation:authenticate-ide-user.v1:15",
+        "callee": "provider:ide-session-provider",
+        "operationMs": 52.4716796875,
+        "providerMs": 51.094095,
+        "pieces": [
+          {
+            "t0": 893.930908203125,
+            "t1": 946.402587890625,
+            "d0": 0,
+            "d1": 1142,
+            "basis": "captured own-operation start/end; schematic path progress"
+          }
+        ],
+        "approximateDotAtProviderMs": 3.043357421875
+      }
+    ]
+  },
+  "providerEvidence": {
+    "runs": 2,
+    "matchedReturns": 5,
+    "liveBeforeReturn": 5,
+    "refusedExchanges": 1,
+    "negativeChecks": 25,
+    "liveAndReplay": true,
+    "timedProviders": [
+      {
+        "provider": "provider:identity-principal-provider",
+        "from": 76.070556640625,
+        "to": 733.068359375,
+        "duration": 656.997802734375
+      },
+      {
+        "provider": "provider:password-credential-provider",
+        "from": 895.947021484375,
+        "to": 1567.46044921875,
+        "duration": 671.513427734375
+      },
+      {
+        "provider": "provider:identity-principal-provider",
+        "from": 92.947021484375,
+        "to": 327.934326171875,
+        "duration": 234.9873046875
+      },
+      {
+        "provider": "provider:password-credential-provider",
+        "from": 485.1845703125,
+        "to": 758.146240234375,
+        "duration": 272.961669921875
+      },
+      {
+        "provider": "provider:ide-session-provider",
+        "from": 893.968505859375,
+        "to": 945.062255859375,
+        "duration": 51.09375
+      }
+    ]
+  },
+  "traversal": {
+    "capture": "evidence/replay-review-20261005/authenticate.sse",
+    "runId": "sfx-observer:0ea412ee87b7e59d297c768c:1310",
+    "findings": [],
+    "payload": {
+      "start": [
+        150,
+        370
+      ],
+      "currentAtEntry": true
+    },
+    "traversal": {
+      "operations": 17,
+      "samples": 6800,
+      "providerTrips": 3,
+      "childTrips": 0,
+      "providerCurrentSamples": 592,
+      "calleeCurrentSamples": 0,
+      "portBusyWhileBeyond": 592
+    },
+    "terminal": {
+      "kind": "variant",
+      "nodeId": "variant:authenticate-ide-user:AUTHENTICATED",
+      "variantId": "AUTHENTICATED",
+      "code": null,
+      "reported": null
+    },
+    "clock": [
+      {
+        "rate": 1,
+        "capturedMs": 1137.74609375,
+        "wallMs": 1137.74609375
+      },
+      {
+        "rate": 0.1,
+        "capturedMs": 1137.74609375,
+        "wallMs": 11377.4609375
+      }
+    ],
+    "pauseStepSpeed": true,
+    "declaredVariantRouting": {
+      "basis": "altered copies; routing logic only, not execution testimony",
+      "routing": [
+        {
+          "variant": "AUTHENTICATED",
+          "classification": "success",
+          "routed": true
+        },
+        {
+          "variant": "AUTHENTICATION_REJECTED",
+          "classification": "failure",
+          "routed": true
+        },
+        {
+          "variant": "IDENTITY_UNAVAILABLE",
+          "classification": "failure",
+          "routed": true
+        },
+        {
+          "variant": "THROTTLED",
+          "classification": "failure",
+          "routed": true
+        }
+      ]
+    },
+    "defects": {
+      "basis": "altered copies; defect behaviour only",
+      "unknownVariant": "outcome:authenticate-ide-user/reported-variant",
+      "mismatchedContract": "outcome:authenticate-ide-user/reported-variant",
+      "missingReturn": "outcome:authenticate-ide-user/reported-variant"
+    },
+    "heldTraversal": true
+  },
+  "browser": {
+    "checkedAt": "2026-10-05T11:14:44.569Z",
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "capabilityId": "authenticate-ide-user",
+    "runId": "sfx-observer:0ea412ee87b7e59d297c768c:1310",
+    "capture": "C:/lab/repos/sfx-embody/evidence/replay-review-20261005/authenticate.sse",
+    "candidateOverride": false,
+    "basis": "Browser replay of unchanged retained real capture; no execution or observer writes",
+    "measurements": [
+      {
+        "rate": 1,
+        "capturedMilliseconds": 1137.74609375,
+        "expectedMilliseconds": 1137.74609375,
+        "measuredMilliseconds": 1141.5,
+        "deviationMilliseconds": 3.75390625,
+        "providers": [
+          {
+            "provider": "provider:identity-principal-provider",
+            "capturedMilliseconds": 234.9873046875,
+            "frames": 13
+          },
+          {
+            "provider": "provider:password-credential-provider",
+            "capturedMilliseconds": 272.961669921875,
+            "frames": 16
+          },
+          {
+            "provider": "provider:ide-session-provider",
+            "capturedMilliseconds": 51.09375,
+            "frames": 4
+          }
+        ]
+      },
+      {
+        "rate": 0.1,
+        "capturedMilliseconds": 1137.74609375,
+        "expectedMilliseconds": 11377.4609375,
+        "measuredMilliseconds": 11389.399999976158,
+        "deviationMilliseconds": 11.939062476158142,
+        "providers": [
+          {
+            "provider": "provider:identity-principal-provider",
+            "capturedMilliseconds": 234.9873046875,
+            "frames": 141
+          },
+          {
+            "provider": "provider:password-credential-provider",
+            "capturedMilliseconds": 272.961669921875,
+            "frames": 163
+          },
+          {
+            "provider": "provider:ide-session-provider",
+            "capturedMilliseconds": 51.09375,
+            "frames": 30
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "regressions": {
+    "objectiveLive": "1396 real prefixes; parallel instances, ambiguous admission, late descendants and exact called-scenario matching passed",
+    "enrollmentReplay": "12 operations, two providers, exact 1x and 0.1x clock checks passed"
+  },
+  "evidenceHashes": {
+    "scene": "f20dacb02f335df1637dd9ac2aa44b1e51b07e552db4d5c135cf80bf010890f1",
+    "capture": "819f682d0858ad840ab6a0447ebcf3ac41fd27feeb7a4171665ddd88825245fe",
+    "hostCapture": "72b752a9ca1fce9628b06b9ef7da150216b51c4e82dbdf7b62c8403c91cd8af7"
+  },
+  "limitations": [
+    "Retained real capture replayed in an isolated browser; no new user login invoked",
+    "Recorded provider executor intervals do not separately measure network transit and remote processing",
+    "No provider interval is invented when only the owning operation has timing",
+    "Browser scheduling can be late; measured deviations are retained separately"
+  ],
+  "estateCommit": "56d0c0a29675d82f931a49965a18ec5dff47fe74"
+}
