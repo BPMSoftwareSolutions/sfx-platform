@@ -3,9 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawn, spawnSync } from 'node:child_process';
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 
 const release = JSON.parse(fs.readFileSync('/opt/sfx/release.json', 'utf8'));
+const bootId = randomUUID();
 const unlock = process.env.SFX_VAULT_UNLOCK;
 const token = process.env.SDA_API_TOKEN;
 const retrievalConnection = process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
@@ -114,7 +115,19 @@ http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
   if (url.pathname === '/readyz' || url.pathname === '/healthz') {
     response.writeHead(stopping ? 503 : 200, { 'content-type': 'application/json', 'x-sidefx-release': release.id, 'cache-control': 'no-store' });
-    response.end(JSON.stringify({ ready: !stopping, release: release.id, kernelDigest: release.kernelDigest, kernelLanguage: release.kernelLanguage ?? null })); return;
+    response.end(JSON.stringify({ ready: !stopping, release: release.id, bootId, kernelDigest: release.kernelDigest, kernelLanguage: release.kernelLanguage ?? null })); return;
+  }
+  // Deployment verification reads identity and ciphertext fingerprint only.
+  // This is never a public vault read or a credential export.
+  if (url.pathname === '/internal/deployment') {
+    const supplied = createHash('sha256').update(request.headers.authorization || '').digest();
+    const expected = createHash('sha256').update(`Bearer ${token}`).digest();
+    if (!timingSafeEqual(supplied, expected)) { response.writeHead(401); response.end(); return; }
+    if (request.method !== 'GET') { response.writeHead(405); response.end(); return; }
+    const ciphertext = fs.readFileSync(path.join(data, 'sfx/vault/vault.json'));
+    response.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
+    response.end(JSON.stringify({ bootId, release, vault: { bytes: ciphertext.length,
+      sha256: createHash('sha256').update(ciphertext).digest('hex') } })); return;
   }
   const api = url.pathname.startsWith('/v1/');
   const identity = url.pathname.startsWith('/auth/');

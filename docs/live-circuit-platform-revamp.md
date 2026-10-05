@@ -1,5 +1,12 @@
 # SFX Live Circuit Platform: revamp plan
 
+**New user decision, 2026-10-05:** staging deploys automatically on pushes to
+`main`; this does not wait for P2 or a manually approved workflow. See
+[automatic-staging-deployment.md](automatic-staging-deployment.md) for the
+implementation and acceptance/rollback contract. This supersedes the manual
+deployment choice in the historical dashboard below. P2 retains automatic
+delivery while replacing overlay assembly.
+
 Decided **2026-10-05**. This plan turns `sfx-platform` from a Next.js website
 prototype plus a separately copied circuit into one product: the **SFX Live
 Circuit Platform**, the Capability Explorer workspace around the existing Live
@@ -196,9 +203,9 @@ then delete the estate's `demo/`.
    removed, and `/` redirects to `/circuit` until P4 lands.
 4. A single release script writes `/opt/sfx/release.json` with every component
    hash and source revision. It builds in ACR and locks the new tag and manifest.
-5. CI builds and tests that composite image on pull requests and pushes. It never
-   binds a slot. Binding stays the runbook's operator step, or a separately
-   approved manual workflow.
+5. CI builds and tests that composite image on pull requests and pushes. Pushes
+   to `main` automatically bind staging and run acceptance/rollback through the
+   release workflow. P2 replaces image assembly, not automatic delivery.
 
 Acceptance: runbook §7 gates on staging, plus parity with r14 for circuit reads,
 Observe, external runs, identity, retrieval, replay and restart. The overlay
@@ -315,5 +322,5 @@ DC-05a must be installed before the Explorer can read navigation.
 | --- | --- |
 | Public legal, privacy and contact pages after Next.js: none on staging (noindex), or minimal static pages served by the platform? | Before any production promotion |
 | Fate of `services/capability-api` (lab service with its own `package.json`) | P5 |
-| Deploy from CI by a manual approved workflow, or operator-only? | P2 |
+| Automatic staging deployment on `main` | Decided 2026-10-05; implemented by `staging.yml`; P2 retains it |
 | Name of the Explorer route: keep `/circuit` deep links and serve the workspace at `/`, or introduce `/explorer`? | P4 |

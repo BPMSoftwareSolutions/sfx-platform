@@ -1,0 +1,14 @@
+{
+  "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "keyVault": "aiengine-kv-20260406",
+  "acceptanceSecret": "sfx-staging-release-acceptance",
+  "vaultVfs": "/api/vfs/sjones/.local/share/sfx/vault/vault.json",
+  "observe": {
+    "object": "capability",
+    "operation": "observe",
+    "subject": "request-capability-from-objective-v3",
+    "namespace": "sidefx:capabilities",
+    "input": {"contractId":"agent-objective-request.v1","payload":{"objective":"What is Broadcom's current market price?"}}
+  },
+  "expectedOutcome": "ADMITTED"
+}

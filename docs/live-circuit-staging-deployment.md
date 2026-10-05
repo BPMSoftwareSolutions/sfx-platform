@@ -1,5 +1,12 @@
 # SFX Live Circuit: sidefx/staging deployment strategy
 
+**Release policy updated 2026-10-05:** circuit overlays now deploy automatically
+on pushes to `main` through `.github/workflows/staging.yml`, with real browser,
+CLI, replay, restart/vault gates and automatic rollback. See
+[automatic-staging-deployment.md](automatic-staging-deployment.md) for the normal
+delivery path. The r14 audit below is historical; its manual steps remain an
+incident/full-runtime reference rather than a required operator procedure.
+
 This is the operational runbook for the **composite Live Circuit deployment** at
 <https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit>.
 It covers the website, observer, SDA Run API, installed kernel, procedure retrieval,

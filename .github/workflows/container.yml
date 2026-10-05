@@ -74,7 +74,8 @@ jobs:
   # The website-only `staging` deployment job was removed on 2026-10-05. It bound a
   # website-only image to sidefx/staging, which hosts the composite Live Circuit
   # (gateway, circuit/observer, SDA Run API, retrieval, identity and installed
-  # kernel); a successful run would have replaced that host. Staging releases follow
-  # docs/live-circuit-staging-deployment.md. The repository variable
+  # kernel); a successful run would have replaced that host. Composite circuit
+  # releases now deploy automatically through staging.yml; see
+  # docs/automatic-staging-deployment.md. The repository variable
   # AZURE_STAGING_ENABLED was also set to false. This build-and-test job retires
   # with the Next.js website: see docs/live-circuit-platform-revamp.md.

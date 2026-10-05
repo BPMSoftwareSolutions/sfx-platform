@@ -1,0 +1,9 @@
+{
+  "name": "sfx-staging-acceptance-tools",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "node-pty": "1.1.0",
+    "playwright": "1.63.0"
+  }
+}

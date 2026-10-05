@@ -1,9 +1,10 @@
 # Staging SDA host
 
-The complete current strategy and operator procedure are in
-[SFX Live Circuit staging deployment](../../docs/live-circuit-staging-deployment.md).
-That runbook was checked against Azure on 2026-10-05 and distinguishes the
-complete host from the still-enabled website-only deployment workflow.
+Circuit overlays deploy automatically on `main`; see
+[automatic staging deployment](../../docs/automatic-staging-deployment.md).
+The [composite host runbook](../../docs/live-circuit-staging-deployment.md) retains
+runtime ownership and incident/full-runtime procedures. The website-only workflow
+builds/tests only and cannot bind staging.
 The latest audited release is **r14**; its bounded acceptance is recorded in
 [provider-replay-acceptance-2026-10-05.json](provider-replay-acceptance-2026-10-05.json).
 The sections below retain packaging details and dated release history.
