@@ -1,0 +1,7 @@
+ARG STAGING_IMAGE
+FROM ${STAGING_IMAGE}
+USER root
+COPY runtime/ /opt/sfx/
+RUN chown -R node:node /opt/sfx/host /opt/sfx/estate
+WORKDIR /opt/sfx
+CMD ["sh", "/opt/sfx/host/initialize.sh"]
