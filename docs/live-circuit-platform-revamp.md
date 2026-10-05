@@ -107,6 +107,27 @@ Acceptance: hashes match the manifest. Every existing `verify-*.mjs` passes
 against a local installed kernel. Browser Observe, external CLI follow and replay
 behave as before.
 
+**Status 2026-10-05: steps 1 and 2 are done; step 3 is held.**
+
+- `ce8b402` holds the verbatim copy: 32 files, no committed-blob mismatch.
+- `05007ef` adds `SDA_ESTATE_DIR` and moves the packagers onto `live-circuit/`.
+- The [move acceptance](../deploy/sda-kernel/live-circuit-move-acceptance-2026-10-05.json)
+  records the evidence:
+  - packaged files are equal across all three packagers;
+  - observer reads match except `readAt` (350-entry catalog, two scenes);
+  - 11 of 11 acceptance-script cases behave identically from both locations;
+  - the run-scoped SSE check passes.
+
+Browser Observe and replay were not exercised. Retained inputs no longer fit
+eight of the script cases at either location.
+
+Step 3 is held because an observer started from the estate's `demo/` on
+October 2 still serves port 8787 and reads static files from disk. The estate
+copy is frozen behind a notice (estate `87fdf42`), and its documents name
+`live-circuit/`. To finish: restart local observers from this repository
+(`SDA_ESTATE_DIR=<estate> node live-circuit/dispatch-pair/observe-server.mjs`),
+then delete the estate's `demo/`.
+
 ### P2. One composite image from one repository, without Next.js
 
 1. A new composite Dockerfile builds `FROM` a pinned Node runtime image by digest.
