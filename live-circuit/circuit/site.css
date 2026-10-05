@@ -1,0 +1,88 @@
+/* Live Circuit Platform pages (home, sign-in): home design H2 tokens.
+   Background artwork is decorative and never execution evidence; circuits are
+   always the database scene. */
+:root {
+  color-scheme: dark;
+  --bg: #06111F; --bar: rgba(2, 13, 25, .96); --panel: rgba(5, 21, 34, .94); --panel-solid: #0A1C2E;
+  --white: #F4F7FB; --muted: #B3C5D8; --dim: #829AB2; --cyan: #72D7EE; --blue: #45A7FF;
+  --green: #4DE0B0; --amber: #F6B94D; --red: #FF5F70; --line: #29435B;
+  --shade: rgba(3, 16, 28, .70);
+  --radius: 10px; --gutter: clamp(16px, 3.8vw, 56px); --max: 1280px;
+  font: 16px/1.5 Arial, Helvetica, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--white); }
+a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
+[hidden] { display: none !important; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* Decorative artwork behind sections, darkened for text contrast. */
+.art { background-color: var(--bg); background-size: cover; background-position: center right; background-repeat: no-repeat; }
+.art-architecture { background-image: linear-gradient(90deg, rgba(3,16,28,.94) 0%, rgba(3,16,28,.80) 45%, rgba(3,16,28,.45) 100%), url(/circuit/assets/optical-architecture.webp); }
+.art-flow { background-image: linear-gradient(180deg, rgba(3,16,28,.80) 0%, var(--shade) 100%), url(/circuit/assets/optical-flow.webp); }
+@media (max-width: 900px) {
+  .art-architecture { background-image: linear-gradient(180deg, rgba(3,16,28,.86), rgba(3,16,28,.80)), url(/circuit/assets/optical-architecture-900.webp); }
+  .art-flow { background-image: linear-gradient(180deg, rgba(3,16,28,.86), rgba(3,16,28,.82)), url(/circuit/assets/optical-flow-900.webp); }
+}
+
+/* Header */
+.site-header { position: sticky; top: 0; z-index: 10; background: var(--bar); border-bottom: 1px solid rgba(41,67,91,.6); backdrop-filter: blur(6px); }
+.site-header .wrap { display: flex; align-items: center; gap: 28px; height: 64px; }
+.brand { display: flex; align-items: center; gap: 16px; color: var(--muted); font-size: 15px; white-space: nowrap; }
+.brand img { height: 34px; width: auto; display: block; }
+.brand .divider { width: 1px; height: 24px; background: var(--line); }
+.site-nav { display: flex; gap: 30px; margin-left: auto; margin-right: auto; }
+.site-nav a { color: var(--white); font-size: 15px; }
+.site-actions { display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+.env { color: var(--amber); font-size: 12px; font-weight: bold; letter-spacing: .06em; }
+.who { color: var(--muted); font-size: 14px; } .who strong { color: var(--white); font-weight: normal; }
+
+/* Buttons */
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 26px; border-radius: 7px;
+  border: 1px solid var(--cyan); font: bold 16px Arial, sans-serif; cursor: pointer; text-decoration: none !important; }
+.button.primary { background: var(--cyan); color: var(--bg); }
+.button.primary:hover { background: #8fe2f3; }
+.button.secondary { background: rgba(7,23,37,.85); color: var(--cyan); }
+.button.secondary:hover { background: rgba(14,40,60,.95); }
+.button.small { min-height: 36px; padding: 0 16px; font-size: 14px; }
+.button:disabled { opacity: .5; cursor: default; }
+
+/* Type */
+.eyebrow { color: var(--cyan); font-size: 13px; font-weight: bold; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 18px; }
+.display { font-size: clamp(38px, 5.2vw, 66px); line-height: 1.08; font-weight: bold; letter-spacing: -.01em; margin: 0 0 24px; }
+.lede { color: var(--muted); font-size: clamp(17px, 1.6vw, 22px); line-height: 1.45; margin: 0 0 34px; max-width: 34em; }
+.micro { color: var(--muted); font-size: 14px; margin: 14px 0 0; }
+.section-title { font-size: clamp(26px, 2.6vw, 34px); font-weight: bold; margin: 0; }
+
+/* Panels */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.panel-label { color: var(--cyan); font-size: 12px; font-weight: bold; letter-spacing: .06em; text-transform: uppercase; margin: 0; }
+
+/* Database circuit preview */
+.circuit-card { padding: 16px 18px 14px; background: rgba(5,19,33,.94); border: 1px solid var(--line); border-radius: 12px; }
+.circuit-card header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.circuit-card .source { color: var(--dim); font-size: 12px; letter-spacing: .04em; }
+.circuit-figure { position: relative; aspect-ratio: 16 / 9; background: #050f1b; border-radius: 6px; overflow: hidden; }
+.circuit-figure img { width: 100%; height: 100%; display: block; }
+.circuit-figure .state { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 14px; text-align: center; padding: 16px; }
+.circuit-card footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 14px; color: var(--muted); }
+.circuit-card footer a { font-weight: bold; }
+
+/* Footer */
+.site-footer { background: var(--bar); border-top: 1px solid rgba(41,67,91,.6); }
+.site-footer .wrap { display: flex; align-items: center; gap: 24px; min-height: 64px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+.site-footer img { height: 30px; width: auto; display: block; }
+.site-footer .credit { color: var(--muted); font-size: 13px; }
+.site-footer .links { display: flex; gap: 22px; margin: 0 auto; font-size: 14px; }
+.site-footer .links a { color: var(--white); }
+.site-footer .release { color: var(--dim); font-size: 12px; margin-left: auto; }
+
+@media (max-width: 900px) {
+  .site-nav { display: none; }
+  .brand .label, .brand .divider { display: none; }
+  .site-header .wrap { justify-content: space-between; }
+  .site-footer .links { margin: 0; }
+  .site-footer .release { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }

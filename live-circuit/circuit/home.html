@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="same-origin">
+<title>SFX Live Circuit Platform</title>
+<meta name="description" content="Watch declared capabilities execute live: input, operations, provider calls and outcome as their receipts arrive.">
+<link rel="icon" href="/circuit/assets/sfx-emblem.png">
+<link rel="stylesheet" href="/circuit/site.css">
+<style>
+  .hero { padding: 72px 0 40px; }
+  .hero .hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 56px; align-items: center; }
+  .actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .counts { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 52px; padding: 22px 0; }
+  .count { padding: 0 26px; border-left: 1px solid var(--line); } .count:first-child { border-left: 0; }
+  .count .value { font-size: clamp(30px, 3vw, 42px); font-weight: bold; line-height: 1.1; }
+  .count .label { color: var(--muted); font-size: 17px; } .count .sub { color: var(--dim); font-size: 13px; }
+  .snapshot { color: var(--dim); font-size: 12px; margin: 10px 0 0; }
+  .signed-panels { display: grid; grid-template-columns: 2fr 5fr; gap: 18px; margin-top: 52px; }
+  .signed-panels .panel { padding: 20px 24px; }
+  .signed-panels .big { font-size: 26px; font-weight: bold; margin: 8px 0 4px; overflow-wrap: anywhere; }
+  .signed-panels .sub { color: var(--muted); font-size: 14px; margin: 0; }
+  .runs { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+  .runs li { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--muted); border-top: 1px solid rgba(41,67,91,.6); padding-top: 6px; }
+  .runs li strong { color: var(--white); font-weight: normal; }
+  .lower { padding: 64px 0 72px; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin: 28px 0 64px; }
+  .step { padding: 24px 26px 28px; background: rgba(8,26,43,.92); }
+  .step h3 { display: flex; gap: 18px; align-items: baseline; font-size: 24px; margin: 0 0 14px; }
+  .step h3 span { font-size: 22px; }
+  .step p { color: var(--muted); font-size: 17px; margin: 0; }
+  .cards-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .cards-head small { color: var(--amber); font-size: 12px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
+  .card { display: flex; flex-direction: column; padding: 20px 20px 18px; background: rgba(7,23,37,.96); min-height: 250px; }
+  .card h3 { font-size: 21px; margin: 0 0 12px; }
+  .card .body { color: var(--muted); font-size: 16px; margin: 0 0 14px; }
+  .card .promise { color: var(--cyan); font-size: 14px; margin: 0; }
+  .card .meta { display: flex; justify-content: space-between; align-items: baseline; margin-top: auto; padding-top: 18px; font-size: 13px; color: var(--dim); }
+  .card .meta a { font-size: 15px; font-weight: bold; }
+  .card.missing { border-style: dashed; }
+  @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 900px) {
+    .hero { padding: 36px 0 28px; }
+    .hero .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+    .counts { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0; background: none; border: 0; }
+    .count { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 14px 16px; }
+    .signed-panels, .steps { grid-template-columns: 1fr; }
+    .actions .button { width: 100%; }
+  }
+  @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/circuit/home" aria-label="SFX Live Circuit Platform home"><img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX"><span class="divider"></span><span class="label">Live Circuit Platform</span></a>
+    <nav class="site-nav" aria-label="Primary"><a href="/circuit/">Live Circuit</a><a href="/circuit/">Capabilities</a><a href="#how">How it works</a></nav>
+    <div class="site-actions"><span class="env" id="env" hidden></span><span id="identity"></span></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero art art-architecture" aria-labelledby="headline">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow" id="eyebrow">SFX Live Circuit Platform</p>
+        <h1 class="display" id="headline">Watch capabilities execute live.</h1>
+        <p class="lede" id="lede">Capabilities are declared as data. The SDA kernel executes their graphs. Follow the input, operations, provider calls and outcome as receipts arrive.</p>
+        <div class="actions" id="actions">
+          <a class="button primary" href="/circuit/">Open the Live Circuit</a>
+          <a class="button secondary" id="sign-in-cta" href="/circuit/login?return=%2Fcircuit%2Fhome">Sign in to observe</a>
+        </div>
+        <p class="micro" id="micro">Explore publicly. Sign in to start an observed run.</p>
+      </div>
+      <article class="circuit-card" aria-label="Database circuit">
+        <header><p class="panel-label" id="circuit-label">Circuit</p><span class="source">DATABASE SCENE</span></header>
+        <div class="circuit-figure" id="circuit-figure"><div class="state">Reading the circuit from the database…</div></div>
+        <footer><span id="circuit-caption"></span><a id="circuit-link" href="/circuit/">Open this circuit</a></footer>
+      </article>
+    </div>
+    <div class="wrap">
+      <div class="counts panel" id="counts" aria-label="Live estate counts">
+        <div class="count"><div class="value" id="c-total">–</div><div class="label">capabilities</div><div class="sub" id="c-split">Reading the catalog…</div></div>
+        <div class="count"><div class="value" id="c-scenarios">–</div><div class="label">scenarios</div><div class="sub">Declared across the estate</div></div>
+        <div class="count"><div class="value" id="c-multi">–</div><div class="label">multi-scenario capabilities</div><div class="sub">One circuit per scenario</div></div>
+        <div class="count"><div class="value" id="c-kernel">–</div><div class="label">installed kernel</div><div class="sub" id="c-release">Release not reported by this host</div></div>
+      </div>
+      <div class="signed-panels" id="signed-panels" hidden>
+        <div class="panel"><p class="panel-label">Your session</p><p class="big" id="s-who"></p><p class="sub" id="s-detail"></p></div>
+        <div class="panel"><p class="panel-label">Your observed runs</p><p class="big" id="r-head">No runs started in this session</p><p class="sub" id="r-sub">Your observed runs appear here after you start them in the Live Circuit.</p><ul class="runs" id="runs"></ul></div>
+      </div>
+      <p class="snapshot" id="snapshot"></p>
+    </div>
+  </section>
+
+  <section class="lower art art-flow" id="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 class="section-title" id="how-title">Built from declared meaning</h2>
+      <div class="steps">
+        <div class="step panel"><h3><span style="color:var(--amber)">01</span>Declare</h3><p>Contracts, operations and provider bindings live as rows in one authority database.</p></div>
+        <div class="step panel"><h3><span style="color:var(--blue)">02</span>Execute</h3><p>The installed SDA kernel interprets the graph selected for the capability.</p></div>
+        <div class="step panel"><h3><span style="color:var(--cyan)">03</span>Observe</h3><p>Receipts light the circuit. Replay preserves the captured scenario timing.</p></div>
+      </div>
+      <div class="cards-head"><h2 class="section-title">Capabilities to explore</h2></div>
+      <div class="cards" id="cards"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX">
+    <span class="credit">SideFX / a BPM Intelligence product</span>
+    <nav class="links" aria-label="Footer"><a href="/circuit/">Live Circuit</a><a href="/circuit/login?return=%2Fcircuit%2Fhome">Sign in</a><a href="/healthz">Status</a></nav>
+    <span class="release" id="release"></span>
+  </div>
+</footer>
+<script type="module" src="/circuit/home.js"></script>
+</body>
+</html>

@@ -25,7 +25,24 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/login', ['login.html', 'text/html; charset=utf-8']],
   ['/circuit/login.js', ['login.js', 'text/javascript; charset=utf-8']],
   ['/circuit/session-status.js', ['session-status.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/home', ['home.html', 'text/html; charset=utf-8']],
+  ['/circuit/home.js', ['home.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/site.js', ['site.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/site.css', ['site.css', 'text/css; charset=utf-8']],
+  ['/circuit/assets/optical-architecture.webp', ['assets/optical-architecture.webp', 'image/webp']],
+  ['/circuit/assets/optical-architecture-900.webp', ['assets/optical-architecture-900.webp', 'image/webp']],
+  ['/circuit/assets/optical-flow.webp', ['assets/optical-flow.webp', 'image/webp']],
+  ['/circuit/assets/optical-flow-900.webp', ['assets/optical-flow-900.webp', 'image/webp']],
+  ['/circuit/assets/sfx-logo-wordmark.png', ['assets/sfx-logo-wordmark.png', 'image/png']],
+  ['/circuit/assets/sfx-emblem.png', ['assets/sfx-emblem.png', 'image/png']],
 ]);
+// Home and sign-in page configuration is host data (circuit-host.json); the
+// environment label comes from the host's indexing setting or an explicit label.
+const hostPolicy = JSON.parse(await readFile(new URL('circuit-host.json', CIRCUIT_DIR), 'utf8'));
+const homeConfig = () => ({
+  hero: hostPolicy.home?.hero ?? null, featured: hostPolicy.home?.featured ?? [], signInCircuit: hostPolicy.identity?.circuit ?? null,
+  environment: process.env.SFX_ENVIRONMENT_LABEL || (process.env.SIDEFX_INDEXING === 'disabled' ? 'STAGING' : null)
+});
 const ringLimit = 2000;
 const maxBodyBytes = 16 * 1024 * 1024;
 
@@ -398,6 +415,10 @@ const handleRequest = async (req, res) => {
   try {
     const url = new URL(req.url ?? '/', `http://localhost:${port}`);
     if (await serveSessionApi(req, res, url)) return;
+    if (req.method === 'GET' && url.pathname === '/api/circuit/v1/home') {
+      sendJson(res, 200, homeConfig());
+      return;
+    }
     if (await serveRunApi(req, res, url)) return;
     if (await serveCircuitApi(req, res, url)) return;
     if (req.method === 'GET' && url.pathname === '/circuit/decks') {

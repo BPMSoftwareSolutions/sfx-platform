@@ -64,8 +64,15 @@ const post = (target, path, value, { origin = target.origin, type = 'application
 const get = (target, path, cookie) => fetch(target.origin + path, { headers: cookie ? { cookie } : {} });
 let cookie = null, session = null;
 
-check('sign-in page and scripts are served', async () => {
-  for (const p of ['/circuit/login', '/circuit/login.js', '/circuit/session-status.js']) assert.equal((await get(o, p)).status, 200, p);
+check('sign-in and home pages, scripts, styles and artwork are served', async () => {
+  for (const p of ['/circuit/login', '/circuit/login.js', '/circuit/session-status.js', '/circuit/home', '/circuit/home.js', '/circuit/site.js',
+    '/circuit/site.css', '/circuit/assets/optical-flow.webp', '/circuit/assets/optical-architecture-900.webp', '/circuit/assets/sfx-logo-wordmark.png'])
+    assert.equal((await get(o, p)).status, 200, p);
+});
+check('home configuration is host data: hero, featured, sign-in circuit', async () => {
+  const h = await (await get(o, '/api/circuit/v1/home')).json();
+  assert.equal(h.hero.capabilityId, 'authenticate-ide-user'); assert.equal(h.signInCircuit.capabilityId, 'authenticate-ide-user');
+  assert.ok(h.featured.length >= 1 && h.featured.every(f => f.capabilityId && f.title && f.namespaceId));
 });
 check('no cookie: not authenticated, Observe requires session', async () => {
   const s = await (await get(o, '/api/circuit/v1/session')).json();
@@ -114,7 +121,7 @@ check('Observe with a session reaches the API with the machine credential only a
   const forwarded = apiLog.at(-1);
   assert.equal(forwarded.authorization, `Bearer ${MACHINE}`); assert.equal(forwarded.cookie, null);
   const runs = await (await get(o, '/api/circuit/v1/session/runs', cookie)).json();
-  assert.equal(runs.principalId, session.principalId); assert.deepEqual(runs.runs.map(x => x.runId), [admitted.runId]);
+  assert.equal(runs.principalId, session.principalId); assert.deepEqual(runs.runs.map(x => [x.runId, x.capabilityId]), [[admitted.runId, 'say-hello-world']]);
 });
 check('a revoked session is refused for Observe and its cookie cleared', async () => {
   const token = cookie.split('=').slice(1).join('=');

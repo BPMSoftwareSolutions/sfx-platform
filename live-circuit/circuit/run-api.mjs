@@ -24,7 +24,7 @@ export async function serveRunApi(req, res, url, configuration = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), policy.timeoutMilliseconds);
   res.on('close', () => controller.abort());
-  let session = null;
+  let session = null, subject = {};
   try {
     let body;
     if (req.method === 'POST') {
@@ -49,6 +49,7 @@ export async function serveRunApi(req, res, url, configuration = {}) {
       }
       // The API's default namespace is host data. Other identities pass through
       // unchanged to API admission; no selected namespace is silently guessed.
+      subject = { capabilityId: submission.subject, namespaceId: submission.namespace ?? defaultNamespace };
       if (submission.namespace === defaultNamespace) delete submission.namespace;
       // Observe is tied to a signed-in identity: the browser's session cookie is
       // validated with the identity host before anything reaches the SDA API.
@@ -74,7 +75,7 @@ export async function serveRunApi(req, res, url, configuration = {}) {
     if (session && req.method === 'POST') {
       // Admission responses are small JSON; read it to attribute the run to the principal.
       const text = await upstream.text();
-      if (upstream.ok) { try { attributeRun(JSON.parse(text)?.runId, session); } catch { /* Unattributable admission body. */ } }
+      if (upstream.ok) { try { attributeRun(JSON.parse(text)?.runId, session, subject); } catch { /* Unattributable admission body. */ } }
       res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/json', 'cache-control': 'no-store' });
       res.end(text);
       return true;

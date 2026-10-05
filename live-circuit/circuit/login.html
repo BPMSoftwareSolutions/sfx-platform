@@ -3,60 +3,98 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="same-origin">
-<title>Sign in · SFX Live Circuit</title>
+<title>Sign in · SFX Live Circuit Platform</title>
+<link rel="icon" href="/circuit/assets/sfx-emblem.png">
+<link rel="stylesheet" href="/circuit/site.css">
 <style>
-  :root { color-scheme:dark; --bg:#06111F; --panel:#102238; --panel-deep:#0A1A2C; --white:#F4F7FB; --muted:#A8B8CA; --blue:#45A7FF; --amber:#F6B94D; --green:#4DE0B0; --red:#FF5F70; --grid:#263A51; --observation:#72D7EE; font:14px Arial,sans-serif; }
-  * { box-sizing:border-box; } body { margin:0; min-height:100vh; background:var(--bg); color:var(--white); display:grid; grid-template-rows:auto 1fr; }
-  header { display:flex; justify-content:space-between; align-items:baseline; gap:16px; padding:14px 24px; border-bottom:1px solid var(--grid); background:#010C18; }
-  header a { color:var(--white); text-decoration:none; font-weight:bold; letter-spacing:.02em; } header small { color:var(--muted); }
-  main { display:grid; place-items:start center; padding:56px 16px; }
-  .card { width:min(440px,100%); background:var(--panel); border:1px solid var(--grid); border-radius:4px; padding:28px; }
-  h1 { font-size:22px; margin:0 0 6px; } p { line-height:1.5; color:var(--muted); margin:0 0 16px; } a { color:var(--blue); }
-  form { display:grid; gap:14px; margin-top:18px; }
-  label { display:grid; gap:6px; font-size:12px; color:var(--muted); }
-  input { font:15px Arial,sans-serif; padding:10px 12px; border:1px solid var(--grid); border-radius:3px; color:var(--white); background:var(--panel-deep); width:100%; }
-  button { font:14px Arial,sans-serif; padding:10px 14px; border-radius:3px; cursor:pointer; border:1px solid var(--observation); color:var(--bg); background:var(--observation); font-weight:bold; }
-  button.secondary { background:transparent; color:var(--white); border-color:var(--grid); font-weight:normal; }
-  button:disabled { opacity:.5; cursor:default; }
-  :focus-visible { outline:2px solid var(--amber); outline-offset:3px; }
-  #status { min-height:1.4em; font-size:13px; margin:14px 0 0; color:var(--muted); }
-  #status.error { color:var(--red); } #status.ok { color:var(--green); }
-  .identity { display:grid; gap:4px; padding:12px; margin:16px 0; border:1px solid var(--grid); background:var(--panel-deep); font-size:13px; }
-  .identity strong { font-size:15px; overflow-wrap:anywhere; } .identity span { color:var(--muted); overflow-wrap:anywhere; }
-  .actions { display:flex; flex-wrap:wrap; gap:10px; }
-  .note { font-size:12px; margin-top:18px; border-top:1px solid var(--grid); padding-top:14px; }
-  [hidden] { display:none !important; }
+  main { flex: 1; }
+  body { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth { padding: 64px 0 72px; flex: 1; }
+  .auth .wrap { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 56px; align-items: start; }
+  .auth .display { font-size: clamp(36px, 4.4vw, 56px); }
+  .auth .lede { margin-bottom: 30px; }
+  .form-card { padding: 34px 34px 30px; background: rgba(5,19,33,.95); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(114,215,238,.06) inset; }
+  .form-card h2 { font-size: 28px; margin: 6px 0 6px; }
+  .form-card .hint { color: var(--muted); font-size: 15px; margin: 0 0 24px; }
+  form { display: grid; gap: 18px; }
+  label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; letter-spacing: .02em; }
+  input { font: 16px Arial, sans-serif; padding: 13px 14px; color: var(--white); background: #04101c; border: 1px solid var(--line); border-radius: 8px; width: 100%; }
+  input:focus { border-color: var(--cyan); outline: none; box-shadow: 0 0 0 3px rgba(114,215,238,.18); }
+  form .button { width: 100%; margin-top: 6px; }
+  #status { min-height: 1.5em; font-size: 14px; margin: 18px 0 0; color: var(--muted); }
+  #status.error { color: var(--red); } #status.ok { color: var(--green); }
+  .identity-card { padding: 16px 18px; margin: 4px 0 20px; background: #04101c; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 4px; }
+  .identity-card span { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+  .identity-card strong { font-size: 22px; overflow-wrap: anywhere; }
+  .stack { display: grid; gap: 12px; }
+  .note { color: var(--dim); font-size: 13px; line-height: 1.5; margin: 24px 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
+  @media (max-width: 900px) {
+    .auth { padding: 28px 0 40px; }
+    .auth .wrap { grid-template-columns: 1fr; gap: 28px; }
+    .form-card { order: -1; padding: 26px 22px; }
+  }
 </style>
 </head>
 <body>
-<header><a href="/circuit/">SFX Live Circuit</a><small>Database authority · scenario circuits · live testimony</small></header>
-<main>
-  <section class="card" aria-labelledby="title">
-    <h1 id="title">Sign in</h1>
-    <p>Signing in runs the <a id="capability-link" href="/circuit/?capability=authenticate-ide-user&amp;namespace=sidefx%3Acapabilities&amp;scenario=authenticate-ide-user">authenticate-ide-user</a>
-      capability. Open it in another tab to watch the sign-in execute. Observe requires a signed-in identity, and each run you submit is attributed to it.</p>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/circuit/home" aria-label="SFX Live Circuit Platform home"><img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX"><span class="divider"></span><span class="label">Live Circuit Platform</span></a>
+    <nav class="site-nav" aria-label="Primary"><a href="/circuit/">Live Circuit</a><a href="/circuit/">Capabilities</a><a href="/circuit/home#how">How it works</a></nav>
+    <div class="site-actions"><span class="env" id="env" hidden></span></div>
+  </div>
+</header>
 
-    <form id="sign-in" hidden autocomplete="on">
-      <label>Identifier <input id="identifier" name="username" autocomplete="username" required maxlength="254" spellcheck="false" autocapitalize="none"></label>
-      <label>Password <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024"></label>
-      <button id="submit" type="submit">Sign in</button>
-    </form>
+<main class="auth art art-flow">
+  <div class="wrap">
+    <section aria-labelledby="title">
+      <p class="eyebrow">Sign in</p>
+      <h1 class="display" id="title">Sign in to observe live runs.</h1>
+      <p class="lede">Signing in runs the <a id="capability-link" href="/circuit/?capability=authenticate-ide-user&amp;namespace=sidefx%3Acapabilities&amp;scenario=authenticate-ide-user">authenticate-ide-user</a>
+        capability, shown below as declared in the database. Observe requires a signed-in identity, and each run you start is attributed to it.</p>
+      <article class="circuit-card" aria-label="Sign-in circuit">
+        <header><p class="panel-label" id="circuit-label">Sign-in circuit</p><span class="source">DATABASE SCENE</span></header>
+        <div class="circuit-figure" id="circuit-figure"><div class="state">Reading the circuit from the database…</div></div>
+        <footer><span id="circuit-caption"></span><a id="circuit-link" href="/circuit/">Open this circuit</a></footer>
+      </article>
+    </section>
 
-    <div id="signed-in" hidden>
-      <div class="identity" aria-live="polite">
-        <span>Signed in as</span><strong id="who"></strong>
-        <span id="session-detail"></span>
+    <section class="form-card" aria-labelledby="form-title">
+      <p class="panel-label">SFX identity</p>
+      <h2 id="form-title">Welcome</h2>
+      <p class="hint" id="form-hint">Use your enrolled identifier and password.</p>
+
+      <form id="sign-in" hidden autocomplete="on">
+        <label>Identifier <input id="identifier" name="username" autocomplete="username" required maxlength="254" spellcheck="false" autocapitalize="none"></label>
+        <label>Password <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024"></label>
+        <button id="submit" class="button primary" type="submit">Sign in</button>
+      </form>
+
+      <div id="signed-in" hidden>
+        <div class="identity-card" aria-live="polite">
+          <span>Signed in as</span><strong id="who"></strong>
+          <span id="session-detail"></span>
+        </div>
+        <div class="stack">
+          <button id="continue" class="button primary" type="button">Open the Live Circuit</button>
+          <button id="sign-out" class="button secondary" type="button">Sign out</button>
+        </div>
       </div>
-      <div class="actions">
-        <button id="continue" type="button">Open the circuit</button>
-        <button id="sign-out" class="secondary" type="button">Sign out</button>
-      </div>
-    </div>
 
-    <p id="status" role="status" aria-live="polite"></p>
-    <p class="note">Your password goes only to the identity host for this sign-in. This page does not store it. Your session is held in an HttpOnly cookie that page script cannot read, and it ends when you sign out or when it expires.</p>
-  </section>
+      <p id="status" role="status" aria-live="polite"></p>
+      <p class="note">Your password goes only to the identity host for this sign-in. This page does not store it. Your session is held in an HttpOnly cookie that page script cannot read, and it ends when you sign out or when it expires.</p>
+    </section>
+  </div>
 </main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX">
+    <span class="credit">SideFX / a BPM Intelligence product</span>
+    <nav class="links" aria-label="Footer"><a href="/circuit/home">Home</a><a href="/circuit/">Live Circuit</a><a href="/healthz">Status</a></nav>
+    <span class="release" id="release"></span>
+  </div>
+</footer>
 <script type="module" src="/circuit/login.js"></script>
 </body>
 </html>

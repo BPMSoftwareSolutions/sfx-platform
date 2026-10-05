@@ -1,7 +1,7 @@
 // Sign-in page: posts { identifier, password } to the same-origin session
 // transport, which runs authenticate-ide-user through the identity host. The
 // session bearer never reaches this script; it lives in an HttpOnly cookie.
-const $ = id => document.getElementById(id);
+import { $, home, release, circuitPreview, footerRelease } from './site.js';
 const session = '/api/circuit/v1/session';
 const messages = {
   AUTHENTICATION_REJECTED: 'The identifier or password was not accepted.',
@@ -40,6 +40,8 @@ function render(state) {
   const signedIn = state?.authenticated === true || state?.disposition === 'AUTHENTICATED';
   $('sign-in').hidden = signedIn;
   $('signed-in').hidden = !signedIn;
+  $('form-title').textContent = signedIn ? 'You are signed in' : 'Welcome';
+  $('form-hint').hidden = signedIn;
   if (signedIn) {
     $('who').textContent = state.identifier ?? `principal ${state.principalId}`;
     const expires = new Date(state.expiresAt);
@@ -95,3 +97,13 @@ $('sign-out').addEventListener('click', async () => {
 
 $('continue').addEventListener('click', () => location.assign(target));
 refresh().catch(() => { $('sign-in').hidden = false; status('Session status is unavailable.', 'error'); });
+
+// Page context: environment label, the sign-in circuit from the database, release.
+home().then(r => {
+  const config = r.ok ? r.body : null;
+  if (config?.environment) { $('env').textContent = config.environment; $('env').hidden = false; }
+  const circuit = config?.signInCircuit;
+  if (circuit) circuitPreview({ figure: $('circuit-figure'), caption: $('circuit-caption'), link: $('circuit-link'), label: $('circuit-label') }, circuit);
+  else $('circuit-figure').querySelector('.state').textContent = 'Host configuration could not be read.';
+});
+release().then(health => footerRelease($('release'), health));

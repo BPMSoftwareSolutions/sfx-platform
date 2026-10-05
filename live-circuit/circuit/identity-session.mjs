@@ -93,9 +93,11 @@ export async function validateSession(req) {
 
 export const observeRequiresSession = () => policy.observeRequiresSession === true;
 
-export function attributeRun(runId, session) {
+export function attributeRun(runId, session, subject = {}) {
   if (typeof runId !== 'string' || !runId) return;
-  attributions.push({ runId, principalId: session.principalId, sessionId: session.sessionId, admittedAt: new Date().toISOString() });
+  attributions.push({ runId, principalId: session.principalId, sessionId: session.sessionId, admittedAt: new Date().toISOString(),
+    capabilityId: typeof subject.capabilityId === 'string' ? subject.capabilityId : null,
+    namespaceId: typeof subject.namespaceId === 'string' ? subject.namespaceId : null });
   while (attributions.length > policy.maximumAttributedRuns) attributions.shift();
 }
 
@@ -117,7 +119,8 @@ export async function serveSessionApi(req, res, url) {
     const checked = await validateSession(req);
     if (!checked.session) { const r = checked.refusal; send(res, r.status, { disposition: r.disposition }, r.clear ? { 'set-cookie': expired() } : {}); return true; }
     send(res, 200, { principalId: checked.session.principalId,
-      runs: attributions.filter(a => a.principalId === checked.session.principalId).map(({ runId, admittedAt, sessionId }) => ({ runId, admittedAt, sessionId })) });
+      runs: attributions.filter(a => a.principalId === checked.session.principalId)
+        .map(({ runId, admittedAt, sessionId, capabilityId, namespaceId }) => ({ runId, admittedAt, sessionId, capabilityId, namespaceId })) });
     return true;
   }
 

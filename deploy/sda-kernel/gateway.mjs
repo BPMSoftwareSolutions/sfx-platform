@@ -114,7 +114,7 @@ http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
   if (url.pathname === '/readyz' || url.pathname === '/healthz') {
     response.writeHead(stopping ? 503 : 200, { 'content-type': 'application/json', 'x-sidefx-release': release.id, 'cache-control': 'no-store' });
-    response.end(JSON.stringify({ ready: !stopping, release: release.id, kernelDigest: release.kernelDigest })); return;
+    response.end(JSON.stringify({ ready: !stopping, release: release.id, kernelDigest: release.kernelDigest, kernelLanguage: release.kernelLanguage ?? null })); return;
   }
   const api = url.pathname.startsWith('/v1/');
   const identity = url.pathname.startsWith('/auth/');
