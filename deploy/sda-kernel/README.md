@@ -1,5 +1,13 @@
 # Staging SDA host
 
+The complete current strategy and operator procedure are in
+[SFX Live Circuit staging deployment](../../docs/live-circuit-staging-deployment.md).
+That runbook was checked against Azure on 2026-10-05 and distinguishes the
+complete host from the still-enabled website-only deployment workflow.
+The latest audited release is **r14**; its bounded acceptance is recorded in
+[provider-replay-acceptance-2026-10-05.json](provider-replay-acceptance-2026-10-05.json).
+The sections below retain packaging details and dated release history.
+
 The existing Linux website image is the base. The release adds the circuit demo,
 the SDA Run API and a verified, self-contained kernel installation. The estate
 delivery names that installed entry; it has no runtime checkout or build step.
@@ -175,7 +183,7 @@ slow replay 0.1. The replay window was 12,141.427 ms versus a 13,890 ms process
 window, excluding setup. Provider drill-down and a second capability's paginated
 scenario loaded successfully; browser JavaScript errors: zero.
 
-These are functional deployment checks. The current database-rendered objective
+These were functional deployment checks of r3. Its database-rendered objective
 page declares one displayed provider (Node Platform), and its verification panel
 reports `NOT_FORMALLY_OBSERVABLE` because the captured graph lacks selected
 definition digests. This release does not claim complete provider declaration

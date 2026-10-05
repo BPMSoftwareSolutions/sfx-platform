@@ -1,7 +1,16 @@
-# Azure container deployment
+# Azure website container deployment baseline
 
-This implements the deployment path in design spec §§8.4–8.7. It deploys the current incomplete
-P1 site to staging. It does not enable the authoring conveyor, exports, media persistence or mail.
+This describes the original website-only deployment path in design spec §§8.4–8.7.
+Its September baseline, publication checks and workflow are retained below.
+For the **current composite sidefx/staging deployment**, including the Live Circuit,
+SDA Kernel API, retrieval, identity and persistent vault, use
+[the Live Circuit staging runbook](live-circuit-staging-deployment.md).
+
+As verified on 2026-10-05, the website-only workflow is still enabled and targets
+the same slot. A successful run can replace the composite image with the website
+alone. Coordinate that job before releasing or pushing to its deployment branches;
+it is not the complete-image release pipeline. The runtime and health semantics
+below apply to the website image, not the composite gateway.
 
 ## Verified baseline
 
@@ -123,23 +132,16 @@ the staging workflow or by successful ACR publication.
 - [GitHub OIDC authentication to Azure](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
 - [ACR image locking](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-image-lock)
 
-## Capability execution is not deployed
+## Capability execution in the current staging image
 
-The image built here carries the web process only. Capability execution needs the command API
-(`services/capability-api`) running beside it with a database connection, and no environment has
-`SIDEFX_INVOCATION_ENDPOINT` configured. Hosted builds therefore report execution unavailable and
-offer no working run control — the honest state, not a degraded one.
+Capability execution **is deployed** in the composite Live Circuit host. Its SDA
+Run API invokes an installed, digest-admitted Linux kernel; the circuit offers
+the real JSON Observe action. Retrieval, identity and persistent vault custody
+are also deployed. No runtime kernel checkout or estate build is required.
 
-Deploying it is release work with its own prerequisites, none of them satisfied yet:
-
-| Prerequisite | Why |
-| --- | --- |
-| An authorization boundary on the API | It is unauthenticated today; it must not be reachable from the public internet without one |
-| Network path to SQL from the service | The service holds the database boundary the web process must not cross (§11.1) |
-| The `sfx-embody` workspace and its pinned toolchain in the service image | It owns the process binding, the credential reference and the integrity checks |
-| Its own health, restart and capacity policy | Each in-flight command holds a connection and a runtime; the service is not the web process and must not share its lifecycle |
-
-Promotion of the website image is unaffected by any of this: the site runs, and says execution is
-unavailable, wherever the endpoint is absent.
-
-See [capability-execution.md](capability-execution.md).
+The root Dockerfile/workflow described above still produces the website-only
+image. Building it does not package these services. The older
+`services/capability-api` discussion in [capability-execution.md](capability-execution.md)
+must not be used as an inventory or deployment prescription for the SDA host.
+Use [the composite runbook](live-circuit-staging-deployment.md) for packaging,
+authentication, persistence, readiness, verification, rollback and observed gaps.
