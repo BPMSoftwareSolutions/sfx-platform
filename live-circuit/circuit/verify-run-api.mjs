@@ -51,7 +51,7 @@ try {
 } finally { proxy.closeAllConnections();upstream.closeAllConnections();await Promise.all([new Promise(r=>proxy.close(r)),new Promise(r=>upstream.close(r))]); }
 
 // Optional regression against an actual database scene with omitted variant lists.
-// node demo/circuit/verify-run-api.mjs <scene.json> <capture.sse>
+// node live-circuit/circuit/verify-run-api.mjs <scene.json> <capture.sse>
 if (process.argv[2] || process.argv[3]) {
   const scene = JSON.parse(await readFile(process.argv[2], 'utf8'));
   assert(scene.observationMap.boundaries.some(boundary => !Array.isArray(boundary.variants)), 'Use a scene with an omitted variant list');

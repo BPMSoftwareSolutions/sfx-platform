@@ -39,8 +39,8 @@ The release name identifies a deployed image; it does not pin the live database.
 
 | Owner | Version-controlled responsibility | Deployed responsibility |
 | --- | --- | --- |
-| `sfx-platform` | `deploy/sda-kernel/`, infrastructure, website, `tools/sfx-api/`, release receipts | Gateway, process supervision, packaged services, HTTP CLI wrapper |
-| `sfx-embody` | Database migrations/inspect evidence; `demo/circuit/`, `demo/dispatch-pair/observe-server.mjs`; host policy | Database-authored meaning and layout; generic viewer/observer files copied into the image |
+| `sfx-platform` | `deploy/sda-kernel/`, `live-circuit/` (viewer and observer, moved from the estate on 2026-10-05), infrastructure, website, `tools/sfx-api/`, release receipts | Gateway, process supervision, packaged services, viewer/observer files placed at `/opt/sfx/estate/demo/`, HTTP CLI wrapper |
+| `sfx-embody` | Database migrations/inspect evidence; data and playback contracts | Database-authored meaning, layout and scene authority |
 | SDA | Kernel installation and SDA API build/interface authority | Admitted installed executable and compiled API files; no kernel checkout or runtime build |
 | `sfx-providers` | `providers/procedure-extract/`, `providers/cli-login/host/` | Published Linux retrieval and identity executables |
 | `sfx-dal` | Generation of DALs from installed database procedures | Published `SFX.DAL.dll` and `SFX.Identity.DAL.dll` carried with their services |
@@ -316,12 +316,12 @@ Next.js under the [platform revamp](live-circuit-platform-revamp.md).
    permissions, run:
 
    ```text
-   node deploy/sda-kernel/prepare.mjs <installed-root> <estate-root> <sda-api-source> <fresh-context>
+   node deploy/sda-kernel/prepare.mjs <installed-root> <sda-api-source> <fresh-context>
    ```
 
    Its Dockerfile takes `WEBSITE_IMAGE=<exact website digest>`. It archives the
-   installed kernel and copies built API/interface/schema files, generic demo
-   files, and a Linux delivery configuration. It does not install database rows,
+   installed kernel and copies built API/interface/schema files, this repository's
+   `live-circuit/` viewer and observer, and a Linux delivery configuration. It does not install database rows,
    generate DALs, provision credentials or by itself assemble all later services.
    Current gateway startup also requires retrieval, identity, their policies and
    the encrypted vault bootstrap. Assemble those before treating a new foundation
@@ -331,25 +331,28 @@ Next.js under the [platform revamp](live-circuit-platform-revamp.md).
    self-contained, with the regenerated `SFX.DAL.dll`, then:
 
    ```text
-   node deploy/sda-kernel/prepare-retrieval.mjs <published-directory> <previous-release.json> <fresh-context> <new-release-id> [estate-directory]
+   node deploy/sda-kernel/prepare-retrieval.mjs <published-directory> <previous-release.json> <fresh-context> <new-release-id> [--with-circuit]
    ```
 
    Build `Dockerfile.retrieval` with `STAGING_IMAGE=<exact previous composite
-   digest>`. The optional estate copy includes only `app.js`, `live-store.mjs`
-   and `circuit-host.json`; it is **not** a full viewer refresh.
+   digest>`. `--with-circuit` also copies `app.js`, `live-store.mjs` and
+   `circuit-host.json` from `live-circuit/circuit/`; it is **not** a full viewer refresh.
 
 3. **Identity or full circuit/observer update:** publish the identity host's
    `LoginHost.csproj` for `linux-x64`, Release, self-contained, with its generated
    `SFX.Identity.DAL.dll`, then:
 
    ```text
-   node deploy/sda-kernel/prepare-identity.mjs <published-host> <previous-release.json> <fresh-context> <new-release-id> <estate-directory>
+   node deploy/sda-kernel/prepare-identity.mjs <published-host> <previous-release.json> <fresh-context> <new-release-id>
    ```
 
-   This copies the full circuit directory and observer, plus identity host and
+   This copies the full `live-circuit/` circuit directory and observer, plus identity host and
    policy, over `STAGING_IMAGE=<exact previous composite digest>`. It preserves
    the inherited installed delivery configuration and retrieval service. Never
    copy a Windows developer's `sfx.config.json` over the Linux configuration.
+   All three packagers place `live-circuit/` through `deploy/sda-kernel/live-circuit.mjs`
+   and refuse the retired estate-directory argument. The image layout is unchanged.
+   The move is recorded in [the move acceptance](../deploy/sda-kernel/live-circuit-move-acceptance-2026-10-05.json).
 
 Packagers require a fresh destination and write `/opt/sfx/release.json`. An
 overlay must preserve inherited services and deliberately replace only its

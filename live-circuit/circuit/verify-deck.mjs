@@ -1,5 +1,5 @@
 // Checks actual exported deck bytes and recorded execution joins. No package install.
-// node demo/circuit/verify-deck.mjs <deck-directory-id> <capture.sse> [observer-url]
+// node live-circuit/circuit/verify-deck.mjs <deck-directory-id> <capture.sse> [observer-url]
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';

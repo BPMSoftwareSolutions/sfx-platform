@@ -1,0 +1,52 @@
+{
+  "contractId": "live-circuit-move-acceptance.v1",
+  "recordedAt": "2026-10-05",
+  "scope": "Phase P1 of docs/live-circuit-platform-revamp.md: the Live Circuit viewer and observer moved from sfx-embody demo/ to sfx-platform live-circuit/. Local verification only; no image was built, no slot was bound, no database row was written.",
+  "move": {
+    "source": { "repository": "BPMSoftwareSolutions/sfx-embody", "revision": "dcfac0f5d34387f1fb0abf7c62df98ed2f75e190", "path": "demo/" },
+    "verbatimCommit": "ce8b402",
+    "manifest": "live-circuit/MOVED-FROM-ESTATE.json",
+    "manifestSha256": "5a0496ed01eaf447cd3773b77d3f990bd67a607021f3becbae9e42ca47e9bed4",
+    "files": 32,
+    "committedBlobMismatches": 0,
+    "bytePolicy": "live-circuit/.gitattributes sets -text; one retained capture (dispatch-pair/observation-capture.v1.txt) carries CRLF"
+  },
+  "changesAfterMove": [
+    "circuit/live-store.mjs and circuit/deck-store.mjs resolve the estate directory from SDA_ESTATE_DIR, defaulting to two levels up (the image layout /opt/sfx/estate is unchanged)",
+    "live-circuit/package.json declares type module only, so Node loads the ES module .js files without re-parsing under the repository's Next.js package.json; it is not packaged",
+    "README and usage comments name live-circuit/ paths and link estate documents by repository",
+    "deploy/sda-kernel/live-circuit.mjs is the single placement of live-circuit/ into runtime/estate/demo/; prepare.mjs, prepare-identity.mjs and prepare-retrieval.mjs use it and refuse the retired estate-directory argument"
+  ],
+  "packaging": {
+    "method": "Each packager run in a scratch directory with stand-in published hosts, a stand-in kernel manifest and stand-in SDA API files; packaged circuit files compared by SHA-256 with live-circuit/",
+    "prepare": { "estateFiles": 25, "equal": true, "deliveryConfiguration": "runtime/estate/sfx.config.json written" },
+    "prepareIdentity": { "estateFiles": 25, "equal": true, "retiredArgumentRefused": true },
+    "prepareRetrieval": { "withCircuitFiles": ["app.js", "live-store.mjs", "circuit-host.json"], "equal": true, "retiredArgumentRefused": true },
+    "note": "prepare.mjs archives the kernel with tar; on Windows the run used bsdtar (System32). The runbook still directs complete releases to Linux."
+  },
+  "observerParity": {
+    "method": "The estate-hosted observer on 8787 and the moved copy on 8788 (SDA_ESTATE_DIR=sfx-embody) read the live database through the same installed kernel delivery; responses compared",
+    "byteIdentical": ["/health", "/", "/circuit/", "/circuit/app.js", "/circuit/traversal.js", "/circuit/circuit-viewer.js", "/circuit/decks", "/circuit/index.html (404 on both)"],
+    "fieldIdenticalExceptReadAt": [
+      { "path": "/api/circuit/v1/capabilities", "capabilities": 350 },
+      { "path": "/api/circuit/v1/scenario resolve-equity-market-price-evidence", "snapshotDigest": "ac428e3e43a9c9f465f4c8ce9f4d325cf0cc46ef1beb3f620931db07ebc9d345", "presentationDigest": "c8a900ffc86d8e72aedd3f278d105c017db5cb667a586e7fe1f12cfb8ace82c1" },
+      { "path": "/api/circuit/v1/scenario evaluate-sidefx-proof-binding", "snapshotDigest": "6c402328f8ddd5d648fee6d1c08275d2ac1798612ed24590238a5822a1a93a1a", "presentationDigest": "2eb9dbbd692dff3f41dda65c235f652fd6f0aa4d59a28fe178df81563d5395c9" }
+    ]
+  },
+  "acceptanceScriptParity": {
+    "method": "Each script run from sfx-embody demo/ and from live-circuit/ with the same retained estate inputs; exit status and output compared after normalizing the viewer path and timestamps",
+    "cases": 11,
+    "identical": 11,
+    "passingAtBothLocations": [
+      "verify-provider-child authenticate-ide-user/live-scene.json + host-final/observations.ndjson",
+      "verify-traversal replay-review-20261005/scene.json + its capture",
+      "verify-boundaries live-outcome-acceptance-20260929 + live-circuit-deck/boundary-live.sse"
+    ],
+    "failingIdenticallyAtBothLocations": "8 cases whose retained inputs no longer fit the scripts (design-review-scene.json: Unexpected end of JSON input; a capture without a complete matching run; run start/end process identities). These are pre-existing input mismatches, not move effects.",
+    "runScopedSse": { "script": "dispatch-pair/verify-run-scoped-sse.mjs", "estate": "RUN_SCOPED_SSE_OK runs=2 admitted=6", "platform": "RUN_SCOPED_SSE_OK runs=2 admitted=6" }
+  },
+  "notEstablished": [
+    "Browser Observe, external CLI follow and replay in a browser were not exercised in this local check",
+    "No image built from the new packagers; the first release from live-circuit/ must pass the runbook section 7 gates"
+  ]
+}

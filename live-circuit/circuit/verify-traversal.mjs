@@ -2,7 +2,7 @@
 // Positive execution claims use a retained real capture. Altered copies are
 // labelled: they test refusal/defect behaviour and routing logic only, and are
 // never uploaded to the observer or shown as demo testimony.
-//   node demo/circuit/verify-traversal.mjs <scene.json> <capture.sse> [<child-scene.json>]
+//   node live-circuit/circuit/verify-traversal.mjs <scene.json> <capture.sse> [<child-scene.json>]
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { newRun, applyRecord, replayTimeline, capturedTimestamp } from './deck-trace.js';

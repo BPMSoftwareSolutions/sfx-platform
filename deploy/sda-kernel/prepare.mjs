@@ -4,8 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { copyLiveCircuit } from './live-circuit.mjs';
 
-const [installed, estate, apiSource, destination] = process.argv.slice(2).map(value => path.resolve(value));
+// node prepare.mjs <installed-root> <sda-api-source> <fresh-context>
+// The viewer and observer come from this repository's live-circuit/.
+if (process.argv.length !== 5) throw new Error('Expected installed-root sda-api-source fresh-context');
+const [installed, apiSource, destination] = process.argv.slice(2).map(value => path.resolve(value));
 if (!destination || fs.existsSync(destination)) throw new Error('FRESH_RELEASE_DIRECTORY_REQUIRED');
 const manifest = JSON.parse(fs.readFileSync(path.join(installed, 'kernel-install-manifest.json'), 'utf8'));
 const digest = manifest.artifactDigest.replace(/^sha256:/, '');
@@ -14,9 +18,7 @@ const installedTarget = '/opt/sfx/kernel/' + digest;
 fs.mkdirSync(path.join(runtime, 'kernel'), { recursive: true });
 const archived = spawnSync('tar', ['-czf', path.join(runtime, 'kernel.tar.gz'), '-C', path.dirname(installed), path.basename(installed)]);
 if (archived.status !== 0) throw new Error('KERNEL_ARCHIVE_FAILED');
-for (const relative of ['demo/circuit', 'demo/dispatch-pair/observe-server.mjs']) {
-  fs.cpSync(path.join(estate, relative), path.join(runtime, 'estate', relative), { recursive: true });
-}
+copyLiveCircuit(runtime);
 const args = manifest.entryArgs.map(value => value.replaceAll('{installRoot}', installedTarget));
 fs.writeFileSync(path.join(runtime, 'estate/sfx.config.json'), JSON.stringify({
   configurationType: 'sfx-project.v1', deliveries: { 'database-memory': {

@@ -1,6 +1,6 @@
 // Check presentation against every prefix of a real capture, including calls
 // shorter than the decorative transition. No events are generated or posted.
-// node demo/circuit/verify-live-locations.mjs <scene.json> <capture.sse>
+// node live-circuit/circuit/verify-live-locations.mjs <scene.json> <capture.sse>
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { newRun, applyRecord } from './deck-trace.js';

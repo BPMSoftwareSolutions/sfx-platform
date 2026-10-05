@@ -1,6 +1,6 @@
 // Positive assertions consume real installed-kernel records. Mutated copies
 // below exercise refusal only; no generated testimony is sent to the observer.
-// node demo/circuit/verify-provider-child.mjs <scene.json> <observations.ndjson>
+// node live-circuit/circuit/verify-provider-child.mjs <scene.json> <observations.ndjson>
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {newRun,applyRecord,replayTimeline,capturedTimestamp} from './deck-trace.js';

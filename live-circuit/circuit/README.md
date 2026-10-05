@@ -1,6 +1,6 @@
 # Live scenario circuit
 
-The [scenario playback contract](../../docs/scenario-playback-contract.md) defines
+The [scenario playback contract](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/scenario-playback-contract.md) defines
 the replay window, excluded host phases, clock scaling, evidence retention, and
 acceptance checks. **Startup, database connection, session setup, authority reads,
 and graph preparation are excluded from scenario playback.**
@@ -9,7 +9,7 @@ The default source is **Live database**. Search the installed kernel catalog,
 select any capability and namespace, and open its declared scenarios without
 creating an export. The reader supplies the circuit SVG, deck palette and Arial
 typography, complete event pages, component navigation and observation bindings.
-See [live circuit data and navigation](../../docs/live-circuit-data-contract.md)
+See [live circuit data and navigation](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/live-circuit-data-contract.md)
 for the portable contract, caching, selection validation and evidence limits.
 
 Click circuit labels to drill into complete event circuits and component
@@ -25,9 +25,12 @@ For the hosted demo, start with the [sidefx/staging deployment guide](../../docs
 It identifies the canonical platform runbook, deployed services, vault and API
 boundaries, database versus image releases, live/replay acceptance and rollback.
 
-Start locally with `node demo/dispatch-pair/observe-server.mjs`; the observer listens on
+Start locally from the sfx-platform checkout with `SDA_ESTATE_DIR` naming the estate
+(the directory whose `sfx.config.json` selects the installed kernel and whose
+`evidence/` holds retained decks), then `node live-circuit/dispatch-pair/observe-server.mjs`. In the
+image the estate directory is `/opt/sfx/estate`, two levels above this file. The observer listens on
 8787 by default. The installed kernel delivery comes from `sfx.config.json` and
-reader/transport limits from `demo/circuit/circuit-host.json`. No package install,
+reader/transport limits from `live-circuit/circuit/circuit-host.json`. No package install,
 build, source checkout or generator import participates.
 
 ## Provider database inspection
@@ -61,7 +64,7 @@ Azure acceptance on 2026-10-02 verified Gemini Select and Gemini Summary with
 eight returned result sets each, exact definition digests, stale-selection 409
 and non-provider-selection 422. The hosted browser expanded the canonical row
 without JavaScript errors. Evidence is retained at
-`evidence/retrieval-api-deployment-20261002/azure-acceptance.json` and in the
+the estate's `evidence/retrieval-api-deployment-20261002/azure-acceptance.json` and in the
 deployment repository's `deploy/sda-kernel/retrieval-acceptance-2026-10-02.json`.
 
 ## Observe from the page
@@ -103,7 +106,7 @@ This public staging action intentionally lets visitors invoke capabilities under
 the host's configured SDA admission policy, like the existing website actions.
 It accepts same-origin JSON POSTs; external `/v1/` clients still need Bearer
 authentication. The browser proxy is a transport, not a capability implementation.
-`node demo/circuit/verify-run-api.mjs` checks its request boundaries, credential
+`node live-circuit/circuit/verify-run-api.mjs` checks its request boundaries, credential
 custody, cursor forwarding and capture-envelope compatibility.
 Optional scene/capture arguments check every real receipt prefix for the omitted
 variant-list regression. A capability without declared variants still returns its
@@ -133,7 +136,7 @@ the mechanical admissions needed to show each operation and provider call.
 Missing mechanical testimony cannot be reconstructed as live work.
 
 Historical exported decks remain optional. Put complete deck directories under
-`evidence/circuit-decks/`, or set `CIRCUIT_DECK_ROOT`. Each directory retains
+`evidence/circuit-decks/` under `SDA_ESTATE_DIR`, or set `CIRCUIT_DECK_ROOT`. Each directory retains
 `receipt.json`, `snapshot.json`, `storyboard.json`, `circuit-blueprint.json`
 and `volume-*/slide-*.svg`. Select an **Export** source to inspect its original
 slides, links and review readings. Missing exports do not hide live capabilities.
@@ -303,7 +306,7 @@ traversal states and evidence states.
 
 ## Checks
 
-`node demo/circuit/verify-live-flow.mjs <scene.json> <capture.sse> [<browser-samples.json>]`
+`node live-circuit/circuit/verify-live-flow.mjs <scene.json> <capture.sse> [<browser-samples.json>]`
 checks every actual receipt prefix without a replay timeline: both provider
 admissions before completion, persistent calls across unrelated nested receipts,
 own returns, exact outcome, and no motion after return. Optional browser samples
@@ -312,27 +315,27 @@ return receipt. Adversarial copies check wrong authorities/addresses, refused
 edges, mismatched graphs, ambiguous or parallel calls, late descendants, exact
 child identity and parallel-return motion isolation. No test testimony is posted.
 
-`node demo/circuit/verify-deck.mjs <deck-directory-id> <capture.sse>` compares
+`node live-circuit/circuit/verify-deck.mjs <deck-directory-id> <capture.sse>` compares
 served SVG bytes to the exported slide and checks real testimony joins plus
 wrong-address, wrong-capability, wrong-generation, missing-map and overlapping
-run refusals. `node demo/dispatch-pair/verify-run-scoped-sse.mjs` verifies the
+run refusals. `node live-circuit/dispatch-pair/verify-run-scoped-sse.mjs` verifies the
 observer's existing stream/replay contract on an isolated port.
-`node demo/circuit/verify-flow.mjs <deck-directory-id> <capture.sse>` additionally
+`node live-circuit/circuit/verify-flow.mjs <deck-directory-id> <capture.sse>` additionally
 checks admission before completion, failure, containment, refused/mismatched
 edges, no traversal inferred from completed endpoints, original wire geometry,
 and complete receipt preservation through replay.
-`node demo/circuit/verify-boundaries.mjs <deck-directory-id> <capture.sse>` checks
+`node live-circuit/circuit/verify-boundaries.mjs <deck-directory-id> <capture.sse>` checks
 real input participation and exact or unknown outcomes, plus synthetic exact success and
 failure variants, absent/falsey/ref-only payload fields, wrong contracts, child
 variant isolation, original shape geometry and replay parity.
-`node demo/circuit/verify-timing.mjs <deck-directory-id-or-saved-deck.json> <capture.sse>`
+`node live-circuit/circuit/verify-timing.mjs <deck-directory-id-or-saved-deck.json> <capture.sse>`
 checks every cell/edge timestamp, retained record order, recorded operation
 intervals and declared sequential edges; exact outcome timing; Normal/Slow/Fast
 clock scaling; pause/resume, stepping, rate changes and stalled-clock catchup;
 and refusal of incomplete, ambiguous, mismatched or invalid timestamp captures.
 The deterministic scheduler consumes the actual capture. Negative tests damage
 copies only; nothing generated is posted to the live observer.
-`node demo/circuit/verify-traversal.mjs <scene.json> <capture.sse> [<child-scene.json>]`
+`node live-circuit/circuit/verify-traversal.mjs <scene.json> <capture.sse> [<child-scene.json>]`
 is the acceptance for the traversal model: start-point containment and payload
 at entry; current exactly under the dot and busy as the call stack at every
 sample; no endpoint before the own return; captured intervals with no added
@@ -348,12 +351,12 @@ terminal return its own admission result (`ADMITTED`, `REFUSED`,
 `PROVIDER_UNAVAILABLE`). The real invoke binding activated since returns the
 child's `terminated` again (fresh capture, 2026-09-30), so the circuit now shows
 that run at the defect endpoint. That is an estate declaration defect, not a
-viewer rule; see [docs/research/circuit-traversal/](../../docs/research/circuit-traversal/README.md).
+viewer rule; see [docs/research/circuit-traversal/](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/research/circuit-traversal/README.md).
 
 ## Integrated execution flow
 
 The database scenario scene now embeds every execution operation and returns
-continuous path geometry. See [the product and evidence contract](../../docs/integrated-scenario-flow.md)
+continuous path geometry. See [the product and evidence contract](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/integrated-scenario-flow.md)
 for ownership, provider identity, timing, navigation, outcomes and live telemetry
 limits. Normal and 0.1× replay use captured operation intervals; route position
 within an interval is explicitly schematic, not measured packet transit.

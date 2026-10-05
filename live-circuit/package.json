@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Live Circuit viewer and observer: dependency-free ES modules, no install or build. Declares the module type only."
+}

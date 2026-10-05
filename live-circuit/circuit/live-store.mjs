@@ -6,7 +6,11 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL('../../', import.meta.url));
+// The estate directory holds the delivery configuration (sfx.config.json) that
+// selects the installed kernel. The image places it two levels up; development
+// names it explicitly with SDA_ESTATE_DIR, the variable the host already gives
+// the SDA API and identity host.
+const root = process.env.SDA_ESTATE_DIR ? path.resolve(process.env.SDA_ESTATE_DIR) : fileURLToPath(new URL('../../', import.meta.url));
 const policy = JSON.parse(await readFile(new URL('./circuit-host.json', import.meta.url), 'utf8'));
 const cache = new Map(), pending = new Map(), queue = [];
 let active = 0, cacheBytes = 0;

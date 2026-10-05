@@ -8,7 +8,10 @@ import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
 
 const execute = promisify(execFile);
-const root = path.resolve(process.env.CIRCUIT_DECK_ROOT ?? fileURLToPath(new URL('../../evidence/circuit-decks/', import.meta.url)));
+// Retained decks are estate evidence: SDA_ESTATE_DIR names the estate (default:
+// two levels up, the image layout); CIRCUIT_DECK_ROOT overrides the deck folder.
+const estate = process.env.SDA_ESTATE_DIR ? path.resolve(process.env.SDA_ESTATE_DIR) : fileURLToPath(new URL('../../', import.meta.url));
+const root = path.resolve(process.env.CIRCUIT_DECK_ROOT ?? path.join(estate, 'evidence', 'circuit-decks'));
 const cache = new Map();
 const json = async (file) => JSON.parse(await readFile(file, 'utf8'));
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -41,7 +44,7 @@ async function readMap(snapshot, blueprint) {
     // Fixed command and generated input path; no URL value is interpolated into a shell.
     const command = `sfx capability invoke read-deck-observation-map --input "@${input}" --json`;
     const { stdout } = await execute(process.env.ComSpec ?? 'cmd.exe', ['/d', '/s', '/c', command], {
-      cwd: fileURLToPath(new URL('../../', import.meta.url)), windowsHide: true, windowsVerbatimArguments: true,
+      cwd: estate, windowsHide: true, windowsVerbatimArguments: true,
       timeout: 30000, maxBuffer: 8 * 1024 * 1024,
     });
     const result = JSON.parse(stdout);

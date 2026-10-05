@@ -1,7 +1,7 @@
 // Live-prefix acceptance. Positive cases consume only an actual observer capture
 // up to the record under test. Nothing is posted to the observer; no replay
 // timeline or completed-operation interval supplies a live location.
-// node demo/circuit/verify-live-flow.mjs <scene.json> <capture.sse>
+// node live-circuit/circuit/verify-live-flow.mjs <scene.json> <capture.sse>
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { newRun, applyRecord } from './deck-trace.js';
