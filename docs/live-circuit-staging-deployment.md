@@ -300,14 +300,14 @@ There are two different paths today:
 | Root Dockerfile and `.github/workflows/container.yml` | Website-only image | A base-image build; **not** a replacement for the complete live slot |
 | `deploy/sda-kernel/` packagers plus ACR build | Composite image or overlay on an exact composite digest | Current Live Circuit release method |
 
-**The website workflow remains enabled.** The repository variable
-`AZURE_STAGING_ENABLED` was `true` on audit, and that workflow patches this same
-slot after a successful non-PR build on its admitted branches. Its last four
-observed runs failed; that does not make it a safe deployment interlock. A future
-successful run can replace the complete host with a website-only image. Coordinate
-or disable that deployment job before a composite release/main push until both
-paths are unified. Changing this flag/workflow is separate release work; this
-documentation audit did not do it.
+**The website-only deployment is disarmed (2026-10-05).** On audit, the
+repository variable `AZURE_STAGING_ENABLED` was `true`, and `container.yml`
+patched this same slot after a successful non-PR build on its admitted branches.
+A successful run could have replaced the complete host with a website-only image.
+The variable was set to `false` at 21:11Z, and the `staging` job was removed from
+the workflow, which now only builds and tests the website image. Neither the
+website image nor that workflow is a Live Circuit release path. Both retire with
+Next.js under the [platform revamp](live-circuit-platform-revamp.md).
 
 ### Packaging choices
 
@@ -509,7 +509,9 @@ joins. Preserve failing captures before retrying or restarting.
 This is a working **single-instance staging composition**, not a claim of
 production or high-availability readiness. Remaining work visible in this audit:
 
-- Unify/coordinate the enabled website-only workflow with complete-image delivery.
+- Replace the overlay packagers with one complete-image build from this repository
+  (the website-only deploy job is removed; see the
+  [platform revamp](live-circuit-platform-revamp.md), phase P2).
 - Preserve an automated complete-image assembly/release manifest; current overlays
   and receipts are versioned, but some release-specific assembly is manual.
 - Make API token and identity connection custody/slot behavior intentional before

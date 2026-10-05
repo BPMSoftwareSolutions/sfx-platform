@@ -1,4 +1,4 @@
-name: Container and Azure staging
+name: Website container (build and test only)
 
 on:
   push:
@@ -71,79 +71,10 @@ jobs:
         if: failure()
         run: docker logs sidefx-smoke || true
 
-  staging:
-    needs: container
-    if: github.event_name != 'pull_request' && vars.AZURE_STAGING_ENABLED == 'true'
-    environment: staging
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    concurrency: azure-sidefx-staging
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '24.20.0'
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: tested-container
-          path: artifacts/
-      - uses: azure/login@8216e11d8cd9b42fe925c852af8e76311ff067ac # v2
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - name: Publish the tested image and deploy staging by digest
-        shell: bash
-        run: |
-          set -euo pipefail
-          registry=$(jq -r .registryName infra/azure.json)
-          server=$(jq -r .registryServer infra/azure.json)
-          repository=$(jq -r .imageRepository infra/azure.json)
-          group=$(jq -r .resourceGroup infra/azure.json)
-          app=$(jq -r .appName infra/azure.json)
-          slot=$(jq -r .stagingSlot infra/azure.json)
-          subscription=$(jq -r .subscriptionId infra/azure.json)
-          api=$(jq -r .appServiceApiVersion infra/azure.json)
-          slot_url="https://management.azure.com/subscriptions/$subscription/resourceGroups/$group/providers/Microsoft.Web/sites/$app/slots/$slot"
-          config_url="$slot_url/config/web?api-version=$api"
-          tag="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          gzip -dc artifacts/image.tar.gz | docker load
-          test "$(docker image inspect sidefx-tested:ci --format '{{.Id}}')" = "$(cat artifacts/image-id.txt)"
-          az acr login --name "$registry"
-          docker tag sidefx-tested:ci "$server/$repository:$tag"
-          docker push "$server/$repository:$tag"
-          digest=$(az acr repository show -n "$registry" --image "$repository:$tag" --query digest -o tsv)
-          [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
-          docker pull "$server/$repository@$digest"
-          test "$(docker image inspect "$server/$repository@$digest" --format '{{.Id}}')" = "$(cat artifacts/image-id.txt)"
-          az acr repository update -n "$registry" --image "$repository:$tag" --write-enabled false --delete-enabled false -o none
-          az acr repository update -n "$registry" --image "$repository@$digest" --write-enabled false --delete-enabled false -o none
-          previous=$(az rest --method get --url "$config_url" --query properties.linuxFxVersion -o tsv)
-          [[ "$previous" == DOCKER\|* ]]
-          image="$server/$repository@$digest"
-          host=$(az rest --method get --url "$slot_url?api-version=$api" --query properties.defaultHostName -o tsv)
-          jq -n --arg source "$GITHUB_SHA" --arg image "$image" --arg previous "$previous" --arg url "https://$host" --slurpfile publication generated/publication-manifest.json \
-            '{sourceCommit:$source,image:$image,previousImage:$previous,url:$url,publication:$publication[0],status:"pending",scope:"staging; P1 incomplete"}' > artifacts/deployment.json
-          jq -n --arg image "DOCKER|$image" '{properties:{linuxFxVersion:$image}}' > artifacts/container-binding.json
-          az rest --method patch --url "$config_url" --body @artifacts/container-binding.json -o none
-          az rest --method post --url "$slot_url/restart?api-version=$api" -o none
-          node scripts/smoke-container.mjs "https://$host" --noindex --revision "$GITHUB_SHA" | tee artifacts/azure-smoke.txt
-          test "$(az rest --method get --url "$config_url" --query properties.linuxFxVersion -o tsv)" = "DOCKER|$image"
-          jq '.status="verified"' artifacts/deployment.json > artifacts/deployment.tmp.json
-          mv artifacts/deployment.tmp.json artifacts/deployment.json
-          echo "Staging: https://$host" >> "$GITHUB_STEP_SUMMARY"
-          echo "Image: $image" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: always()
-        with:
-          name: staging-receipt
-          path: |
-            artifacts/deployment.json
-            artifacts/azure-smoke.txt
-            artifacts/publication-manifest.json
-            artifacts/source-commit.txt
-            artifacts/dependency-lock.sha256
-          retention-days: 90
+  # The website-only `staging` deployment job was removed on 2026-10-05. It bound a
+  # website-only image to sidefx/staging, which hosts the composite Live Circuit
+  # (gateway, circuit/observer, SDA Run API, retrieval, identity and installed
+  # kernel); a successful run would have replaced that host. Staging releases follow
+  # docs/live-circuit-staging-deployment.md. The repository variable
+  # AZURE_STAGING_ENABLED was also set to false. This build-and-test job retires
+  # with the Next.js website: see docs/live-circuit-platform-revamp.md.
