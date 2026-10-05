@@ -33,7 +33,10 @@ async function oldVault() {
   // publishing credentials and ciphertext stay in memory and are never artifacts.
   const credentials = await rest('post', '/config/publishingcredentials/list');
   const c = credentials.properties;
-  const scm = config.origin.replace('.azurewebsites.net', '.scm.azurewebsites.net');
+  const resource = await rest('get', '');
+  const scmHost = resource.properties.enabledHostNames.find(host => host.includes('.scm.'));
+  assert(scmHost?.endsWith('.azurewebsites.net'), 'Declared SCM hostname required');
+  const scm = 'https://' + scmHost;
   const response = await fetch(scm + config.vaultVfs, { redirect: 'error', signal: AbortSignal.timeout(90000), headers: {
     authorization: 'Basic ' + Buffer.from(c.publishingUserName + ':' + c.publishingPassword).toString('base64') } });
   assert.equal(response.status, 200, 'Existing encrypted vault must be readable for fingerprinting');
@@ -55,6 +58,7 @@ async function deploy() {
   const commit = (await run('git', ['rev-parse', 'HEAD'])).trim();
   assert.equal(commit, process.env.GITHUB_SHA);
   const previousImage = validate(await binding());
+  console.log('Reading installed composite manifest from its exact image.');
   await az(['acr', 'login', '-n', azure.registryName]);
   await run('docker', ['pull', previousImage]);
   const container = (await run('docker', ['create', previousImage])).trim();
@@ -62,11 +66,13 @@ async function deploy() {
   try { await run('docker', ['cp', container + ':/opt/sfx/release.json', path.join(evidence, 'previous-release.json')]); }
   finally { await run('docker', ['rm', container]); }
   const previous = read('previous-release.json'); composite(previous);
+  console.log('Checking current readiness and overlay scope.');
   const baseline = await json(config.origin + '/healthz');
   assert.equal(baseline.release, previous.id); assert.equal(baseline.kernelDigest, previous.kernelDigest);
   const changed = (await run('git', ['diff', '--name-only', previous.circuit.sourceCommit, commit])).trim().split(/\r?\n/).filter(Boolean);
   overlayChanges(changed);
   const bearer = await token();
+  console.log('Fingerprinting existing encrypted vault.');
   const vault = baseline.bootId ? (await privateRead(bearer)).vault : await oldVault();
   const state = { sourceCommit: commit, previousImage, previousRelease: previous, vaultBefore: vault, bindAttempted: false, startedAt: new Date().toISOString() };
   write('state.json', state);
@@ -112,5 +118,5 @@ try {
   else if (mode === 'restart-check') await verifyRestart();
   else throw new Error('Expected deploy, restart-check or rollback');
 } catch (error) {
-  console.error(error.message); process.exitCode = 1;
+  console.error(error.message + (error.cause?.code ? ` (${error.cause.code})` : '')); process.exitCode = 1;
 }
