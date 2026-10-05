@@ -1,7 +1,11 @@
 ARG STAGING_IMAGE
 FROM ${STAGING_IMAGE}
 USER root
+# This owned directory is replaced as a unit so deletions in main also deploy.
+# All installed services, estate configuration and vault data remain inherited.
+RUN rm -rf /opt/sfx/estate/demo/circuit
 COPY runtime/ /opt/sfx/
+RUN node -e "const fs=require('node:fs'),crypto=require('node:crypto'); const r=JSON.parse(fs.readFileSync('/opt/sfx/release.json')); for(const [p,want] of Object.entries(r.circuit.files)){const got='sha256:'+crypto.createHash('sha256').update(fs.readFileSync('/opt/sfx/'+p)).digest('hex'); if(got!==want)throw Error('RELEASE_FILE_MISMATCH: '+p)}"
 RUN chown -R node:node /opt/sfx/host /opt/sfx/estate
 WORKDIR /opt/sfx
 CMD ["sh", "/opt/sfx/host/initialize.sh"]

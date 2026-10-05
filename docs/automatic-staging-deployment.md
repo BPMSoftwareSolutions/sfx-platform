@@ -23,6 +23,10 @@ identity/DAL, installed configuration and encrypted vault bootstrap remain
 inherited. The result is a complete runnable image; no operator's local binaries
 are required.
 
+The owned circuit directory is replaced as a unit, so source deletions also
+deploy. The Docker build verifies every overlaid file against the release
+manifest before the image can be bound.
+
 Installed-service/config edits this overlay cannot ship cause failure before
 binding; they are never silently presented as deployed. P2 remains the separate
 effort to assemble pinned runtime inputs in one build and retire Next.js. It must
