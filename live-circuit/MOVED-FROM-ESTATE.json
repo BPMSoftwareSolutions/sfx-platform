@@ -1,0 +1,208 @@
+{
+  "contractId": "live-circuit-move-manifest.v1",
+  "movedAt": "2026-10-05",
+  "source": {
+    "repository": "BPMSoftwareSolutions/sfx-embody",
+    "revision": "dcfac0f5d34387f1fb0abf7c62df98ed2f75e190",
+    "path": "demo/"
+  },
+  "destination": {
+    "repository": "BPMSoftwareSolutions/sfx-platform",
+    "path": "live-circuit/"
+  },
+  "note": "Byte-identical copies of the committed blobs at the source revision. Later changes in this repository are ordinary commits; this manifest records the moved generation only.",
+  "files": [
+    {
+      "source": "demo/circuit/README.md",
+      "destination": "live-circuit/circuit/README.md",
+      "bytes": 23427,
+      "sha256": "5fa13c4ab444db9e2a2830c183541ed23df69cd128468d267adb7622f59d84cc"
+    },
+    {
+      "source": "demo/circuit/app.js",
+      "destination": "live-circuit/circuit/app.js",
+      "bytes": 31330,
+      "sha256": "64b8c71e2e3138094d272ddfe5ab5f47930c55f6f0d26673e5e948db499fc102"
+    },
+    {
+      "source": "demo/circuit/circuit-host.json",
+      "destination": "live-circuit/circuit/circuit-host.json",
+      "bytes": 904,
+      "sha256": "2b56a4d6f8fbae56af7bf430780da5d7c450ae1a17124eca63235010c93d787a"
+    },
+    {
+      "source": "demo/circuit/circuit-viewer.js",
+      "destination": "live-circuit/circuit/circuit-viewer.js",
+      "bytes": 15786,
+      "sha256": "a4f46feff06b447d78aec4b92a3060b3415e08393152e4a9fcdd65e984aeb939"
+    },
+    {
+      "source": "demo/circuit/deck-store.mjs",
+      "destination": "live-circuit/circuit/deck-store.mjs",
+      "bytes": 5596,
+      "sha256": "43e199e44db2390b48c35191ba01abe69f4cf1e7934b2c55f8cc82a8013dbbb2"
+    },
+    {
+      "source": "demo/circuit/deck-trace.js",
+      "destination": "live-circuit/circuit/deck-trace.js",
+      "bytes": 19846,
+      "sha256": "46e2c4da760ef5a6d553761005ec9ffdee07c8abdf80ede00eda8b90558b96d1"
+    },
+    {
+      "source": "demo/circuit/execution-cursor.js",
+      "destination": "live-circuit/circuit/execution-cursor.js",
+      "bytes": 4466,
+      "sha256": "f006b94528af32b3acef3b3a4ae8a6fca0671c7a327903835990ad091872560e"
+    },
+    {
+      "source": "demo/circuit/index.html",
+      "destination": "live-circuit/circuit/index.html",
+      "bytes": 11237,
+      "sha256": "d155ac8429a0100337a7fece5c3b192b220f74d34ae13a88e0f2a0bea64e4d52"
+    },
+    {
+      "source": "demo/circuit/live-store.mjs",
+      "destination": "live-circuit/circuit/live-store.mjs",
+      "bytes": 11049,
+      "sha256": "e6cde5b16fb0991f23f22a3b7a08ca5926245ca2c80c05d832fa72bd25450fe2"
+    },
+    {
+      "source": "demo/circuit/navigation.js",
+      "destination": "live-circuit/circuit/navigation.js",
+      "bytes": 3300,
+      "sha256": "6b351959ec18b979270a73d44da90e3014da5005945e609b3d9c7f595ff72deb"
+    },
+    {
+      "source": "demo/circuit/observe-panel.js",
+      "destination": "live-circuit/circuit/observe-panel.js",
+      "bytes": 10734,
+      "sha256": "6be0b4f862fc0bb67774bbe21e5ee471a00b6ab1dc64474aad88015c11812af4"
+    },
+    {
+      "source": "demo/circuit/playback-clock.js",
+      "destination": "live-circuit/circuit/playback-clock.js",
+      "bytes": 2399,
+      "sha256": "7f99c5a228581a4c15c46c3326c58c681ebfa27d690157c6392e9500782af819"
+    },
+    {
+      "source": "demo/circuit/run-api.mjs",
+      "destination": "live-circuit/circuit/run-api.mjs",
+      "bytes": 4157,
+      "sha256": "df37d5da2321420e617ec74c7f4b258b4d16d9fef0c6843130ca4b138d5cbf43"
+    },
+    {
+      "source": "demo/circuit/traversal.js",
+      "destination": "live-circuit/circuit/traversal.js",
+      "bytes": 32975,
+      "sha256": "507db3e43b222f922d3068059a184ad01e6afde2da457c2b04e500e4bf62cd5e"
+    },
+    {
+      "source": "demo/circuit/verify-boundaries.mjs",
+      "destination": "live-circuit/circuit/verify-boundaries.mjs",
+      "bytes": 5743,
+      "sha256": "3e6b902bee59683df56c2ed63bb21404393eb15caea84378a844ef150c3b7441"
+    },
+    {
+      "source": "demo/circuit/verify-deck.mjs",
+      "destination": "live-circuit/circuit/verify-deck.mjs",
+      "bytes": 2953,
+      "sha256": "3856be9c4e8b542513b63fea8b63cddc611d1ed9f664cb9639101c25fc65766e"
+    },
+    {
+      "source": "demo/circuit/verify-flow.mjs",
+      "destination": "live-circuit/circuit/verify-flow.mjs",
+      "bytes": 6509,
+      "sha256": "996b75ea33af644d78e415f8904917523379168299cfc1c5242775be8c2a1f05"
+    },
+    {
+      "source": "demo/circuit/verify-live-flow.mjs",
+      "destination": "live-circuit/circuit/verify-live-flow.mjs",
+      "bytes": 13141,
+      "sha256": "163e54765630c37636509962c6e68917a0613c2d7f2c8613d997023ad14ffd73"
+    },
+    {
+      "source": "demo/circuit/verify-live-locations.mjs",
+      "destination": "live-circuit/circuit/verify-live-locations.mjs",
+      "bytes": 3054,
+      "sha256": "9e12f28127a19189804b38210409c596f615228ddaad4664637a76017e4fe470"
+    },
+    {
+      "source": "demo/circuit/verify-live.mjs",
+      "destination": "live-circuit/circuit/verify-live.mjs",
+      "bytes": 6227,
+      "sha256": "a4a226b1da094d3cdd99a4fa648776685bfbbe721707bc6f6af1614f61022294"
+    },
+    {
+      "source": "demo/circuit/verify-provider-child.mjs",
+      "destination": "live-circuit/circuit/verify-provider-child.mjs",
+      "bytes": 5027,
+      "sha256": "b9e49975a98109414dc3d4eb2384a68aaf8c83b82e8572baba11e38ad4514a1c"
+    },
+    {
+      "source": "demo/circuit/verify-run-api.mjs",
+      "destination": "live-circuit/circuit/verify-run-api.mjs",
+      "bytes": 5673,
+      "sha256": "02a1735248b4e45b5f1b6fe11ca70ea70215ffdd15f7a77fb3772ceb8946902a"
+    },
+    {
+      "source": "demo/circuit/verify-timing.mjs",
+      "destination": "live-circuit/circuit/verify-timing.mjs",
+      "bytes": 8804,
+      "sha256": "a930b9f216db9daec8e25c34f7bb77012b9f6f5c6d3256b615412d39ea4216d2"
+    },
+    {
+      "source": "demo/circuit/verify-traversal.mjs",
+      "destination": "live-circuit/circuit/verify-traversal.mjs",
+      "bytes": 16475,
+      "sha256": "7a915ecbfddccd731c0801c1fc6f1d4f9f8209050c1d37f4e96067df45df2685"
+    },
+    {
+      "source": "demo/dispatch-pair/certs/.gitignore",
+      "destination": "live-circuit/dispatch-pair/certs/.gitignore",
+      "bytes": 13,
+      "sha256": "5c89a8a9c5af258d02d0bfd3582c75963bea53baa1f5f5132662b80020a63452"
+    },
+    {
+      "source": "demo/dispatch-pair/check-fixture.mjs",
+      "destination": "live-circuit/dispatch-pair/check-fixture.mjs",
+      "bytes": 2026,
+      "sha256": "8193763e93390526845ac80d4c25be774bfbddd2d0a6b4fe7a57255d4b5997d4"
+    },
+    {
+      "source": "demo/dispatch-pair/fixture-server.mjs",
+      "destination": "live-circuit/dispatch-pair/fixture-server.mjs",
+      "bytes": 2237,
+      "sha256": "2c0187d82dfb6051dbd54f25a33faebb46e9b59ba8365b3c1cc2eedb305bc73d"
+    },
+    {
+      "source": "demo/dispatch-pair/observation-capture.v1.txt",
+      "destination": "live-circuit/dispatch-pair/observation-capture.v1.txt",
+      "bytes": 11884,
+      "sha256": "08024dcd7748cb1f5f59c6296ccf9386579914d1164d763a627d63c6257ad6cf"
+    },
+    {
+      "source": "demo/dispatch-pair/observe-server.mjs",
+      "destination": "live-circuit/dispatch-pair/observe-server.mjs",
+      "bytes": 19154,
+      "sha256": "028a9ccd3160960f8c9493cd127543dd337a87c23389136a2a8ea418d2151106"
+    },
+    {
+      "source": "demo/dispatch-pair/setup-cert.ps1",
+      "destination": "live-circuit/dispatch-pair/setup-cert.ps1",
+      "bytes": 3489,
+      "sha256": "8d59c2da46b8ebe518289e088c987e85186a4f5e573c6c835b1fb361870cbcf2"
+    },
+    {
+      "source": "demo/dispatch-pair/subscriber.mjs",
+      "destination": "live-circuit/dispatch-pair/subscriber.mjs",
+      "bytes": 11604,
+      "sha256": "570d2b5a2cdb1d5b5749e8b9127be90bc4153a5cbbc3d231690732907e5bb750"
+    },
+    {
+      "source": "demo/dispatch-pair/verify-run-scoped-sse.mjs",
+      "destination": "live-circuit/dispatch-pair/verify-run-scoped-sse.mjs",
+      "bytes": 11511,
+      "sha256": "114ba2825c4e256751a0b6110eb22ad69275965c70cc1eca8de773622e4d45ab"
+    }
+  ]
+}

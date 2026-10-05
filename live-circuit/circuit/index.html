@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SFX live circuit</title>
+<style>
+  /* Chrome uses the deck's Arial typography and exact design palette.
+     The slide is an original SVG image, unaffected by page CSS. */
+  :root { color-scheme:dark; --bg:#06111F; --panel:#102238; --white:#F4F7FB; --muted:#A8B8CA; --blue:#45A7FF; --amber:#F6B94D; --violet:#A98AF2; --green:#4DE0B0; --red:#FF5F70; --grid:#263A51; --observation:#72D7EE; font-family:Arial,sans-serif; }
+  * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--white); }
+  main { max-width:1600px; margin:auto; padding:20px 24px 40px; }
+  header { display:flex; justify-content:space-between; align-items:baseline; gap:16px; border-bottom:1px solid var(--grid); padding-bottom:12px; }
+  h1 { font-size:24px; margin:0; } h2 { font-size:16px; margin:0 0 12px; color:var(--blue); }
+  p { line-height:1.45; } small,.muted { color:var(--muted); }
+  .controls { display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin:16px 0 10px; }
+  label { display:grid; gap:6px; color:var(--muted); font-size:12px; }
+  select,input,button { font:14px Arial,sans-serif; padding:8px 10px; border:1px solid var(--grid); border-radius:3px; color:var(--white); background:var(--panel); }
+  input { width:min(410px,80vw); } select { max-width:440px; } button { cursor:pointer; } button:hover { border-color:var(--blue); }
+  :focus-visible { outline:2px solid var(--amber); outline-offset:3px; }
+  .check { display:flex; align-items:center; gap:6px; padding:8px 0; } .check input { width:auto; }
+  #status,#run,#cursor { font-size:12px; color:var(--muted); margin:7px 0; overflow-wrap:anywhere; }
+  #viewer { position:relative; width:100%; aspect-ratio:16/9; background:var(--bg); margin:10px 0; }
+  .deck-image,.deck-overlay,.flow-wires { position:absolute; inset:0; width:100%; height:100%; }
+  .flow-wires { pointer-events:none; overflow:visible; }
+  .deck-overlay { pointer-events:none; }
+  .component-hit,.slide-link { position:absolute; pointer-events:auto; cursor:pointer; background:transparent; border:1px solid transparent; padding:0; border-radius:0; }
+  .component-hit:hover,.component-hit:focus { border-color:var(--observation); }
+  .component-hit.selection { border:1px dashed var(--observation); }
+  .observed-marker { display:none; position:absolute; right:1px; top:1px; width:7px; height:7px; border-radius:50%; background:var(--signal,var(--observation)); border:1px solid var(--bg); }
+  .component-hit[data-phase]:not([data-phase="unobserved"]) { --signal:var(--observation); border:1px solid color-mix(in srgb,var(--signal) 40%,transparent); }
+  /* Traversal state: current = under the dot; busy = owns outstanding work; visited = passed through. */
+  .component-hit[data-busy="true"] { border:1.5px dashed #45A7FF !important; background:#45A7FF14; }
+  .component-hit[data-visited="true"]:not([data-current="true"]) { box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--observation) 45%,transparent); }
+  .component-hit[data-current="true"] { border:2px solid var(--signal) !important; outline:2px solid var(--white); outline-offset:1px; box-shadow:0 0 16px var(--observation); }
+  .component-hit:not([data-phase="unobserved"]) .observed-marker { display:block; }
+  .component-hit[data-phase="completed"] { --signal:var(--green) !important; background:#4DE0B012; }
+  .component-hit[data-phase="failed"] { --signal:var(--red) !important; background:#FF5F7025; }
+  .component-hit[data-phase="traversed"] { --signal:var(--violet) !important; }
+  .component-hit[data-phase="input-observed"],.component-hit[data-phase="input-context"],.component-hit[data-phase="variant-unmapped"] { --signal:var(--amber) !important; background:#F6B94D12; }
+  .component-hit[data-phase="input-context"] { border-style:dashed !important; }
+  .component-hit[data-phase="outcome-failure"] { --signal:var(--red) !important; background:#FF5F7025; }
+  .boundary-hit { pointer-events:none; }
+  .component-hit[data-kind="reported-variant"],.component-hit[data-kind="outcome-defect"] { font-size:clamp(6px, .95vw, 14px); line-height:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:var(--bg); z-index:1; }
+  .component-hit[data-phase="active"],.component-hit[data-phase="admitted"] { background:#72D7EE1C; }
+  .component-hit[data-kind="outcome-defect"] { background:transparent; color:var(--amber); }
+  .component-hit[data-phase="outcome-defect"] { --signal:var(--amber) !important; background:var(--bg); }
+  .wire-observed { fill:none; stroke:var(--observation); stroke-width:1.2; opacity:.25; }
+  .wire-terminal { fill:none; stroke:var(--green); stroke-width:2; }
+  [data-terminal="defect"] .wire-terminal { stroke:var(--amber); stroke-dasharray:3 2; }
+  .flow-signal { fill:var(--white); stroke:var(--observation); stroke-width:2; filter:drop-shadow(0 0 4px #72D7EE); }
+  .flow-signal[data-direction="return"] { fill:var(--green); stroke:var(--green); }
+  #flow-basis { color:var(--muted); font-size:12px; }
+  .is-paused * { animation-play-state:paused !important; }
+  @media(prefers-reduced-motion:reduce) { .flow-signal { filter:none; } .component-hit[data-current="true"] { box-shadow:none; } }
+  button:disabled { opacity:.45; cursor:default; }
+  .flow-bar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:12px 0; font-size:12px; }
+  .flow-bar strong { margin-right:auto; }
+  .legend { font-size:12px; color:var(--muted); line-height:1.6; }
+  .slide-link:hover,.slide-link:focus { border-color:var(--blue); }
+  #empty { border:1px solid var(--grid); padding:28px; margin:20px 0; }
+  .evidence-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .panel { border:1px solid var(--grid); padding:16px; background:var(--panel); min-width:0; }
+  .warning { color:var(--amber); } .error { color:var(--red); } .observation { color:var(--observation); }
+  pre { white-space:pre-wrap; overflow-wrap:anywhere; font:12px/1.5 Consolas,monospace; max-height:420px; overflow:auto; }
+  #verification p,#inspector p { font-size:13px; margin:8px 0; }
+  summary { cursor:pointer; color:var(--blue); padding:8px 0; } a { color:var(--blue); }
+  #inventory { margin-top:16px; }
+  .observe-panel { border:1px solid var(--grid); padding:12px; margin:12px 0; }
+  .observe-editor { display:flex; flex-wrap:wrap; gap:12px; align-items:end; }
+  .observe-editor label { flex:1 1 420px; min-width:0; }
+  #payload { width:100%; min-height:96px; resize:vertical; background:var(--panel); color:var(--white); border:1px solid var(--grid); border-radius:3px; padding:10px; font:13px/1.4 Consolas,monospace; }
+  #observe { border-color:var(--observation); color:var(--observation); }
+  #observe-status,#payload-contract { font-size:12px; overflow-wrap:anywhere; margin:8px 0; }
+  .observe-panel details { font-size:12px; }
+  .related-links { display:flex; gap:10px 20px; flex-wrap:wrap; margin:16px 0; }
+  .authority-children { margin-left:16px; border-left:1px solid var(--grid); padding-left:12px; }
+  .authority-value { font:13px/1.65 Consolas,monospace; overflow-wrap:anywhere; padding:3px 0; }
+  #declaration-detail { margin-top:12px; background:var(--bg); border-color:var(--violet); }
+  #declaration-detail p { overflow-wrap:anywhere; }
+  [hidden] { display:none !important; }
+  @media(max-width:800px) { main { padding:12px; } header { display:block; } .evidence-grid { grid-template-columns:1fr; } select { max-width:90vw; } h1 { font-size:20px; } }
+</style>
+</head>
+<body><main>
+<header><h1>SFX live circuit</h1><small>Database authority · scenario circuits · live testimony</small></header>
+<div class="controls">
+  <label>Capability<input id="capability" list="capabilities" autocomplete="off" placeholder="Select a declared capability"></label><datalist id="capabilities"></datalist><button id="open-capability" type="button">Open capability</button>
+  <label>Namespace<select id="namespace"></select></label>
+  <label>Source<select id="deck"><option value="live">Live database</option></select></label><button id="refresh" type="button">Refresh from database</button>
+</div>
+<div class="controls">
+  <label>Declared scenario<select id="scenario-selection"></select></label>
+  <label>Circuit page<select id="slide"></select></label><button id="back" type="button">Back</button><button id="scenario" type="button">Scenario circuit</button>
+  <label>Explore component<select id="component"><option value="">Select component…</option></select></label>
+  <label class="check"><input id="overlay" type="checkbox" checked>Animate execution evidence</label>
+  <button id="replay" type="button">Replay latest run</button>
+</div>
+<section class="observe-panel" aria-label="Invoke through the SDA API">
+  <div class="observe-editor"><label>Capability input · JSON<textarea id="payload" spellcheck="false" aria-describedby="payload-contract" placeholder="Enter the capability’s JSON input"></textarea></label>
+    <button id="payload-template" type="button" disabled>Use contract template</button><button id="observe" type="button" disabled>Observe</button></div>
+  <p id="payload-contract">Select a capability to load its input contract.</p>
+  <div id="observe-status" role="status" aria-live="polite"></div>
+  <button id="observe-resume" type="button" hidden>Resume observation</button><button id="observe-external" type="button" hidden>Follow external runs</button>
+  <details><summary>Declared input schema</summary><pre id="payload-schema"></pre></details>
+  <details id="observe-result" hidden><summary>API result</summary><pre id="observe-output"></pre></details>
+</section>
+<div id="status" role="status">Connecting…</div><div id="run"></div>
+<div class="flow-bar"><strong id="mode">LIVE · follows incoming testimony</strong>
+  <button id="pause" type="button" disabled>Pause replay</button><button id="step" type="button" disabled>Step</button>
+  <label>Captured replay speed<select id="speed"></select></label>
+  <label class="check"><input id="follow" type="checkbox" checked>Follow execution page</label>
+  <button id="live" type="button" disabled>Return to live</button></div>
+<div id="cursor" role="status">Waiting for execution evidence</div>
+<div id="flow-basis"></div>
+<div class="legend">Bright: latest receipt / recorded interval · Dim: observed history · <span style="color:var(--amber)">Input</span> · <span style="color:var(--green)">Completed</span> · <span style="color:var(--red)">Failure</span> · Dashed input: field presence unavailable · Unlit: no matching evidence</div>
+<div id="empty" hidden></div><div id="viewer"></div>
+<div id="detail-pages" class="controls" hidden><label>Drill-down page<select id="detail-page"></select></label></div>
+<section id="declaration-detail" class="panel" aria-label="Component authority" hidden></section>
+<div class="evidence-grid">
+  <section class="panel" id="verification"><h2>Verification evidence</h2></section>
+  <section class="panel" id="inspector"><h2>Component inspection</h2></section>
+</div>
+<section id="inventory" class="panel"><h2>Execution testimony</h2></section>
+</main><script type="module" src="/circuit/app.js"></script></body></html>
