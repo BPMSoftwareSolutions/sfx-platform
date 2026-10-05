@@ -12,6 +12,86 @@ The current deployment is documented in
 [live-circuit-staging-deployment.md](live-circuit-staging-deployment.md), which
 stays authoritative for releases until phase P2 replaces its release path.
 
+## Status at 2026-10-05, 22:30 EDT
+
+Staging still runs **r14** (`sda-f50865d3feb4-r14`, image `273fe391…`, kernel
+`f50865d3…`). It is unchanged by everything below; `/healthz` was re-read at the
+time of writing.
+
+| Item | State | Evidence |
+| --- | --- | --- |
+| D3 Deploy guard | **Done.** The push-triggered run had only the build-and-test job | `AZURE_STAGING_ENABLED=false` (21:11Z); `973b8f0` |
+| P0 Credential custody | **Not started; needs a go.** `SDA_API_TOKEN` and `SFX_IDENTITY_CONNECTION_STRING` should move to slot-sticky Key Vault references. Changing them restarts staging | Runbook §4 |
+| P0 Registry locking | **Not started; needs a go.** Lock the r14 tag and manifest, the rollback target for the next release | Runbook §7 |
+| P1 Move the Live Circuit | **Steps 1 and 2 done; step 3 held** | §4 P1 status; move acceptance receipt |
+| Browser sign-in | **Built, not released.** `/circuit/login` runs `authenticate-ide-user`; the session is an HttpOnly cookie; Observe requires it, and runs are attributed. 13 of 13 conformance checks pass. A real sign-in against staging's identity host **worked from a local observer** (user-confirmed, 2026-10-05) | `46098e1`; [browser session contract](live-circuit-browser-session.md) |
+| Local Observe | **Available, not yet accepted.** A local SDA Run API (127.0.0.1:8799, the built API from the SDA checkout, the installed C# kernel `d0fe2b83…`) feeds the local observer (8788). The kernel command it launches returned `say-hello-world` correctly. The launcher is a scratch script, not yet committed | "Next" step 0 |
+| P2–P5 | Not started. P3 waits on estate DC-05a and on the routing-law regression | §4, §6 |
+
+## Next: release r15 to staging (sign-in and the moved circuit)
+
+**Scope.** r15 is an overlay on the exact r14 digest. It carries only:
+
+- `deploy/sda-kernel/gateway.mjs`: the two session POST routes and
+  `SFX_IDENTITY_ENDPOINT` for the observer;
+- `live-circuit/`: the moved viewer and observer, sign-in, and the Observe gate.
+
+r14's `app.js` and `traversal.js` hashes equal the moved files, so the only
+circuit difference is the sign-in work. The kernel, identity host, retrieval
+service, database, vault and credentials are unchanged. The Next.js website
+stays in this overlay; P2 removes it.
+
+**Behavior change to accept first.** Observe on staging becomes sign-in only.
+Anyone testing Observe needs an enrolled `sfx-ide-local` account. Scene and run
+reads stay public.
+
+Steps:
+
+0. **Commit the local stack launcher** as a development tool. It starts a local
+   Run API on the installed kernel and the observer, with a per-launch token. It
+   takes the built SDA API path as an argument rather than embedding a checkout
+   path.
+1. **Overlay packager.** Add `deploy/sda-kernel/prepare-circuit.mjs` and
+   `Dockerfile.circuit`. The packager writes `host/gateway.mjs` and the
+   `live-circuit/` placement over `STAGING_IMAGE`, refuses a non-fresh directory,
+   and writes `release.json` with the hashes of every placed circuit file and of
+   the gateway. Verify it with stand-in inputs, as the move acceptance did. The
+   existing identity and retrieval overlays need published binaries that r15 does
+   not change.
+2. **Optional P0 first.** Apply the Key Vault and stickiness change and the r14
+   lock in their own window. r15's restart acceptance then also covers them.
+   Otherwise, lock r14 before binding r15.
+3. **Record the binding** (runbook §7): previous image
+   `DOCKER|…@sha256:273fe391…`, nonsecret settings, release receipt and the
+   selected database generations, all in a private release record.
+4. **Build and lock.** `az acr build` with `STAGING_IMAGE=<r14 digest>` and
+   release ID `sda-f50865d3feb4-r15`. Record the ACR run and digest, then set the
+   tag and manifest `--write-enabled false --delete-enabled false`.
+5. **Bind and restart** the staging slot only, by digest. Confirm the ARM binding
+   afterwards.
+6. **Acceptance.** Write the receipt as
+   `deploy/sda-kernel/browser-session-acceptance-<date>.json`.
+
+   | Gate | Required evidence |
+   | --- | --- |
+   | Startup | `/healthz` shows r15 and the unchanged kernel; all children start; no restart loop |
+   | Public boundary | Catalog and scenes load without sign-in; anonymous `/v1/*` is 401; external `POST /events` is 405; other circuit POSTs are 405 |
+   | Sign-in | A real enrolled account. The cookie has `HttpOnly`, `Secure`, `SameSite=Strict` and the `__Host-` prefix. The header shows the identifier. The `authenticate-ide-user` run is visible on its circuit. A wrong password gives `AUTHENTICATION_REJECTED` and no cookie |
+   | Observe gate | Anonymous Observe is 401 `SIGN_IN_REQUIRED`, with no run admitted. Signed-in Observe passes the runbook's live-flow gate (payload, operations, ports and providers, exact outcome). `/api/circuit/v1/session/runs` lists the run |
+   | Sign-out | `REVOKED`; the next Observe is 401; a revoked cookie is refused |
+   | Unchanged paths | CLI `sfx login`/`whoami`/`logout`; external CLI follow; provider inspection; replay at 1x and 0.1x |
+   | Secrets | No password or bearer in `az webapp log tail` output during sign-in and Observe |
+   | Restart | The vault is preserved; a fresh sign-in and Observe succeed afterwards |
+
+7. **Rollback.** Rebind the recorded r14 digest and restart. Sessions live in the
+   identity database and are unaffected. r14 ignores the cookie, so Observe reverts
+   to public.
+8. **Close out.** Update the runbook (the route table's "Not in r14" becomes r15,
+   and the release record) and this status table.
+
+After r15: P2 (one composite image without Next.js) replaces the overlay path.
+P3 and P4 follow once DC-05a installs in the estate.
+
 ## 1. Decisions
 
 | # | Decision | Consequence |
@@ -86,7 +166,7 @@ local estate and kernel is an explicit setting, not a sibling path.
 Each phase ends with evidence, and nothing is released without the runbook's
 acceptance gates.
 
-### P0. Release safety (in progress)
+### P0. Release safety (deploy guard done; credential custody and registry lock await a go)
 
 Done: D3. Remaining Azure operator work, not done by this plan:
 
@@ -220,8 +300,9 @@ Explorer has a declared equivalent.
 
 ## 5. Sequence
 
-P0 → P1 → P2 → P3 → P4 → P5, with P6 alongside. P2 already removes Next.js from
-the image, so P5 is only repository cleanup. P3 and P4 depend on the estate:
+P0 → P1 → r15 (overlay release of P1 and browser sign-in) → P2 → P3 → P4 → P5,
+with P6 alongside. P2 already removes Next.js from the image, so P5 is only
+repository cleanup. P3 and P4 depend on the estate:
 DC-05a must be installed before the Explorer can read navigation.
 
 ## 6. Known blockers and risks
