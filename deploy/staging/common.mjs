@@ -47,7 +47,11 @@ export async function privateFixture() {
 }
 export async function json(url, init = {}) {
   const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(90000), ...init });
-  if (!response.ok) throw new Error(`HTTP_${response.status}: ${new URL(url).pathname}`);
+  if (!response.ok) {
+    let code;
+    try { const body = await response.json(); code = typeof body.error === 'string' ? body.error : body.error?.code; } catch {}
+    throw new Error(`HTTP_${response.status}: ${new URL(url).pathname}${/^[A-Z0-9_]+$/.test(code || '') ? ' (' + code + ')' : ''}`);
+  }
   return response.json();
 }
 export async function sleep(ms) { await new Promise(resolve => setTimeout(resolve, ms)); }

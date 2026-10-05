@@ -71,6 +71,13 @@ The selected capability/input are release fixture data in
 selected end-to-end path and transport regressions, not every estate capability
 or complete formal observability.
 
+Provider inspection follows each definition's shape. Provider entities must
+return matching database digests; catalog/executor authorities without a
+`providerId` must preserve the explicit `DECLARED_PROVIDER_REQUIRED` refusal.
+On the r15 baseline this applies to the Node Platform catalog, while both Gemini
+provider entities retrieve successfully. Receipts record that held inspection;
+they do not call it successful provider retrieval.
+
 ## Credentials and one-time setup
 
 The managed identity `sfx-platform-github-staging` uses the environment's

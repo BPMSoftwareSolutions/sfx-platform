@@ -46,14 +46,27 @@ try {
     const catalog = await json(config.origin + '/api/circuit/v1/capabilities'); assert(catalog.capabilities?.length > 0);
     const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
     const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);
+    const inspections = [];
     for (const provider of providers) {
       const query = new URLSearchParams({capabilityId:scene.capabilityId,namespaceId:scene.namespaceId,scenarioId:scene.scenarioId,detailId:provider.id,expectedSnapshotDigest:scene.snapshotDigest});
-      const inspected = await json(config.origin+'/api/circuit/v1/provider-inspection?'+query);
-      assert.equal(inspected.definitionDigest,provider.definitionDigest); assert.equal(inspected.snapshotDigest,scene.snapshotDigest);
+      const detail = await json(config.origin+'/api/circuit/v1/scenario?'+query);
+      assert.equal(detail.detail.id,provider.id); assert.equal(detail.snapshotDigest,scene.snapshotDigest);
+      if (detail.detail.status === 'DECLARED' && detail.detail.body?.providerId) {
+        const inspected = await json(config.origin+'/api/circuit/v1/provider-inspection?'+query);
+        assert.equal(inspected.definitionDigest,provider.definitionDigest); assert.equal(inspected.snapshotDigest,scene.snapshotDigest);
+        inspections.push({id:provider.id,status:'retrieved',resultSets:inspected.resultSets.length});
+      } else {
+        // Catalog/executor authority can be a circuit provider without a provider
+        // entity. Preserve the explicit refusal; never pretend it was retrieved.
+        const refused = await fetch(config.origin+'/api/circuit/v1/provider-inspection?'+query);
+        assert.equal(refused.status,422); assert.equal((await refused.json()).error,'DECLARED_PROVIDER_REQUIRED');
+        inspections.push({id:provider.id,status:'held',reason:'DECLARED_PROVIDER_REQUIRED'});
+      }
       query.set('expectedSnapshotDigest','0'.repeat(64));
       const stale = await fetch(config.origin+'/api/circuit/v1/provider-inspection?'+query); assert.equal(stale.status,409); await stale.body.cancel();
     }
-    write('public.json',{checkedAt:new Date().toISOString(),checks,catalogCount:catalog.capabilities.length,providers:providers.length});
+    assert(inspections.some(i=>i.status==='retrieved'), 'Acceptance requires a real retrieved provider entity');
+    write('public.json',{checkedAt:new Date().toISOString(),checks,catalogCount:catalog.capabilities.length,providers:providers.length,inspections});
     console.log('Public reads, provider drill-down and unauthenticated refusal passed.');
   } else throw new Error('Unknown acceptance mode');
 } catch (error) { console.error('ACCEPTANCE_FAILED: ' + error.message); process.exitCode = 1; }
