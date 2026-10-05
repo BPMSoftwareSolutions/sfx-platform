@@ -91,7 +91,8 @@ network protections exist.
 | --- | --- | --- |
 | `/`, website routes | 3001 | Public website |
 | `/circuit`, `/circuit/*`, circuit catalog/scenario/detail GETs | 8787 | Public database-backed viewer; no HTTP Basic prompt |
-| `POST /api/circuit/v1/runs` | 8787, then 8799 | Same-origin JSON Observe transport; server adds its machine bearer |
+| `POST /api/circuit/v1/runs` | 8787, then 8799 | Same-origin JSON Observe transport; server adds its machine bearer. From the release carrying the [browser session](live-circuit-browser-session.md), it also requires a signed-in session |
+| `/circuit/login`, `GET`/`POST /api/circuit/v1/session`, `POST /api/circuit/v1/session/logout` | 8787, then 8793 | Browser sign-in (`authenticate-ide-user`), status and sign-out. Same-origin JSON; HttpOnly `__Host-` cookie. Not in r14 |
 | Run GETs under `/api/circuit/v1/runs/{id}` | 8787, then 8799 | Public circuit proxy for run status, graph, output and events |
 | `/events` GET | 8787 | Public external-run SSE; gateway refuses public POST/event injection |
 | `/v1/*` | 8799 | Direct SDA API validates caller's Bearer token; gateway forwards it unchanged |

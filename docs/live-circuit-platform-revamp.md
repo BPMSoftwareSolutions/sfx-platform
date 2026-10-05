@@ -207,6 +207,12 @@ Explorer has a declared equivalent.
 - Durable run, output, event and idempotency storage, so evidence survives
   restarts and releases.
 - Per-user authorization before Observe stops being public staging behavior.
+  Started 2026-10-05, unreleased:
+  - browser sign-in at `/circuit/login` runs `authenticate-ide-user`;
+  - Observe requires the resulting HttpOnly session, and each run is attributed
+    to its principal ([browser session contract](live-circuit-browser-session.md)).
+
+  Per-user authority inside the SDA API remains open.
 - A production slot with swap-safe settings, and a promotion procedure.
 - Health beyond startup: a scheduled real reading and invocation, recorded with
   the selected database generation.

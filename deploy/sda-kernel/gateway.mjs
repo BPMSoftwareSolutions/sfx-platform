@@ -70,7 +70,9 @@ launch('/opt/sfx/procedure-extract/procedure-extract', ['--serve', '--url', 'htt
   PROCEDURE_EXTRACT_ALLOWED_PROCEDURES: retrievalPolicy.allowedProcedures.join(',')
 }, ['SDA_API_TOKEN', 'IDENTITY_HEADER', 'MSI_SECRET']);
 launch(process.execPath, ['demo/dispatch-pair/observe-server.mjs'], '/opt/sfx/estate',
-  { SDA_API_ENDPOINT: 'http://127.0.0.1:8799', PROCEDURE_EXTRACT_ENDPOINT: 'http://127.0.0.1:8791' }, ['IDENTITY_HEADER', 'MSI_SECRET']);
+  { SDA_API_ENDPOINT: 'http://127.0.0.1:8799', PROCEDURE_EXTRACT_ENDPOINT: 'http://127.0.0.1:8791',
+    // Browser sign-in and the Observe session gate call the identity host on loopback.
+    SFX_IDENTITY_ENDPOINT: 'http://127.0.0.1:8793' }, ['IDENTITY_HEADER', 'MSI_SECRET']);
 async function waitFor(url, headers = {}, expected = 200) {
   for (let i = 0; i < 60; i++) {
     try { const response = await fetch(url, { headers, signal: AbortSignal.timeout(1000) }); if (response.status === expected) return; } catch {}
@@ -134,8 +136,11 @@ http.createServer((request, response) => {
   const circuit = url.pathname === '/circuit' || url.pathname.startsWith('/circuit/') || url.pathname.startsWith('/api/circuit/') || url.pathname === '/events';
   // Website and circuit reads are public. The SDA API validates the caller's
   // own Bearer header; the gateway must never substitute its server credential.
-  const observe = url.pathname === '/api/circuit/v1/runs' && request.method === 'POST';
-  if (circuit && request.method !== 'GET' && !observe) { response.writeHead(405); response.end(); return; }
+  // Circuit POSTs are Observe and the browser session (sign-in, sign-out); the
+  // observer applies the same-origin JSON and session checks to each.
+  const circuitPost = request.method === 'POST' &&
+    ['/api/circuit/v1/runs', '/api/circuit/v1/session', '/api/circuit/v1/session/logout'].includes(url.pathname);
+  if (circuit && request.method !== 'GET' && !circuitPost) { response.writeHead(405); response.end(); return; }
   const upstream = http.request({ hostname: '127.0.0.1', port: identity ? 8793 : retrieval ? 8791 : api ? 8799 : circuit ? 8787 : 3001,
     path: retrieval ? url.pathname.slice('/procedure-extract'.length) : request.url, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
     response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(identity || api || circuit || retrieval ? { 'cache-control': 'no-store' } : {}) });

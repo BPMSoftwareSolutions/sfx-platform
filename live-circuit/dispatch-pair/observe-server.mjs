@@ -5,6 +5,7 @@ import { randomBytes } from 'node:crypto';
 import { listDecks, loadDeck, readSlide } from '../circuit/deck-store.mjs';
 import { serveCircuitApi } from '../circuit/live-store.mjs';
 import { serveRunApi } from '../circuit/run-api.mjs';
+import { serveSessionApi } from '../circuit/identity-session.mjs';
 
 const port = Number.parseInt(process.env.OBSERVER_PORT ?? '8787', 10);
 
@@ -21,6 +22,9 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/execution-cursor.js', ['execution-cursor.js', 'text/javascript; charset=utf-8']],
   ['/circuit/traversal.js', ['traversal.js', 'text/javascript; charset=utf-8']],
   ['/circuit/playback-clock.js', ['playback-clock.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/login', ['login.html', 'text/html; charset=utf-8']],
+  ['/circuit/login.js', ['login.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/session-status.js', ['session-status.js', 'text/javascript; charset=utf-8']],
 ]);
 const ringLimit = 2000;
 const maxBodyBytes = 16 * 1024 * 1024;
@@ -393,6 +397,7 @@ const page = `<!doctype html>
 const handleRequest = async (req, res) => {
   try {
     const url = new URL(req.url ?? '/', `http://localhost:${port}`);
+    if (await serveSessionApi(req, res, url)) return;
     if (await serveRunApi(req, res, url)) return;
     if (await serveCircuitApi(req, res, url)) return;
     if (req.method === 'GET' && url.pathname === '/circuit/decks') {

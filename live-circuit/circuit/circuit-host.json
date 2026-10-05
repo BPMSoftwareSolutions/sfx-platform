@@ -2,6 +2,7 @@
   "contractId": "circuit-host.v1",
   "delivery": "database-memory",
   "api": { "defaultNamespace": "sidefx:capabilities", "timeoutMilliseconds": 630000, "maximumBodyBytes": 1048576 },
+  "identity": { "observeRequiresSession": true, "cookie": "__Host-sfx-session", "timeoutMilliseconds": 130000, "maximumBodyBytes": 4096, "maximumSessionLabels": 1000, "maximumAttributedRuns": 2000 },
   "timeoutMilliseconds": 30000,
   "maximumResponseBytes": 16777216,
   "maximumConcurrentReads": 2,

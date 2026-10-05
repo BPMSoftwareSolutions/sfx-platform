@@ -2,6 +2,7 @@
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { readFile } from 'node:fs/promises';
+import { validateSession, observeRequiresSession, attributeRun } from './identity-session.mjs';
 
 const policy = JSON.parse(await readFile(new URL('./circuit-host.json', import.meta.url), 'utf8')).api;
 const prefix = '/api/circuit/v1/runs';
@@ -11,8 +12,9 @@ export async function serveRunApi(req, res, url, configuration = {}) {
   const endpoint = configuration.endpoint ?? process.env.SDA_API_ENDPOINT;
   const token = configuration.token ?? process.env.SDA_API_TOKEN;
   const defaultNamespace = configuration.defaultNamespace ?? policy.defaultNamespace;
+  const requireSession = configuration.observeRequiresSession ?? observeRequiresSession();
   if (url.pathname === '/api/circuit/v1/execution' && req.method === 'GET') {
-    send(res, 200, { configured: Boolean(endpoint && token), defaultNamespace }); return true;
+    send(res, 200, { configured: Boolean(endpoint && token), defaultNamespace, observeRequiresSession: requireSession }); return true;
   }
   if (url.pathname !== prefix && !url.pathname.startsWith(prefix + '/')) return false;
   const suffix = url.pathname.slice(prefix.length);
@@ -22,6 +24,7 @@ export async function serveRunApi(req, res, url, configuration = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), policy.timeoutMilliseconds);
   res.on('close', () => controller.abort());
+  let session = null;
   try {
     let body;
     if (req.method === 'POST') {
@@ -47,6 +50,20 @@ export async function serveRunApi(req, res, url, configuration = {}) {
       // The API's default namespace is host data. Other identities pass through
       // unchanged to API admission; no selected namespace is silently guessed.
       if (submission.namespace === defaultNamespace) delete submission.namespace;
+      // Observe is tied to a signed-in identity: the browser's session cookie is
+      // validated with the identity host before anything reaches the SDA API.
+      // The API still receives only the host's machine credential.
+      if (requireSession) {
+        const checked = await validateSession(req);
+        if (!checked.session) {
+          const { status, disposition, clear } = checked.refusal;
+          res.writeHead(status, { 'content-type': 'application/json', 'cache-control': 'no-store',
+            ...(clear ? { 'set-cookie': '__Host-sfx-session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } : {}) });
+          res.end(JSON.stringify({ disposition, error: status === 401 ? 'Sign in to observe: open /circuit/login.' : 'Sign-in is unavailable, so Observe is refused.' }));
+          return true;
+        }
+        session = checked.session;
+      }
       body = JSON.stringify(submission);
     }
     const upstream = await fetch(endpoint.replace(/\/+$/, '') + '/v1/runs' + suffix + url.search, {
@@ -54,6 +71,14 @@ export async function serveRunApi(req, res, url, configuration = {}) {
       headers: { authorization: `Bearer ${token}`, ...(body ? { 'content-type': 'application/json' } : {}),
         ...(req.headers['idempotency-key'] ? { 'idempotency-key': req.headers['idempotency-key'] } : {}) }
     });
+    if (session && req.method === 'POST') {
+      // Admission responses are small JSON; read it to attribute the run to the principal.
+      const text = await upstream.text();
+      if (upstream.ok) { try { attributeRun(JSON.parse(text)?.runId, session); } catch { /* Unattributable admission body. */ } }
+      res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/json', 'cache-control': 'no-store' });
+      res.end(text);
+      return true;
+    }
     res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/json',
       'cache-control': 'no-store', 'x-accel-buffering': 'no' });
     if (upstream.body) await pipeline(Readable.fromWeb(upstream.body), res); else res.end();

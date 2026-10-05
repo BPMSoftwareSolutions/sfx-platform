@@ -31,6 +31,11 @@ to the CLI helper. The scenario carries a correlation and provider origin, not
 credentials. `whoami` and `logout` call their dedicated session endpoints; they
 do not invent another authentication circuit execution.
 
+A browser can also sign in at `/circuit/login`. It runs the same
+`authenticate-ide-user` capability through `POST /auth/v1/login`. The observer keeps
+the session in an HttpOnly cookie, and Observe then requires it. See
+[the browser session contract](../../docs/live-circuit-browser-session.md).
+
 Do not put a password into the circuit's generic JSON Observe editor. That
 editor invokes capability input, and cannot create the private login context.
 The command above is the login ingress while this page is its live observer.
@@ -75,7 +80,7 @@ Publish `sfx-providers/providers/cli-login/host/LoginHost.csproj` for `linux-x64
 Release, self-contained. Its Linux dependency lock is checked in. Then:
 
 ```text
-node deploy/sda-kernel/prepare-identity.mjs <published-host> <previous-release.json> <fresh-context> <release-id> <estate-directory>
+node deploy/sda-kernel/prepare-identity.mjs <published-host> <previous-release.json> <fresh-context> <release-id>
 ```
 
 Build that fresh context in ACR, passing the exact previous image digest as

@@ -67,6 +67,17 @@ without JavaScript errors. Evidence is retained at
 the estate's `evidence/retrieval-api-deployment-20261002/azure-acceptance.json` and in the
 deployment repository's `deploy/sda-kernel/retrieval-acceptance-2026-10-02.json`.
 
+## Sign in
+
+`/circuit/login` signs a browser in by running the declared `authenticate-ide-user`
+capability through the identity host (`SFX_IDENTITY_ENDPOINT`). The session is an
+HttpOnly `__Host-sfx-session` cookie that page script cannot read. Observe requires
+a signed-in identity by default (`identity.observeRequiresSession` in
+`circuit-host.json`), and each admitted run is attributed to its principal. The
+header shows who is signed in. The cookie and CSRF contract, the routes and their
+limits are in sfx-platform `docs/live-circuit-browser-session.md`;
+`verify-identity-session.mjs` checks them.
+
 ## Observe from the page
 
 Select a capability, fill **Capability input · JSON**, and click **Observe**.
