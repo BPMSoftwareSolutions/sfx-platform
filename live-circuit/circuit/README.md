@@ -67,6 +67,33 @@ without JavaScript errors. Evidence is retained at
 the estate's `evidence/retrieval-api-deployment-20261002/azure-acceptance.json` and in the
 deployment repository's `deploy/sda-kernel/retrieval-acceptance-2026-10-02.json`.
 
+## Home and sign-in pages
+
+`/circuit/home` is the platform home page (design H2). `/circuit/login` uses the
+same visual language. Both share `site.css` and `site.js`. Until revamp phase P2
+removes Next.js, the gateway still sends `/` to the old website, so the home page
+is reached at `/circuit/home`.
+
+Every value on these pages is read when the page loads:
+
+- `GET /api/circuit/v1/home`: the hero circuit, featured capabilities and
+  sign-in circuit from `circuit-host.json` (`home`, `identity.circuit`), plus the
+  environment label (`SFX_ENVIRONMENT_LABEL`, or `STAGING` when
+  `SIDEFX_INDEXING=disabled`).
+- The capability catalog, for the counts and each card's scenario count. A
+  featured capability missing from the estate shows as such.
+- The gateway's `/healthz`, for release and kernel language. A host without it
+  reports nothing rather than a guess.
+- The database scene for the hero, shown unchanged after its `svgDigest` check.
+- The session and the observed runs of the signed-in identity. The greeting uses
+  the identifier entered at sign-in.
+
+Featured titles and summaries are editorial host data until the list is declared
+as database authority (revamp P3). The artwork in `assets/` is decorative and
+never execution evidence. `optical-architecture` and `optical-flow` are WebP
+encodings (1672 px and 900 px) of the generated H2 images, whose PNG sources
+hash `9acc7812…` and `ec27ecc8…` respectively.
+
 ## Sign in
 
 `/circuit/login` signs a browser in by running the declared `authenticate-ide-user`
