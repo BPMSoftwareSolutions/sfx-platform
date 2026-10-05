@@ -89,7 +89,7 @@ jobs:
       id-token: write
     env:
       SFX_LOGIN_TEST_PTY_MODULE: ${{ github.workspace }}/deploy/staging/test-tools/node_modules/node-pty
-      SFX_CI_CLIENT_BIN: ${{ runner.temp }}/sfx-cli/bin
+      SFX_CI_CLIENT_BIN: ${{ github.workspace }}/.acceptance-cli/bin
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       # Input provider test build only; no server/kernel rebuild or checkout in the release image.
