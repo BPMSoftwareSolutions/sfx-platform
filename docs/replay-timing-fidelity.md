@@ -12,6 +12,22 @@ run 37415691113 as `browser/capture.sse`, `browser/scene.json` and
 from the estate's rows: scenario `execute-projected-model-provider-attempt`,
 `model.execution_operation` ordinals 0–9.
 
+**The log reviewed** is retained in
+[`replay-timing-fidelity/`](replay-timing-fidelity/):
+
+- **[`timing-log.md`](replay-timing-fidelity/timing-log.md)** is the readable
+  digest. It covers:
+  - the invocation and delivery phases;
+  - every operation, with its replay position;
+  - each provider call's nested steps, including spans with no timed receipt;
+  - what the browser's dot showed at 1×.
+- `receipts.csv` has one row per record in the run.
+- `dot.csv` has the browser's replay samples.
+- `capture.sse` is the original capture. Its SHA-256,
+  `9d7b44b88d0b2e64a469cd3e70fb7dd77df40576c67a6262033bf7e681156e6c`, matches the staging artifact.
+
+`build-timing-log.mjs` regenerates the digest and the CSVs from the capture.
+
 ## What drives the dot
 
 **Replay.** The clock is honest; the shape inside an operation is not.
@@ -57,14 +73,16 @@ from the estate's rows: scenario `execute-projected-model-provider-attempt`,
   its lane in 32 ms; operation 4 crawls at about 120 px/s. Inside a call, though,
   where the dot is depends on wire length, not on evidence.
 - **Time outside the window.** Replay starts at the first operation. The 2,474 ms
-  before it and the 304 ms after the return are not played, even though the
-  capture times them as delivery phases (`readAuthority`, `executeDeclaredGraph`
-  and so on).
+  before it and the 304 ms after the return are not played.
+  - The capture times the last 852 ms before the window as delivery phases
+    (`readExecutionDelivery`, `readAuthority`, `executeDeclaredGraph`).
+  - The first 1,622 ms after `run-start` has no captured phase at all.
 
 ## Why the replay doesn't use the evidence today
 
-The capture already holds the truth: 318 timed receipts inside operation 4 and
-328 inside operation 10. Three gaps keep the client from using them:
+The capture already holds the truth. Operations 4 and 10 each contain 318 timed
+cell receipts (14 steps, 5 scenario returns and 299 expression cells) plus 315
+edges. Three gaps keep the client from using them:
 
 1. **Not in the graph.** The nested provider-attempt cells are absent from
    `execution-graph-captured.v1`, which has 327 cells, all from the root
@@ -107,6 +125,11 @@ unknown, not as motion.**
    - The captured graph should include the nested graph, or a reference to it.
    - Separately, trace where the 0.4–1.3 s live delivery lag comes from: kernel
      flush or observer relay.
+   - One hint: the untimed `projected-capability-invocation` observations reach
+     the browser within about 10 ms of the HTTP step they follow, while cell
+     receipts lag. That points at how testimony is emitted rather than at the
+     relay. The receive time and the execution times come from different
+     processes, so this is an indication, not a measurement.
 4. **Play the whole invocation (platform).**
    - Show the pre-window and post-window delivery phases as a hold at the
      capability boundary, labelled from the captured `delivery-phase`
