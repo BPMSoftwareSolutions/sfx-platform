@@ -127,6 +127,9 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $azurePython = Join-Path (Split-Path (Split-Path (Get-Command az).Source)) 'python.exe'
+          if (-not (Test-Path -LiteralPath $azurePython)) { throw 'Azure CLI Python runtime unavailable' }
+          "SFX_AZURE_CLI_PYTHON=$azurePython" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           npm ci --prefix deploy/staging/test-tools
           if ($LASTEXITCODE) { throw 'Acceptance tooling installation failed' }
           $providerProject = Join-Path $PWD '.acceptance-providers/providers/cli-login-input-provider/CliLoginInputProvider.csproj'

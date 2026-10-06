@@ -2,18 +2,19 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { config, root, evidence, run, write, token, privateFixture, json } from './common.mjs';
+import { config, root, evidence, run, write, token, privateFixture, logAccess, json } from './common.mjs';
 const mode = process.argv[2];
 try {
   if (mode === 'browser') {
     const fixture = await privateFixture();
+    if (process.env.SFX_VERIFY_LOGS === '1') fixture.logs = await logAccess();
     fs.mkdirSync(evidence, {recursive:true});
     const request = path.join(evidence, 'observe-request.json'); fs.writeFileSync(request, JSON.stringify(config.observe));
     await run(process.execPath, ['tools/live-circuit/verify-browser-session.mjs'], {
       input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'), SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome }, timeout: 900000 });
     console.log('Real browser sign-in, live Observe and sign-out passed.');
-    await run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')]);
-    await run(process.execPath, ['tools/sfx-api/verify-circuit-replay.mjs', config.origin, path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse'), path.join(evidence, 'replay')]);
+    await run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'prefix-process.json'});
+    await run(process.execPath, ['tools/sfx-api/verify-circuit-replay.mjs', config.origin, path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse'), path.join(evidence, 'replay')], {publicDiagnostic:'replay-process.json'});
     console.log('Captured receipt prefixes and replay at 1x / 0.1x passed.');
   } else if (mode === 'external') {
     await run(process.execPath, ['tools/live-circuit/verify-external-live.mjs', config.origin, config.observe.subject, config.expectedOutcome,

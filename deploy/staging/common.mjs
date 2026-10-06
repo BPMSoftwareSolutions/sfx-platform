@@ -9,7 +9,7 @@ export const slotUrl = `https://management.azure.com/subscriptions/${azure.subsc
 export const evidence = path.resolve(process.env.SFX_RELEASE_EVIDENCE || path.join(root, 'artifacts/staging'));
 export function write(name, data) { fs.mkdirSync(evidence, { recursive: true }); fs.writeFileSync(path.join(evidence, name), JSON.stringify(data, null, 2) + '\n'); }
 export function read(name) { return JSON.parse(fs.readFileSync(path.join(evidence, name))); }
-export async function run(command, args, { input, env = {}, timeout = 900000 } = {}) {
+export async function run(command, args, { input, env = {}, timeout = 900000, publicDiagnostic } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { cwd: root, windowsHide: true, env: { ...process.env, ...env }, stdio: ['pipe', 'pipe', 'pipe'] });
     let stdout = '', stderr = '', timedOut = false;
@@ -18,6 +18,8 @@ export async function run(command, args, { input, env = {}, timeout = 900000 } =
     child.on('error', () => { clearTimeout(timer); reject(new Error('COMMAND_START_FAILED: ' + path.basename(command))); });
     child.on('close', code => {
       clearTimeout(timer);
+      // Opt-in only for credential-free, retained-capture conformance tools.
+      if (publicDiagnostic) write(publicDiagnostic, { code, timedOut, stdout, stderr });
       // Captured output may contain tokens. Never attach it to thrown errors.
       if (code || timedOut) reject(new Error(`COMMAND_FAILED: ${path.basename(command)} (${timedOut ? 'timeout' : code})`));
       else resolve(stdout);
@@ -44,6 +46,13 @@ export async function privateFixture() {
   const fixture = JSON.parse(value.value);
   if (fixture.endpoint !== config.origin || !fixture.identifier?.startsWith('staging-release-') || !fixture.password) throw new Error('ACCEPTANCE_FIXTURE_INVALID');
   return fixture;
+}
+export async function logAccess() {
+  const resource = await rest('get', '');
+  const host = resource.properties.enabledHostNames.find(value => value.includes('.scm.'));
+  if (!host?.endsWith('.azurewebsites.net')) throw new Error('DECLARED_SCM_HOST_REQUIRED');
+  const credentials = (await rest('post', '/config/publishingcredentials/list')).properties;
+  return { url: 'https://' + host + '/api/logstream', authorization: 'Basic ' + Buffer.from(credentials.publishingUserName + ':' + credentials.publishingPassword).toString('base64') };
 }
 export async function json(url, init = {}) {
   const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(90000), ...init });

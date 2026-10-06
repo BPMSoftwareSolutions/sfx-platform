@@ -76,6 +76,19 @@ The selected capability/input are release fixture data in
 selected end-to-end path and transport regressions, not every estate capability
 or complete formal observability.
 
+Replay verification selects the completed capability run from the capture
+(which also contains real sign-in/sign-out runs), retaining its original receipt
+IDs, values and timestamps. Its browser consumes that retained run without new
+live events interrupting it. Separately timed provider receipts require a dwell
+throughout that recorded interval. When only the owning operation is timed,
+the test verifies provider visitation within that window and explicitly records
+schematic transport location; it never fabricates a provider duration.
+
+The log check streams actual container output through the slot's authenticated
+SCM endpoint. Publishing credentials travel over private stdin to the bounded
+log reader, never argv or artifacts. HTTP 200 and a real host startup marker are
+required, so an Azure CLI error message cannot masquerade as checked host logs.
+
 Provider inspection follows each definition's shape. Provider entities must
 return matching database digests; catalog/executor authorities without a
 `providerId` must preserve the explicit `DECLARED_PROVIDER_REQUIRED` refusal.

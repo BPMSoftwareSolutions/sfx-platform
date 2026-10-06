@@ -6,12 +6,26 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { newRun, applyRecord } from '../../live-circuit/circuit/deck-trace.js';
 
 const [endpoint, sceneFile, captureFile, output, candidate] = process.argv.slice(2);
 assert(endpoint && sceneFile && captureFile && output, 'Supply endpoint, real scene/capture, and output directory');
 const deck = JSON.parse(fs.readFileSync(sceneFile, 'utf8'));
 const capture = fs.readFileSync(captureFile, 'utf8');
-const records = capture.split(/\r?\n/).filter(line => line.startsWith('data: ')).map(line => JSON.parse(line.slice(6)));
+const allRecords = capture.split(/\r?\n/).filter(line => line.startsWith('data: ')).map(line => JSON.parse(line.slice(6)));
+// A browser sign-in/Observe/sign-out capture contains several executions. Feed
+// exactly the selected complete run to "replay latest"; preserve all its values,
+// receipt IDs and timestamps. Never let a login run-end select the wrong replay.
+const groups = []; let group;
+for (const record of allRecords) {
+  if (record.kind === 'run-start') { group = {run:newRun(record),records:[]}; groups.push(group); }
+  else if (group) applyRecord(group.run,record);
+  group?.records.push(record);
+}
+const selected = groups.findLast(g=>g.run.ended && g.run.graph?.graphId==='graph:'+deck.capabilityId);
+assert(selected, 'Capture must contain a completed execution of the selected capability');
+const records = selected.records;
+const selectedCapture = records.map(record=>'data: '+JSON.stringify(record)+'\n\n').join('');
 const { chromium } = await import(pathToFileURL(process.env.SFX_BROWSER_TEST_MODULE).href);
 const browser = await chromium.launch({ executablePath: process.env.SFX_BROWSER_EXECUTABLE, headless: true });
 fs.mkdirSync(output, { recursive: true });
@@ -19,7 +33,8 @@ try {
   const page = await browser.newPage({ viewport: { width: 1600, height: 1200 } });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.route('**/events*', route => new URL(route.request().url()).searchParams.get('run') === 'current'
-    ? route.fulfill({ status: 200, contentType: 'text/event-stream', body: capture }) : route.continue());
+    ? route.fulfill({ status: 200, contentType: 'text/event-stream', body: selectedCapture })
+    : route.fulfill({status:200,contentType:'text/event-stream',body:': retained replay acceptance; no new live records\n\n'}));
   if (candidate) await page.route('**/circuit/traversal.js', route => route.fulfill({
     contentType: 'text/javascript', body: fs.readFileSync(candidate, 'utf8') }));
   if (candidate) await page.route('**/circuit/app.js', route => route.fulfill({
@@ -39,9 +54,10 @@ try {
     run = runs.findLast(value => value.graph?.graphId === 'graph:' + deck.capabilityId);
     const timeline = replayTimeline(deck, run), model = buildTraversal(deck, run, timeline);
     return { runId: run.id, duration: timeline.duration, providers: model.segments.filter(segment => segment.call === 'provider').map(segment => ({
-      nodeId: segment.calleeNodeId, interval: segment.pieces.find(piece => piece.basis === 'captured provider execution') })) };
+      nodeId: segment.calleeNodeId, from: segment.from, to: segment.to,
+      interval: segment.pieces.find(piece => piece.basis === 'captured provider execution') })) };
   }, { deck, records });
-  assert(expected.providers.length && expected.providers.every(provider => provider.interval), 'Acceptance requires captured provider intervals');
+  assert(expected.providers.length, 'Acceptance requires provider calls matched to captured executor authority');
   const measurements = [];
   for (const rate of [1, 0.1]) {
     await page.locator('#speed').selectOption(String(rate));
@@ -69,10 +85,14 @@ try {
     fs.writeFileSync(path.join(output, `clock-${rate}.json`), JSON.stringify({ duration: result.duration, wall: result.wall, expected }, null, 2));
     assert.equal(result.duration, expected.duration);
     const providers = expected.providers.map(provider => {
-      const within = result.samples.filter(sample => sample.position >= provider.interval.t0 && sample.position < provider.interval.t1);
+      const from = provider.interval?.t0 ?? provider.from, to = provider.interval?.t1 ?? provider.to;
+      const within = result.samples.filter(sample => sample.position >= from && sample.position < to);
       assert(within.length, 'Browser must sample the recorded interval: ' + provider.nodeId);
-      assert(within.every(sample => sample.current.includes(provider.nodeId)), 'Provider is current throughout its sampled recorded interval');
-      return { provider: provider.nodeId, capturedMilliseconds: provider.interval.t1 - provider.interval.t0, frames: within.length };
+      if (provider.interval) assert(within.every(sample => sample.current.includes(provider.nodeId)), 'Provider is current throughout its separately captured provider interval');
+      else assert(within.some(sample => sample.current.includes(provider.nodeId)), 'Schematic path must visit the provider within the captured owning-operation window');
+      return { provider: provider.nodeId, capturedMilliseconds: to - from, frames: within.length,
+        providerFrames: within.filter(sample => sample.current.includes(provider.nodeId)).length,
+        timingBasis: provider.interval ? 'separately captured provider execution' : 'captured owning operation; transport location is schematic' };
     });
     const deviation = result.wall - expected.duration / rate;
     assert(Math.abs(deviation) < 50, 'Browser scheduling deviation must be under 50 ms in this uninterrupted acceptance run');

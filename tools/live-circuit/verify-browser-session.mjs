@@ -1,6 +1,6 @@
-// Real-host acceptance, invoked by the existing private identity fixture harness.
-// Credentials arrive over stdin and are never persisted or printed. The harness
-// owns disposable identity creation/cleanup; the browser runs normal product UI.
+// Real-host acceptance with a caller-owned identity fixture (disposable or CI).
+// Credentials arrive over stdin and are never persisted or printed. The browser
+// uses the normal product UI and revokes the session in cleanup.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,7 +23,19 @@ context.setDefaultNavigationTimeout(90000);
 const page = await context.newPage();
 const checks = [], errors = [], consoleMessages = [], secrets = [fixture.password];
 let logProcess, logText = '', logTruncated = false;
-if (process.env.SFX_VERIFY_LOGS === '1' || process.env.SFX_AZURE_CLI_PYTHON) {
+let logStatus, logExit;
+if (fixture.logs) {
+  secrets.push(fixture.logs.authorization);
+  // Private stdin keeps SCM credentials out of argv. A bounded streaming curl
+  // process can be stopped reliably even when the server leaves its body open.
+  assert(/^https:\/\/[a-z0-9.-]+\.azurewebsites\.net\/api\/logstream$/.test(fixture.logs.url));
+  assert(/^Basic [A-Za-z0-9+/=]+$/.test(fixture.logs.authorization));
+  logProcess = spawn('curl', ['--config','-'], {windowsHide:true,stdio:['pipe','pipe','pipe']});
+  logProcess.stdin.end(`url = "${fixture.logs.url}"\nheader = "Authorization: ${fixture.logs.authorization}"\nno-buffer\ninclude\nsilent\nshow-error\nfail\nconnect-timeout = 20\nmax-time = 300\n`);
+  const retain = bytes => {if(logText.length+bytes.length<=4*1024*1024)logText+=bytes;else logTruncated=true;};
+  logProcess.stdout.on('data',retain); logProcess.stderr.on('data',retain);
+  logProcess.on('error',()=>{logTruncated=true;}); logProcess.on('close',code=>{logExit=code;});
+} else if (process.env.SFX_AZURE_CLI_PYTHON) {
   for (const key of ['SFX_LOG_RESOURCE_GROUP', 'SFX_LOG_APP', 'SFX_LOG_SLOT']) assert(process.env[key], key);
   logProcess = spawn(process.env.SFX_AZURE_CLI_PYTHON || 'az', [...(process.env.SFX_AZURE_CLI_PYTHON ? ['-IBm', 'azure.cli'] : []), 'webapp', 'log', 'tail',
     '-g', process.env.SFX_LOG_RESOURCE_GROUP, '-n', process.env.SFX_LOG_APP, '--slot', process.env.SFX_LOG_SLOT],
@@ -167,14 +179,16 @@ try {
   record('No password or bearer in browser console, run output or observer testimony');
   if (logProcess) {
     assert(!logTruncated && logText.length > 100, 'Azure log sample must be available and complete within its bound');
+    if (fixture.logs) { logStatus = Number(logText.match(/HTTP\/[\d.]+ (\d+)/)?.[1]); assert.equal(logStatus,200); assert(logExit===undefined || logExit===0); }
+    assert(logText.includes('STAGING_GATEWAY_READY'), 'Sample must contain real host output, not an Azure CLI diagnostic');
     for (const secret of secrets) assert(!logText.includes(secret), 'Private acceptance value in server logs');
     assert(!/Bearer\s+[A-Za-z0-9+/_=-]{24,}/.test(logText), 'Bearer-like credential in server logs');
     record('Azure log sample contains no acceptance password/session bearer or bearer-like credential');
   }
   const receipt = { checkedAt: new Date().toISOString(), origin, runId, sceneDigest: scene.snapshotDigest,
     checks, errors, sampleCount: samples.length, visited: [...new Set(samples.flatMap(s => s.current.map(n => n.id)))],
-    serverLogCheck: { performed: Boolean(logProcess), sampledCharacters: logText.length, truncated: logTruncated, rawLogsRetained: false },
-    basis: 'Fresh real identity and capability execution through product browser UI; no response mocks or replay overrides' };
+    serverLogCheck: { performed: Boolean(logProcess), httpStatus:logStatus, actualHostOutput:logText.includes('STAGING_GATEWAY_READY'), sampledCharacters: logText.length, truncated: logTruncated, rawLogsRetained: false },
+    basis: 'Real identity session and fresh capability execution through product browser UI; no response mocks or replay overrides' };
   fs.writeFileSync(path.join(evidence, 'browser-receipt.json'), JSON.stringify(receipt, null, 2));
   process.stdout.write(JSON.stringify(receipt));
 } catch (error) {
