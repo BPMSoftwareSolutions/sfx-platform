@@ -1,0 +1,150 @@
+{
+  "basis": "local SDA API (installed kernel, estate sfx.config.json), read 2026-10-06 via GET /v1/runs/{id}, /output, /evidence, /events and /v1/evidence/{ref}",
+  "run": {
+    "runId": "29807fa4-728b-4d65-a348-19f0b03ff999",
+    "state": "completed",
+    "capability": {
+      "object": "capability",
+      "operation": "observe",
+      "subject": "request-capability-from-objective-v3"
+    },
+    "createdAt": "2026-10-06T12:43:04.803Z",
+    "startedAt": "2026-10-06T12:43:04.815Z",
+    "endedAt": "2026-10-06T12:43:22.167Z",
+    "pid": 35916,
+    "exitCode": 0,
+    "cursor": 1894,
+    "retainedFrom": 1,
+    "evictedCount": 0,
+    "partial": false,
+    "output": {
+      "available": true,
+      "bytes": 274,
+      "byteCap": 16777216,
+      "overflow": false
+    }
+  },
+  "output": {
+    "contractId": "invoke-database-capability-summary-result.v1",
+    "disposition": "ADMITTED",
+    "summary": "Broadcom's (AVGO) current observed market price is $362.51 USD according to Nasdaq Real Time Price (Market state: PRE).",
+    "invocationDisposition": "MODEL_RESPONSE_OBTAINED"
+  },
+  "evidence": {
+    "runId": "29807fa4-728b-4d65-a348-19f0b03ff999",
+    "references": [
+      {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:556",
+        "digest": "sha256:dbe02cd7c032790e955f28eaeaba448c57447a9f829316fff78450afc5f9ab44",
+        "mediaType": "application/json",
+        "size": 252,
+        "producer": "sda-api-host"
+      },
+      {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:557",
+        "digest": "sha256:c822eacbc389c4d6453f0a20e5b4ceabacfb7f48411cfbe726d9a2457a42e9e4",
+        "mediaType": "application/json",
+        "size": 205,
+        "producer": "sda-api-host"
+      },
+      {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:1493",
+        "digest": "sha256:0ba41b6010274ad1c95ee027297fdc6b44d89d2d8a9df81496c066612b48adf6",
+        "mediaType": "application/json",
+        "size": 252,
+        "producer": "sda-api-host"
+      },
+      {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:1494",
+        "digest": "sha256:16797986c09d89ad3df0a3d788f7951f3a2f973fd31f9fc51c34696a850e15de",
+        "mediaType": "application/json",
+        "size": 205,
+        "producer": "sda-api-host"
+      }
+    ]
+  },
+  "eventKinds": {
+    "run.admitted": 1,
+    "run.started": 1,
+    "delivery-phase": 11,
+    "graph.captured": 1,
+    "observation/cell-execution-testimony.v1": 941,
+    "observation/edge-execution-testimony.v1": 934,
+    "provider-exchange-shape.v1": 2,
+    "model-response-shape.v1": 2,
+    "run.exited": 1
+  },
+  "evidenceEvents": [
+    {
+      "eventId": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:556",
+      "cursor": 556,
+      "at": "2026-10-06T12:43:13.060Z",
+      "kind": "provider-exchange-shape.v1",
+      "payload": {
+        "cellId": "projected-capability-invocation",
+        "cellExecutionId": "projected-capability-invocation",
+        "disposition": "completed"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:556",
+        "digest": "sha256:dbe02cd7c032790e955f28eaeaba448c57447a9f829316fff78450afc5f9ab44",
+        "mediaType": "application/json",
+        "size": 252,
+        "producer": "sda-api-host"
+      }
+    },
+    {
+      "eventId": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:557",
+      "cursor": 557,
+      "at": "2026-10-06T12:43:13.060Z",
+      "kind": "model-response-shape.v1",
+      "payload": {
+        "cellId": "projected-capability-invocation",
+        "cellExecutionId": "projected-capability-invocation"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:557",
+        "digest": "sha256:c822eacbc389c4d6453f0a20e5b4ceabacfb7f48411cfbe726d9a2457a42e9e4",
+        "mediaType": "application/json",
+        "size": 205,
+        "producer": "sda-api-host"
+      }
+    },
+    {
+      "eventId": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:1493",
+      "cursor": 1493,
+      "at": "2026-10-06T12:43:21.752Z",
+      "kind": "provider-exchange-shape.v1",
+      "payload": {
+        "cellId": "projected-capability-invocation",
+        "cellExecutionId": "projected-capability-invocation",
+        "disposition": "completed"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:1493",
+        "digest": "sha256:0ba41b6010274ad1c95ee027297fdc6b44d89d2d8a9df81496c066612b48adf6",
+        "mediaType": "application/json",
+        "size": 252,
+        "producer": "sda-api-host"
+      }
+    },
+    {
+      "eventId": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:1494",
+      "cursor": 1494,
+      "at": "2026-10-06T12:43:21.753Z",
+      "kind": "model-response-shape.v1",
+      "payload": {
+        "cellId": "projected-capability-invocation",
+        "cellExecutionId": "projected-capability-invocation"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:1494",
+        "digest": "sha256:16797986c09d89ad3df0a3d788f7951f3a2f973fd31f9fc51c34696a850e15de",
+        "mediaType": "application/json",
+        "size": 205,
+        "producer": "sda-api-host"
+      }
+    }
+  ],
+  "resolveEvidenceResponse": "{\"error\":{\"code\":\"EVIDENCE_PROVIDER_NOT_CONFIGURED\",\"message\":\"V1 emits evidence references only; no evidence storage provider is configured.\",\"details\":{\"ref\":\"urn:sda-api:run-event:29807fa4-728b-4d65-a348-19f0b03ff999:557\"}}}\nHTTP 501"
+}

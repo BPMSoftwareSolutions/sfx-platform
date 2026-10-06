@@ -1,0 +1,221 @@
+{
+  "basis": "local SDA API, read 2026-10-06; provider cell authorities from GET /v1/runs/{id}/graph",
+  "run": {
+    "runId": "52d5fe1e-381f-4ba3-9860-b8c66621e10a",
+    "state": "completed",
+    "capability": {
+      "object": "capability",
+      "operation": "observe",
+      "subject": "resolve-equity-market-price-evidence"
+    },
+    "createdAt": "2026-10-06T12:36:24.160Z",
+    "startedAt": "2026-10-06T12:36:24.187Z",
+    "endedAt": "2026-10-06T12:36:29.403Z",
+    "pid": 80692,
+    "exitCode": 0,
+    "cursor": 638,
+    "retainedFrom": 1,
+    "evictedCount": 0,
+    "partial": false,
+    "output": {
+      "available": true,
+      "bytes": 430,
+      "byteCap": 16777216,
+      "overflow": false
+    }
+  },
+  "output": {
+    "contractId": "equity-market-price-evidence.v1",
+    "disposition": "EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED",
+    "payload": {
+      "symbol": "AVGO",
+      "region": "US",
+      "currency": "USD",
+      "observedPrice": 362.51,
+      "observedMarketTime": 1791230401,
+      "marketState": "PRE",
+      "exchange": "NMS",
+      "sourceAttribution": "Delayed Quote"
+    },
+    "providerTestimony": {
+      "bindingId": "rapidapi-yahoo-finance15-stock-quotes.v1",
+      "providerId": "rapidapi/yahoo-finance15",
+      "nativeShape": "body.0"
+    }
+  },
+  "evidence": {
+    "runId": "52d5fe1e-381f-4ba3-9860-b8c66621e10a",
+    "references": [
+      {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:79",
+        "digest": "sha256:bb3d0ec4a31867538408659b5f9e99e55905e8ce24875b87873ca49edd5fafda",
+        "mediaType": "application/json",
+        "size": 397,
+        "producer": "sda-api-host"
+      },
+      {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:342",
+        "digest": "sha256:24a51122e1bfc177784cd087f471f61dfd21e693323f3267bd49b534065773f9",
+        "mediaType": "application/json",
+        "size": 397,
+        "producer": "sda-api-host"
+      },
+      {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:475",
+        "digest": "sha256:19ac44d538daf0807a6a730568b1aa7ed02612be0bd8f724d981b9b121dd12a6",
+        "mediaType": "application/json",
+        "size": 406,
+        "producer": "sda-api-host"
+      },
+      {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:606",
+        "digest": "sha256:2c43b26194729207aaeed340b4b09c32a6fd2d994f19df3e3789163f930d707f",
+        "mediaType": "application/json",
+        "size": 396,
+        "producer": "sda-api-host"
+      }
+    ]
+  },
+  "eventKinds": {
+    "run.admitted": 1,
+    "run.started": 1,
+    "delivery-phase": 11,
+    "graph.captured": 1,
+    "observation/cell-execution-testimony.v1": 310,
+    "observation/edge-execution-testimony.v1": 309,
+    "provider-exchange-shape.v1": 4,
+    "run.exited": 1
+  },
+  "evidenceEvents": [
+    {
+      "eventId": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:79",
+      "cursor": 79,
+      "at": "2026-10-06T12:36:27.541Z",
+      "kind": "provider-exchange-shape.v1",
+      "payload": {
+        "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.4",
+        "cellExecutionId": "execution:graph:resolve-equity-market-price-evidence:cell:provider:resolve-equity-market-price-evidence.operation.4:1",
+        "disposition": "retained-non-success"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:79",
+        "digest": "sha256:bb3d0ec4a31867538408659b5f9e99e55905e8ce24875b87873ca49edd5fafda",
+        "mediaType": "application/json",
+        "size": 397,
+        "producer": "sda-api-host"
+      }
+    },
+    {
+      "eventId": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:342",
+      "cursor": 342,
+      "at": "2026-10-06T12:36:27.901Z",
+      "kind": "provider-exchange-shape.v1",
+      "payload": {
+        "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.9",
+        "cellExecutionId": "execution:graph:resolve-equity-market-price-evidence:cell:provider:resolve-equity-market-price-evidence.operation.9:1",
+        "disposition": "retained-non-success"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:342",
+        "digest": "sha256:24a51122e1bfc177784cd087f471f61dfd21e693323f3267bd49b534065773f9",
+        "mediaType": "application/json",
+        "size": 397,
+        "producer": "sda-api-host"
+      }
+    },
+    {
+      "eventId": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:475",
+      "cursor": 475,
+      "at": "2026-10-06T12:36:29.239Z",
+      "kind": "provider-exchange-shape.v1",
+      "payload": {
+        "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.14",
+        "cellExecutionId": "execution:graph:resolve-equity-market-price-evidence:cell:provider:resolve-equity-market-price-evidence.operation.14:1",
+        "disposition": "completed"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:475",
+        "digest": "sha256:19ac44d538daf0807a6a730568b1aa7ed02612be0bd8f724d981b9b121dd12a6",
+        "mediaType": "application/json",
+        "size": 406,
+        "producer": "sda-api-host"
+      }
+    },
+    {
+      "eventId": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:606",
+      "cursor": 606,
+      "at": "2026-10-06T12:36:29.266Z",
+      "kind": "provider-exchange-shape.v1",
+      "payload": {
+        "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.19",
+        "cellExecutionId": "execution:graph:resolve-equity-market-price-evidence:cell:provider:resolve-equity-market-price-evidence.operation.19:1",
+        "disposition": "rejected-endpoint"
+      },
+      "evidenceRef": {
+        "ref": "urn:sda-api:run-event:52d5fe1e-381f-4ba3-9860-b8c66621e10a:606",
+        "digest": "sha256:2c43b26194729207aaeed340b4b09c32a6fd2d994f19df3e3789163f930d707f",
+        "mediaType": "application/json",
+        "size": 396,
+        "producer": "sda-api-host"
+      }
+    }
+  ],
+  "providerCellReceipts": [
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.2",
+      "authorityId": "provider:sda-external-credential-reference-binding-port.v1",
+      "durationMilliseconds": 3.9699,
+      "outcomeVariant": "BOUND",
+      "startedAt": "2026-10-06T12:36:27.1223494Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.4",
+      "authorityId": "provider:sda-governed-http-exchange-port.v1",
+      "durationMilliseconds": 413.1268,
+      "outcomeVariant": "retained-non-success",
+      "startedAt": "2026-10-06T12:36:27.1302370Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.7",
+      "authorityId": "provider:sda-external-credential-reference-binding-port.v1",
+      "durationMilliseconds": 13.3205,
+      "outcomeVariant": "BOUND",
+      "startedAt": "2026-10-06T12:36:27.6026274Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.9",
+      "authorityId": "provider:sda-governed-http-exchange-port.v1",
+      "durationMilliseconds": 265.059,
+      "outcomeVariant": "retained-non-success",
+      "startedAt": "2026-10-06T12:36:27.6371280Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.12",
+      "authorityId": "provider:sda-external-credential-reference-binding-port.v1",
+      "durationMilliseconds": 1.4143,
+      "outcomeVariant": "BOUND",
+      "startedAt": "2026-10-06T12:36:27.9089144Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.14",
+      "authorityId": "provider:sda-governed-http-exchange-port.v1",
+      "durationMilliseconds": 1322.394,
+      "outcomeVariant": "completed",
+      "startedAt": "2026-10-06T12:36:27.9173259Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.17",
+      "authorityId": "provider:sda-external-credential-reference-binding-port.v1",
+      "durationMilliseconds": 0.3263,
+      "outcomeVariant": "CREDENTIAL_NOT_AVAILABLE",
+      "startedAt": "2026-10-06T12:36:29.2552028Z"
+    },
+    {
+      "cellId": "cell:provider:resolve-equity-market-price-evidence.operation.19",
+      "authorityId": "provider:sda-governed-http-exchange-port.v1",
+      "durationMilliseconds": 0.6231,
+      "outcomeVariant": "rejected-endpoint",
+      "startedAt": "2026-10-06T12:36:29.2663430Z"
+    }
+  ]
+}

@@ -2,6 +2,11 @@
 
 Recorded 2026-10-06. Status: **for review.** No code has changed.
 
+**Storage.** Evidence will be stored in the sfx-identity database, linked to the
+principal who ran the capability. This was the product owner's direction on
+2026-10-06. The phased work, its measured baseline and its acceptance gates are in
+[run-evidence-implementation-plan.md](run-evidence-implementation-plan.md).
+
 The design covers three things:
 
 - reviewing a run when it ends;

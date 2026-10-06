@@ -1,0 +1,37 @@
+Scenario resolve-equity-market-price-evidence
+---------------------------------------------
+GIVEN live-equity-price-request  (live-equity-price-request.v1)
+WHEN
+  û build-equity-price-binding-request  2.1802 ms
+  û bind-equity-price-provider-credential  4.4039 ms
+  û build-equity-price-exchange-request  1.343 ms
+  û observe-equity-price-exchange  (provider rapidapi/davethebeast/yahoo-finance166 | binding rapidapi-davethebeast-yahoo-finance166-stock-price.v1 | endpoint https://yahoo-finance166.p.rapidapi.com/api/stock/get-price? | exchange retained-non-success | stage response-complete | calls 1 | transport completed | redacted true | http 429)  380.3093 ms
+  û normalize-equity-price-evidence  5.182 ms
+  û build-fallback-price-binding-request  0.9147 ms
+  û bind-fallback-price-provider-credential  1.242 ms
+  û build-fallback-price-exchange-request  1.6046 ms
+  û observe-fallback-price-exchange  (provider rapidapi/yahoo-finance-real-time1 | binding rapidapi-yahoo-finance-real-time1-market-quotes.v1 | endpoint https://yahoo-finance-real-time1.p.rapidapi.com/market/get-quotes? | exchange retained-non-success | stage response-complete | calls 1 | transport completed | redacted true | http 429)  197.3117 ms
+  û select-equity-price-route  1.8807 ms
+  û build-finance15-price-binding-request  2.1088 ms
+  û bind-finance15-price-provider-credential  1.6323 ms
+  û build-finance15-price-exchange-request  1.8113 ms
+  û observe-finance15-price-exchange  (provider rapidapi/yahoo-finance15 | binding rapidapi-yahoo-finance15-stock-quotes.v1 | endpoint https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes? | exchange completed | stage response-complete | calls 1 | transport completed | redacted true | http 200)  1680.5335 ms
+  û select-finance15-price-route  2.2752 ms
+  û build-finance15bodyproof-price-binding-request  14.7004 ms
+  û bind-finance15bodyproof-price-provider-credential  0.3763 ms
+  û build-finance15bodyproof-price-exchange-request  1.4614 ms
+  û observe-finance15bodyproof-price-exchange  (provider rapidapi/yahoo-finance15 | binding rapidapi-yahoo-finance15-stock-quotes.v1 | endpoint https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes? | exchange rejected-endpoint | stage endpoint-admission | calls 0 | transport denied | redacted true | http 0)  0.4702 ms
+  û select-finance15bodyproof-price-route  0.4523 ms
+THEN
+  û equity-market-price-evidence  (equity-market-price-evidence.v1)
+STATUS EQUITY_MARKET_PRICE_EVIDENCE_RESOLVED
+{
+  "symbol": "AVGO",
+  "region": "US",
+  "currency": "USD",
+  "observedPrice": 362.51,
+  "observedMarketTime": 1791230401,
+  "marketState": "PRE",
+  "exchange": "NMS",
+  "sourceAttribution": "Delayed Quote"
+}

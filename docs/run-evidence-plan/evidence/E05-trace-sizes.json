@@ -1,0 +1,19 @@
+{
+  "basis": "Node zlib gzip level 6 and brotli defaults, 2026-10-06",
+  "samples": [
+    {
+      "name": "local run 29807fa4-728b-4d65-a348-19f0b03ff999 events JSON (GET /events, all pages)",
+      "bytes": 2630798,
+      "gzip6": 99619,
+      "brotli": 59587
+    },
+    {
+      "name": "staging run 1d59905f observer SSE records (docs/replay-timing-fidelity/capture.sse from seq 849)",
+      "bytes": 3794311,
+      "gzip6": 148091,
+      "brotli": 85268
+    }
+  ],
+  "stagingRunRecords": 1893,
+  "graphRecordBytes": 615092
+}
