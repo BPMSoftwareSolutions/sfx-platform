@@ -24,15 +24,106 @@ async function capacity() {
   if (queue.length >= policy.maximumQueuedReads) throw new CircuitReadError('CIRCUIT_READER_BUSY', 503);
   await new Promise(resolve => queue.push(() => { active++; resolve(); }));
 }
+// A resident delivery keeps one kernel process and exchanges one compact
+// envelope line per request. The capacity gate above still admits deliveries;
+// this chain serializes them through the single pipe, one line at a time, and
+// settles each result line to its own caller. A timeout or an exit kills the
+// child and the next delivery starts a fresh one.
+let residentTransport = null;
+function residentOutcome(result, reader) {
+  const value = result.outcome?.result?.outcome;
+  if (value?.code && !value.contractId) {
+    const reported=/^[A-Z0-9_]+$/.test(value.message ?? '') ? value.message : value.code;
+    const status=reported.endsWith('_NOT_FOUND') ? 404 : /_(NAMESPACE_REQUIRED|SNAPSHOT_CHANGED)$/.test(reported) ? 409 : 422;
+    throw new CircuitReadError(/^[A-Z0-9_]+$/.test(reported) ? reported : 'CIRCUIT_DECLARATION_UNAVAILABLE',status);
+  }
+  if (value === undefined) {
+    const errorCode = result.errorCode ?? result.error?.code ?? result.outcome?.result?.error?.code;
+    throw new CircuitReadError(/^[A-Z0-9_]+$/.test(errorCode ?? '') ? errorCode : 'CIRCUIT_DECLARATION_UNAVAILABLE', 422);
+  }
+  if (reader.outputContractId && value.contractId !== reader.outputContractId) throw new CircuitReadError('CIRCUIT_READER_CONTRACT_MISMATCH');
+  return value;
+}
+function residentReject(state, code, child = state.child) {
+  if (child && state.child !== child) return;
+  state.child = null; state.buffer = ''; state.bytes = 0;
+  if (child?.exitCode === null) child.kill();
+  const pending = state.pending; state.pending = null;
+  if (pending) { clearTimeout(pending.timeout); pending.reject(new CircuitReadError(code)); }
+}
+function residentSettle(state, line) {
+  const pending = state.pending;
+  if (!pending) return;
+  state.pending = null; clearTimeout(pending.timeout);
+  let result;
+  try { result = JSON.parse(line); }
+  catch { return pending.reject(new CircuitReadError('CIRCUIT_READER_INVALID_JSON')); }
+  try { pending.resolve(residentOutcome(result, pending.reader)); }
+  catch (error) { pending.reject(error); }
+}
+function residentData(state, child, chunk) {
+  if (state.child !== child) return;
+  state.bytes += chunk.length;
+  if (state.bytes > policy.maximumResponseBytes) return residentReject(state, 'CIRCUIT_RESPONSE_TOO_LARGE');
+  state.buffer += chunk.toString('utf8');
+  for (let index; (index = state.buffer.indexOf('\n')) >= 0;) {
+    const line = state.buffer.slice(0, index); state.buffer = state.buffer.slice(index + 1);
+    if (line.trim()) residentSettle(state, line);
+  }
+}
+function residentClosed(state, child) {
+  if (state.child !== child) return;
+  state.child = null;
+  const line = state.buffer; state.buffer = ''; state.bytes = 0;
+  if (line.trim()) residentSettle(state, line);
+  if (state.pending) residentReject(state, 'CIRCUIT_READER_INVALID_JSON');
+}
+function residentStart(state, delivery) {
+  const env = { ...process.env }; delete env.SDA_API_TOKEN; delete env.SFX_API_TOKEN;
+  delete env.SFX_EVIDENCE_SERVICE_KEY; delete env.SFX_EVIDENCE_CALLERS;
+  const child = spawn(delivery.command, delivery.args, { env, cwd: path.resolve(root, delivery.cwd ?? '.'), windowsHide: true,
+    shell: false, stdio: ['pipe', 'pipe', 'pipe'] });
+  state.child = child;
+  child.stdout.on('data', chunk => residentData(state, child, chunk));
+  // Reader diagnostics stay off the observed subject's stream.
+  child.stderr.resume();
+  child.stdin.on('error', () => {});
+  child.on('error', () => residentReject(state, 'INSTALLED_KERNEL_UNAVAILABLE', child));
+  child.on('close', () => residentClosed(state, child));
+}
+function residentWrite(state, delivery, envelope, reader) {
+  if (state.retired) return Promise.reject(new CircuitReadError('INSTALLED_KERNEL_UNAVAILABLE'));
+  state.buffer = ''; state.bytes = 0;
+  if (!state.child || state.child.exitCode !== null || state.child.signalCode !== null) state.child = null;
+  if (!state.child) residentStart(state, delivery);
+  const child = state.child;
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => residentReject(state, 'CIRCUIT_READ_TIMEOUT'), policy.timeoutMilliseconds);
+    state.pending = { resolve, reject, reader, timeout };
+    child.stdin.write(JSON.stringify(envelope) + '\n', error => { if (error) residentReject(state, 'INSTALLED_KERNEL_UNAVAILABLE', child); });
+  });
+}
+function deliverResident(delivery, envelope, reader) {
+  const key = JSON.stringify([delivery.command, delivery.cwd ?? '.', delivery.args]);
+  if (residentTransport && residentTransport.key !== key) {
+    residentTransport.retired = true; residentReject(residentTransport, 'INSTALLED_KERNEL_UNAVAILABLE'); residentTransport = null;
+  }
+  residentTransport ??= { key, child: null, buffer: '', bytes: 0, pending: null, retired: false, queue: Promise.resolve() };
+  const state = residentTransport;
+  const exchange = state.queue.then(() => residentWrite(state, delivery, envelope, reader));
+  state.queue = exchange.then(() => {}, () => {});
+  return exchange;
+}
 async function deliver(reader, payload) {
   await capacity();
   try {
     const project = JSON.parse(await readFile(path.join(root, 'sfx.config.json'), 'utf8'));
     const delivery = project.deliveries?.[policy.delivery];
-    if (!delivery?.command || !delivery.args?.includes('--stdin-envelope')) throw new CircuitReadError('INSTALLED_KERNEL_DELIVERY_REQUIRED');
+    const resident = delivery?.type === 'resident';
+    if (!delivery?.command || !delivery.args?.includes(resident ? '--resident-envelopes' : '--stdin-envelope')) throw new CircuitReadError('INSTALLED_KERNEL_DELIVERY_REQUIRED');
     const request = { ...reader.request, ...(reader.inputContractId ? { input: { contractId: reader.inputContractId, payload } } : {}) };
     const envelope = { deliveryType: 'sfx-command-delivery.v1', operation: reader.operation, request };
-    const output = await new Promise((resolve, reject) => {
+    const output = await (resident ? deliverResident(delivery, envelope, reader) : new Promise((resolve, reject) => {
       const env = { ...process.env }; delete env.SDA_API_TOKEN; delete env.SFX_API_TOKEN;
       delete env.SFX_EVIDENCE_SERVICE_KEY; delete env.SFX_EVIDENCE_CALLERS;
       const child = spawn(delivery.command, delivery.args, { env, cwd: path.resolve(root, delivery.cwd ?? '.'), windowsHide: true,
@@ -66,7 +157,7 @@ async function deliver(reader, payload) {
         resolve(value);
       });
       child.stdin.end(JSON.stringify(envelope));
-    });
+    }));
     return output;
   } finally { release(); }
 }
