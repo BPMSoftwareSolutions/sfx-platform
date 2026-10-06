@@ -108,8 +108,11 @@ launch(process.execPath, ['/opt/sfx/host/api.mjs'], '/opt/sfx', {
   SDA_OUTPUT_BYTE_CAP: '16777216'
 });
 await waitFor('http://127.0.0.1:8799/v1/runs/ready', { authorization: `Bearer ${token}` }, 404);
-launch(process.execPath, ['server.js'], '/app', { PORT: '3001', HOSTNAME: '127.0.0.1', SDA_API_ENDPOINT: 'http://127.0.0.1:8799' });
-await waitFor('http://127.0.0.1:3001/readyz');
+// No website process: the platform home page is served by the circuit host
+// (revamp P2). Paths the retired Next.js website used now answer 404.
+const notFound = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+  + '<title>Not found · SFX Live Circuit Platform</title><body style="margin:0;padding:48px 24px;background:#06111F;color:#F4F7FB;font:16px Arial,sans-serif">'
+  + '<h1 style="font-size:28px">Not found</h1><p><a style="color:#72D7EE" href="/">Go to the Live Circuit Platform home</a></p></body></html>';
 
 http.createServer((request, response) => {
   const url = new URL(request.url, 'http://localhost');
@@ -154,9 +157,23 @@ http.createServer((request, response) => {
   const circuitPost = request.method === 'POST' &&
     ['/api/circuit/v1/runs', '/api/circuit/v1/session', '/api/circuit/v1/session/logout'].includes(url.pathname);
   if (circuit && request.method !== 'GET' && !circuitPost) { response.writeHead(405); response.end(); return; }
-  const upstream = http.request({ hostname: '127.0.0.1', port: identity ? 8793 : retrieval ? 8791 : api ? 8799 : circuit ? 8787 : 3001,
-    path: retrieval ? url.pathname.slice('/procedure-extract'.length) : request.url, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
-    response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', ...(identity || api || circuit || retrieval ? { 'cache-control': 'no-store' } : {}) });
+  const read = request.method === 'GET' || request.method === 'HEAD';
+  if (url.pathname === '/robots.txt' && read) {
+    response.writeHead(200, { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex, nofollow' });
+    response.end(process.env.SIDEFX_INDEXING === 'disabled' ? 'User-agent: *\nDisallow: /\n' : 'User-agent: *\nDisallow:\n'); return;
+  }
+  // "/" is the platform home page and /favicon.ico its emblem, both served by the circuit host.
+  const home = url.pathname === '/' && read, icon = url.pathname === '/favicon.ico' && read;
+  const port = identity ? 8793 : retrieval ? 8791 : api ? 8799 : (circuit || home || icon) ? 8787 : 0;
+  if (!port) {
+    response.writeHead(404, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex, nofollow' });
+    response.end(request.method === 'HEAD' ? undefined : notFound); return;
+  }
+  const upstreamPath = retrieval ? url.pathname.slice('/procedure-extract'.length)
+    : home ? '/circuit/home' + url.search : icon ? '/circuit/assets/sfx-emblem.png' : request.url;
+  const upstream = http.request({ hostname: '127.0.0.1', port,
+    path: upstreamPath, method: request.method, headers: { ...request.headers, host: 'localhost', 'x-forwarded-host': request.headers.host } }, incoming => {
+    response.writeHead(incoming.statusCode, { ...incoming.headers, 'x-robots-tag': 'noindex, nofollow', 'cache-control': 'no-store' });
     incoming.pipe(response);
   });
   upstream.on('error', () => { if (!response.headersSent) response.writeHead(502); response.end(); });

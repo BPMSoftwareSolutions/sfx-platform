@@ -1,0 +1,41 @@
+# One composite Live Circuit image (revamp P2), built from this repository:
+#   - the pinned Node runtime (the same base the website image used);
+#   - the admitted components of an accepted image, copied by digest and proved
+#     unchanged: installed kernel, SDA API build, retrieval and identity hosts,
+#     installed delivery configuration and the encrypted vault bootstrap;
+#   - this repository's host files and live-circuit/ (placed by prepare-composite.mjs).
+# The Next.js website (/app) is not part of this image.
+ARG COMPONENTS_IMAGE
+FROM ${COMPONENTS_IMAGE} AS components
+USER root
+COPY component-fingerprint.sh /tmp/component-fingerprint.sh
+RUN sh /tmp/component-fingerprint.sh /tmp/components
+
+FROM node:24.20.0-bookworm-slim@sha256:6642ef280aebc09c4541bee0b15c9f89f0f3f3c247ddee79ae1d37eddfdcbbaa
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends dbus gnome-keyring libsecret-tools ca-certificates libicu72 libssl3 util-linux \
+ && rm -rf /var/lib/apt/lists/*
+COPY --from=components /opt/sfx/kernel /opt/sfx/kernel
+COPY --from=components /opt/sfx/api /opt/sfx/api
+COPY --from=components /opt/sfx/procedure-extract /opt/sfx/procedure-extract
+COPY --from=components /opt/sfx/identity /opt/sfx/identity
+COPY --from=components /opt/sfx/vault-bootstrap.tar.gz /opt/sfx/vault-bootstrap.tar.gz
+COPY --from=components /opt/sfx/estate/sfx.config.json /opt/sfx/estate/sfx.config.json
+COPY --from=components /tmp/components /tmp/components-source
+COPY runtime/ /opt/sfx/
+COPY component-fingerprint.sh /tmp/component-fingerprint.sh
+# Refuse the image unless the copied components are byte-identical to their source
+# and every repository-placed file equals its release manifest digest.
+RUN sh /tmp/component-fingerprint.sh /tmp/components-copied \
+ && diff -r /tmp/components-source /tmp/components-copied \
+ && mkdir -p /opt/sfx/.components && cp /tmp/components-copied/* /opt/sfx/.components/ \
+ && node -e "const fs=require('node:fs'),crypto=require('node:crypto'); const r=JSON.parse(fs.readFileSync('/opt/sfx/release.json')); \
+for (const [p,want] of Object.entries(r.circuit.files)) { const got='sha256:'+crypto.createHash('sha256').update(fs.readFileSync('/opt/sfx/'+p)).digest('hex'); if (got!==want) throw Error('RELEASE_FILE_MISMATCH: '+p); } \
+if (r.composite?.website !== false || fs.existsSync('/app')) throw Error('WEBSITE_PRESENT');" \
+ && rm -rf /tmp/components-source /tmp/components-copied /tmp/component-fingerprint.sh \
+ && chown -R node:node /opt/sfx
+ENV NODE_ENV=production HOME=/home/sjones XDG_DATA_HOME=/home/sjones/.local/share PORT=3000
+WORKDIR /opt/sfx
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3000/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+CMD ["sh", "/opt/sfx/host/initialize.sh"]

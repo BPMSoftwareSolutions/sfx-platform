@@ -17,9 +17,19 @@ retrieval, identity and persistent vault are unchanged. The previously outstandi
 replay, restart/vault and external CLI gates passed on this new release;
 the [durable receipt](releases/staging-automation-2026-10-06.json) records them.
 
-**Next:** P0 credential custody in its own window, P2 composite assembly without
-Next.js, the estate's P3 prerequisites, and the remaining P1 local-observer
-cleanup. Automatic deployment is implemented and does not wait for those tasks.
+**P2 implemented 2026-10-06** (one composite image, no Next.js). Each push to
+`main` now builds one image from the pinned Node base, copies the admitted
+components from the bound image by digest and proves them byte-identical, and
+places every host file and `live-circuit/` from the commit. The gateway no
+longer starts the website: `/` serves the H2 home page, `/robots.txt` is the
+gateway's own, and the website's routes answer 404. An ACR build-only preflight
+against the current release passed (§4 P2). The first composite release goes
+through the normal automatic workflow with acceptance and rollback; its result
+is recorded below when it completes.
+
+**Next:** P0 credential custody in its own window, the estate's P3
+prerequisites, P5 (remove the Next.js code and the overlay packagers once the
+first composite release is accepted), and the remaining P1 local-observer cleanup.
 
 Decided **2026-10-05**. This plan turns `sfx-platform` from a Next.js website
 prototype plus a separately copied circuit into one product: the **SFX Live
@@ -49,7 +59,7 @@ rollback target. The old Next.js website still answers `/`.
 | Browser sign-in | **Released in r15.** Hosted checks passed at 22:31 UTC: real sign-in and cookie, wrong password refused, anonymous Observe refused, signed-in live Observe with providers visited and attribution, sign-out revocation, CLI login unchanged, no secrets in logs | `46098e1`; r15 evidence (not yet committed) |
 | r15 close-out | **Open.** Replay at r15, a restart with the vault check, and external CLI visibility are not recorded. The receipt and runbook update are not committed | "Next" item 1 |
 | Home page | **Designed and built, not released.** H1 (`1507752`), then H2 from another session; H2 implemented at `/circuit/home` with the sign-in page restyled to match (`0ca7388`) | [Home page design](home-page-design.md) |
-| P2 One image without Next.js | **Not started** | §4 P2 |
+| P2 One image without Next.js | **Implemented 2026-10-06**; first composite release pending its automatic run | §4 P2 |
 | P3 Explorer data path | **Blocked** in the estate: DC-05a is paused, and a routing-law regression makes 11 capability readings fail | §6 |
 | P4 Explorer workspace | **Not started** (needs P3) | §4 P4 |
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
@@ -225,6 +235,34 @@ then delete the estate's `demo/`.
 Acceptance: runbook §7 gates on staging, plus parity with r14 for circuit reads,
 Observe, external runs, identity, retrieval, replay and restart. The overlay
 packagers retire after the first complete release.
+
+**As implemented (2026-10-06).** Files: `deploy/sda-kernel/Dockerfile.composite`,
+`prepare-composite.mjs`, `component-fingerprint.sh`, `verify-composite-package.mjs`;
+`deploy/staging/release.mjs` and `policy.mjs`; `gateway.mjs`. Three differences
+from the steps above, each deliberate:
+
+- **Components come from the bound exact image**, not from separately published
+  inputs. The release already reads that image by digest; the build copies its
+  kernel, SDA API build, retrieval and identity hosts with DALs, delivery
+  configuration and vault bootstrap, and fingerprints each one (paths, contents,
+  modes, symlinks) before and after the copy. Rebuilding those binaries stays an
+  SDA-side release; the policy refuses any manifest whose binaries change.
+- **`/` serves the home page** (H2, decided with the home page) instead of
+  redirecting to `/circuit`. `/favicon.ico` is the emblem. `/robots.txt` disallows
+  everything when `SIDEFX_INDEXING=disabled`. Every other former website path is a
+  404 page linking home.
+- **Pull requests run the packaging check**, not an image build. The image is
+  built in ACR only on `main`, where it is locked and bound. The build itself
+  refuses the image on any component or manifest mismatch, or if `/app` exists.
+
+Preflight, before the first push: `az acr run` built the composite against
+`circuit-b8f15c889fb6-37399599577-1` without pushing. Components were identical,
+`/app` was absent, `ldd` found no missing libraries for `KernelEntry`,
+`sfx-identity-host` or `procedure-extract`, and the observer served
+`/circuit/home`, `/circuit/login`, `/circuit/site.css`, the emblem and
+`/api/circuit/v1/home`. Public acceptance now also requires the home page at
+`/`, 404 for `/capabilities`, `/about` and `/sitemap.xml`, and a disallow-all
+`robots.txt`.
 
 ### P3. Explorer data path
 

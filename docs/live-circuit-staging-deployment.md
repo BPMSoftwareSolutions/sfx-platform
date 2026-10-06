@@ -18,6 +18,13 @@ Kernel and installed services remain the r15 identities; rollback is the locked
 r15 digest `b926002b…`. H2 is published at `/circuit/home`; `/` is still the
 inherited website. The tables below retain the earlier r14 audit context.
 
+**From the first composite release (revamp P2, 2026-10-06)** the image no longer
+contains the website. Releases are built by
+[`Dockerfile.composite`](../deploy/sda-kernel/Dockerfile.composite) from the
+pinned Node base, with the installed components copied by digest from the bound
+image (see [automatic staging](automatic-staging-deployment.md)). The gateway
+starts no website process; the route table and §5 below mark what changes.
+
 This is the operational runbook for the **composite Live Circuit deployment** at
 <https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit>.
 It covers the website, observer, SDA Run API, installed kernel, procedure retrieval,
@@ -75,7 +82,6 @@ installed kernel through `/opt/sfx/estate/sfx.config.json` and the closed
 flowchart TD
   Client[Browser or installed CLI] --> Azure[Azure HTTPS frontend]
   Azure --> Gateway[Gateway :3000]
-  Gateway --> Website[Website :3001]
   Gateway --> Observer[Circuit and observer :8787]
   Gateway --> API[SDA Run API :8799]
   Gateway --> Retrieval[Procedure extraction :8791]
@@ -107,7 +113,9 @@ network protections exist.
 
 | Public surface | Internal destination | Authentication and behavior |
 | --- | --- | --- |
-| `/`, website routes | 3001 | Public website |
+| `/`, `/favicon.ico` | 8787 (`/circuit/home`, the emblem) | Platform home page. Before P2: the website on 3001 |
+| `/robots.txt` | Gateway | Disallow all when `SIDEFX_INDEXING=disabled` |
+| Any other path | Gateway | 404 page linking home; the website's former routes end here |
 | `/circuit`, `/circuit/*`, circuit catalog/scenario/detail GETs | 8787 | Public database-backed viewer; no HTTP Basic prompt |
 | `POST /api/circuit/v1/runs` | 8787, then 8799 | Same-origin JSON Observe transport; server adds its machine bearer. From the release carrying the [browser session](live-circuit-browser-session.md), it also requires a signed-in session |
 | `/circuit/login`, `GET`/`POST /api/circuit/v1/session`, `POST /api/circuit/v1/session/logout` | 8787, then 8793 | Browser sign-in (`authenticate-ide-user`), status and sign-out. Same-origin JSON; HttpOnly `__Host-` cookie. Not in r14 |
@@ -277,8 +285,9 @@ cross-instance event, run-state or file-vault coordination.
 ## 5. Startup, readiness and operating bounds
 
 [`gateway.mjs`](../deploy/sda-kernel/gateway.mjs) checks required configuration,
-restores/unlocks the vault, then launches retrieval and observer, identity, SDA
-API, and website. It waits for each service before exposing the public listener.
+restores/unlocks the vault, then launches retrieval and observer, identity and
+SDA API (and, before P2, the website). It waits for each service before exposing
+the public listener.
 The API readiness probe is an authenticated lookup of a nonexistent run, expected
 to return 404; it proves the HTTP/auth path is responding, not business success.
 Any supervised child error/exit terminates the composite host. An observation
@@ -286,9 +295,9 @@ bridge failure also exits the API rather than leaving missing evidence silent.
 
 Public `/readyz` and `/healthz` both report gateway state, release ID and kernel
 digest. After startup, they do **not** repeatedly execute SQL, inspect every
-child, test all providers or validate capability results. The website's separate
-internal `/readyz` checks its publication at startup. Do not apply the older
-website-only health semantics to the public composite gateway.
+child, test all providers or validate capability results. Before P2 the
+website's separate internal `/readyz` checked its publication at startup. Do not
+apply the older website-only health semantics to the public composite gateway.
 
 | Bound | Current packaged configuration |
 | --- | --- |

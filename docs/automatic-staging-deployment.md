@@ -51,26 +51,42 @@ and extracts `/opt/sfx/release.json`. It refuses a website-only manifest, mutabl
 base tag, foreign registry/repository, or missing installed-service identity.
 The manifest must agree with the running health response.
 
-`prepare-circuit.mjs` overlays `live-circuit/circuit/`, the observer and gateway
-from the checked-out commit. It records every placed file's SHA-256, source commit,
-previous release and exact base image. Kernel, SDA API binaries, retrieval/DAL,
-identity/DAL, installed configuration and encrypted vault bootstrap remain
-inherited. The result is a complete runnable image; no operator's local binaries
-are required.
+Every push builds **one composite image** (revamp P2). It does not layer on the
+previous image and it contains no Next.js website:
 
-The owned circuit directory is replaced as a unit, so source deletions also
-deploy. The Docker build verifies every overlaid file against the release
-manifest before the image can be bound.
+- the runtime is the pinned `node:24.20.0-bookworm-slim@sha256:6642ef…` base
+  named in `deploy/sda-kernel/Dockerfile.composite`;
+- the previous exact image is used only as the **components image**: its
+  installed kernel, SDA API build, retrieval host/DAL, identity host/DAL,
+  installed delivery configuration (`estate/sfx.config.json`) and encrypted vault
+  bootstrap are copied by digest;
+- every host file (`gateway.mjs`, `api.mjs`, `initialize.sh`, the identity and
+  retrieval policies) and all of `live-circuit/` come from the checked-out commit.
 
-Installed-service/config edits this overlay cannot ship cause failure before
-binding; they are never silently presented as deployed. P2 remains the separate
-effort to assemble pinned runtime inputs in one build and retire Next.js. It must
-retain automatic delivery. The first automatic release includes the committed H2
-home/sign-in design at `/circuit/home`; `/` remains the inherited website until P2.
+`prepare-composite.mjs` stages the host files and circuit, records every placed
+file's SHA-256, the source commit, the pinned base, the components image and its
+release id, and the previous manifest's digest, and marks `website: false`. The
+Docker build fingerprints each component (paths, contents, modes, symlinks) in
+the components image and again after the copy, and refuses the image unless they
+are identical, every placed file matches the manifest and `/app` does not exist.
+The fingerprints are kept in the image at `/opt/sfx/.components/`.
+
+The gateway serves the platform home page at `/` and its emblem at
+`/favicon.ico` from the circuit host, answers `/robots.txt` itself (disallow all
+when `SIDEFX_INDEXING=disabled`), and returns 404 for every path the retired
+website used. Kernel or DAL changes cannot ship this way: the release policy
+refuses any manifest whose binaries differ from the components image. Changes
+under `infra/` other than `azure.json` and `authorize-staging-release.ps1` are
+refused before building; they are separate infrastructure operations.
+
+The first composite release was preflighted in ACR (build only, no push) against
+`circuit-b8f15c889fb6-37399599577-1`: components identical, no `/app`, no missing
+shared libraries in the kernel, identity or retrieval executables, and the
+observer served `/circuit/home`, `/circuit/login`, its assets and the home API.
 
 ## Release sequence and gates
 
-1. Run release-policy, overlay-packaging and browser-session contract checks.
+1. Run release-policy, composite-packaging and browser-session contract checks.
    PRs stop here.
 2. Authenticate with GitHub OIDC. No Azure client secret or publish profile is
    stored in GitHub.
@@ -81,7 +97,9 @@ home/sign-in design at `/circuit/home`; `/` remains the inherited website until 
    Persist recovery state **before** PATCH, bind by digest, restart, and wait
    for the expected release. Match the running manifest and vault fingerprint.
 5. Check public pages/catalog, provider drill-down digests, stale-selection
-   refusal and protected API boundaries.
+   refusal and protected API boundaries. Require the platform home page at `/`,
+   404 for retired website routes (`/capabilities`, `/about`, `/sitemap.xml`) and
+   a disallow-all `robots.txt`.
 6. Use the real sign-in UI: wrong-password refusal, Secure/HttpOnly/SameSite
    Strict host cookie, anonymous Observe refusal, signed-in live Observe with
    provider/owning-step/call/exact-outcome visibility, principal attribution,

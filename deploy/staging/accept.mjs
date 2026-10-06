@@ -40,12 +40,19 @@ try {
     for (const [route, method, expected] of [
       ['/', 'GET', 200], ['/circuit', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/login', 'GET', 200],
       ['/healthz','GET',200], ['/readyz','GET',200], ['/v1/runs/ready','GET',401], ['/internal/deployment','GET',401],
-      ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/procedure-extract/json','POST',401]
+      ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/procedure-extract/json','POST',401],
+      ['/robots.txt','GET',200], ['/favicon.ico','GET',200], ['/capabilities','GET',404], ['/about','GET',404], ['/sitemap.xml','GET',404]
     ]) {
       const response = await fetch(config.origin + route, {method, redirect:'error', signal:AbortSignal.timeout(90000)});
       assert.equal(response.status, expected, route); assert(!response.headers.get('www-authenticate')?.includes('Basic'));
       await response.body?.cancel(); checks.push({route,method,status:response.status});
     }
+    // The Next.js website is retired: "/" is the platform home page and staging stays unindexed.
+    const home = await fetch(config.origin + '/', {redirect:'error', signal:AbortSignal.timeout(90000)});
+    assert((await home.text()).includes('<title>SFX Live Circuit Platform</title>'), 'The platform home page must be served at /');
+    const robots = await fetch(config.origin + '/robots.txt', {redirect:'error', signal:AbortSignal.timeout(90000)});
+    assert.equal(await robots.text(), 'User-agent: *\nDisallow: /\n', 'Staging must disallow indexing');
+    checks.push({route:'/',content:'platform home'},{route:'/robots.txt',content:'disallow all'});
     const catalog = await json(config.origin + '/api/circuit/v1/capabilities'); assert(catalog.capabilities?.length > 0);
     const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
     const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);

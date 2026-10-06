@@ -9,14 +9,28 @@ export function composite(release) {
     assert(/^sha256:[a-f0-9]{64}$/.test(value || ''), 'Complete installed runtime required');
   assert(release.id && release.kernelLanguage && release.circuit?.sourceCommit, 'Composite manifest required');
 }
+// A composite release copies the admitted binaries from the previous image: the
+// kernel and the retrieval and identity executables and DALs must not change.
+// Host policies are repository files and travel with the release.
 export function unchangedRuntime(previous, next) {
-  for (const key of ['kernelDigest', 'kernelLanguage', 'retrieval', 'identity']) assert.deepEqual(next[key], previous[key], `Overlay changed ${key}`);
+  for (const key of ['kernelDigest', 'kernelLanguage']) assert.deepEqual(next[key], previous[key], `Release changed ${key}`);
+  for (const service of ['retrieval', 'identity'])
+    for (const key of ['executable', 'dal']) assert.equal(next[service]?.[key], previous[service]?.[key], `Release changed ${service}.${key}`);
 }
 export function rollbackAllowed(state, current) {
   return Boolean(state.bindAttempted && state.candidateImage && current === state.candidateImage);
 }
-export function overlayChanges(files) {
-  const unsupported = files.filter(file => /^(deploy\/sda-kernel\/|infra\/)/.test(file)
-    && !/^(deploy\/sda-kernel\/(gateway\.mjs|prepare-circuit\.mjs|Dockerfile\.circuit|live-circuit\.mjs|verify-circuit-package\.mjs|.*\.md|.*acceptance.*\.json)|infra\/(azure\.json|authorize-staging-release\.ps1))$/.test(file));
-  assert.equal(unsupported.length, 0, 'Circuit overlay cannot ship installed-service/config changes: ' + unsupported.join(', '));
+// Everything under deploy/sda-kernel/ and live-circuit/ is delivered by the
+// composite build. Infrastructure changes are separate operations, except the
+// two files the release itself reads.
+export function releaseChanges(files) {
+  const unsupported = files.filter(file => /^infra\//.test(file) && !/^infra\/(azure\.json|authorize-staging-release\.ps1)$/.test(file));
+  assert.equal(unsupported.length, 0, 'Staging release cannot ship infrastructure changes: ' + unsupported.join(', '));
+}
+// Composite releases never carry the retired Next.js website and always name
+// their pinned Node base.
+export function websiteRetired(release) {
+  assert.equal(release.composite?.kind, 'composite', 'Composite release manifest required');
+  assert.equal(release.composite?.website, false, 'The Next.js website must not be part of the release');
+  assert(/^node:[^\s@]+@sha256:[a-f0-9]{64}$/.test(release.composite?.base ?? ''), 'Pinned Node base required');
 }

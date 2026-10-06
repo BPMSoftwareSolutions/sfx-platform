@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { azure, config, root, evidence, az, rest, run, read, write, token, json, sleep } from './common.mjs';
-import { exactImage, composite, unchangedRuntime, rollbackAllowed, overlayChanges } from './policy.mjs';
+import { exactImage, composite, unchangedRuntime, rollbackAllowed, releaseChanges, websiteRetired } from './policy.mjs';
 const mode = process.argv[2];
 const binding = async () => (await rest('get', '/config/web')).properties.linuxFxVersion.replace(/^DOCKER\|/, '');
 const validate = image => exactImage(image, azure.registryServer, azure.imageRepository);
@@ -66,24 +66,28 @@ async function deploy() {
   try { await run('docker', ['cp', container + ':/opt/sfx/release.json', path.join(evidence, 'previous-release.json')]); }
   finally { await run('docker', ['rm', container]); }
   const previous = read('previous-release.json'); composite(previous);
-  console.log('Checking current readiness and overlay scope.');
+  console.log('Checking current readiness and release scope.');
   const baseline = await json(config.origin + '/healthz');
   assert.equal(baseline.release, previous.id); assert.equal(baseline.kernelDigest, previous.kernelDigest);
   const changed = (await run('git', ['diff', '--name-only', previous.circuit.sourceCommit, commit])).trim().split(/\r?\n/).filter(Boolean);
-  overlayChanges(changed);
+  releaseChanges(changed);
   const bearer = await token();
   console.log('Fingerprinting existing encrypted vault.');
   const vault = baseline.bootId ? (await privateRead(bearer)).vault : await oldVault();
   const state = { sourceCommit: commit, previousImage, previousRelease: previous, vaultBefore: vault, bindAttempted: false, startedAt: new Date().toISOString() };
   write('state.json', state);
   await lock(previousImage);
-  const id = `circuit-${commit.slice(0, 12)}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
+  const id = `composite-${commit.slice(0, 12)}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
   const context = path.join(path.dirname(evidence), 'staging-context');
-  await run(process.execPath, ['deploy/sda-kernel/prepare-circuit.mjs', path.join(evidence, 'previous-release.json'), context, id, previousImage]);
-  const next = JSON.parse(fs.readFileSync(path.join(context, 'runtime/release.json'))); composite(next); unchangedRuntime(previous, next);
+  // One image from the pinned Node base: the previous exact image supplies only its
+  // admitted components (kernel, API, retrieval, identity, delivery config, vault
+  // bootstrap); every host and circuit file comes from this commit. No website.
+  await run(process.execPath, ['deploy/sda-kernel/prepare-composite.mjs', path.join(evidence, 'previous-release.json'), context, id, previousImage]);
+  const next = JSON.parse(fs.readFileSync(path.join(context, 'runtime/release.json')));
+  composite(next); websiteRetired(next); unchangedRuntime(previous, next);
   write('release.json', next);
-  console.log('Building complete image overlay ' + id);
-  await az(['acr', 'build', '-r', azure.registryName, '-t', azure.imageRepository + ':' + id, '--platform', 'linux/amd64', '--build-arg', 'STAGING_IMAGE=' + previousImage, '--no-logs', context]);
+  console.log('Building composite image ' + id);
+  await az(['acr', 'build', '-r', azure.registryName, '-t', azure.imageRepository + ':' + id, '--platform', 'linux/amd64', '--build-arg', 'COMPONENTS_IMAGE=' + previousImage, '--no-logs', context]);
   const metadata = await az(['acr', 'repository', 'show', '-n', azure.registryName, '--image', azure.imageRepository + ':' + id]);
   state.candidateImage = validate(azure.registryServer + '/' + azure.imageRepository + '@' + metadata.digest);
   state.candidateRelease = id; write('state.json', state);
