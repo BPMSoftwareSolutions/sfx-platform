@@ -3,6 +3,15 @@ name: Live Circuit staging
 on:
   push:
     branches: [main]
+    paths:
+      - 'live-circuit/**'
+      - 'deploy/sda-kernel/**'
+      - 'deploy/staging/**'
+      - 'tools/live-circuit/**'
+      - 'tools/sfx-api/**'
+      - 'infra/azure.json'
+      - 'infra/authorize-staging-release.ps1'
+      - '.github/workflows/staging.yml'
   pull_request:
   workflow_dispatch:
 

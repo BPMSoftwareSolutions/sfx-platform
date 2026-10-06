@@ -5,6 +5,11 @@ The user decision on 2026-10-05 is **automatic deployment on pushes to `main`**.
 required. PRs run checks without Azure credentials. `workflow_dispatch` is an
 optional recovery trigger; only `main` can bind the slot.
 
+Push paths cover the circuit, host/packagers, release tools, CLI and acceptance
+tools, Azure binding and this workflow. Documentation-only changes do not
+restart staging. No release label or operator command is needed for runtime
+changes under those paths.
+
 The target is `sidefx/staging` in `sidefx_group`. Production is never swapped or
 rebound. The website-only `container.yml` remains build/test only. Its old
 `AZURE_STAGING_ENABLED=false` switch stays false; the new workflow does not use it.
