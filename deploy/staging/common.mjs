@@ -9,7 +9,7 @@ export const slotUrl = `https://management.azure.com/subscriptions/${azure.subsc
 export const evidence = path.resolve(process.env.SFX_RELEASE_EVIDENCE || path.join(root, 'artifacts/staging'));
 export function write(name, data) { fs.mkdirSync(evidence, { recursive: true }); fs.writeFileSync(path.join(evidence, name), JSON.stringify(data, null, 2) + '\n'); }
 export function read(name) { return JSON.parse(fs.readFileSync(path.join(evidence, name))); }
-export async function run(command, args, { input, env = {}, timeout = 900000, publicDiagnostic } = {}) {
+export async function run(command, args, { input, env = {}, timeout = 900000, publicDiagnostic, redactions = [] } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { cwd: root, windowsHide: true, env: { ...process.env, ...env }, stdio: ['pipe', 'pipe', 'pipe'] });
     let stdout = '', stderr = '', timedOut = false;
@@ -18,8 +18,10 @@ export async function run(command, args, { input, env = {}, timeout = 900000, pu
     child.on('error', () => { clearTimeout(timer); reject(new Error('COMMAND_START_FAILED: ' + path.basename(command))); });
     child.on('close', code => {
       clearTimeout(timer);
-      // Opt-in only for credential-free, retained-capture conformance tools.
-      if (publicDiagnostic) write(publicDiagnostic, { code, timedOut, stdout, stderr });
+      // Explicit test diagnostics only; callers register any private input.
+      const clean = text => redactions.reduce((value, secret) => secret ? value.replaceAll(secret,'[private]') : value, text)
+        .replace(/Bearer\s+[A-Za-z0-9+/_=-]+/g,'Bearer [private]');
+      if (publicDiagnostic) write(publicDiagnostic, { code, timedOut, stdout:clean(stdout), stderr:clean(stderr) });
       // Captured output may contain tokens. Never attach it to thrown errors.
       if (code || timedOut) reject(new Error(`COMMAND_FAILED: ${path.basename(command)} (${timedOut ? 'timeout' : code})`));
       else resolve(stdout);

@@ -18,13 +18,15 @@ try {
     console.log('Captured receipt prefixes and replay at 1x / 0.1x passed.');
   } else if (mode === 'external') {
     await run(process.execPath, ['tools/live-circuit/verify-external-live.mjs', config.origin, config.observe.subject, config.expectedOutcome,
-      path.join(evidence, 'external'), process.execPath, 'deploy/staging/accept.mjs', 'api-command']);
+      path.join(evidence, 'external'), process.execPath, 'deploy/staging/accept.mjs', 'api-command'], {publicDiagnostic:'external-process.json'});
     console.log('External API CLI command and live provider/outcome visibility passed.');
   } else if (mode === 'api-command') {
     const machineToken = await token();
+    const execution = await json(config.origin + '/api/circuit/v1/execution');
+    assert.equal(execution.defaultNamespace, config.observe.namespace, 'Fixture must use the configured API default namespace');
     const output = await run(process.execPath, ['tools/sfx-api/sfx-api.mjs', 'capability', 'observe', config.observe.subject,
-      '--input', JSON.stringify(config.observe.input), '--namespace', config.observe.namespace, '--auth', 'machine', '--endpoint', config.origin, '--json', '--trace'],
-      { env: { SFX_API_TOKEN: machineToken, SFX_API_TRACE_DIRECTORY: path.join(evidence, 'api-traces') } });
+      '--input', JSON.stringify(config.observe.input), '--auth', 'machine', '--endpoint', config.origin, '--json', '--trace'],
+      { env: { SFX_API_TOKEN: machineToken, SFX_API_TRACE_DIRECTORY: path.join(evidence, 'api-traces') }, publicDiagnostic:'api-command-process.json', redactions:[machineToken] });
     assert(!output.includes(machineToken));
     const result = JSON.parse(output); assert.equal(result.disposition, config.expectedOutcome);
     write('api-command.json', { checkedAt: new Date().toISOString(), disposition: result.disposition });
