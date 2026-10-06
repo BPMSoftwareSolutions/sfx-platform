@@ -120,8 +120,8 @@ try {
   assert(runId);
   await page.waitForFunction(() => /API run .* · (completed|failed|cancelled|timed-out)/.test(document.querySelector('#observe-status').textContent), null, { timeout: 360000 });
   samples = await page.evaluate(() => { cancelAnimationFrame(window.acceptanceFrame); return window.acceptanceFrames; });
-  const run = await (await fetch(origin + '/api/circuit/v1/runs/' + runId)).json();
-  output = await (await fetch(origin + '/api/circuit/v1/runs/' + runId + '/output')).json();
+  const run = await (await fetch(origin + '/api/circuit/v1/runs/' + runId, { headers: { cookie } })).json();
+  output = await (await fetch(origin + '/api/circuit/v1/runs/' + runId + '/output', { headers: { cookie } })).json();
   fs.writeFileSync(path.join(evidence, 'run.json'), JSON.stringify({ run, output }, null, 2));
   fs.writeFileSync(path.join(evidence, 'frames.json'), JSON.stringify(samples));
   await page.screenshot({ path: path.join(evidence, 'observe.png'), fullPage: true });
