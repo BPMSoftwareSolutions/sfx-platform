@@ -35,8 +35,17 @@ gateway's own, and the website's routes answer 404. An ACR build-only preflight
 against the current release passed (§4 P2), and the first composite release
 passed the normal automatic workflow above.
 
-**Next:** the Capability Explorer (P3 data path, then P4 workspace), starting
-with the estate's P3 prerequisites (§6). Alongside: P0 credential custody in its
+**Explorer transition started 2026-10-06.** P3 step 1 is done: estate unit
+DC-05a is installed (estate `58602e4`,
+[closeout](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/research/coherence-conformance/capability-navigation-closeout.md)).
+The policy is declared, and the capability reading returns
+`capability_navigation` (tree, tabs, counts, badges, per-scenario
+attribution). By decision, the routing-law regression stays with its owner:
+the Explorer shows those 11 capabilities as a visible reading failure.
+
+**Next:** P3 step 2, a kernel-invoked Explorer reading (one JSON value)
+declared like `read-live-scenario-circuit` and added to `circuit-host.json`
+readers; then P4, the workspace. Alongside: P0 credential custody in its
 own window, P5 (remove the Next.js code and the now-unused overlay packagers),
 and the remaining P1 local-observer cleanup.
 
@@ -69,7 +78,7 @@ rollback target. The old Next.js website still answers `/`.
 | r15 close-out | **Open.** Replay at r15, a restart with the vault check, and external CLI visibility are not recorded. The receipt and runbook update are not committed | "Next" item 1 |
 | Home page | **Designed and built, not released.** H1 (`1507752`), then H2 from another session; H2 implemented at `/circuit/home` with the sign-in page restyled to match (`0ca7388`) | [Home page design](home-page-design.md) |
 | P2 One image without Next.js | **Accepted 2026-10-06** (`composite-e82d47d8a901-37403470208-1`) | §4 P2 |
-| P3 Explorer data path | **Blocked** in the estate: DC-05a is paused, and a routing-law regression makes 11 capability readings fail | §6 |
+| P3 Explorer data path | **Step 1 done** (DC-05a installed 2026-10-06); step 2, the kernel-invoked reading, is next. 11 capabilities fail their reading until the routing-law owner repairs it | §4 P3, §6 |
 | P4 Explorer workspace | **Not started** (needs P3) | §4 P4 |
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
 | P6 Deployment evolution | **Started.** Observe requires sign-in; per-user authority inside the API, durable run history and production promotion remain | §4 P6 |
@@ -276,9 +285,8 @@ Preflight, before the first push: `az acr run` built the composite against
 ### P3. Explorer data path
 
 1. Finish estate unit **DC-05a**: declare the navigation policy and add
-   `capability_navigation` to `analysis.read_capability_details`. The migration
-   pair is drafted and dry-run clean, but **not installed** (paused 2026-10-05; see
-   §6).
+   `capability_navigation` to `analysis.read_capability_details`. **Installed
+   2026-10-06** (estate `58602e4`; definition `1627abda…`, policy r4).
 2. Declare a reading capability that the kernel invokes, like
    `read-live-scenario-circuit`, and add it to `circuit-host.json` readers with
    the same timeouts, size cap, queueing and cache. This keeps one invocation
@@ -360,14 +368,12 @@ DC-05a must be installed before the Explorer can read navigation.
   350 selected capabilities, including the 30-scenario
   `author-capability-scenario-conveyor`. Fifteen carry NULL-terminal variants in
   some scenario (165 rows). Source: estate migration
-  `correct-v3-routing-and-terminal-law`. It needs an estate repair before the
-  Explorer can show those capabilities.
-- **DC-05a is paused.** Its draft migration pair
-  (`declare-capability-navigation.sql`/`.commit.sql`) entered estate history
-  through an unrelated commit (18c7c07) before acceptance. Do not run it until the
-  unit resumes: its preflight harness needs a transaction check after every
-  request, and its marker reporting has one open correction. The preflight's
-  accidental residue was retired by estate commit 7440728.
+  `correct-v3-routing-and-terminal-law`. Rechecked 2026-10-06, unchanged.
+  Decision (2026-10-06): the repair stays with the law's owner; the Explorer
+  renders these capabilities as a visible reading failure (error 515).
+- **DC-05a, closed 2026-10-06.** The harness now checks `@@TRANCOUNT` after
+  every request; the marker correction is in; the pair was regenerated,
+  preflighted and installed (estate `58602e4`).
 - **Second-renderer drift.** Any Explorer view that redraws circuit topology from
   rows in the browser violates D4. Use the returned scene, or extend scene
   authority in the estate.
