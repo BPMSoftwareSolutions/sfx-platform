@@ -70,6 +70,16 @@ gone; `/circuit` and `/circuit/` redirect here, keeping their query. The regions
   evidence and execution testimony. The element ids of these controls (`#viewer`,
   `#slide`, `#mode`, `#follow`, `#speed`, `#replay`, …) are what the staging browser
   acceptance drives.
+- **View: Paged | Linear** (shown when the scene has a `scenario-linear` slide).
+  Paged is the page-by-page circuit. Linear shows the reader's single linear
+  scene: Given / Input pinned at the left, Then / Outcome pinned at the right, and
+  the execution bands scrolling between them.
+  - **Zoom:** −, Fit, 100%, 125% and +, or Ctrl + wheel. 100% is a page's width.
+    Zoom stops where the two end caps would take half the frame.
+  - **Follow execution** scrolls the band to the current position instead of
+    switching pages.
+  - **Saved:** the choice is kept per viewer and in the URL (`view=linear`).
+  - **Traversal:** paged traversal never includes the linear slide.
 - **Sections:** each section shows the rows of its declared result set. A
   scenario-scoped section shows only the selected scenario's rows, using its
   declared scenario key. Rows with a non-ROW `row_state` are shown as markers.

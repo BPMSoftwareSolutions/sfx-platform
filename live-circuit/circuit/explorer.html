@@ -119,6 +119,19 @@
   .observe-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 6px; }
   #observe-status { font-size: 12px; overflow-wrap: anywhere; margin: 6px 0; }
   @media (max-width: 1150px) { .evidence-grid { grid-template-columns: 1fr; } }
+  /* View and zoom. Linear: the reader's end caps stay pinned and its bands scroll between them. */
+  .view-controls { display: inline-flex; gap: 6px; align-items: center; }
+  .view-controls[hidden] { display: none; }
+  .seg { display: inline-flex; }
+  .seg button { border-radius: 0; } .seg button:first-child { border-radius: 6px 0 0 6px; } .seg button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+  .seg button[aria-pressed="true"] { background: var(--cyan); color: var(--bg); border-color: var(--cyan); font-weight: bold; }
+  .circuit-frame.linear { display: flex; align-items: flex-start; background: #050f1b; border-radius: 6px; overflow: hidden; }
+  .cap { position: relative; overflow: hidden; flex: none; z-index: 2; }
+  #cap-left { box-shadow: 6px 0 10px -4px rgba(0, 0, 0, .55); } #cap-right { box-shadow: -6px 0 10px -4px rgba(0, 0, 0, .55); }
+  .viewer-copy { position: absolute; top: 0; }
+  .circuit-frame.linear #band { flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; }
+  .circuit-frame.linear #band-inner { position: relative; overflow: hidden; }
+  .circuit-frame.linear #viewer { position: absolute; top: 0; aspect-ratio: auto; border-radius: 0; }
 </style>
 </head>
 <body>
@@ -156,6 +169,12 @@
         <button id="step" type="button" disabled>Step</button>
         <label>Speed <select id="speed"></select></label>
         <button id="live" type="button" disabled>Return to live</button>
+        <span class="view-controls" id="view-controls" hidden>
+          <span class="seg" role="group" aria-label="Circuit view"><button id="view-paged" type="button" aria-pressed="true">Paged</button><button id="view-linear" type="button" aria-pressed="false">Linear</button></span>
+          <button id="zoom-out" type="button" disabled aria-label="Zoom out">−</button>
+          <select id="zoom" aria-label="Zoom" disabled><option value="fit">Fit</option><option value="1">100%</option><option value="1.25">125%</option></select>
+          <button id="zoom-in" type="button" disabled aria-label="Zoom in">+</button>
+        </span>
         <label class="check"><input id="follow" type="checkbox" checked>Follow execution page</label>
         <label class="check"><input id="overlay" type="checkbox" checked>Animate evidence</label>
         <select id="slide" aria-label="Circuit page"></select>
@@ -163,7 +182,11 @@
       <div class="run-lines"><span><span id="observer-status">Observer connecting</span> · <span id="run"></span></span><span id="cursor" role="status"></span><span id="flow-basis"></span></div>
       <div class="detail-bar" id="detail-pages" hidden><label>Drill-down page <select id="detail-page"></select></label><button id="close-detail" type="button">Back to scenario circuit</button></div>
       <div id="empty">Choose a capability to read its circuit.</div>
-      <div id="viewer" hidden></div>
+      <div id="circuit-frame" class="circuit-frame">
+        <div class="cap" id="cap-left" hidden><div class="viewer-copy" id="viewer-cap-left"></div></div>
+        <div id="band"><div id="band-inner"><div id="viewer" hidden></div></div></div>
+        <div class="cap" id="cap-right" hidden><div class="viewer-copy" id="viewer-cap-right"></div></div>
+      </div>
       <div class="legend">Bright: latest receipt / recorded interval · Dim: observed history · <span class="warning">Input</span> · <span style="color:var(--green)">Completed</span> · <span class="error">Failure</span> · Dashed input: field presence unavailable · Unlit: no matching evidence</div>
     </section>
     <details class="panel run-evidence"><summary>Run evidence: verification and execution testimony</summary>

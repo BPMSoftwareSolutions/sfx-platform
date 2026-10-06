@@ -1,6 +1,10 @@
 # Capability Explorer: linear scenario view, design L1
 
-Recorded 2026-10-06. Status: **for review**. Nothing is implemented.
+Recorded 2026-10-06. Status: **implemented on 2026-10-06 with the reader-composed
+option.** The estate's `render_integrated_scenario_circuit` returns a
+`scenario-linear` slide (sfx-embody `d9b1d3b`). The Explorer's View (Paged |
+Linear) and Zoom lay it out with pinned end caps and a scrolling band. See
+`live-circuit/circuit/README.md`. The design below is the reviewed L1 record.
 
 The deck is one editable slide:
 `sfx-providers/outputs/capability-estate/live-circuit-platform-explorer/L1/linear-L1.pptx`.

@@ -9,7 +9,9 @@ export function el(tag, attributes = {}, children = []) {
   }
   node.append(...children); return node;
 }
-const position = (x, y, w, h) => `left:${x / 9.6}%;top:${y / 5.4}%;width:${w / 9.6}%;height:${h / 5.4}%;`;
+// A slide declares its drawing surface; pages are 960 x 540, a linear scene is wider.
+export const surface = slide => { const [, , w, h] = slide?.blueprint?.viewBox ?? [0, 0, 960, 540]; return { w, h }; };
+const placer = ({ w: W, h: H }) => (x, y, w, h) => `left:${x / W * 100}%;top:${y / H * 100}%;width:${w / W * 100}%;height:${h / H * 100}%;`;
 const svg = (tag, attributes = {}) => {
   const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
   for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
@@ -122,11 +124,12 @@ const DEFECT_KINDS = new Set(['outcome-defect', 'reported-variant']);
 // busy, visited, tokens and terminal. Nothing here reinterprets receipts.
 export function renderCircuitViewer(root, deck, slide, view, options) {
   const { selectedNode, selectNode, selectSlide, selectTarget, overlay, run, mode, paused } = options;
+  const size = surface(slide), position = placer(size);
   const key = `${deck.id}:${deck.presentationDigest ?? ''}:${slide.id}:${slide.svgDigest??''}:${run?.id ?? ''}:${options.playbackId ?? ''}:${deck.observationMap?.boundaries?.length ?? 0}`;
   if (root.dataset.slide !== key) {
     root.dataset.slide = key;
     root.replaceChildren(el('img', { src: slide.imageUrl, alt: `${slide.title} — ${deck.capabilityId}`, class: 'deck-image' }),
-      svg('svg', { class: 'flow-wires', viewBox: '0 0 960 540', 'aria-hidden': 'true' }),
+      svg('svg', { class: 'flow-wires', viewBox: `0 0 ${size.w} ${size.h}`, 'aria-hidden': 'true' }),
       el('div', { class: 'deck-overlay', role: 'group', 'aria-label': 'Deck component inspection and observations' }));
     const layer = root.querySelector('.deck-overlay');
     for (const glyph of [...(slide.blueprint?.glyphs ?? []), ...boundaryGlyphs(deck, slide)]) {

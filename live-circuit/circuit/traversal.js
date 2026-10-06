@@ -79,7 +79,10 @@ export function outcomeTerminal(deck, boundary, evidence, run) {
       : 'Returned variant has no exact declared match. It is testimony, not a domain outcome.' };
 }
 
-const flowScenes = deck => deck.slides.filter(s => s.blueprint?.flow?.contractId === FLOW_CONTRACT);
+// A linear scene repeats the pages' lanes on one surface: a deck view traverses
+// either the pages or the linear scene, never both.
+const flowScenes = deck => deck.slides.filter(s => s.blueprint?.flow?.contractId === FLOW_CONTRACT &&
+  (s.blueprint.role === 'scenario-linear') === Boolean(deck.linear));
 const selectedBoundary = deck => (deck.observationMap?.boundaries ?? []).find(b => b.scenarioId === deck.scenarioId) ??
   deck.observationMap?.boundaries?.[0] ?? null;
 
