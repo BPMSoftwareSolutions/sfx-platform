@@ -391,6 +391,21 @@ The primary workbench renders complete selected SQL blueprints, declared scenari
 
 Source nodes and routes retain their identities, contracts, pointers and digest provenance. Coverage and geometry checks reject omitted source components or rendered edges. Branch, fan-out, convergence, return, recurrence, cancellation and dependency relations retain their native vocabulary. Search, zoom, component inspection and silver-ball route tracing operate on this complete graph. Tracing is an illustration of declared relationships, with automatic continuation across branches and joins, one visit per cyclic route, and a visible completion count; it never invokes providers or establishes execution testimony. Reviewed authored films and circuit editions remain separate teaching surfaces. The boundary renderer remains the readable fallback and contract summary; it cannot stand in for an available complete blueprint. The full dedicated-image backfill remains open; see `visual-integration-audit.md` and `media-operations.md`.
 
+### 10.1 Observation altitude and evidence context
+
+[Observation altitudes](observation-altitudes.md) establishes the nine-level resolution model:
+Enterprise Capability Data Center → Circuit Domain → Circuit Assembly → Capability Circuit →
+Scenario Network → Scenario Cell → Event / Execution Authority → Mechanic Circuit → Provider /
+Physical Realization. This is the governing observation vocabulary, independent of semantic and
+authoring altitude, the four runtime cell altitudes, material/visual planes and camera zoom.
+
+The selected altitude is shown with its parent context. Descent changes the projection while
+preserving authority, exact subject identity, revisions, typed boundaries and selected evidence.
+Cost, risk, security, SLO and similar properties are overlays, not more altitudes. Execution-cell
+testimony is one source for these views; filtering it by `scenario`, `mechanic`, `provider` or
+`physical` does not implement the nine-level hierarchy. Projection, navigation and overlay
+implementation remain open; the decision's delivery and acceptance matrix records that work.
+
 ## 11. What makes this cutting edge
 
 The architectural bet, stated plainly:
@@ -414,6 +429,7 @@ The architecture is established; portions remain unimplemented. Per §10 and the
 | Capability export adapter, verified SDA release | 5.3, 9 | Not connected; no downloads offered anywhere |
 | SQL media schema + Nano Banana production + ingest | 5.2 | Schema installed; originals, derivatives and exact bindings persisted. 10 reviewed subject images / 20 selections; 1,383 further jobs queued |
 | Content-lab grammar/material/player integration | 10 | Connected: 15 materials, complete source topology, 35 SQL blueprints, mechanic dependency graphs, 810 scenario workbench entries and reviewed teaching editions. Unmatched definitions retain explicit gaps |
+| Nine observation altitudes, parent context and evidence mapping | 10.1 | Vocabulary established; projection contracts, navigation, geometry and evidence/overlay acceptance remain open. See `observation-altitudes.md` §8 |
 | Durable inquiry store + mail worker | 4, spec §8.7 | Hosted builds reject submissions with values preserved |
 | Legal entity, analytics config, workspace routes | 4, 5.4 | Registered unavailable; unlinked, noindex |
 | Estate analytics, semantic retrieval, media QA services | 7 | Lab assets exist; platform services not wired (§7.4) |

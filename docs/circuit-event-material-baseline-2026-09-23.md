@@ -7,6 +7,13 @@ current circuit renderer (`components/circuit/*`, `lib/run-graph.ts`, `lib/live-
 **Authority:** the raw captures are the evidence; this document analyses them. Raw files live in
 `%TEMP%\opencode\baseline` (machine-local, not committed) and are listed in §1.2.
 
+**Terminology clarification (2026-09-23):** The four `scenario`, `mechanic`, `provider` and
+`physical` values in this study are execution-cell altitudes. They are not the nine observation
+altitudes established in [the observation model](observation-altitudes.md). That model defines
+enterprise-to-physical resolution with parent context, independently of runtime filters,
+semantic/authoring altitude and overlays. The measurements and raw field names below remain
+unchanged; this capture supports lower-level projection analysis, not proof of all nine views.
+
 Two capabilities were captured:
 
 | Capability | Graph | Lane |

@@ -1,4 +1,40 @@
-# SFX Live Circuit Platform home page: design H1
+# SFX Live Circuit Platform home page: design H2
+
+## H2 visual revision, 2026-10-05
+
+The revised eight-slide deck is in
+`sfx-providers/outputs/capability-estate/live-circuit-platform-home/H2/home-H2.pptx`.
+H1 remains unchanged. This is a design revision, not a website deployment.
+
+- Two generated navy/cyan optical backgrounds support the cover, desktop and
+  mobile compositions. They are decorative artwork, never execution evidence.
+- Text, controls and page structures remain native editable PowerPoint objects.
+  The three circuit placements retain the exact database SVG with its PNG fallback.
+- The headline is now **Watch capabilities execute live.** It avoids claiming
+  universal execution readiness from one accepted capability run.
+- Featured cards use complete editorial summaries of their retained user stories
+  and promises. Their friendly titles are design copy, not new database labels.
+- The desktop signed-in view retains an explicit empty run state. All seven
+  original review decisions remain present.
+
+The sources remain the H1 readings at `2026-10-05T22:35Z`, including 350
+capabilities, 1,019 scenarios and 125 multi-scenario capabilities. The design
+task did not refresh or change database authority. See the source details below.
+
+| H2 artifact | SHA-256 / verification |
+| --- | --- |
+| `home-H2.pptx`, 18,639,013 bytes | `0faa60178776b94f9e27ff656bde92ff67f720d1245b52ed3bfff683a430719f` |
+| Exact embedded scene SVG, slides 3, 5 and 6 | `250c07e73dd9e888b468f50d1d90cfe8a62b919286b9fd8765a9a215be1ba26f` |
+| Source H1, preserved | `b0a856c00f5635ffcad336bcfc8d82885132e1936b31f26560ab37567ad330a9` |
+| `render/slide-01..08.png` | Final Microsoft PowerPoint renders, individually reviewed |
+| `generator/`, `sources/`, `assets/`, `SHA256SUMS` | Retained authoring sources, readings, imagery and hashes |
+
+Package integrity, slide count, source dimensions, heading fit, font policy and
+Artifact Tool re-import all passed with no findings. Native PowerPoint rendering
+also passed. The deck preserves Arial and the source 13.333 × 7.5 inch canvas.
+The output folder remains outside Git. This record supplies its durable identity.
+
+## H1 baseline
 
 Status: **H1 drafted for review, 2026-10-05.** It is not implemented. The
 staging gateway still sends `/` to the Next.js website, which retires under

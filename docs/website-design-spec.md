@@ -867,6 +867,17 @@ The supplied PNGs guide depth, material, hierarchy and drill-down affordances. T
 
 Opening a capability selects its overview and a meaningful initial scenario. Selecting a scenario, node or supported altitude preserves capability identity, revision and evidence context. Supply fit, zoom, pan, search within the circuit, a text outline, legend, node details, source inspection, Base/Material appearance and SVG/PNG export. Back navigation restores catalog filters and scroll.
 
+**Observation altitude** follows the nine-level contract in
+[`observation-altitudes.md`](observation-altitudes.md): Enterprise Capability Data Center through
+Provider / Physical Realization (OA0–OA8). Show the selected level with its parent context;
+preserve exact authority, subject, revision, run and evidence scope through navigation. This is
+independent of semantic/authoring altitude, the four runtime cell/testimony altitudes, visual
+planes, material choice and camera zoom. Cost, risk, security, SLO and similar properties are
+observation overlays. Resolve the typed observation projection before layout; a drawing limit or
+runtime-altitude filter cannot stand in for that projection. The linked decision defines each
+level's contents, source requirements, boundary/evidence mapping and acceptance. Its vocabulary
+is established; its implementation is not implied by this specification.
+
 Reuse `templates/circuit-flow.js` from the content lab through a pinned integration. The silver sphere follows exact compiled edge paths and junction arms. Fan-out emits the declared branches; joins wait for the required arrivals; decisions take only the selected illustrative alternative. Support links do not carry execution spheres. Refuse unsupported retries or traces rather than inventing their iteration or timing.
 
 Playback begins only on **Play flow**. Pause/resume, replay, seek and speed preserve deterministic viewer state. Base/Material switching retains selection, zoom and flow time. Reduced motion advances to event boundaries. Hiding/leaving the page stops motion; node inspection pauses it. Label this mode **Illustrative flow**.

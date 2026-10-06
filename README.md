@@ -9,6 +9,9 @@ boundaries, pipelines, contracts and honesty invariants — that the codebase is
 [`docs/visual-integration-audit.md`](docs/visual-integration-audit.md) is the ledger of open gates.
 [`docs/capability-execution.md`](docs/capability-execution.md) documents capability execution — the
 surface that runs a capability from the database, and the platform's centre of gravity.
+[`docs/observation-altitudes.md`](docs/observation-altitudes.md) establishes the nine observation
+altitudes, parent-context navigation and evidence mapping, separately from semantic/authoring
+altitude, runtime cell filters and observation overlays. It records requirements and open work.
 
 ## Running it
 
