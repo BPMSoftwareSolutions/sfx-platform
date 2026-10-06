@@ -85,9 +85,25 @@ the Explorer shows those 11 capabilities as a visible reading failure.
 - **Presentations.** Specialized renderers for the 21 presentation kinds (for
   example the DO / TO / SO THAT narrative). All kinds render as tables or
   fields today.
-- **Live state.** The live and replay overlay inside the Explorer (spec §8).
+**P4 second slice, 2026-10-06: one workspace.** The Explorer now hosts the
+live circuit, so the separate page is gone.
 
-The first two are estate policy revisions. Alongside: P0 credential custody in its
+- **Runtime module.** `app.js`'s runtime is now `circuit-runtime.js`, mounted
+  by the Explorer. It provides live following, replay, run controls, component
+  drill-down and Observe.
+- **Observe input.** Observe sits in the right column. Its input contract
+  renders as one field per declared value, and the fields write the input JSON
+  that is submitted.
+- **Old addresses.** `/circuit` and `/circuit/` redirect to `/circuit/explorer`
+  with their query. The old page, its `app.js` and `session-status.js` are
+  removed.
+- **Acceptance.** Staging browser acceptance now drives the Explorer (sign-in,
+  live Observe, external follow, replay, enrollment) with the same element
+  ids, and public acceptance checks the redirect and the removed scripts.
+- **Tested locally** before release.
+
+Remaining from the first slice: summary cards, the operation scene key and
+specialized presentations. The first two are estate policy revisions. Alongside: P0 credential custody in its
 own window, P5 (remove the Next.js code and the now-unused overlay packagers),
 and the remaining P1 local-observer cleanup.
 
@@ -121,7 +137,7 @@ rollback target. The old Next.js website still answers `/`.
 | Home page | **Designed and built, not released.** H1 (`1507752`), then H2 from another session; H2 implemented at `/circuit/home` with the sign-in page restyled to match (`0ca7388`) | [Home page design](home-page-design.md) |
 | P2 One image without Next.js | **Accepted 2026-10-06** (`composite-e82d47d8a901-37403470208-1`) | §4 P2 |
 | P3 Explorer data path | **Steps 1–3 done 2026-10-06**: navigation installed, `read-capability-details` declared, served at `/api/circuit/v1/capability-details`. Uncached host reads take 3.9–5.0 s, over the 3-second bound (see §4 P3); cached reads are immediate. 11 capabilities fail their reading until the routing-law owner repairs it | §4 P3, §6 |
-| P4 Explorer workspace | **First slice built 2026-10-06** at `/circuit/explorer`; summary cards, operation linking, specialized presentations and the live overlay remain | §4 P4 |
+| P4 Explorer workspace | **One workspace 2026-10-06**: Explorer with the live circuit runtime and Observe; `/circuit` redirects there. Summary cards, operation linking and specialized presentations remain | §4 P4 |
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
 | P6 Deployment evolution | **Started.** Observe requires sign-in; per-user authority inside the API, durable run history and production promotion remain | §4 P6 |
 

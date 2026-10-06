@@ -65,7 +65,7 @@ const get = (target, path, cookie) => fetch(target.origin + path, { headers: coo
 let cookie = null, session = null;
 
 check('sign-in and home pages, scripts, styles and artwork are served', async () => {
-  for (const p of ['/circuit/login', '/circuit/login.js', '/circuit/session-status.js', '/circuit/home', '/circuit/home.js', '/circuit/site.js',
+  for (const p of ['/circuit/login', '/circuit/login.js', '/circuit/explorer', '/circuit/explorer.js', '/circuit/circuit-runtime.js', '/circuit/home', '/circuit/home.js', '/circuit/site.js',
     '/circuit/site.css', '/circuit/assets/optical-flow.webp', '/circuit/assets/optical-architecture-900.webp', '/circuit/assets/sfx-logo-wordmark.png'])
     assert.equal((await get(o, p)).status, 200, p);
 });

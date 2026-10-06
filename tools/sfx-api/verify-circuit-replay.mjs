@@ -37,9 +37,9 @@ try {
     : route.fulfill({status:200,contentType:'text/event-stream',body:': retained replay acceptance; no new live records\n\n'}));
   if (candidate) await page.route('**/circuit/traversal.js', route => route.fulfill({
     contentType: 'text/javascript', body: fs.readFileSync(candidate, 'utf8') }));
-  if (candidate) await page.route('**/circuit/app.js', route => route.fulfill({
-    contentType: 'text/javascript', body: fs.readFileSync(path.join(path.dirname(candidate), 'app.js'), 'utf8') }));
-  await page.goto(endpoint + '/circuit?' + new URLSearchParams({ capability: deck.capabilityId,
+  if (candidate) await page.route('**/circuit/circuit-runtime.js', route => route.fulfill({
+    contentType: 'text/javascript', body: fs.readFileSync(path.join(path.dirname(candidate), 'circuit-runtime.js'), 'utf8') }));
+  await page.goto(endpoint + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId,
     namespace: deck.namespaceId, scenario: deck.scenarioId, page: 'scenario-1' }));
   await page.waitForSelector('.component-hit', { timeout: 90000 });
   await page.locator('#follow').check();

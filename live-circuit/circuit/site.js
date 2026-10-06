@@ -25,7 +25,7 @@ export function circuitHref(capabilityId, namespaceId, scenarioId, page) {
   const q = new URLSearchParams({ capability: capabilityId, namespace: namespaceId });
   if (scenarioId) q.set('scenario', scenarioId);
   if (page) q.set('page', page);
-  return `/circuit/?${q}`;
+  return `/circuit/explorer?${q}`;
 }
 
 async function sha256(text) {

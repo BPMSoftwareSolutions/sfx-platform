@@ -20,7 +20,7 @@ try {
   const response = await fetch(origin + '/api/circuit/v1/scenario?' + selection);
   assert.equal(response.status, 200); const scene = await response.json();
   fs.writeFileSync(path.join(evidence, 'scene.json'), JSON.stringify(scene));
-  await page.goto(origin + '/circuit?' + new URLSearchParams({ capability, namespace: scene.namespaceId, scenario: capability, page: 'scenario-1' }));
+  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability, namespace: scene.namespaceId, scenario: capability, page: 'scenario-1' }));
   await page.waitForSelector('.component-hit', { timeout: 90000 });
   await page.locator('#follow').check();
   await page.evaluate(async () => {

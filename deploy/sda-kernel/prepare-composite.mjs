@@ -50,7 +50,7 @@ const release = {
   retrieval: previous.retrieval,
   // Binaries come from the components image; the placed policy is this repository's.
   identity: { ...previous.identity, policy: files['host/identity-policy.json'] },
-  circuit: { app: files['estate/demo/circuit/app.js'], traversal: files['estate/demo/circuit/traversal.js'], sourceCommit, files },
+  circuit: { runtime: files['estate/demo/circuit/circuit-runtime.js'], traversal: files['estate/demo/circuit/traversal.js'], sourceCommit, files },
   composite: { kind: 'composite', base, componentsImage, componentsRelease: previous.id, previousManifest: sha(previousFile), website: false }
 };
 fs.writeFileSync(path.join(runtime, 'release.json'), JSON.stringify(release, null, 2) + '\n');

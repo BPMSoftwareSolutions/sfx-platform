@@ -97,7 +97,7 @@ try {
   const sceneResponse = await fetch(origin + '/api/circuit/v1/scenario?' + query);
   assert.equal(sceneResponse.status, 200); scene = await sceneResponse.json();
   fs.writeFileSync(path.join(evidence, 'scene.json'), JSON.stringify(scene));
-  await page.goto(origin + '/circuit?' + new URLSearchParams({ capability: request.subject, namespace: query.get('namespaceId'), scenario: request.subject, page: 'scenario-1' }));
+  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: request.subject, namespace: query.get('namespaceId'), scenario: request.subject, page: 'scenario-1' }));
   await page.locator('.component-hit').first().waitFor({ timeout: 90000 });
   await page.waitForFunction(() => document.querySelector('#identity').textContent.includes('Signed in as'));
   assert((await page.locator('#identity').textContent()).includes(fixture.identifier));

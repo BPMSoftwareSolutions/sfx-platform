@@ -40,7 +40,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="/circuit/home" aria-label="SFX Live Circuit Platform home"><img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX"><span class="divider"></span><span class="label">Live Circuit Platform</span></a>
-    <nav class="site-nav" aria-label="Primary"><a href="/circuit/">Live Circuit</a><a href="/circuit/explorer">Explorer</a><a href="/circuit/home#how">How it works</a></nav>
+    <nav class="site-nav" aria-label="Primary"><a href="/circuit/explorer">Explorer</a><a href="/circuit/home#how">How it works</a></nav>
     <div class="site-actions"><span class="env" id="env" hidden></span></div>
   </div>
 </header>
@@ -50,12 +50,12 @@
     <section aria-labelledby="title">
       <p class="eyebrow">Sign in</p>
       <h1 class="display" id="title">Sign in to observe live runs.</h1>
-      <p class="lede">Signing in runs the <a id="capability-link" href="/circuit/?capability=authenticate-ide-user&amp;namespace=sidefx%3Acapabilities&amp;scenario=authenticate-ide-user">authenticate-ide-user</a>
+      <p class="lede">Signing in runs the <a id="capability-link" href="/circuit/explorer?capability=authenticate-ide-user&amp;namespace=sidefx%3Acapabilities&amp;scenario=authenticate-ide-user">authenticate-ide-user</a>
         capability, shown below as declared in the database. Observe requires a signed-in identity, and each run you start is attributed to it.</p>
       <article class="circuit-card" aria-label="Sign-in circuit">
         <header><p class="panel-label" id="circuit-label">Sign-in circuit</p><span class="source">DATABASE SCENE</span></header>
         <div class="circuit-figure" id="circuit-figure"><div class="state">Reading the circuit from the database…</div></div>
-        <footer><span id="circuit-caption"></span><a id="circuit-link" href="/circuit/">Open this circuit</a></footer>
+        <footer><span id="circuit-caption"></span><a id="circuit-link" href="/circuit/explorer">Open this circuit</a></footer>
       </article>
     </section>
 
@@ -91,7 +91,7 @@
   <div class="wrap">
     <img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX">
     <span class="credit">SideFX / a BPM Intelligence product</span>
-    <nav class="links" aria-label="Footer"><a href="/circuit/home">Home</a><a href="/circuit/">Live Circuit</a><a href="/healthz">Status</a></nav>
+    <nav class="links" aria-label="Footer"><a href="/circuit/home">Home</a><a href="/circuit/explorer">Live Circuit</a><a href="/healthz">Status</a></nav>
     <span class="release" id="release"></span>
   </div>
 </footer>

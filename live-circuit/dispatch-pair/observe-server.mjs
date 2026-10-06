@@ -12,9 +12,6 @@ const port = Number.parseInt(process.env.OBSERVER_PORT ?? '8787', 10);
 // The circuit consumes database scenes or historical exports and declared observation identities.
 const CIRCUIT_DIR = new URL('../circuit/', import.meta.url);
 const CIRCUIT_FILES = new Map([
-  ['/circuit', ['index.html', 'text/html; charset=utf-8']],
-  ['/circuit/', ['index.html', 'text/html; charset=utf-8']],
-  ['/circuit/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/circuit/observe-panel.js', ['observe-panel.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-viewer.js', ['circuit-viewer.js', 'text/javascript; charset=utf-8']],
   ['/circuit/navigation.js', ['navigation.js', 'text/javascript; charset=utf-8']],
@@ -24,11 +21,11 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/playback-clock.js', ['playback-clock.js', 'text/javascript; charset=utf-8']],
   ['/circuit/login', ['login.html', 'text/html; charset=utf-8']],
   ['/circuit/login.js', ['login.js', 'text/javascript; charset=utf-8']],
-  ['/circuit/session-status.js', ['session-status.js', 'text/javascript; charset=utf-8']],
   ['/circuit/home', ['home.html', 'text/html; charset=utf-8']],
   ['/circuit/home.js', ['home.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer', ['explorer.html', 'text/html; charset=utf-8']],
   ['/circuit/explorer.js', ['explorer.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/circuit-runtime.js', ['circuit-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer-model.mjs', ['explorer-model.mjs', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-canvas.css', ['circuit-canvas.css', 'text/css; charset=utf-8']],
   ['/circuit/site.js', ['site.js', 'text/javascript; charset=utf-8']],
@@ -454,6 +451,12 @@ const handleRequest = async (req, res) => {
     }
     if (req.method === 'POST' && (url.pathname === '/events' || url.pathname === '/events/batch')) {
       await receive(req, res);
+      return;
+    }
+    // The former Live Circuit page is the Explorer; old links keep their selection.
+    if (req.method === 'GET' && (url.pathname === '/circuit' || url.pathname === '/circuit/')) {
+      res.writeHead(302, { location: `/circuit/explorer${url.search}`, 'cache-control': 'no-store' });
+      res.end();
       return;
     }
     if (req.method === 'GET' && CIRCUIT_FILES.has(url.pathname)) {

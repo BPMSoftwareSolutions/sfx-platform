@@ -23,7 +23,7 @@ const signedOut = {
 // Only same-origin circuit paths are accepted as a return target.
 const target = (() => {
   const value = new URLSearchParams(location.search).get('return');
-  return value && value.startsWith('/circuit') && !value.startsWith('//') && !value.includes('\\') ? value : '/circuit/';
+  return value && value.startsWith('/circuit') && !value.startsWith('//') && !value.includes('\\') ? value : '/circuit/explorer';
 })();
 
 function status(text, kind = '') { $('status').textContent = text; $('status').className = kind; }

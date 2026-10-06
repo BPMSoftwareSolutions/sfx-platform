@@ -20,7 +20,7 @@ test('rollback must own the binding; uncertain PATCH can still recover', () => {
   assert(!rollbackAllowed({ ...state, bindAttempted: false }, image));
 });
 test('host and circuit files ship; infrastructure changes do not', () => {
-  releaseChanges(['live-circuit/circuit/app.js', 'deploy/sda-kernel/gateway.mjs', 'deploy/sda-kernel/api.mjs',
+  releaseChanges(['live-circuit/circuit/explorer.js', 'deploy/sda-kernel/gateway.mjs', 'deploy/sda-kernel/api.mjs',
     'deploy/sda-kernel/identity-policy.json', 'infra/azure.json']);
   assert.throws(() => releaseChanges(['infra/main.bicep']));
 });

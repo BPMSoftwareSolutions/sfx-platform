@@ -15,6 +15,77 @@ export function payloadTemplate(schema, root = schema, depth = 0) {
   return null;
 }
 
+// Input fields for the declared contract: one control per leaf of the schema, so
+// one value can be set without editing JSON. The JSON input remains the value
+// that is submitted; the fields read and write it.
+const resolveRef = (ref, root) => ref.slice(2).split('/').reduce((value, key) => value?.[key.replace(/~1/g, '/').replace(/~0/g, '~')], root);
+export function inputFields(schema, root = schema, path = [], required = true, depth = 0) {
+  if (!schema || depth > 12) return [];
+  if (schema.$ref?.startsWith('#/')) return inputFields(resolveRef(schema.$ref, root), root, path, required, depth + 1);
+  if (schema.properties && !Object.hasOwn(schema, 'const'))
+    return Object.entries(schema.properties).flatMap(([key, child]) => inputFields(child, root, [...path, key], (schema.required ?? []).includes(key), depth + 1));
+  return [{ path, schema, required }];
+}
+export function fieldKind(s) {
+  if (Object.hasOwn(s, 'const')) return 'const';
+  if (Array.isArray(s.enum)) return 'enum';
+  if (s.type === 'boolean') return 'boolean';
+  if (s.type === 'integer' || s.type === 'number') return 'number';
+  if (s.type === 'string') return (s.maxLength ?? Infinity) > 120 ? 'text-long' : 'text';
+  if (s.type === 'array' && (!s.items || s.items.type === 'string')) return 'lines';
+  return 'json';
+}
+const valueAt = (object, path) => path.reduce((value, key) => value == null ? undefined : value[key], object);
+function setAt(object, path, value) {
+  let target = object;
+  for (const key of path.slice(0, -1)) { if (target[key] == null || typeof target[key] !== 'object') target[key] = {}; target = target[key]; }
+  if (value === undefined) delete target[path.at(-1)]; else target[path.at(-1)] = value;
+}
+function fieldValue(field, control) {
+  const kind = fieldKind(field.schema), text = control.value;
+  if (kind === 'boolean') return control.checked;
+  if (kind === 'number') return text === '' ? undefined : Number(text);
+  if (kind === 'enum') return text === '' ? undefined : field.schema.enum.find(option => JSON.stringify(option) === text);
+  if (kind === 'lines') { const items = text.split('\n').map(line => line.trim()).filter(Boolean); return items.length || field.required ? items : undefined; }
+  if (kind === 'json') return text.trim() === '' ? undefined : JSON.parse(text);
+  return text === '' && !field.required ? undefined : text;
+}
+function showValue(field, control, value) {
+  const kind = fieldKind(field.schema);
+  if (kind === 'const') control.textContent = JSON.stringify(field.schema.const);
+  else if (kind === 'boolean') control.checked = value === true;
+  else if (kind === 'enum') control.value = value === undefined ? '' : JSON.stringify(value);
+  else if (kind === 'lines') control.value = Array.isArray(value) ? value.join('\n') : '';
+  else if (kind === 'json') control.value = value === undefined ? '' : JSON.stringify(value, null, 2);
+  else control.value = value ?? '';
+}
+function fieldControl(field, write) {
+  const s = field.schema, kind = fieldKind(s), name = field.path.join('.');
+  const make = (tag, attributes) => Object.assign(document.createElement(tag), attributes);
+  let control;
+  if (kind === 'const') control = make('code', {});
+  else if (kind === 'enum') {
+    control = make('select', {});
+    control.append(new Option(field.required ? 'Choose…' : '(not set)', ''));
+    for (const option of s.enum) control.append(new Option(typeof option === 'string' ? option : JSON.stringify(option), JSON.stringify(option)));
+  } else if (kind === 'boolean') control = make('input', { type: 'checkbox' });
+  else if (kind === 'number') control = make('input', { type: 'number', step: s.type === 'integer' ? '1' : 'any' });
+  else if (kind === 'text') control = make('input', { type: 'text', autocomplete: 'off', spellcheck: false });
+  else control = make('textarea', { rows: 3, spellcheck: false, placeholder: kind === 'lines' ? 'One item per line' : kind === 'json' ? 'JSON value' : '' });
+  for (const [attribute, key] of [['min', 'minimum'], ['max', 'maximum'], ['maxLength', 'maxLength']]) if (s[key] != null && kind !== 'const') control[attribute] = s[key];
+  control.dataset.path = name; control.id = `field-${name.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+  const hint = [s.description ?? s.title, s.pattern && `pattern ${s.pattern}`, s.format && `format ${s.format}`,
+    s.minLength && `at least ${s.minLength} character${s.minLength === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
+  const label = make('label', { className: 'input-field', htmlFor: control.id });
+  const head = make('span', { className: 'field-name', textContent: field.path.at(-1) ?? 'value', title: name });
+  if (field.required && kind !== 'const') head.append(make('span', { className: 'required', textContent: ' *', title: 'Required' }));
+  if (kind === 'const') head.append(make('span', { className: 'fixed', textContent: ' · fixed' }));
+  label.append(head, control);
+  if (hint) label.append(make('small', { textContent: hint }));
+  if (kind !== 'const') control.addEventListener(kind === 'boolean' || kind === 'enum' ? 'change' : 'input', () => write(field, control));
+  return { field, control, label };
+}
+
 export async function readEventStream(response, receive) {
   if (!response.ok) throw new Error(`Event stream unavailable (${response.status}).`);
   const reader = response.body.getReader(), decoder = new TextDecoder(); let pending = '';
@@ -43,10 +114,32 @@ export function apiRecord(event, graph) {
 
 export function createObservePanel(hooks) {
   const $ = id => document.getElementById(id), prefix = '/api/circuit/v1/runs';
-  let key = '', serial = 0, schema, template, ready = false, busy = false, run = null, feed;
+  let key = '', serial = 0, schema, template, ready = false, busy = false, run = null, feed, controls = [];
   const drafts = new Map();
   const status = (text, error = false) => { $('observe-status').textContent = text; $('observe-status').className = error ? 'error' : 'muted'; };
-  const buttons = () => { $('observe').disabled = !ready || !key || busy; $('payload').disabled = busy; $('payload-template').disabled = busy || template === undefined; };
+  const buttons = () => { $('observe').disabled = !ready || !key || busy; $('payload').disabled = busy; $('payload-template').disabled = busy || template === undefined;
+    for (const { control } of controls) control.disabled = busy; };
+  // The fields write the JSON input; editing the JSON updates the fields.
+  function writeField(field, control) {
+    let input;
+    try { input = JSON.parse($('payload').value || 'null'); } catch { input = null; }
+    if (input === null || typeof input !== 'object') input = structuredClone(template ?? {});
+    try { setAt(input, field.path, fieldValue(field, control)); } catch { control.classList.add('invalid'); return; }
+    const pattern = field.schema.pattern && control.value !== '' ? new RegExp(field.schema.pattern) : null;
+    control.classList.toggle('invalid', Boolean(pattern && !pattern.test(control.value)));
+    $('payload').value = JSON.stringify(input, null, 2); drafts.set(key, $('payload').value); $('payload-fields').classList.remove('stale');
+  }
+  function syncFields() {
+    let input;
+    try { input = JSON.parse($('payload').value || '{}'); } catch { $('payload-fields').classList.add('stale'); return; }
+    $('payload-fields').classList.remove('stale');
+    for (const { field, control } of controls) if (control !== document.activeElement) showValue(field, control, valueAt(input, field.path));
+  }
+  function renderFields() {
+    controls = schema ? inputFields(schema).map(field => fieldControl(field, writeField)) : [];
+    $('payload-fields').replaceChildren(...controls.map(({ label }) => label));
+    syncFields(); buttons();
+  }
   async function request(path, options = {}) {
     const response = await fetch(path, options), text = await response.text();
     let body; try { body = JSON.parse(text); } catch { body = text; }
@@ -115,8 +208,8 @@ export function createObservePanel(hooks) {
       busy = false; buttons();
     }
   });
-  $('payload-template').addEventListener('click', () => { $('payload').value = JSON.stringify(template, null, 2); drafts.set(key, $('payload').value); });
-  $('payload').addEventListener('input', () => drafts.set(key, $('payload').value));
+  $('payload-template').addEventListener('click', () => { $('payload').value = JSON.stringify(template, null, 2); drafts.set(key, $('payload').value); syncFields(); });
+  $('payload').addEventListener('input', () => { drafts.set(key, $('payload').value); syncFields(); });
   $('observe-resume').addEventListener('click', follow);
   function release() {
     feed?.abort(); run = null; busy = false; $('observe-resume').hidden = true; $('observe-external').hidden = true; hooks.release(); buttons();
@@ -128,7 +221,7 @@ export function createObservePanel(hooks) {
       if (key) drafts.set(key, $('payload').value);
       ++serial; key = ''; template = undefined; release();
       $('payload').value = ''; $('payload-contract').textContent = 'Reading the selected capability…';
-      $('payload-schema').textContent = ''; $('observe-result').hidden = true; status(''); buttons();
+      $('payload-schema').textContent = ''; $('observe-result').hidden = true; status(''); schema = undefined; renderFields();
     },
     async select(deck) {
       const next = JSON.stringify([deck.capabilityId, deck.namespaceId]);
@@ -136,7 +229,7 @@ export function createObservePanel(hooks) {
       if (key) drafts.set(key, $('payload').value);
       release(); key = next; schema = undefined; template = undefined; const generation = ++serial;
       $('payload').value = drafts.get(key) ?? ''; $('observe-result').hidden = true;
-      $('payload-contract').textContent = 'Reading the capability input contract…'; $('payload-schema').textContent = ''; buttons();
+      $('payload-contract').textContent = 'Reading the capability input contract…'; $('payload-schema').textContent = ''; renderFields();
       try {
         const query = new URLSearchParams({ capabilityId: deck.capabilityId, namespaceId: deck.namespaceId });
         const root = deck.scenarioId === deck.rootScenarioId ? deck : await request(`/api/circuit/v1/scenario?${query}`);
@@ -150,6 +243,7 @@ export function createObservePanel(hooks) {
         $('payload-contract').textContent = `Input contract · ${boundary.inputContractId} · Fill the required values before observing.`;
         $('payload-schema').textContent = JSON.stringify(schema, null, 2);
         if (!drafts.has(key)) $('payload').value = JSON.stringify(template, null, 2);
+        renderFields();
       } catch (error) { if (generation === serial) $('payload-contract').textContent = error.message; }
       if (generation === serial) buttons();
     }

@@ -18,7 +18,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1600, height: 1200 } });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto(endpoint + '/circuit?capability=enroll-ide-user&namespace=sidefx%3Acapabilities&scenario=enroll-ide-user&page=scenario-1');
+  await page.goto(endpoint + '/circuit/explorer?capability=enroll-ide-user&namespace=sidefx%3Acapabilities&scenario=enroll-ide-user&page=scenario-1');
   await page.waitForSelector('.component-hit', { timeout: 90000 });
   await page.locator('#follow').check();
   await page.evaluate(async () => {

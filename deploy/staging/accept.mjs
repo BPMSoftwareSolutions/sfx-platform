@@ -38,7 +38,7 @@ try {
   } else if (mode === 'public') {
     const checks = [];
     for (const [route, method, expected] of [
-      ['/', 'GET', 200], ['/circuit', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200],
+      ['/', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/circuit-runtime.js', 'GET', 200], ['/circuit/app.js', 'GET', 404], ['/circuit/session-status.js', 'GET', 404], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200],
       ['/healthz','GET',200], ['/readyz','GET',200], ['/v1/runs/ready','GET',401], ['/internal/deployment','GET',401],
       ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/procedure-extract/json','POST',401],
       ['/robots.txt','GET',200], ['/favicon.ico','GET',200], ['/capabilities','GET',404], ['/about','GET',404], ['/sitemap.xml','GET',404]
@@ -46,6 +46,13 @@ try {
       const response = await fetch(config.origin + route, {method, redirect:'error', signal:AbortSignal.timeout(90000)});
       assert.equal(response.status, expected, route); assert(!response.headers.get('www-authenticate')?.includes('Basic'));
       await response.body?.cancel(); checks.push({route,method,status:response.status});
+    }
+    // The former Live Circuit page is the Explorer: old links redirect with their selection intact.
+    for (const route of ['/circuit', '/circuit/']) {
+      const query = '?capability=' + encodeURIComponent(config.observe.subject) + '&page=scenario-1';
+      const moved = await fetch(config.origin + route + query, {redirect:'manual', signal:AbortSignal.timeout(90000)});
+      assert.equal(moved.status, 302, route); assert.equal(moved.headers.get('location'), '/circuit/explorer' + query, route + ' keeps its selection');
+      await moved.body?.cancel(); checks.push({route, method:'GET', status:302, location:moved.headers.get('location')});
     }
     // The Next.js website is retired: "/" is the platform home page and staging stays unindexed.
     const home = await fetch(config.origin + '/', {redirect:'error', signal:AbortSignal.timeout(90000)});

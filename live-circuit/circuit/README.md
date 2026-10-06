@@ -54,26 +54,35 @@ failure is never shown as an empty workspace.
 
 ## Capability Explorer
 
-`/circuit/explorer?capability=…&namespace=…[&scenario=…&node=…&row=…]` is the
-Explorer workspace (`explorer.html`, `explorer.js`, `explorer-model.mjs`). Its
-regions:
+`/circuit/explorer?capability=…&namespace=…[&scenario=…&node=…&row=…&page=…&detail=…]`
+is the Live Circuit Platform's one workspace (`explorer.html`, `explorer.js`,
+`explorer-model.mjs`, `circuit-runtime.js`). The former separate circuit page is
+gone; `/circuit` and `/circuit/` redirect here, keeping their query. The regions:
 
 - **Shell:** the tree, the tabs and the scenario switcher are the reading's
   declared navigation rows: coordinates, nodes, aliases and scenarios. Counts,
   states, placements and finding badges are shown as returned. Empty and
   diagnostic sections stay listed under their coordinate.
-- **Circuit:** the selected scenario's database scene, drawn by this viewer's
-  own renderer (`renderCircuitViewer`) without a runtime overlay. The canvas
-  rules are shared with the Live Circuit page in `circuit-canvas.css`.
+- **Circuit and run bar:** the selected scenario's database scene, drawn by
+  `renderCircuitViewer`, with the circuit runtime mounted on it: live following of
+  observer runs, captured replay (pause, step, speed, return to live), follow
+  execution page, drill-down pages, and a collapsible panel of verification
+  evidence and execution testimony. The element ids of these controls (`#viewer`,
+  `#slide`, `#mode`, `#follow`, `#speed`, `#replay`, …) are what the staging browser
+  acceptance drives.
 - **Sections:** each section shows the rows of its declared result set. A
   scenario-scoped section shows only the selected scenario's rows, using its
   declared scenario key. Rows with a non-ROW `row_state` are shown as markers.
 - **Linking sections and circuit:** a row whose declared scene key names a
   component of the circuit links to it, and a circuit target selects its section.
   Components without a declared scene key (operations, bindings) select no
-  section and link to their Live Circuit detail.
-- **Live work:** Observe, live following and replay stay on the Live Circuit
-  page. Every Explorer view links there with the same selection.
+  section. Any component's declared authority opens in the right column.
+- **Observe:** at the top of the right column. The input contract becomes one
+  control per declared field: constants are fixed, enums are lists, strings are
+  text, string arrays are one item per line, and anything else is a JSON value.
+  The fields write the input JSON shown below them. That JSON is what is
+  submitted, and editing it updates the fields. Observe requires a signed-in
+  session where the host policy says so.
 
 The details and the scene are read in parallel, so the circuit appears first. A
 failed reading is shown as a failure, never as empty sections.
