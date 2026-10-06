@@ -1,0 +1,217 @@
+{
+  "status": "PASS",
+  "basis": "Fresh execution through the deployed staging browser, complete SQL capture, confirmed full-container restart, same-owner archive readback and no new execution.",
+  "acceptedAt": "2026-10-06T19:39:03.384Z",
+  "release": "composite-909be6247fa4-37518715996-1",
+  "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:beee57419d03cbce60011055beeb22f5ffa3d94e287a51f6c7f3541a62ad789d",
+  "sourceCommit": "909be6247fa44a3450106d34bf102190277155df",
+  "durableRun": {
+    "checkedAt": "2026-10-06T19:36:07.095Z",
+    "runId": "878600a2-95d6-409d-9a50-36a53fe1ea73",
+    "state": "completed",
+    "persistence": "complete",
+    "trust": "NOT_EVALUATED",
+    "outcome": "ADMITTED",
+    "events": 1894,
+    "eventsSha256": "a454ddbbb8374a01026401a721036349476cce3ae0da18fb2e3ecc76c89592a2",
+    "graphSha256": "052785f439cfff4315fd2116312373f07c55558944649493c18a6e073b79be69",
+    "outputSha256": "388068c161cbee1665378914171ee0cb132b51f3e3df0e8d499d128c8647676c",
+    "previousBoot": "451e119a-b6e6-4ac8-bb2b-d5ba8522b8b8",
+    "bootId": "cd83bd65-ebec-459a-8968-46facd59448d",
+    "admissions": 0,
+    "browserErrors": [],
+    "checks": [
+      "same owner lists run",
+      "complete SQL capture",
+      "all event identities and bytes match",
+      "graph and output match",
+      "browser reopens original run",
+      "no new execution"
+    ]
+  },
+  "rollbackImage": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:bb22533a5ed1c179ae31dfc6bd54dca89842fc6296229f839061dca3b86e2305",
+  "workflow": "https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37518715996",
+  "capability": "request-capability-from-objective-v3",
+  "identitySources": {
+    "providers": "a020024c513eee4f2a8f84939af284f84727d911",
+    "dal": "bcaae40c2447bd9454b6eea9e3e001f0fc61b25b"
+  },
+  "preservation": {
+    "kernelDigest": "sha256:e27ed8bc77a1b28871cddf822ab9a856b0b95fadb521a5fa0943990228b44fa6",
+    "retrieval": {
+      "executable": "sha256:d86ff8a28a9951ee52c44fc45f6bb388bc7f9ca81e8b9b4cc7bb45ebb692c537",
+      "dal": "sha256:6788030836b0942f570a6928d5801af278cf590d41b70f4e874d0cf93ebdebbe",
+      "circuitWired": true
+    },
+    "vault": {
+      "bytes": 2092,
+      "sha256": "2dc758d5a52dac01ecf600aa264541bf7dbeaa03445e174c0e6438a068653085"
+    }
+  },
+  "browser": {
+    "checkedAt": "2026-10-06T19:32:11.671Z",
+    "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "runId": "878600a2-95d6-409d-9a50-36a53fe1ea73",
+    "sceneDigest": "fe57ed1b1b12b846e8d45a9102ed9cd49b2204fc1399799bdb395137b2738333",
+    "checks": [
+      "Anonymous Observe refused before admission",
+      "Real wrong password refused without a cookie",
+      "Real browser sign-in; __Host-, HttpOnly, Secure, Strict cookie; no script bearer",
+      "Signed-in browser Observe completes with live operation/provider/outcome visits and principal attribution",
+      "Complete SQL trace, graph and output retained before restart",
+      "Sign-out revokes the real session; replayed cookie cannot Observe",
+      "No password or bearer in browser console, run output or observer testimony",
+      "Azure log sample contains no acceptance password/session bearer or bearer-like credential"
+    ],
+    "errors": [],
+    "sampleCount": 1454,
+    "visited": [
+      "input:request-capability-from-objective-v3/payload",
+      "provider:google/gemini-select",
+      "provider:ScenarioKernel.NodePlatform",
+      "provider:google/gemini-summary",
+      "variant:request-capability-from-objective-v3:ADMITTED"
+    ],
+    "serverLogCheck": {
+      "performed": true,
+      "httpStatus": 200,
+      "actualHostOutput": true,
+      "sampledCharacters": 1933942,
+      "truncated": false,
+      "rawLogsRetained": false
+    },
+    "basis": "Real identity session and fresh capability execution through product browser UI; no response mocks or replay overrides"
+  },
+  "replay": [
+    {
+      "rate": 1,
+      "capturedMilliseconds": 16429.861328125,
+      "expectedMilliseconds": 16429.861328125,
+      "measuredMilliseconds": 16443.400000000023,
+      "deviationMilliseconds": 13.538671875023283,
+      "providers": [
+        {
+          "provider": "provider:google/gemini-select",
+          "capturedMilliseconds": 6835.451904296875,
+          "frames": 410,
+          "providerFrames": 33,
+          "timingBasis": "captured owning operation; transport location is schematic"
+        },
+        {
+          "provider": "provider:ScenarioKernel.NodePlatform",
+          "capturedMilliseconds": 2178.7412109375,
+          "frames": 131,
+          "providerFrames": 11,
+          "timingBasis": "captured owning operation; transport location is schematic"
+        },
+        {
+          "provider": "provider:google/gemini-summary",
+          "capturedMilliseconds": 7130.640380859375,
+          "frames": 415,
+          "providerFrames": 34,
+          "timingBasis": "captured owning operation; transport location is schematic"
+        }
+      ]
+    },
+    {
+      "rate": 0.1,
+      "capturedMilliseconds": 16429.861328125,
+      "expectedMilliseconds": 164298.61328125,
+      "measuredMilliseconds": 164312.19999999995,
+      "deviationMilliseconds": 13.586718749953434,
+      "providers": [
+        {
+          "provider": "provider:google/gemini-select",
+          "capturedMilliseconds": 6835.451904296875,
+          "frames": 4101,
+          "providerFrames": 326,
+          "timingBasis": "captured owning operation; transport location is schematic"
+        },
+        {
+          "provider": "provider:ScenarioKernel.NodePlatform",
+          "capturedMilliseconds": 2178.7412109375,
+          "frames": 1307,
+          "providerFrames": 116,
+          "timingBasis": "captured owning operation; transport location is schematic"
+        },
+        {
+          "provider": "provider:google/gemini-summary",
+          "capturedMilliseconds": 7130.640380859375,
+          "frames": 4205,
+          "providerFrames": 364,
+          "timingBasis": "captured owning operation; transport location is schematic"
+        }
+      ]
+    }
+  ],
+  "external": {
+    "checkedAt": "2026-10-06T19:36:30.936Z",
+    "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "capability": "request-capability-from-objective-v3",
+    "exitCode": 0,
+    "errors": [],
+    "frames": 1166,
+    "liveFrames": 960,
+    "providers": [
+      "provider:google/gemini-select",
+      "provider:ScenarioKernel.NodePlatform",
+      "provider:google/gemini-summary"
+    ],
+    "declaredProviders": [
+      "provider:google/gemini-select",
+      "provider:google/gemini-summary",
+      "provider:ScenarioKernel.NodePlatform"
+    ],
+    "pages": [
+      "scenario-linear"
+    ],
+    "outcomes": [
+      "variant:request-capability-from-objective-v3:ADMITTED"
+    ],
+    "terminalObserved": true,
+    "commandCompletedAt": 1791315389882,
+    "outcomePaintedAt": 1791315389789,
+    "replayUsed": false
+  },
+  "windowsCli": {
+    "checks": [
+      "Installed interactive Ctrl+C restores prompt and creates no session",
+      "Installed interactive login uses hidden provider prompt, real HTTPS and real database",
+      "Real HTTPS login persisted with Windows DPAPI",
+      "sfx-api selects the same exact user bearer",
+      "Installed whoami validates real session from outside checkout",
+      "Installed logout confirms server revocation and local deletion",
+      "Identity database rejects revoked session",
+      "Installed whoami fails after logout",
+      "Installed login refuses redirected input",
+      "Installed CLI refuses password flags without echoing their values",
+      "Installed login help works outside an estate",
+      "CLI output and persisted metadata contain no password or bearer"
+    ],
+    "count": 12,
+    "inputMode": "Windows ConPTY installed command",
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net"
+  },
+  "missingRun": {
+    "checkedAt": "2026-10-06T19:39:56.169Z",
+    "runId": "3865cf23-e320-411c-a9f6-813063d55a42",
+    "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "admissions": 0,
+    "checks": [
+      "real staging unavailable run explains recovery",
+      "Resume hidden",
+      "Observe and input enabled",
+      "no automatic resubmission"
+    ]
+  },
+  "additionalBrowserChecks": [
+    "Linear selected by default after restart",
+    "Settled Run report displays Evidence persistence: complete and retained output"
+  ],
+  "limits": [
+    "Capability outcome ADMITTED is not a trust disposition; trust remains NOT_EVALUATED.",
+    "Complete captured material survives restart; this does not resume execution in a terminated kernel.",
+    "The earlier in-memory run cannot be reconstructed if its material was never captured.",
+    "Acceptance run belongs to the dedicated release account; its test sessions were revoked."
+  ]
+}

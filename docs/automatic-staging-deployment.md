@@ -17,12 +17,21 @@ rebound. The website-only `container.yml` remains build/test only. Its old
 
 ## Accepted automatic release
 
+Current accepted release: [`37518715996`](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37518715996),
+source `909be62`, accepted **2026-10-06 19:39 UTC**. The pinned identity host and
+generated DAL now capture into SQL through private service credentials. Run
+`878600a2-95d6-409d-9a50-36a53fe1ea73` reopens after a confirmed container restart
+with all 1,894 events, graph and output identical. Browser, replay, external flow
+and all 12 Windows CLI checks passed. See [E14](run-evidence-plan/evidence/E14-staging-restart-acceptance.json)
+for the exact image digest, process IDs and evidence hashes. Linear remains the
+default; capability outcome `ADMITTED` is separate from `NOT_EVALUATED` trust.
+
 [Push-triggered run 37396070778](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37396070778)
-passed all four jobs on **2026-10-06 at 01:03 UTC**. Staging runs
+was the first automatic release, passing all four jobs on **2026-10-06 at 01:03 UTC**. It ran
 `circuit-e52b3eb246e8-37396070778-1`, image digest
 `sha256:bc94ae5f17ac3bf3670638ebc406ee940e372d2c85507ca7be1ffe98c475ff9f`.
 The tag and manifest are write/delete locked. ARM binding and public health
-were checked again after completion and matched the accepted release.
+were checked again after completion and matched that accepted release.
 
 The [version-controlled receipt](releases/staging-automation-2026-10-06.json)
 retains browser sign-in/Observe, all three providers visited live, exact

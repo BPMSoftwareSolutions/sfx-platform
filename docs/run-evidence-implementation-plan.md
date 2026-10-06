@@ -2,8 +2,8 @@
 
 Prepared 2026-10-06. Status: **implementation underway; run capture and the trust
 authority reference are installed in sfx-identity. The declared C1 evaluator is
-installed in the estate. Claim history, evaluator integration and staging service
-rollout remain open.**
+installed in the estate. Durable capture is deployed to staging and survives a
+confirmed full-container restart. Claim history and evaluator integration remain open.**
 
 ## Implementation checkpoint — 2026-10-06
 
@@ -18,9 +18,11 @@ rollout remain open.**
 | Trust vocabulary and declared C1 evaluator installed | Estate commits `ad9a61d`, `4435ba6`; [32-fixture acceptance](../../sfx-embody/sql/inspect/run-evidence-trust/evaluator-acceptance.json). SQL rollback, uncommitted kernel invocation, installed CLI and idempotence pass. Complete synthetic C1 evidence returns `SATISFIED` / eligible `OBSERVED`; no claim or disposition is written by the reader. |
 | Exact authority reference, CodeLightly DAL and private read API | DAL `8461695`, provider host `76303ae`; migration `003-trust-authority`, 17 total tables, 16 typed procedures, 213 manifest-checked files. [E13: private API acceptance](run-evidence-plan/evidence/E13-trust-authority-private-api.json) verifies service/session checks, exact policy/evaluator hashes, vocabulary counts and refusal of unknown pins. |
 | Incomplete staging basis stays unavailable | [Installed evaluator result](../../sfx-embody/sql/inspect/run-evidence-trust/staging-pending-evaluation.json): the retained E12 acceptance receipt, without invented executor identity or cleaned-up trace bytes, returns `NOT_OBSERVABLE` and no eligible state. This is a missing-basis check, not another full-run replay. |
+| Staging durable capture, restart recovery and missing-run controls | [E14: staging restart acceptance](run-evidence-plan/evidence/E14-staging-restart-acceptance.json). Release `909be62`, workflow `37518715996`: run `878600a2-95d6-409d-9a50-36a53fe1ea73` retains all 1,894 events, graph and output across a different container process. The same owner signs in again and reopens it without another execution; Linear stays the default. Unavailable runs hide Resume and release Observe; temporary failures remain resumable. |
 
-The numbered baseline below remains the **pre-implementation** baseline. The
-candidate services are not deployed to staging. Database migration `002` contains
+The numbered baseline below remains the **pre-implementation** baseline. E10–E13
+used candidate local services; E14 proves their staging rollout through the normal
+workflow, with separate Key Vault service credentials. Database migration `002` contains
 run material; `003` contains the pinned authority reference and vocabulary.
 Reserve `004-trust-ledger` for subjects, claims and append-only decision history.
 W2.1–W2.5 are partial, not complete. E13 establishes the reference-copy portion of
@@ -30,14 +32,20 @@ E12 is the capability's returned outcome; run trust remains `NOT_EVALUATED`.
 Remaining delivery order: implement the claim ledger and authenticated producer
 bindings; invoke the installed evaluator from protected stored inputs and persist
 its complete basis; verify historical replay and invalidation; close attributable executor
-identity through S0; add retention/tombstones and staging caller credentials;
-package the changed identity binary, deploy and prove full-container restart;
+identity through S0; add retention/tombstones;
 then close S1–S3 and the content/producer gates. Q7/Q8 rules remain unavailable
 until their prerequisites are settled. The detailed work items below remain the
 completion criteria. The evaluator is a pure consistency reading: direct callers
 cannot authenticate themselves by submitting JSON, and its eligible state is not
 a stored disposition. Its current implementation refuses a different evaluator
 pin; historical replay must execute the matching retained implementation.
+
+Staging persistence covers complete captured runs. It does not resume execution
+inside a killed kernel, reconstruct material never captured, or establish trust.
+The old in-memory run `3865cf23` cannot be reconstructed from this change. A 404
+explains that the run is unavailable and that Observe starts a new execution;
+the client never automatically resubmits it. The retained acceptance run remains
+owned by the dedicated release account, with its test sessions revoked.
 
 Installed policy digest:
 `98b97712ba40153553186212b6094970433b9b4fee810fb67e2c9921368f4454`.
@@ -944,6 +952,7 @@ SHA-256 values are in that folder's `README.md`.
 | E04 | Local equity run `52d5fe1e`: run record, output, references, 4 exchange events, 8 provider cell receipts with authorities from `/graph` | Same |
 | E05 | Trace sizes, raw and compressed, for a local and a staging run | Node `zlib` |
 | E10–E12 | Durable run transport, retained replay recovery and fresh staging execution | Candidate local hosts against live sfx-identity, with disposable fixture principals |
+| E14 | Deployed staging run survives a confirmed container restart; live 404 recovery controls and Windows CLI pass | [Accepted workflow 37518715996](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37518715996), retained owner-scoped run, exact event/graph/output hashes |
 | E13 | Pinned trust authority through generated DAL and authenticated private API | Installed migration 003; candidate local identity host; exact byte hashes and service/session refusal checks |
 
 Related retained evidence:

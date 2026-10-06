@@ -15,9 +15,14 @@ Checksums are of the files as committed (LF line endings).
 | `E11-retained-capture-acceptance.json` | `77523f6fc43bb3e3d4b73dc3979839c6d012d1cc4262f93dab0f16b9496a47c1` |
 | `E12-fresh-execution-acceptance.json` | `8c8bc9e1f18fc65e4d4948439c775cbbe2a750f65ad7b8dc3b2c411f72a2b5e0` |
 | `E13-trust-authority-private-api.json` | `6f76bd30a8c2c7c9398d2a00d79a9db31446ba4d127503b524ca42b0df7287df` |
+| `E14-staging-restart-acceptance.json` | `43ff573b0bcfe3b9f7e44e7f821ba4f6ef86bb0f48e9862424b94e596abe6803` |
 
 E13 covers the pinned authority reference through generated DAL and the private
 identity API. It does not establish a persisted trust disposition. Estate
 evaluator fixtures and the incomplete E12-basis check are retained in
 `sfx-embody/sql/inspect/run-evidence-trust/`; 32 evaluator fixtures pass, and the
 incomplete basis yields `NOT_OBSERVABLE` without an eligible state.
+
+E14 is the accepted staging rollout and full-container restart proof. It also
+records a live browser check of the missing-run controls and all 12 Windows CLI
+checks. The captured capability outcome remains distinct from trust evaluation.

@@ -6,8 +6,10 @@ It records what each repository needs to address next.
 Update 2026-10-06: X1 closed by `3275616` and accepted workflow run
 `37513029598`. X2 closed: DAL `24fee68`, `8461695` and Linux restore lock
 `bcaae40` are pushed. X3 closed: provider commits through `a020024` are pushed.
-The identity transport's staging rollout is being delivered through the staging
-workflow with a complete-capture readback gate after a confirmed restart.
+The identity transport's staging rollout passed workflow `37518715996` at
+19:39 UTC, release `909be62`, including complete-capture readback after a confirmed
+restart. [E14](run-evidence-plan/evidence/E14-staging-restart-acceptance.json)
+retains the run, event/graph/output digests and process identities.
 The original observations below remain historical; unrelated X9 files remain
 with their owner.
 
