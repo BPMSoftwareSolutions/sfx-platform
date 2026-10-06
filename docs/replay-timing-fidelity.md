@@ -125,11 +125,15 @@ unknown, not as motion.**
    - The captured graph should include the nested graph, or a reference to it.
    - Separately, trace where the 0.4–1.3 s live delivery lag comes from: kernel
      flush or observer relay.
-   - One hint: the untimed `projected-capability-invocation` observations reach
-     the browser within about 10 ms of the HTTP step they follow, while cell
-     receipts lag. That points at how testimony is emitted rather than at the
-     relay. The receive time and the execution times come from different
-     processes, so this is an indication, not a measurement.
+   - One hint: the `projected-capability-invocation` records reach the browser
+     within about 10 ms of the HTTP step they follow, while cell receipts lag.
+     That points at how testimony is emitted rather than at the relay. The
+     receive time and the execution times come from different processes, so
+     this is an indication, not a measurement.
+   - Those records are the evidence records each model call leaves:
+     `provider-exchange-shape.v1` and `model-response-shape.v1`. A local re-run
+     on the API on 2026-10-06 showed this. The observer bridge drops their kind
+     and the API strips their content to a reference.
 4. **Play the whole invocation (platform).**
    - Show the pre-window and post-window delivery phases as a hold at the
      capability boundary, labelled from the captured `delivery-phase`

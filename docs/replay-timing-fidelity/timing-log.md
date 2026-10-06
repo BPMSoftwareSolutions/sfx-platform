@@ -66,8 +66,8 @@ The table lists steps and scenario returns. Expression cells and edges are in `r
 | 3,252 | 3,283 | 31 | +3,066 | nested step: `execute-projected-model-provider-attempt.operation.5` | bind-credential-port |
 | 3,284 | 3,312 | 28 | +3,098 | nested step: `execute-projected-model-provider-attempt.operation.6` | prepare-http-exchange-port |
 | 3,312 | 6,378 | 3,066 | +3,127 | nested step: `execute-projected-model-provider-attempt.operation.7` | observe-http-port |
-| 6,371 ᵒ | | | +6,185 | untimed observation: `projected-capability-invocation` completed | |
-| 6,374 ᵒ | | | +6,188 | untimed observation: `projected-capability-invocation`  | |
+| 6,371 ᵒ | | | +6,185 | evidence record: `projected-capability-invocation` completed | |
+| 6,374 ᵒ | | | +6,188 | evidence record: `projected-capability-invocation`  | |
 | 6,379 | 6,408 | 30 | +6,193 | nested step: `execute-projected-model-provider-attempt.operation.8` | prepare-provider-normalization-port |
 | 6,409 | 6,868 | 458 | +6,223 | nested step: `execute-projected-model-provider-attempt.operation.9` | normalize-provider-protocol-port |
 | 6,763 | 6,764 | 1 | +6,577 | nested step: `project-model-provider-protocol.operation.1` |  |
@@ -78,7 +78,7 @@ The table lists steps and scenario returns. Expression cells and edges are in `r
 | 6,927 | 6,928 | 0 | +6,742 | nested scenario: `execute-projected-model-provider-attempt` |  |
 | 6,928 | 6,955 | 27 | +6,742 | **no timed receipt** | |
 
-ᵒ Observer receive time; the record carries no execution timestamp.
+ᵒ Observer receive time; the record carries no execution timestamp. These are the evidence records each model call leaves (provider-exchange-shape.v1 and model-response-shape.v1, as a local re-run on the API shows); the observer bridge drops their kind.
 
 What the replayed dot showed (browser samples at 1×):
 
@@ -104,7 +104,7 @@ The table lists steps and scenario returns. Expression cells and edges are in `r
 | ---: | ---: | ---: | ---: | --- | --- |
 | 6,982 | 9,302 | 2,321 | +0 | **no timed receipt** | |
 
-ᵒ Observer receive time; the record carries no execution timestamp.
+ᵒ Observer receive time; the record carries no execution timestamp. These are the evidence records each model call leaves (provider-exchange-shape.v1 and model-response-shape.v1, as a local re-run on the API shows); the observer bridge drops their kind.
 
 What the replayed dot showed (browser samples at 1×):
 
@@ -140,8 +140,8 @@ The table lists steps and scenario returns. Expression cells and edges are in `r
 | 10,983 | 11,021 | 38 | +1,655 | nested step: `execute-projected-model-provider-attempt.operation.5` | bind-credential-port |
 | 11,022 | 11,035 | 14 | +1,694 | nested step: `execute-projected-model-provider-attempt.operation.6` | prepare-http-exchange-port |
 | 11,036 | 13,507 | 2,471 | +1,708 | nested step: `execute-projected-model-provider-attempt.operation.7` | observe-http-port |
-| 13,498 ᵒ | | | +4,170 | untimed observation: `projected-capability-invocation` completed | |
-| 13,502 ᵒ | | | +4,174 | untimed observation: `projected-capability-invocation`  | |
+| 13,498 ᵒ | | | +4,170 | evidence record: `projected-capability-invocation` completed | |
+| 13,502 ᵒ | | | +4,174 | evidence record: `projected-capability-invocation`  | |
 | 13,508 | 13,530 | 23 | +4,180 | nested step: `execute-projected-model-provider-attempt.operation.8` | prepare-provider-normalization-port |
 | 13,531 | 13,974 | 443 | +4,203 | nested step: `execute-projected-model-provider-attempt.operation.9` | normalize-provider-protocol-port |
 | 13,915 | 13,916 | 1 | +4,586 | nested step: `project-model-provider-protocol.operation.1` |  |
@@ -151,7 +151,7 @@ The table lists steps and scenario returns. Expression cells and edges are in `r
 | 13,976 | 14,048 | 72 | +4,647 | nested step: `execute-projected-model-provider-attempt.operation.10` | finalize-provider-attempt-port |
 | 14,048 | 14,048 | 0 | +4,720 | nested scenario: `execute-projected-model-provider-attempt` |  |
 
-ᵒ Observer receive time; the record carries no execution timestamp.
+ᵒ Observer receive time; the record carries no execution timestamp. These are the evidence records each model call leaves (provider-exchange-shape.v1 and model-response-shape.v1, as a local re-run on the API shows); the observer bridge drops their kind.
 
 What the replayed dot showed (browser samples at 1×):
 

@@ -44,9 +44,10 @@ const stepName = id => {
 };
 const classify = p => {
   if (p.testimonyType === 'edge-execution-testimony.v1') return topExec.has(p.sourceCellExecutionId) ? 'handoff edge' : 'nested edge';
+  // A scenario return carries the execution id of the operation that returned it; test altitude first.
+  if (p.cellAltitude === 'scenario') return p.cellId === `cell:scenario:${deck.rootScenarioId}` ? 'scenario return' : 'nested scenario';
   if (topExec.has(p.cellExecutionId)) return 'operation';
   if ((p.cellId ?? '').includes(':expression')) return 'expression';
-  if (p.cellAltitude === 'scenario') return p.rootExecutionId && p.cellId === `cell:scenario:${deck.rootScenarioId}` ? 'scenario return' : 'nested scenario';
   return 'nested step';
 };
 
@@ -55,7 +56,7 @@ const rows = records.map(r => {
   const p = r.payload ?? {};
   const start = p.startedAt ? at(p.startedAt) : p.observedAt || p.at ? at(p.observedAt ?? p.at) : NaN;
   const end = p.completedAt ? at(p.completedAt) : start;
-  const level = p.testimonyType ? classify(p) : p.observationType ?? (r.kind === 'observation' ? 'untimed observation' : r.kind);
+  const level = p.testimonyType ? classify(p) : p.observationType ?? (r.kind === 'observation' ? 'evidence record' : r.kind);
   // Observer receive time, on the observer's clock (not the kernel's). The only time an untimed record has.
   const received = Date.parse(r.receivedAt) - t0;
   const own = level === 'operation' ? topExec.get(p.cellExecutionId) : Number.isFinite(start) ? owner(start, end) : owner(received, received);
@@ -115,7 +116,7 @@ for (const o of ops) {
 }
 for (const o of ops.filter(o => o.provider)) {
   const nested = rows.filter(r => r.operation === `${o.ordinal} ${o.label}` && r.level !== 'operation' && Number.isFinite(r.start));
-  const untimed = rows.filter(r => r.operation === `${o.ordinal} ${o.label}` && r.level === 'untimed observation');
+  const untimed = rows.filter(r => r.operation === `${o.ordinal} ${o.label}` && r.level === 'evidence record');
   const shown = [...nested.filter(r => r.level === 'nested step' || r.level === 'nested scenario'),
     ...untimed.map(r => ({ ...r, start: r.received, end: r.received, duration: NaN, untimed: true }))];
   // Time inside the operation that no nested receipt covers.
@@ -131,9 +132,9 @@ for (const o of ops.filter(o => o.provider)) {
     '| start | end | duration | +op | receipt | declared step |', '| ---: | ---: | ---: | ---: | --- | --- |',
     ...[...shown.map(r => ({ ...r, kind: 'r' })), ...gaps.map(([a, b]) => ({ start: a, end: b, kind: 'gap' }))].sort((a, b) => a.start - b.start).map(r => r.kind === 'gap'
       ? `| ${ms(r.start)} | ${ms(r.end)} | ${ms(r.end - r.start)} | +${ms(r.start - o.from)} | **no timed receipt** | |`
-      : r.untimed ? `| ${ms(r.start)} ᵒ | | | +${ms(r.start - o.from)} | untimed observation: \`${r.id}\` ${r.disposition} | |`
+      : r.untimed ? `| ${ms(r.start)} ᵒ | | | +${ms(r.start - o.from)} | evidence record: \`${r.id}\` ${r.disposition} | |`
       : `| ${ms(r.start)} | ${ms(r.end)} | ${ms(r.duration)} | +${ms(r.start - o.from)} | ${r.level}: \`${r.id.replace(/^cell:(mechanic|scenario):/, '')}\` | ${r.step} |`),
-    '', 'ᵒ Observer receive time; the record carries no execution timestamp.');
+    '', 'ᵒ Observer receive time; the record carries no execution timestamp. These are the evidence records each model call leaves (provider-exchange-shape.v1 and model-response-shape.v1, as a local re-run on the API shows); the observer bridge drops their kind.');
   const track = dot.filter(d => d.to > o.from && d.from < o.to);
   out.push('', 'What the replayed dot showed (browser samples at 1×):', '', '| from | to | +op | current component |', '| ---: | ---: | ---: | --- |',
     ...track.map(d => `| ${ms(Math.max(d.from, o.from))} | ${ms(Math.min(d.to, o.to))} | +${ms(Math.max(d.from, o.from) - o.from)} | ${d.current || '(none)'} |`));
