@@ -7,7 +7,7 @@
   --white: #F4F7FB; --muted: #B3C5D8; --dim: #829AB2; --cyan: #72D7EE; --blue: #45A7FF;
   --green: #4DE0B0; --amber: #F6B94D; --red: #FF5F70; --line: #29435B;
   --shade: rgba(3, 16, 28, .70);
-  --radius: 10px; --gutter: clamp(16px, 3.8vw, 56px); --max: 1280px;
+  --radius: 10px; --gutter: clamp(16px, 2vw, 40px);
   font: 16px/1.5 Arial, Helvetica, sans-serif;
 }
 * { box-sizing: border-box; }
@@ -15,7 +15,7 @@ html, body { margin: 0; background: var(--bg); color: var(--white); }
 a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 4px; }
 [hidden] { display: none !important; }
-.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+.wrap { width: 100%; padding: 0 var(--gutter); }
 
 /* Decorative artwork behind sections, darkened for text contrast. */
 .art { background-color: var(--bg); background-size: cover; background-position: center right; background-repeat: no-repeat; }
