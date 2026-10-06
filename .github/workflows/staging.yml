@@ -174,15 +174,16 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Record accepted release
+        id: accepted
+        if: needs.deploy.result == 'success' && needs.windows-cli.result == 'success'
+        run: node deploy/staging/finish.mjs
       - name: Restore prior digest when any release gate failed
-        if: needs.deploy.result != 'success' || needs.windows-cli.result != 'success'
+        if: always() && (needs.deploy.result != 'success' || needs.windows-cli.result != 'success' || steps.accepted.outcome == 'failure')
         run: |
           if test -f artifacts/staging/state.json; then node deploy/staging/release.mjs rollback; fi
           echo 'Release rejected; inspect acceptance and rollback receipts.' >> "$GITHUB_STEP_SUMMARY"
           exit 1
-      - name: Record accepted release
-        if: needs.deploy.result == 'success' && needs.windows-cli.result == 'success'
-        run: node deploy/staging/finish.mjs
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

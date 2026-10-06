@@ -6,6 +6,6 @@ assert.equal((await rest('get','/config/web')).properties.linuxFxVersion, 'DOCKE
 assert.equal((await json(config.origin+'/healthz')).release,state.candidateRelease);
 const receipt = {acceptedAt:new Date().toISOString(),release:state.candidateRelease,image:state.candidateImage,sourceCommit:state.sourceCommit,
   rollbackImage:state.previousImage,workflow:`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`};
-write('accepted.json',receipt);
 fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Accepted **${receipt.release}**\n\nImage: \`${receipt.image}\`\n\nRollback: \`${receipt.rollbackImage}\`\n\nReal browser/live flow, replay, restart/vault, external API CLI and Windows login gates passed.\n`);
+write('accepted.json',receipt);
 console.log(JSON.stringify(receipt));
