@@ -53,7 +53,7 @@ try {
   await page.screenshot({ path: path.join(evidence, 'external.png'), fullPage: true });
   const live = samples.filter(s => s.open && s.graph === 'graph:' + capability);
   const providers = [...new Set(live.flatMap(s => s.current.filter(n => n.kind === 'provider').map(n => n.id)))];
-  const declared = [...new Set(scene.observationMap.declaredNodes.filter(n => n.kind === 'provider').map(n => n.id))];
+  const declared = [...new Set(scene.nodes.filter(n => n.kind === 'provider').map(n => n.id))];
   const outcomes = [...new Set(samples.flatMap(s => s.current.filter(n => n.kind === 'variant').map(n => n.id)))];
   const receipt = { checkedAt: new Date().toISOString(), origin, capability, exitCode, errors,
     frames: samples.length, liveFrames: live.length, providers, declaredProviders: declared,
