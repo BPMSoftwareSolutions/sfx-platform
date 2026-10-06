@@ -44,6 +44,16 @@ export class PlaybackClock {
     }
     this.changed();
   }
+  // Callers reset their accumulated receipt prefix before seeking backwards.
+  seek(position, reset) {
+    if (!Number.isFinite(position)) throw new Error('Invalid replay position');
+    this.cancel(); this.paused = true; reset(); this.index = 0;
+    this.position = Math.max(0, Math.min(this.timeline.duration, position));
+    while (this.index < this.timeline.frames.length && this.timeline.frames[this.index].at <= this.position)
+      this.apply(this.timeline.frames[this.index++]);
+    this.done = this.index === this.timeline.frames.length; this.stepped = true;
+    this.wallElapsed = 0; this.changed();
+  }
   get gap() {
     const next = this.timeline.frames[this.index]?.at ?? this.position;
     return Math.max(0, (next - this.position) / this.rate);

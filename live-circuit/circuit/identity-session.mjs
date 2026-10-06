@@ -7,6 +7,7 @@
 // Observe gate call the identity host with that bearer. Passwords and bearers
 // are never logged, echoed, stored on disk or sent to the SDA API.
 import { readFile } from 'node:fs/promises';
+import { evidenceConfigured, evidenceRequest } from './evidence-store.mjs';
 
 const policy = JSON.parse(await readFile(new URL('./circuit-host.json', import.meta.url), 'utf8')).identity;
 const prefix = '/api/circuit/v1/session';
@@ -94,12 +95,17 @@ export async function validateSession(req) {
 export const observeRequiresSession = () => policy.observeRequiresSession === true;
 
 export function attributeRun(runId, session, subject = {}) {
-  if (typeof runId !== 'string' || !runId) return;
+  if (typeof runId !== 'string' || !runId) return false;
+  const existing = attributions.find(a => a.runId === runId);
+  if (existing) return existing.principalId === session.principalId;
   attributions.push({ runId, principalId: session.principalId, sessionId: session.sessionId, admittedAt: new Date().toISOString(),
     capabilityId: typeof subject.capabilityId === 'string' ? subject.capabilityId : null,
     namespaceId: typeof subject.namespaceId === 'string' ? subject.namespaceId : null });
   while (attributions.length > policy.maximumAttributedRuns) attributions.shift();
+  return true;
 }
+
+export const ownsRun = (runId, principalId) => attributions.some(a => a.runId === runId && a.principalId === principalId);
 
 export async function serveSessionApi(req, res, url) {
   if (url.pathname !== prefix && !url.pathname.startsWith(prefix + '/')) return false;
@@ -118,6 +124,16 @@ export async function serveSessionApi(req, res, url) {
   if (req.method === 'GET' && route === '/runs') {
     const checked = await validateSession(req);
     if (!checked.session) { const r = checked.refusal; send(res, r.status, { disposition: r.disposition }, r.clear ? { 'set-cookie': expired() } : {}); return true; }
+    if (evidenceConfigured()) {
+      try {
+        const stored = await evidenceRequest('/runs', { bearer: sessionCookie(req) });
+        const combined = new Map(stored.runs.map(r => [r.runId, r]));
+        for (const r of attributions.filter(a => a.principalId === checked.session.principalId))
+          if (!combined.has(r.runId)) combined.set(r.runId, { runId: r.runId, admittedAt: r.admittedAt, capabilityId: r.capabilityId, namespaceId: r.namespaceId, captureStatus: 'unconfirmed' });
+        send(res, 200, { principalId: checked.session.principalId, storage: 'durable', runs: [...combined.values()] });
+      } catch { send(res, 503, { disposition: 'EVIDENCE_UNAVAILABLE' }); }
+      return true;
+    }
     send(res, 200, { principalId: checked.session.principalId,
       runs: attributions.filter(a => a.principalId === checked.session.principalId)
         .map(({ runId, admittedAt, sessionId, capabilityId, namespaceId }) => ({ runId, admittedAt, sessionId, capabilityId, namespaceId })) });

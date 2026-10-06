@@ -9,13 +9,16 @@ import { PlaybackClock } from './playback-clock.js';
 import { targetLink, relatedLinks, renderDetail, authorityTree } from './navigation.js';
 import { buildTraversal, traversalState, LiveMotion } from './traversal.js';
 import { createObservePanel } from './observe-panel.js';
+import { createRunContext } from './run-context.js';
 
 const $ = id => document.getElementById(id);
 const json = async (url, signal) => { const response = await fetch(url, { signal }); const body = await response.json(); if (!response.ok) throw new Error(body.error ?? `Read failed (${response.status})`); return body; };
 const paragraph = (text, className = '') => el('p', { text, class: className });
 const details = (title, value) => el('details', {}, [el('summary', { text: title }), el('pre', { text: JSON.stringify(value, null, 2) })]);
 const glyphsOf = slide => [...(slide.blueprint?.glyphs ?? []), ...(slide.blueprint?.boundaryGlyphs ?? [])];
-const storedView = () => { try { return localStorage.getItem('sfx.circuit.view') === 'linear' ? 'linear' : 'paged'; } catch { return 'paged'; } };
+// Linear is the default. A deliberately saved Paged preference still applies;
+// missing/invalid storage and storage-denied browsers start in Linear.
+const storedView = () => { try { return localStorage.getItem('sfx.circuit.view') === 'paged' ? 'paged' : 'linear'; } catch { return 'linear'; } };
 // Zoom stops where the two end caps together would take half the frame, so the
 // scrolling band always keeps at least half of it (960 / 2 = 480 page units).
 const maxZoom = slide => { const caps = slide?.blueprint?.endCaps; return caps ? 480 / (caps.left.w + caps.right.w) : 1; };
@@ -26,11 +29,20 @@ const maxZoom = slide => { const caps = slide?.blueprint?.endCaps; return caps ?
 export function createCircuitRuntime(shell) {
   const state = { deck: null, slideId: null, page: null, selectedNode: null, detailId: null, detailPointer: '', detailSlides: [], detailSlideId: null,
     runs: [], current: null, openRuns: 0, lastSeq: 0, instance: null, connection: 'connecting', playback: null,
-    apiOwned: false, apiRun: null, apiGap: false, replayError: null, view: storedView(), zoom: 'fit', scale: null };
+    apiOwned: false, apiRun: null, apiGap: false, apiId: null, apiResult: null, output: undefined, outputError: null,
+    replayError: null, view: storedView(), zoom: 'fit', scale: null };
   let detailRequest, detailSerial = 0, replaySerial = 0, frame = 0, source;
   let liveTraversal = { key: null, model: null };
   const liveMotion = new LiveMotion();
   const capability = () => shell.selection().capabilityId;
+  const context = createRunContext({ capability, replay: () => startReplay(latestRun()),
+    select: id => { focus(id); shell.component(id); context.tab('evidence'); },
+    seek: position => {
+      if (!state.playback) startReplay(latestRun());
+      const playback = state.playback;
+      playback?.clock.seek(position, () => { playback.run = newRun(playback.source.startRecord); playback.run.graph = playback.source.graph; });
+    }
+  });
   // The view decides which scenes the circuit shows and traverses: the paged
   // scenario slides, or the reader's single linear scene. Other slides are shared.
   const hasLinear = deck => Boolean(deck?.slides.some(slide => slide.blueprint?.role === 'scenario-linear'));
@@ -233,6 +245,7 @@ export function createCircuitRuntime(shell) {
     const expanded = new Set([...document.querySelectorAll('#verification details[open],#inspector details[open],#inventory details[open]')]
       .map(node => node.querySelector('summary').textContent.replace(/\(\d+\)/g, '')));
     const deck = viewDeck(), playback = state.playback, run = playback?.run ?? latestRun(), clock = playback?.clock;
+    context.update({ deck, run: latestRun(), api: state.apiResult, output: state.output, outputError: state.outputError, selected: state.selectedNode, playback });
     $('view-paged').setAttribute('aria-pressed', String(viewMode() === 'paged')); $('view-linear').setAttribute('aria-pressed', String(viewMode() === 'linear'));
     $('observer-status').textContent = `Observer ${state.connection} · ${state.apiOwned ? Number(Boolean(state.apiRun)) : state.runs.length} run(s) seen`;
     const view = deck ? traversalView(deck, playback, run) : null;
@@ -265,7 +278,7 @@ export function createCircuitRuntime(shell) {
       replayWall: String(clock?.wallElapsed ?? ''), replayRate: String(clock?.rate ?? ''), replayPaused: String(clock?.paused ?? false) });
     const slide = shownSlide();
     if (slide) for (const root of layout(slide)) renderCircuitViewer(root, deck, slide, view, {
-      selectedNode: state.selectedNode, selectNode: id => { state.selectedNode = id; render(); shell.component(id); }, selectSlide, selectTarget,
+      selectedNode: state.selectedNode, selectNode: id => { state.selectedNode = id; render(); shell.component(id); context.tab('evidence'); }, selectSlide, selectTarget,
       overlay: $('overlay').checked, run, mode: playback ? `Replay ${clock.rate}×` : 'Live', paused: clock?.paused, scenarioComplete: clock?.done, playbackId: playback?.id,
     });
     // Follow execution scrolls the linear band to the current position instead of switching pages.
@@ -358,7 +371,9 @@ export function createCircuitRuntime(shell) {
       await shell.loadRoot();
       if (!state.deck) throw new Error('The live scenario could not be loaded.');
     },
-    admitted: id => { source?.close(); stopReplay(); state.apiOwned = true; state.apiRun = null; state.apiGap = false; state.connection = `API run ${id}`; schedule(); },
+    admitted: id => { source?.close(); stopReplay(); Object.assign(state, { apiOwned: true, apiRun: null, apiGap: false, apiId: id, apiResult: null, output: undefined, outputError: null }); state.connection = `API run ${id}`; context.tab('run'); shell.location(false); schedule(); },
+    completed: (result, output, error) => { state.apiResult = result; state.output = output; state.outputError = error; schedule(); },
+    failed: message => { state.outputError = message; schedule(); },
     record: record => {
       if (record.kind === 'run-start') { state.apiRun = newRun(record); state.apiRun.ambiguous = Boolean(state.apiGap); }
       else if (state.apiRun) applyRecord(state.apiRun, record);
@@ -368,7 +383,7 @@ export function createCircuitRuntime(shell) {
     gap: () => { state.apiGap = true; if (state.apiRun) state.apiRun.ambiguous = true; schedule(); },
     release: () => {
       if (!state.apiOwned) return;
-      stopReplay(); state.apiOwned = false; state.apiRun = null; state.runs = []; state.current = null; state.openRuns = 0; state.lastSeq = 0; state.instance = null; connect(); schedule();
+      stopReplay(); state.apiOwned = false; state.apiRun = null; state.apiId = null; state.apiResult = null; state.output = undefined; state.outputError = null; state.runs = []; state.current = null; state.openRuns = 0; state.lastSeq = 0; state.instance = null; connect(); schedule();
     }
   });
   $('slide').addEventListener('change', () => selectSlide($('slide').value));
@@ -394,8 +409,8 @@ export function createCircuitRuntime(shell) {
   connect();
   return {
     state, install, clear, render, selectSlide, openDetail, closeDetail, focus, hasComponent, slideOf, setView,
-    reset: () => observePanel.reset(),
+    reset: () => observePanel.reset(), openRun: id => observePanel.open(id), contextTab: context.tab,
     selection: () => ({ page: state.page, detail: state.detailId, pointer: state.detailPointer, detailPage: state.detailSlideId,
-      view: state.view === 'linear' ? 'linear' : null })
+      view: state.view, run: state.apiId })
   };
 }

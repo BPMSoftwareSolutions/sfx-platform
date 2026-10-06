@@ -43,8 +43,10 @@ async function readMap(snapshot, blueprint) {
     } }));
     // Fixed command and generated input path; no URL value is interpolated into a shell.
     const command = `sfx capability invoke read-deck-observation-map --input "@${input}" --json`;
+    const env = { ...process.env };
+    for (const name of ['SDA_API_TOKEN', 'SFX_API_TOKEN', 'SFX_EVIDENCE_SERVICE_KEY', 'SFX_EVIDENCE_CALLERS']) delete env[name];
     const { stdout } = await execute(process.env.ComSpec ?? 'cmd.exe', ['/d', '/s', '/c', command], {
-      cwd: estate, windowsHide: true, windowsVerbatimArguments: true,
+      cwd: estate, env, windowsHide: true, windowsVerbatimArguments: true,
       timeout: 30000, maxBuffer: 8 * 1024 * 1024,
     });
     const result = JSON.parse(stdout);

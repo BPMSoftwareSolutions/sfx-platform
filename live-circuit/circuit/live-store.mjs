@@ -34,6 +34,7 @@ async function deliver(reader, payload) {
     const envelope = { deliveryType: 'sfx-command-delivery.v1', operation: reader.operation, request };
     const output = await new Promise((resolve, reject) => {
       const env = { ...process.env }; delete env.SDA_API_TOKEN; delete env.SFX_API_TOKEN;
+      delete env.SFX_EVIDENCE_SERVICE_KEY; delete env.SFX_EVIDENCE_CALLERS;
       const child = spawn(delivery.command, delivery.args, { env, cwd: path.resolve(root, delivery.cwd ?? '.'), windowsHide: true,
         shell: false, stdio: ['pipe', 'pipe', 'pipe'] });
       let bytes = 0, chunks = [], failure = null;

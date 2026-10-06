@@ -8,7 +8,7 @@ import { createCircuitRuntime } from './circuit-runtime.js';
 import { workspace, nodeStatus, nodeRows, sceneKey, selectionForScene, rowLabel } from './explorer-model.mjs';
 
 const params = new URLSearchParams(location.search);
-const requestedFrom = p => ({ page: p.get('page'), detail: p.get('detail'), pointer: p.get('pointer') ?? '', detailPage: p.get('detailPage'), view: p.get('view') });
+const requestedFrom = p => ({ page: p.get('page'), detail: p.get('detail'), pointer: p.get('pointer') ?? '', detailPage: p.get('detailPage'), view: p.get('view'), run: p.get('run') });
 const state = { capability: params.get('capability') ?? '', namespace: params.get('namespace') ?? '', scenario: params.get('scenario') ?? '',
   node: params.get('node') ?? '', row: params.has('row') ? Number(params.get('row')) : null, component: null, showAll: false,
   catalog: [], document: null, ws: null, detailsError: null, detailsMs: null, sceneError: null, serial: 0, sceneSerial: 0, health: null };
@@ -33,7 +33,7 @@ const deck = () => runtime.state.deck;
 function syncUrl(push = false) {
   const url = new URL(location.href), circuit = runtime.selection();
   for (const [key, value] of [['capability', state.capability], ['namespace', state.namespace], ['scenario', state.scenario], ['node', state.node],
-    ['row', state.row], ['page', circuit.page], ['detail', circuit.detail], ['pointer', circuit.pointer], ['detailPage', circuit.detailPage], ['view', circuit.view]])
+    ['row', state.row], ['page', circuit.page], ['detail', circuit.detail], ['pointer', circuit.pointer], ['detailPage', circuit.detailPage], ['view', circuit.view], ['run', circuit.run]])
     if (value !== null && value !== undefined && value !== '') url.searchParams.set(key, value); else url.searchParams.delete(key);
   history[push ? 'pushState' : 'replaceState'](null, '', url);
 }
@@ -74,7 +74,7 @@ async function readScene(refresh = false, requested = {}) {
   const r = await json(`/api/circuit/v1/scenario?${q}`);
   if (serial !== state.sceneSerial) return;
   if (!r.ok) { state.sceneError = r.body?.error ?? `HTTP_${r.status}`; runtime.clear(`Circuit loading held: ${state.sceneError}. The capability’s sections remain available.`); }
-  else { state.namespace ||= r.body.namespaceId ?? ''; await runtime.install(r.body, requested); }
+  else { state.namespace ||= r.body.namespaceId ?? ''; await runtime.install(r.body, requested); if (requested.run && requested.run !== runtime.selection().run) await runtime.openRun(requested.run); }
   render();
 }
 function changeScenario(id) {
@@ -85,13 +85,14 @@ function changeScenario(id) {
 // Selection: tree, tabs, table rows and circuit components share one model.
 function selectNode(id, push = true) {
   Object.assign(state, { node: id, row: null, component: null, showAll: false });
-  syncUrl(push); render(); closeDrawers();
+  syncUrl(push); render(); runtime.contextTab('evidence'); closeDrawers();
 }
 function selectRow(index) {
   const node = currentNode(); state.row = index; state.component = null;
   const key = sceneKey(node, nodeRows(state.document, node, scenario()).rows[index]);
   if (key && runtime.hasComponent(key)) { state.component = key; runtime.focus(key); }
   syncUrl(false); render();
+  runtime.contextTab('evidence');
 }
 // Canvas to tree: the section and row that declare this component's scene key.
 function selectComponent(id) {
@@ -286,7 +287,12 @@ window.addEventListener('popstate', () => {
   if (state.capability !== previous.capability || state.namespace !== previous.namespace) { runtime.reset(); open(false, requested); return; }
   if (state.scenario !== previous.scenario) { render(); readScene(false, requested); return; }
   const circuit = runtime.selection();
-  if ((requested.view ?? null) !== circuit.view) runtime.setView(requested.view === 'linear' ? 'linear' : 'paged', false);
+  if ((requested.run ?? null) !== circuit.run) {
+    if (requested.run) runtime.openRun(requested.run);
+    else { runtime.reset(); readScene(false, requested); }
+  }
+  const requestedView = requested.view === 'paged' ? 'paged' : 'linear';
+  if (requestedView !== circuit.view) runtime.setView(requestedView, false);
   if (requested.detail && requested.detail !== circuit.detail) runtime.openDetail(requested.detail, false, requested.pointer, requested.detailPage);
   else if (!requested.detail && circuit.detail) { runtime.closeDetail(); runtime.render(); }
   else if (requested.page && requested.page !== circuit.page) runtime.selectSlide(requested.page, false);

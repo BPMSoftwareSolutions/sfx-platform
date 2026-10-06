@@ -2,7 +2,9 @@
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { readFile } from 'node:fs/promises';
-import { validateSession, observeRequiresSession, attributeRun } from './identity-session.mjs';
+import { createHash } from 'node:crypto';
+import { validateSession, observeRequiresSession, attributeRun, ownsRun, sessionCookie } from './identity-session.mjs';
+import { evidenceConfigured, captureRun, captureStatus, storedRun, serveStoredRun } from './evidence-store.mjs';
 
 const policy = JSON.parse(await readFile(new URL('./circuit-host.json', import.meta.url), 'utf8')).api;
 const prefix = '/api/circuit/v1/runs';
@@ -20,13 +22,26 @@ export async function serveRunApi(req, res, url, configuration = {}) {
   const suffix = url.pathname.slice(prefix.length);
   const read = /^\/[a-zA-Z0-9-]+(?:\/(?:events(?:\/stream)?|graph|output))?$/.test(suffix);
   if (!(req.method === 'POST' && suffix === '' || req.method === 'GET' && read)) { send(res, 405, { error: 'Unsupported run operation.' }); return true; }
-  if (!endpoint || !token) { send(res, 503, { error: 'The circuit host has no SDA API connection configured.' }); return true; }
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), policy.timeoutMilliseconds);
   res.on('close', () => controller.abort());
   let session = null, subject = {};
   try {
     let body;
+    if (req.method === 'GET' && requireSession) {
+      const checked = await validateSession(req);
+      if (!checked.session) { send(res, checked.refusal.status, { disposition: checked.refusal.disposition, error: 'Sign in to read your runs.' }); return true; }
+      const runId = suffix.split('/')[1];
+      let stored = null;
+      if (evidenceConfigured()) {
+        try { stored = await storedRun(runId, sessionCookie(req)); }
+        catch (error) { if (!ownsRun(runId, checked.session.principalId)) throw error; }
+        if (stored && await serveStoredRun(res, suffix, url, stored, sessionCookie(req))) return true;
+        if (stored?.captureStatus === 'capturing' && endpoint && token) captureRun(runId, { capabilityId: stored.capabilityId, namespaceId: stored.namespaceId }, sessionCookie(req), { endpoint, token });
+      }
+      if (!stored && !ownsRun(runId, checked.session.principalId)) { send(res, 404, { error: 'Run not found.' }); return true; }
+    }
+    if (!endpoint || !token) { send(res, 503, { error: 'The circuit host has no SDA API connection configured.' }); return true; }
     if (req.method === 'POST') {
       const origin = req.headers.origin;
       const host = req.headers['x-forwarded-host'] || req.headers.host;
@@ -70,15 +85,31 @@ export async function serveRunApi(req, res, url, configuration = {}) {
     const upstream = await fetch(endpoint.replace(/\/+$/, '') + '/v1/runs' + suffix + url.search, {
       method: req.method, body, redirect: 'error', signal: controller.signal,
       headers: { authorization: `Bearer ${token}`, ...(body ? { 'content-type': 'application/json' } : {}),
-        ...(req.headers['idempotency-key'] ? { 'idempotency-key': req.headers['idempotency-key'] } : {}) }
+        // The SDA API authenticates the host, not the browser principal. Scope
+        // browser retry keys here so two principals cannot recover one run.
+        ...(req.headers['idempotency-key'] ? { 'idempotency-key': session
+          ? createHash('sha256').update(JSON.stringify([session.principalId, req.headers['idempotency-key']])).digest('hex')
+          : req.headers['idempotency-key'] } : {}) }
     });
     if (session && req.method === 'POST') {
       // Admission responses are small JSON; read it to attribute the run to the principal.
       const text = await upstream.text();
-      if (upstream.ok) { try { attributeRun(JSON.parse(text)?.runId, session, subject); } catch { /* Unattributable admission body. */ } }
+      if (upstream.ok) {
+        let attributed = false;
+        try { attributed = attributeRun(JSON.parse(text)?.runId, session, subject); } catch { /* Refuse an unattributable admission body. */ }
+        if (!attributed) { send(res, 502, { error: 'Run attribution unavailable. Check your runs before submitting again.' }); return true; }
+        const runId = JSON.parse(text).runId;
+        captureRun(runId, subject, sessionCookie(req), { endpoint, token });
+        send(res, upstream.status, { ...JSON.parse(text), evidencePersistence: evidenceConfigured() ? captureStatus(runId) : 'not-configured' });
+        return true;
+      }
       res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/json', 'cache-control': 'no-store' });
       res.end(text);
       return true;
+    }
+    if (req.method === 'GET' && /^\/[a-zA-Z0-9-]+$/.test(suffix) && upstream.ok) {
+      const body = await upstream.json();
+      send(res, upstream.status, { ...body, evidencePersistence: evidenceConfigured() ? captureStatus(suffix.slice(1)) : 'not-configured' }); return true;
     }
     res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') || 'application/json',
       'cache-control': 'no-store', 'x-accel-buffering': 'no' });

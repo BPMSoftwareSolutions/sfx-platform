@@ -1,0 +1,1 @@
+{"status":"PASS","basis":"Live identity SQL + retained execution capture in fixture API; upstream stopped before replay","records":1893,"chunks":15,"checks":["outage retry","lost completion acknowledgement","exact stored events","digest refusal","gap refusal","stored output","authenticated replay with no execution configuration","no trust claim"]}

@@ -1,5 +1,11 @@
 # Capability Explorer: linear scenario view, design L1
 
+2026-10-06 implementation direction: **Linear is the default view** when the
+reading supplies a linear scenario slide. An explicitly selected Paged view is
+remembered and represented in the URL. A single-page scenario continues to use
+its one declared scene. Run reports, seeking and evidence inspection retain the
+same circuit and work in either presentation.
+
 Recorded 2026-10-06. Status: **implemented on 2026-10-06 with the reader-composed
 option.** The estate's `render_integrated_scenario_circuit` returns a
 `scenario-linear` slide (sfx-embody `d9b1d3b`). The Explorer's View (Paged |

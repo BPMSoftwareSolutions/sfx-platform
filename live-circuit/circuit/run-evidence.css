@@ -1,0 +1,33 @@
+.context-tabs { position: sticky; top: -14px; background: var(--bg); z-index: 3; }
+.context-tabs .tab { flex: 1; justify-content: center; }
+#context [hidden] { display: none !important; }
+#run-report, #component-evidence { overflow-wrap: anywhere; }
+#run-report h3, #component-evidence h3 { margin-top: 22px; color: var(--dim); }
+.report-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0; }
+.run-outcome { color: var(--cyan); border: 1px solid var(--cyan); border-radius: 8px; padding: 8px 12px; }
+.not-captured { border: 1px dashed var(--amber); border-radius: 6px; padding: 12px; margin: 10px 0; background: rgba(246,185,77,.04); }
+.not-captured strong { color: var(--amber); font-size: 12px; text-transform: uppercase; }
+.not-captured p { margin: 6px 0 0; }
+.answer-fields { margin: 10px 0; }
+.answer-fields dt { color: var(--dim); font-size: 12px; margin-top: 10px; }
+.answer-fields dd { margin: 4px 0 0; }
+.answer { color: var(--white); font-size: 15px; white-space: pre-wrap; }
+#run-report pre, #component-evidence pre { max-height: 280px; overflow: auto; white-space: pre-wrap; }
+.evidence-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.run-row { display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--line); padding: 15px 0; color: var(--white); text-decoration: none; overflow-wrap: anywhere; }
+.run-row time, .run-row small { color: var(--dim); font-size: 12px; }
+.run-row:hover { color: var(--cyan); }
+.trace-table { max-height: 350px; overflow: auto; }
+#run-steps { margin: 18px 0; }
+#run-steps button { display: block; width: 100%; height: auto; text-align: left; white-space: normal; margin: 4px 0; padding: 8px; }
+#run-steps [aria-current="true"] { border-color: var(--cyan); color: var(--cyan); }
+#invocation-timeline { margin-top: 20px; }
+#invocation-timeline h3 { font-size: 13px; color: var(--dim); }
+.invocation-track { position: relative; height: 32px; background: #25364a; margin-bottom: 8px; }
+.timing-span { position: absolute; height: 100%; top: 0; border: 0; border-radius: 0; min-width: 1px; padding: 0; background: #3d5168; cursor: pointer; }
+.timing-span.operation { background: #2d72b7; }
+.timing-span.provider { background: var(--violet); }
+.timing-span.gap { background: repeating-linear-gradient(125deg,transparent 0 4px,#ac8bea 4px 6px); }
+.invocation-playhead { position: absolute; top: -5px; bottom: -5px; width: 2px; background: white; pointer-events: none; }
+#replay-seek { width: 100%; accent-color: var(--cyan); }
+#context .button { white-space: normal; height: auto; padding-top: 8px; padding-bottom: 8px; }

@@ -108,6 +108,7 @@ export function apiRecord(event, graph) {
   if (event.kind === 'run.admitted') return null;
   const kind = event.kind === 'run.started' ? 'run-start' : event.kind === 'run.exited' ? 'run-end' : 'observation';
   return { kind, seq: event.cursor, observationKey: `sda-api:${event.eventId}`, receivedAt: event.at,
+    runId: event.runId ?? /^urn:sda-api:run-event:([a-zA-Z0-9-]+):\d+$/.exec(event.eventId ?? '')?.[1], apiEvent: event,
     payload: event.kind === 'graph.captured' ? graph : kind === 'run-start' ? { ...event.payload, at: event.at, processId: event.payload.pid }
       : kind === 'run-end' ? { ...event.payload, at: event.at } : event.payload };
 }
@@ -175,12 +176,27 @@ export function createObservePanel(hooks) {
         const output = await request(`${prefix}/${encodeURIComponent(selected.id)}/output`, { signal });
         $('observe-output').textContent = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
         $('observe-result').hidden = false;
-      } catch (error) { $('observe-output').textContent = error.message; $('observe-result').hidden = false; }
+        hooks.completed?.(result, output);
+        watchPersistence(selected, result, output, undefined, signal);
+      } catch (error) { $('observe-output').textContent = error.message; $('observe-result').hidden = false; hooks.completed?.(result, undefined, error.message); watchPersistence(selected, result, undefined, error.message, signal); }
       selected.finished = true;
     } catch (error) {
-      if (!signal.aborted && run === selected) { status(`${error.message} Run ${selected.id}; resume observation before submitting again.`, true); $('observe-resume').hidden = false; }
+      if (!signal.aborted && run === selected) { hooks.failed?.(error.message); status(`${error.message} Run ${selected.id}; resume observation before submitting again.`, true); $('observe-resume').hidden = false; }
     } finally {
       if (run === selected && !signal.aborted) { busy = !selected.finished; buttons(); }
+    }
+  }
+  // Execution can finish before its final durable write. Refresh the report's
+  // capture status for a bounded period without reconnecting or rerunning it.
+  async function watchPersistence(selected, initial, output, error, signal) {
+    let result = initial;
+    for (let attempt = 0; attempt < 15 && ['capturing', 'unconfirmed'].includes(result.persistence ?? result.evidencePersistence); attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (run !== selected || signal.aborted) return;
+      try { result = await request(`${prefix}/${encodeURIComponent(selected.id)}`, { signal }); }
+      catch { return; }
+      if (run !== selected || signal.aborted) return;
+      hooks.completed?.(result, output, error);
     }
   }
   $('observe').addEventListener('click', async () => {
@@ -217,6 +233,12 @@ export function createObservePanel(hooks) {
   $('observe-external').addEventListener('click', () => { release(); status('Following externally observed runs. A submitted API execution continues on the server.'); });
   request('/api/circuit/v1/execution').then(config => { ready = config.configured; if (!ready) status('Observe unavailable: configure the circuit host’s SDA API connection.', true); buttons(); }).catch(error => status(error.message, true));
   return {
+    async open(id) {
+      if (!/^[a-zA-Z0-9-]+$/.test(id)) throw new Error('Invalid run identity.');
+      feed?.abort();
+      run = { id, cursor: 0 }; $('observe-external').hidden = false;
+      hooks.admitted(id); await follow();
+    },
     reset() {
       if (key) drafts.set(key, $('payload').value);
       ++serial; key = ''; template = undefined; release();

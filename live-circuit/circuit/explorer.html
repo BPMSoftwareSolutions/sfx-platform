@@ -6,6 +6,7 @@
 <link rel="icon" href="/circuit/assets/sfx-emblem.png">
 <link rel="stylesheet" href="/circuit/site.css">
 <link rel="stylesheet" href="/circuit/circuit-canvas.css">
+<link rel="stylesheet" href="/circuit/run-evidence.css">
 <style>
   /* Explorer workspace: tree, capability header and tabs, the database circuit,
      the selected section, the context panel and a status bar. Every label,
@@ -170,7 +171,7 @@
         <label>Speed <select id="speed"></select></label>
         <button id="live" type="button" disabled>Return to live</button>
         <span class="view-controls" id="view-controls" hidden>
-          <span class="seg" role="group" aria-label="Circuit view"><button id="view-paged" type="button" aria-pressed="true">Paged</button><button id="view-linear" type="button" aria-pressed="false">Linear</button></span>
+          <span class="seg" role="group" aria-label="Circuit view"><button id="view-linear" type="button" aria-pressed="true">Linear</button><button id="view-paged" type="button" aria-pressed="false">Paged</button></span>
           <button id="zoom-out" type="button" disabled aria-label="Zoom out">−</button>
           <select id="zoom" aria-label="Zoom" disabled><option value="fit">Fit</option><option value="1">100%</option><option value="1.25">125%</option></select>
           <button id="zoom-in" type="button" disabled aria-label="Zoom in">+</button>
@@ -188,12 +189,21 @@
         <div class="cap" id="cap-right" hidden><div class="viewer-copy" id="viewer-cap-right"></div></div>
       </div>
       <div class="legend">Bright: latest receipt / recorded interval · Dim: observed history · <span class="warning">Input</span> · <span style="color:var(--green)">Completed</span> · <span class="error">Failure</span> · Dashed input: field presence unavailable · Unlit: no matching evidence</div>
+      <section id="invocation-timeline" aria-label="Invocation timing" hidden></section>
     </section>
     <details class="panel run-evidence"><summary>Run evidence: verification and execution testimony</summary>
       <div class="evidence-grid"><section id="verification"></section><section id="inventory"></section></div></details>
     <section id="section" aria-label="Selected section"></section>
   </section>
   <aside id="context" aria-label="Observe and selection details">
+    <nav class="tabs context-tabs" role="tablist" aria-label="Run context">
+      <button class="tab" id="tab-run" data-context-tab="run" role="tab" aria-selected="true" aria-controls="context-run">Run</button>
+      <button class="tab" id="tab-runs" data-context-tab="runs" role="tab" aria-selected="false" aria-controls="context-runs" tabindex="-1">Runs</button>
+      <button class="tab" id="tab-evidence" data-context-tab="evidence" role="tab" aria-selected="false" aria-controls="context-evidence" tabindex="-1">Evidence</button>
+    </nav>
+    <section id="context-run" role="tabpanel" aria-labelledby="tab-run">
+    <section id="run-report" aria-label="Run report"></section>
+    <section id="run-steps" aria-label="Execution steps"></section>
     <details class="side-section" id="observe-box" open>
       <summary>Observe this capability</summary>
       <p id="payload-contract" class="note">Select a capability to load its input contract.</p>
@@ -208,11 +218,22 @@
       <details id="observe-result" hidden><summary>API result</summary><pre id="observe-output"></pre></details>
       <details><summary>Declared input schema</summary><pre id="payload-schema"></pre></details>
     </details>
+    </section>
+    <section id="context-runs" role="tabpanel" aria-labelledby="tab-runs" hidden>
+      <h3>Your runs</h3>
+      <p class="note" id="runs-storage">Runs admitted in this server session. History is held in memory; a server restart clears it.</p>
+      <label class="check"><input type="checkbox" id="runs-all">All capabilities</label>
+      <button id="runs-refresh" class="button secondary small" type="button">Refresh runs</button>
+      <div id="runs-list" aria-live="polite"></div>
+    </section>
+    <section id="context-evidence" role="tabpanel" aria-labelledby="tab-evidence" hidden>
+    <section id="component-evidence" aria-label="Captured component evidence"></section>
     <section class="side-section" aria-label="Selection details">
       <h3>Details</h3>
       <div id="context-body"><p class="note">Select a section, a row or a circuit component.</p></div>
       <section id="inspector" aria-label="Circuit component" hidden></section>
       <section id="declaration-detail" aria-label="Component authority" hidden></section>
+    </section>
     </section>
   </aside>
 </div>

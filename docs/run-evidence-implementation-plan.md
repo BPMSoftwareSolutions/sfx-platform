@@ -1,6 +1,34 @@
 # Run evidence and the trust ledger: implementation plan
 
-Prepared 2026-10-06 for team review. Status: **draft, not started.**
+Prepared 2026-10-06. Status: **implementation underway; run capture installed in
+sfx-identity, candidate hosts and Explorer verified locally against a fresh
+staging execution. The trust ledger and staging service rollout remain open.**
+
+## Implementation checkpoint — 2026-10-06
+
+| Delivered | Evidence and limits |
+| --- | --- |
+| E1 Run / Runs / Evidence context tabs, report, whole-invocation bar, scenario seeking, receipt inspection and capture export; horizontal circuit preserved; Linear is the default | `verify-run-evidence.mjs`, `verify-run-evidence-browser.mjs`; retained-capture/browser checks pass, including the current linear scene, explicit Paged selection and Back navigation. Exact provider exchange dwell stays unavailable where child receipts do not identify it. |
+| Durable run ownership, immutable compressed trace chunks and terminal graph/output | Installed migration pair `sfx-dal/identity/sql/migrations/002-run-evidence.*.sql`; rollback, install, idempotence and actual CodeLightly generation receipts are under `sfx-dal/identity/verification/`. This is pending material, not the ledger. |
+| Private capture/read API with separate service identity, validated principal, generated DAL, bounded writes and audited owner reads | [E10: local host/live SQL checks](run-evidence-plan/evidence/E10-local-store-acceptance.json). Invalid content, conflicting retries, cross-principal reads and revoked sessions are refused. |
+| Background capture, durable history and authenticated archive replay independent of execution-host availability | [E11: recovery and retained capture](run-evidence-plan/evidence/E11-retained-capture-acceptance.json): 1,893 records; outage and lost-acknowledgement retries; identity-host restart; exact readback. |
+| Fresh staging execution through candidate local hosts | [E12: fresh execution](run-evidence-plan/evidence/E12-fresh-execution-acceptance.json): run `b1827f03-25b9-45cc-a9fb-ed440e509482`, 1,894 records, 24 chunks, 11 operations and 3 providers; exact source/stored event, graph, output and timeline equality. Archive readback passes with the execution connection removed. Disposable test principals and their stored test material were cleaned up. |
+| SDA boundary specified | [S0–S3 request](../../sfx-embody/docs/request-sda-run-evidence.md): attributable executor identity, content delivery, exact ownership and independent evidence budgets. No SDA source or evidence-emission authority was changed. |
+
+The numbered baseline below remains the **pre-implementation** baseline. The
+candidate services are not deployed to staging. Database migration `002` now
+contains only run material; reserve a subsequent migration for the ledger after
+the estate vocabulary/rules are declared. W2.1–W2.5 are partial, not complete.
+No L0–L10 trust gate is claimed by the transport checks. `ADMITTED` in E12 is the
+capability's returned outcome; the stored run explicitly says `NOT_EVALUATED`.
+
+Remaining delivery order: declare vocabulary and evaluator rules; implement the
+claim ledger and replay/contradiction fixtures; close attributable executor
+identity through S0; add retention/tombstones and staging caller credentials;
+package the changed identity binary, deploy and prove full-container restart;
+then close S1–S3 and the content/producer gates. Q7/Q8 rules remain unavailable
+until their prerequisites are settled. The detailed work items below remain the
+completion criteria.
 
 **Revision 3 (2026-10-06): claim-scoped trust integrated into delivery.**
 

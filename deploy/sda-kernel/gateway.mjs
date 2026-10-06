@@ -12,9 +12,13 @@ const token = process.env.SDA_API_TOKEN;
 const retrievalConnection = process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
 const identityConnection = process.env.SFX_IDENTITY_CONNECTION_STRING;
 const identityServiceKey = process.env.SFX_IDENTITY_SERVICE_KEY;
+const evidenceServiceKey = process.env.SFX_EVIDENCE_SERVICE_KEY;
+const evidenceCallers = process.env.SFX_EVIDENCE_CALLERS;
 delete process.env.PROCEDURE_EXTRACT_CONNECTION_STRING;
 delete process.env.SFX_IDENTITY_CONNECTION_STRING;
 delete process.env.SFX_IDENTITY_SERVICE_KEY;
+delete process.env.SFX_EVIDENCE_SERVICE_KEY;
+delete process.env.SFX_EVIDENCE_CALLERS;
 if (!unlock || unlock.startsWith('@Microsoft.KeyVault(') || !token) throw new Error('VAULT_OR_API_AUTH_NOT_CONFIGURED');
 delete process.env.SFX_VAULT_UNLOCK;
 const data = path.join(process.env.HOME, '.local/share');
@@ -73,7 +77,7 @@ launch('/opt/sfx/procedure-extract/procedure-extract', ['--serve', '--url', 'htt
 launch(process.execPath, ['demo/dispatch-pair/observe-server.mjs'], '/opt/sfx/estate',
   { SDA_API_ENDPOINT: 'http://127.0.0.1:8799', PROCEDURE_EXTRACT_ENDPOINT: 'http://127.0.0.1:8791',
     // Browser sign-in and the Observe session gate call the identity host on loopback.
-    SFX_IDENTITY_ENDPOINT: 'http://127.0.0.1:8793' }, ['IDENTITY_HEADER', 'MSI_SECRET']);
+    SFX_IDENTITY_ENDPOINT: 'http://127.0.0.1:8793', ...(evidenceServiceKey ? { SFX_EVIDENCE_SERVICE_KEY: evidenceServiceKey } : {}) }, ['IDENTITY_HEADER', 'MSI_SECRET']);
 async function waitFor(url, headers = {}, expected = 200) {
   for (let i = 0; i < 60; i++) {
     try { const response = await fetch(url, { headers, signal: AbortSignal.timeout(1000) }); if (response.status === expected) return; } catch {}
@@ -99,7 +103,8 @@ launch('/opt/sfx/identity/sfx-identity-host', [], '/opt/sfx/identity', {
   SFX_IDENTITY_REALM: identityPolicy.realm,
   SFX_IDENTITY_PROVIDER_ORIGIN: identityPolicy.providerOrigin,
   SFX_OBSERVER_ENDPOINT: 'http://127.0.0.1:8787/events', SFX_IDENTITY_LOCAL_GATEWAY: '1',
-  SFX_IDENTITY_CONNECTION_STRING: identityConnection, SFX_IDENTITY_SERVICE_KEY: identityServiceKey
+  SFX_IDENTITY_CONNECTION_STRING: identityConnection, SFX_IDENTITY_SERVICE_KEY: identityServiceKey,
+  ...(evidenceCallers ? { SFX_EVIDENCE_CALLERS: evidenceCallers } : {})
 }, ['SDA_API_TOKEN', 'IDENTITY_HEADER', 'MSI_SECRET']);
 await waitFor('http://127.0.0.1:8793/health');
 launch(process.execPath, ['/opt/sfx/host/api.mjs'], '/opt/sfx', {

@@ -39,7 +39,7 @@ const identity = http.createServer(async (req, res) => {
 const apiLog = [];
 const api = http.createServer(async (req, res) => {
   const text = await body(req);
-  apiLog.push({ method: req.method, url: req.url, authorization: req.headers.authorization, body: text, cookie: req.headers.cookie ?? null });
+  apiLog.push({ method: req.method, url: req.url, authorization: req.headers.authorization, body: text, cookie: req.headers.cookie ?? null, idempotency: req.headers['idempotency-key'] });
   json(res, 202, { runId: `run-${apiLog.length}`, state: 'admitted' });
 });
 
@@ -58,9 +58,9 @@ const o = await start({ SFX_IDENTITY_ENDPOINT: `http://127.0.0.1:${identityPort}
 const bare = await start({ SFX_IDENTITY_ENDPOINT: '', SDA_API_ENDPOINT: `http://127.0.0.1:${apiPort}`, SDA_API_TOKEN: MACHINE });
 const checks = [];
 const check = (name, fn) => checks.push([name, fn]);
-const post = (target, path, value, { origin = target.origin, type = 'application/json', cookie } = {}) =>
+const post = (target, path, value, { origin = target.origin, type = 'application/json', cookie, idempotency } = {}) =>
   fetch(target.origin + path, { method: 'POST', redirect: 'manual', body: typeof value === 'string' ? value : JSON.stringify(value),
-    headers: { ...(origin ? { origin } : {}), 'content-type': type, ...(cookie ? { cookie } : {}) } });
+    headers: { ...(origin ? { origin } : {}), 'content-type': type, ...(cookie ? { cookie } : {}), ...(idempotency ? { 'idempotency-key': idempotency } : {}) } });
 const get = (target, path, cookie) => fetch(target.origin + path, { headers: cookie ? { cookie } : {} });
 let cookie = null, session = null;
 
@@ -129,6 +129,31 @@ check('a revoked session is refused for Observe and its cookie cleared', async (
   const r = await post(o, '/api/circuit/v1/runs', { object: 'capability', operation: 'observe', subject: 'say-hello-world', input: {} }, { cookie });
   assert.equal(r.status, 401); assert.equal((await r.json()).disposition, 'SESSION_ENDED'); assert.ok(r.headers.get('set-cookie').includes('Max-Age=0'));
   sessions.get(token).revoked = false;
+});
+check('run reads require the owning principal; other and nonexistent runs have identical refusals', async () => {
+  const list = await (await get(o, '/api/circuit/v1/session/runs', cookie)).json(), runId = list.runs[0].runId;
+  const other = await post(o, '/api/circuit/v1/session', { identifier: IDENTIFIER, password: PASSWORD });
+  const otherCookie = other.headers.get('set-cookie').split(';')[0];
+  assert.deepEqual((await (await get(o, '/api/circuit/v1/session/runs', otherCookie)).json()).runs, []);
+  for (const suffix of ['', '/events', '/events/stream', '/graph', '/output']) {
+    const before = apiLog.length;
+    assert.equal((await get(o, `/api/circuit/v1/runs/${runId}${suffix}`)).status, 401);
+    const denied = await get(o, `/api/circuit/v1/runs/${runId}${suffix}`, otherCookie);
+    const absent = await get(o, `/api/circuit/v1/runs/missing${suffix}`, otherCookie);
+    assert.equal(denied.status, 404); assert.equal(absent.status, 404); assert.equal(await denied.text(), await absent.text());
+    assert.equal(apiLog.length, before, 'Refused reads must never contact execution storage');
+    assert.equal((await get(o, `/api/circuit/v1/runs/${runId}${suffix}`, cookie)).status, 202);
+  }
+});
+check('admission retry keys are stable for one principal and distinct across principals', async () => {
+  const other = await post(o, '/api/circuit/v1/session', { identifier: IDENTIFIER, password: PASSWORD });
+  const otherCookie = other.headers.get('set-cookie').split(';')[0];
+  const keys = [];
+  for (const owner of [cookie, cookie, otherCookie]) {
+    assert.equal((await post(o, '/api/circuit/v1/runs', { object: 'capability', operation: 'observe', subject: 'say-hello-world', input: {} }, { cookie: owner, idempotency: 'same-browser-retry' })).status, 202);
+    keys.push(apiLog.at(-1).idempotency);
+  }
+  assert.equal(keys[0], keys[1]); assert.notEqual(keys[0], keys[2]); assert.notEqual(keys[0], 'same-browser-retry');
 });
 check('sign-out revokes on the identity host and clears the cookie', async () => {
   const cross = await post(o, '/api/circuit/v1/session/logout', {}, { origin: 'https://evil.example', cookie });

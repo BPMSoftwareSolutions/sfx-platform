@@ -12,6 +12,9 @@ const port = Number.parseInt(process.env.OBSERVER_PORT ?? '8787', 10);
 // The circuit consumes database scenes or historical exports and declared observation identities.
 const CIRCUIT_DIR = new URL('../circuit/', import.meta.url);
 const CIRCUIT_FILES = new Map([
+  ['/circuit/run-context.js', ['run-context.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/run-evidence.mjs', ['run-evidence.mjs', 'text/javascript; charset=utf-8']],
+  ['/circuit/run-evidence.css', ['run-evidence.css', 'text/css; charset=utf-8']],
   ['/circuit/observe-panel.js', ['observe-panel.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-viewer.js', ['circuit-viewer.js', 'text/javascript; charset=utf-8']],
   ['/circuit/navigation.js', ['navigation.js', 'text/javascript; charset=utf-8']],

@@ -1,7 +1,7 @@
 // Identity joins only. The database supplies the component/address mapping.
 // Testimony remains verbatim; an observed component is not a success verdict.
 export function newRun(record) {
-  return { id: record.observationKey, startedAt: record.payload?.at ?? record.receivedAt, startRecord: record, graph: null,
+  return { id: record.runId ?? record.observationKey, startedAt: record.payload?.at ?? record.receivedAt, startRecord: record, graph: null,
     cells: new Map(), edges: new Map(), other: [], events: [], ended: false, ambiguous: false };
 }
 export function applyRecord(run, record, at = Date.now()) {
@@ -11,7 +11,8 @@ export function applyRecord(run, record, at = Date.now()) {
   run.events.push({ record, at });
   const payload = record.payload ?? {};
   if (record.kind === 'run-end') {
-    if (payload.processId && run.startRecord?.payload?.processId && payload.processId !== run.startRecord.payload.processId) run.ambiguous = true;
+    const processId = payload.processId ?? payload.pid, startedProcess = run.startRecord?.payload?.processId ?? run.startRecord?.payload?.pid;
+    if (processId != null && startedProcess != null && processId !== startedProcess) run.ambiguous = true;
     run.ended = true; run.exitCode = payload.exitCode; return;
   }
   if (payload.observationType === 'execution-graph-captured.v1') {
