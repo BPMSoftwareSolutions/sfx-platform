@@ -62,7 +62,32 @@ the Explorer shows those 11 capabilities as a visible reading failure.
   requires the document for the release fixture capability, and 404 for an
   unknown one.
 
-**Next:** P4, the Explorer workspace, built on this document. Alongside: P0 credential custody in its
+**P4 first slice, 2026-10-06:** the Explorer workspace at `/circuit/explorer`.
+
+- **Shell from rows:** the tree, tabs and scenario switcher come from the
+  navigation rows, and every section renders its rows by declared presentation.
+- **Same circuit:** the canvas is the database scene, drawn by the Live
+  Circuit's own renderer.
+- **Selection:** a row and its circuit component select each other.
+- **Failures are visible:** the conveyor shows `CELL_EXECUTION_FAILED` with
+  its circuit still drawn.
+- **Checked locally on five capabilities (1–20 scenarios):**
+  `verify-explorer.mjs` passed, the screenshots and interactions recorded no
+  console errors, and the Live Circuit page is unchanged.
+
+**Next for P4** (§4 P4):
+
+- **Summary cards.** Purpose, Requires, Establishes and Posture need declared
+  card bindings; policy r4 declares none.
+- **Operation scene key.** Operations need a declared scene-key template that
+  matches the circuit's operation identity. r4 describes it only in prose, so
+  operations do not link the circuit to the tree.
+- **Presentations.** Specialized renderers for the 21 presentation kinds (for
+  example the DO / TO / SO THAT narrative). All kinds render as tables or
+  fields today.
+- **Live state.** The live and replay overlay inside the Explorer (spec §8).
+
+The first two are estate policy revisions. Alongside: P0 credential custody in its
 own window, P5 (remove the Next.js code and the now-unused overlay packagers),
 and the remaining P1 local-observer cleanup.
 
@@ -96,7 +121,7 @@ rollback target. The old Next.js website still answers `/`.
 | Home page | **Designed and built, not released.** H1 (`1507752`), then H2 from another session; H2 implemented at `/circuit/home` with the sign-in page restyled to match (`0ca7388`) | [Home page design](home-page-design.md) |
 | P2 One image without Next.js | **Accepted 2026-10-06** (`composite-e82d47d8a901-37403470208-1`) | §4 P2 |
 | P3 Explorer data path | **Steps 1–3 done 2026-10-06**: navigation installed, `read-capability-details` declared, served at `/api/circuit/v1/capability-details`. Uncached host reads take 3.9–5.0 s, over the 3-second bound (see §4 P3); cached reads are immediate. 11 capabilities fail their reading until the routing-law owner repairs it | §4 P3, §6 |
-| P4 Explorer workspace | **Not started** (needs P3) | §4 P4 |
+| P4 Explorer workspace | **First slice built 2026-10-06** at `/circuit/explorer`; summary cards, operation linking, specialized presentations and the live overlay remain | §4 P4 |
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
 | P6 Deployment evolution | **Started.** Observe requires sign-in; per-user authority inside the API, durable run history and production promotion remain | §4 P6 |
 

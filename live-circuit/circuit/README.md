@@ -52,6 +52,34 @@ interprets the sets. A capability that is unknown or not selected returns 404
 failure is never shown as an empty workspace.
 `verify-capability-details.mjs` checks a running host against real capabilities.
 
+## Capability Explorer
+
+`/circuit/explorer?capability=…&namespace=…[&scenario=…&node=…&row=…]` is the
+Explorer workspace (`explorer.html`, `explorer.js`, `explorer-model.mjs`). Its
+regions:
+
+- **Shell:** the tree, the tabs and the scenario switcher are the reading's
+  declared navigation rows: coordinates, nodes, aliases and scenarios. Counts,
+  states, placements and finding badges are shown as returned. Empty and
+  diagnostic sections stay listed under their coordinate.
+- **Circuit:** the selected scenario's database scene, drawn by this viewer's
+  own renderer (`renderCircuitViewer`) without a runtime overlay. The canvas
+  rules are shared with the Live Circuit page in `circuit-canvas.css`.
+- **Sections:** each section shows the rows of its declared result set. A
+  scenario-scoped section shows only the selected scenario's rows, using its
+  declared scenario key. Rows with a non-ROW `row_state` are shown as markers.
+- **Linking sections and circuit:** a row whose declared scene key names a
+  component of the circuit links to it, and a circuit target selects its section.
+  Components without a declared scene key (operations, bindings) select no
+  section and link to their Live Circuit detail.
+- **Live work:** Observe, live following and replay stay on the Live Circuit
+  page. Every Explorer view links there with the same selection.
+
+The details and the scene are read in parallel, so the circuit appears first. A
+failed reading is shown as a failure, never as empty sections.
+`verify-explorer.mjs` checks a running host, including that the client names no
+result set.
+
 ## Provider database inspection
 
 Open a declared provider through a circuit label or **Explore component**.
