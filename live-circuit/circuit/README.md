@@ -63,6 +63,12 @@ gone; `/circuit` and `/circuit/` redirect here, keeping their query. The regions
   declared navigation rows: coordinates, nodes, aliases and scenarios. Counts,
   states, placements and finding badges are shown as returned. Empty and
   diagnostic sections stay listed under their coordinate.
+- **Sidebars:** the capability tree and the run context resize by dragging their
+  splitters (double-click resets the default width; a focused splitter resizes
+  with arrow keys, Home/End, and collapses with Enter or Space). The header's
+  **Sections** and **Observe & details** buttons collapse them, and widths plus
+  collapsed state persist per browser. Below 1150 px the same buttons open the
+  drawers instead.
 - **Circuit and run bar:** the selected scenario's database scene, drawn by
   `renderCircuitViewer`, with the circuit runtime mounted on it: live following of
   observer runs, captured replay (pause, step, speed, return to live), follow

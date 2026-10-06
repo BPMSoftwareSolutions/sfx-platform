@@ -11,14 +11,18 @@
   /* Explorer workspace: tree, capability header and tabs, the database circuit,
      the selected section, the context panel and a status bar. Every label,
      count, state and badge is a returned navigation row. */
-  :root { --observation: #72D7EE; --violet: #A98AF2; --tree: 300px; --context: 380px; }
+  :root { --observation: #72D7EE; --violet: #A98AF2; --tree: 300px; --context: 380px; --splitter: 8px; }
   body { min-height: 100vh; display: flex; flex-direction: column; }
   .site-nav a[aria-current="page"] { color: var(--cyan); }
-  .workspace { flex: 1; display: grid; grid-template-columns: var(--tree) minmax(0, 1fr) var(--context); min-height: 0; }
-  .workspace.expanded { grid-template-columns: 0 minmax(0, 1fr) 0; }
-  .workspace.expanded #tree, .workspace.expanded #context { display: none; }
-  aside { border-right: 1px solid var(--line); background: rgba(3, 14, 25, .7); padding: 14px 12px; overflow: auto; max-height: calc(100vh - 64px - 34px); position: sticky; top: 64px; }
-  #context { border-right: 0; border-left: 1px solid var(--line); }
+  .workspace { flex: 1; display: grid; grid-template-columns: var(--tree) var(--splitter) minmax(0, 1fr) var(--splitter) var(--context); min-height: 0; }
+  .splitter { position: relative; cursor: col-resize; touch-action: none; background: none; border: 0; padding: 0; }
+  .splitter::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); background: var(--line); }
+  .splitter:hover::before, .splitter:focus-visible::before, .splitter.active::before { width: 2px; background: var(--cyan); }
+  .splitter:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+  body.pane-resizing, body.pane-resizing * { cursor: col-resize !important; user-select: none; }
+  .workspace.expanded { grid-template-columns: 0 0 minmax(0, 1fr) 0 0; }
+  .workspace.expanded #tree, .workspace.expanded #context, .workspace.expanded .splitter { display: none; }
+  aside { background: rgba(3, 14, 25, .7); padding: 14px 12px; overflow: auto; max-height: calc(100vh - 64px - 34px); position: sticky; top: 64px; }
   #main { padding: 18px var(--gutter) 28px; min-width: 0; }
   .picker { display: flex; gap: 6px; margin-bottom: 14px; }
   .picker input { flex: 1; min-width: 0; font: 14px Arial, sans-serif; padding: 8px 10px; color: var(--white); background: var(--panel-solid); border: 1px solid var(--line); border-radius: 6px; }
@@ -70,13 +74,21 @@
   .status-bar { position: sticky; bottom: 0; background: var(--bar); border-top: 1px solid rgba(41,67,91,.6); color: var(--dim); font-size: 12px;
     display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 8px var(--gutter); }
   .status-bar .warn { color: var(--amber); } .status-bar .error { color: var(--red); }
-  .drawer-toggle { display: none; }
+  .drawer-toggle { display: inline-flex; }
+  @media (min-width: 1151px) {
+    .workspace.tree-collapsed { grid-template-columns: 0 0 minmax(0, 1fr) var(--splitter) var(--context); }
+    .workspace.tree-collapsed #resizer-tree { display: none; }
+    .workspace.context-collapsed { grid-template-columns: var(--tree) var(--splitter) minmax(0, 1fr) 0 0; }
+    .workspace.context-collapsed #resizer-context { display: none; }
+    .workspace.tree-collapsed.context-collapsed { grid-template-columns: 0 0 minmax(0, 1fr) 0 0; }
+    .workspace.tree-collapsed #tree, .workspace.context-collapsed #context { display: none; }
+  }
   @media (max-width: 1150px) {
     .workspace { grid-template-columns: minmax(0, 1fr); }
+    .splitter { display: none; }
     aside { position: fixed; top: 64px; bottom: 34px; width: min(88vw, 360px); z-index: 20; max-height: none; display: none; }
-    #tree { left: 0; } #context { right: 0; }
+    #tree { left: 0; border-right: 1px solid var(--line); } #context { right: 0; border-left: 1px solid var(--line); }
     aside.open { display: block; box-shadow: 0 0 40px rgba(0,0,0,.6); }
-    .drawer-toggle { display: inline-flex; }
   }
   /* Run bar, run evidence and component drill-down (circuit-runtime.js). */
   .run-bar { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
@@ -148,13 +160,14 @@
     <form class="picker" id="picker"><input id="capability" list="capabilities" autocomplete="off" placeholder="Find a capability" aria-label="Capability"><datalist id="capabilities"></datalist><button class="button secondary small" type="submit">Open</button></form>
     <nav id="tree-nodes" aria-label="Sections"></nav>
   </aside>
+  <div class="splitter" id="resizer-tree" role="separator" aria-orientation="vertical" aria-label="Resize capability sections" aria-controls="tree" aria-valuemin="220" aria-valuemax="640" aria-valuenow="300" tabindex="0"></div>
   <section id="main">
     <p class="crumbs" id="crumbs"></p>
     <div class="cap-head">
       <h1 id="title">Capability Explorer</h1>
       <div class="actions">
-        <button class="button secondary small drawer-toggle" type="button" id="toggle-tree">Sections</button>
-        <button class="button secondary small drawer-toggle" type="button" id="toggle-context">Observe &amp; details</button>
+        <button class="button secondary small drawer-toggle" type="button" id="toggle-tree" aria-controls="tree">Sections</button>
+        <button class="button secondary small drawer-toggle" type="button" id="toggle-context" aria-controls="context">Observe &amp; details</button>
         <button class="button secondary small" type="button" id="refresh" disabled>Refresh from database</button>
         <button class="button secondary small" type="button" id="expand" disabled>Expand circuit</button>
       </div>
@@ -195,6 +208,7 @@
       <div class="evidence-grid"><section id="verification"></section><section id="inventory"></section></div></details>
     <section id="section" aria-label="Selected section"></section>
   </section>
+  <div class="splitter" id="resizer-context" role="separator" aria-orientation="vertical" aria-label="Resize run details" aria-controls="context" aria-valuemin="300" aria-valuemax="760" aria-valuenow="380" tabindex="0"></div>
   <aside id="context" aria-label="Observe and selection details">
     <nav class="tabs context-tabs" role="tablist" aria-label="Run context">
       <button class="tab" id="tab-run" data-context-tab="run" role="tab" aria-selected="true" aria-controls="context-run">Run</button>

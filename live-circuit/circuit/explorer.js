@@ -6,6 +6,7 @@ import { $, json, session, signOut, release } from './site.js';
 import { el } from './circuit-viewer.js';
 import { createCircuitRuntime } from './circuit-runtime.js';
 import { workspace, nodeStatus, nodeRows, sceneKey, selectionForScene, rowLabel } from './explorer-model.mjs';
+import { createPaneLayout } from './pane-layout.js';
 
 const params = new URLSearchParams(location.search);
 const requestedFrom = p => ({ page: p.get('page'), detail: p.get('detail'), pointer: p.get('pointer') ?? '', detailPage: p.get('detailPage'), view: p.get('view'), run: p.get('run') });
@@ -249,7 +250,7 @@ function renderStatus() {
   else if (state.sceneError) parts.push(el('span', { class: 'error', text: `Circuit: ${state.sceneError}` }));
   $('status').replaceChildren(...(parts.length ? parts : [el('span', { text: 'Ready to read a capability.' })]));
 }
-function closeDrawers() { for (const id of ['tree', 'context']) $(id).classList.remove('open'); }
+function closeDrawers() { for (const id of ['tree', 'context']) $(id).classList.remove('open'); layout.sync(); }
 
 // Identity, catalog and controls.
 async function identity() {
@@ -278,8 +279,15 @@ $('expand').addEventListener('click', () => {
   const expanded = $('workspace').classList.toggle('expanded');
   $('expand').textContent = expanded ? 'Show workspace' : 'Expand circuit';
 });
-for (const [button, panel] of [['toggle-tree', 'tree'], ['toggle-context', 'context']])
-  $(button).addEventListener('click', () => $(panel).classList.toggle('open'));
+// Both sidebars drag-resize and collapse on desktop; the same buttons open the
+// narrow-window drawers. Widths and collapsed state persist per browser.
+const layout = createPaneLayout({
+  workspace: $('workspace'),
+  panes: [
+    { id: 'tree', variable: '--tree', side: 'left', handle: 'resizer-tree', aside: 'tree', toggle: 'toggle-tree', name: 'sections', minimum: 220, maximum: 640, defaultWidth: 300 },
+    { id: 'context', variable: '--context', side: 'right', handle: 'resizer-context', aside: 'context', toggle: 'toggle-context', name: 'details', minimum: 300, maximum: 760, defaultWidth: 380 }
+  ]
+});
 window.addEventListener('popstate', () => {
   const p = new URLSearchParams(location.search), previous = { ...state }, requested = requestedFrom(p);
   Object.assign(state, { capability: p.get('capability') ?? '', namespace: p.get('namespace') ?? '', scenario: p.get('scenario') ?? '',

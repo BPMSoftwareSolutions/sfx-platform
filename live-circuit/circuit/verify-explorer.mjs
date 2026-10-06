@@ -9,8 +9,18 @@ import { readFile } from 'node:fs/promises';
 import { workspace, nodeStatus, nodeRows } from './explorer-model.mjs';
 const [base, ...capabilities] = process.argv.slice(2);
 assert(base && capabilities.length, 'Supply base URL and capability IDs');
-const client = (await Promise.all(['explorer.js', 'explorer-model.mjs', 'explorer.html']
-  .map(file => readFile(new URL(`./${file}`, import.meta.url), 'utf8')))).join('\n');
+const sources = Object.fromEntries(await Promise.all(['explorer.js', 'explorer-model.mjs', 'explorer.html', 'pane-layout.js']
+  .map(async file => [file, await readFile(new URL(`./${file}`, import.meta.url), 'utf8')])));
+const client = Object.values(sources).join('\n');
+// The two sidebars are focusable separators; the layout module owns their behavior.
+for (const [id, pane] of [['resizer-tree', 'tree'], ['resizer-context', 'context']]) {
+  const tag = sources['explorer.html'].match(new RegExp(`<div[^>]*id="${id}"[^>]*>`))?.[0] ?? '';
+  assert.match(tag, /class="splitter"/, `${id} is declared`);
+  assert.match(tag, /role="separator"/, `${id} is a separator`);
+  assert.match(tag, new RegExp(`aria-controls="${pane}"`), `${id} controls ${pane}`);
+  assert.match(tag, /tabindex="0"/, `${id} is keyboard reachable`);
+}
+assert.match(client, /createPaneLayout\(/, 'The layout module drives the splitters');
 const evidence = [];
 for (const capabilityId of capabilities) {
   const response = await fetch(new URL(`/api/circuit/v1/capability-details?${new URLSearchParams({ capabilityId })}`, base));
