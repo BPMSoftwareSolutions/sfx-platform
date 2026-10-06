@@ -28,6 +28,7 @@ const events = selected.records.map((record, index) => ({ runId, cursor: index +
 events[0].at = selected.run.startedAt; events.at(-1).at = model.endedAt;
 const apiRun = { runId, state: 'completed', capability: { subject: deck.capabilityId }, startedAt: selected.run.startedAt, endedAt: model.endedAt, exitCode: selected.run.exitCode, partial: false };
 const output = { contractId: 'fixture-output.v1', payload: { summary: 'Transport fixture output' } };
+let streamFailure = 0, admissions = 0;
 const sse = selected.records.map(r => 'data: ' + JSON.stringify(r) + '\n\n').join('');
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -39,8 +40,10 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === '/api/circuit/v1/session/runs') return json({ principalId: 'fixture-principal', runs: listed });
   if (url.pathname === '/api/circuit/v1/capabilities') return json({ capabilities: [{ capabilityId: deck.capabilityId, namespaceId: deck.namespaceId }] });
   if (url.pathname === '/api/circuit/v1/home') return json({ environment: 'OFFLINE ACCEPTANCE' });
-  if (url.pathname === '/api/circuit/v1/execution') return json({ configured: false });
+  if (url.pathname === '/api/circuit/v1/execution') return json({ configured: true });
+  if (url.pathname === '/api/circuit/v1/runs' && req.method === 'POST') { admissions++; return json({ runId }, 202); }
   if (url.pathname.endsWith(`/runs/${runId}/events/stream`)) {
+    if (streamFailure) return json({ error: 'Explicit stream failure fixture' }, streamFailure);
     res.writeHead(200, { 'content-type': 'text/event-stream' });
     return res.end(events.map(e => `event: ${e.kind}\ndata: ${JSON.stringify(e)}\n\n`).join('') + `event: end\ndata: ${JSON.stringify({ runId })}\n\n`);
   }
@@ -97,6 +100,25 @@ try {
   if (process.argv[2]) { await fs.mkdir(process.argv[2], { recursive: true }); await page.screenshot({ path: path.join(process.argv[2], 'evidence.png'), fullPage: true }); await page.locator('#tab-run').click(); await page.screenshot({ path: path.join(process.argv[2], 'run-report.png'), fullPage: true }); }
   await page.setViewportSize({ width: 390, height: 844 }); await page.locator('#toggle-context').click(); await page.locator('#tab-runs').click();
   assert(await page.locator('#runs-list').isVisible());
+  await page.setViewportSize({ width: 1680, height: 1100 });
+  // A restart/eviction 404 is terminal for this observation; no implicit rerun.
+  streamFailure = 404;
+  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
+  await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes('Resume cannot recover it'));
+  assert(await page.locator('#observe-resume').isHidden());
+  assert(await page.locator('#observe').isEnabled());
+  assert(await page.locator('#payload').isEnabled());
+  assert.equal(admissions, 0, '404 must never resubmit a capability');
+  // Transient connection failures retain Resume and prevent duplicate Observe.
+  streamFailure = 503;
+  await page.reload();
+  await page.waitForFunction(() => !document.querySelector('#observe-resume').hidden);
+  assert(await page.locator('#observe').isDisabled());
+  streamFailure = 0;
+  await page.locator('#observe-resume').click();
+  await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes(' · completed'));
+  assert(await page.locator('#observe-resume').isHidden());
+  assert.equal(admissions, 0, 'Resume must read the same run, not create one');
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context'], errors, status: 'PASS' }));
+  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '404 releases controls without resubmission', '503 resumes original run'], errors, status: 'PASS' }));
 } finally { await browser.close(); server.closeAllConnections(); await new Promise(r => server.close(r)); }

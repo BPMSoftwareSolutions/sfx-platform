@@ -87,7 +87,11 @@ function fieldControl(field, write) {
 }
 
 export async function readEventStream(response, receive) {
-  if (!response.ok) throw new Error(`Event stream unavailable (${response.status}).`);
+  if (!response.ok) {
+    const error = new Error(`Event stream unavailable (${response.status}).`);
+    error.status = response.status; error.runRead = true;
+    throw error;
+  }
   const reader = response.body.getReader(), decoder = new TextDecoder(); let pending = '';
   try {
     for (;;) {
@@ -144,7 +148,11 @@ export function createObservePanel(hooks) {
   async function request(path, options = {}) {
     const response = await fetch(path, options), text = await response.text();
     let body; try { body = JSON.parse(text); } catch { body = text; }
-    if (!response.ok) throw new Error(body?.error?.message ?? body?.error ?? `API request failed (${response.status}).`);
+    if (!response.ok) {
+      const error = new Error(body?.error?.message ?? body?.error ?? `API request failed (${response.status}).`);
+      error.status = response.status; error.runRead = /^\/api\/circuit\/v1\/runs\/[a-zA-Z0-9-]+$/.test(path);
+      throw error;
+    }
     return body;
   }
   async function follow() {
@@ -181,9 +189,15 @@ export function createObservePanel(hooks) {
       } catch (error) { $('observe-output').textContent = error.message; $('observe-result').hidden = false; hooks.completed?.(result, undefined, error.message); watchPersistence(selected, result, undefined, error.message, signal); }
       selected.finished = true;
     } catch (error) {
-      if (!signal.aborted && run === selected) { hooks.failed?.(error.message); status(`${error.message} Run ${selected.id}; resume observation before submitting again.`, true); $('observe-resume').hidden = false; }
+      if (!signal.aborted && run === selected) {
+        selected.unavailable = error.status === 404 && error.runRead;
+        const message = selected.unavailable
+          ? `Run ${selected.id} is no longer available to this session. It may have expired or been lost during a server restart. Resume cannot recover it. Check Runs for a retained capture, or click Observe to start a new execution.`
+          : `${error.message} Run ${selected.id}; resume observation before submitting again.`;
+        hooks.failed?.(message); status(message, true); $('observe-resume').hidden = selected.unavailable;
+      }
     } finally {
-      if (run === selected && !signal.aborted) { busy = !selected.finished; buttons(); }
+      if (run === selected && !signal.aborted) { busy = !selected.finished && !selected.unavailable; buttons(); }
     }
   }
   // Execution can finish before its final durable write. Refresh the report's

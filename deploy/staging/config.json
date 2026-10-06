@@ -2,6 +2,10 @@
   "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
   "keyVault": "aiengine-kv-20260406",
   "acceptanceSecret": "sfx-staging-release-acceptance",
+  "evidenceSecrets": {
+    "SFX_EVIDENCE_SERVICE_KEY": "sidefx-staging-evidence-service-key",
+    "SFX_EVIDENCE_CALLERS": "sidefx-staging-evidence-callers"
+  },
   "vaultVfs": "/api/vfs/sjones/.local/share/sfx/vault/vault.json",
   "observe": {
     "object": "capability",

@@ -35,6 +35,7 @@ jobs:
       - run: node --test deploy/staging/policy.test.mjs
       - run: node deploy/sda-kernel/verify-composite-package.mjs
       - run: node live-circuit/circuit/verify-identity-session.mjs
+      - run: node live-circuit/circuit/verify-run-api.mjs
 
   deploy:
     needs: checks
@@ -69,6 +70,25 @@ jobs:
         run: |
           npm ci --prefix deploy/staging/test-tools
           deploy/staging/test-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check missing-run and retry controls before deployment
+        run: node live-circuit/circuit/verify-run-evidence-browser.mjs artifacts/staging/missing-run
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-providers
+          ref: a020024c513eee4f2a8f84939af284f84727d911
+          path: .release-sources/sfx-providers
+          sparse-checkout: providers
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-dal
+          ref: bcaae40c2447bd9454b6eea9e3e001f0fc61b25b
+          path: .release-sources/sfx-dal
+          sparse-checkout: identity
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: '8.0.408'
+      - name: Publish the pinned identity evidence transport
+        run: node deploy/staging/build-identity.mjs
       - name: Package, build, lock and deploy one composite image
         run: node deploy/staging/release.mjs deploy
       - name: Public reads and authorization boundaries
@@ -77,6 +97,8 @@ jobs:
         run: node deploy/staging/accept.mjs browser
       - name: Prove a new process and unchanged persistent vault
         run: node deploy/staging/release.mjs restart-check
+      - name: Reopen the same retained run after the confirmed restart
+        run: node deploy/staging/accept.mjs durable
       - name: Real API CLI call and live external follow after restart
         run: node deploy/staging/accept.mjs external
       - name: Retain release state and acceptance evidence

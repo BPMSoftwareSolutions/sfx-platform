@@ -74,8 +74,13 @@ The fingerprints are kept in the image at `/opt/sfx/.components/`.
 The gateway serves the platform home page at `/` and its emblem at
 `/favicon.ico` from the circuit host, answers `/robots.txt` itself (disallow all
 when `SIDEFX_INDEXING=disabled`), and returns 404 for every path the retired
-website used. Kernel or DAL changes cannot ship this way: the release policy
-refuses any manifest whose binaries differ from the components image. Changes
+website used. Kernel and retrieval changes cannot ship this way. The identity
+transport has one explicit update path: `identity-sources.json` pins the provider
+and generated identity DAL commits, checked out and published with a locked
+restore by the workflow. The packager inventories every new identity file; the
+image replaces the complete identity directory and proves every other installed
+component unchanged. The release policy refuses unpinned sources or binary
+digests that do not match that inventory. Changes
 under `infra/` other than `azure.json` and `authorize-staging-release.ps1` are
 refused before building; they are separate infrastructure operations.
 
@@ -108,8 +113,12 @@ observer served `/circuit/home`, `/circuit/login`, its assets and the home API.
 7. Verify every receipt prefix. Replay that capture at 1x and 0.1x and verify
    provider intervals and the captured scenario clock. Live acceptance never
    substitutes synthetic events or API responses.
-8. Restart again; require a different gateway `bootId` with the same release and
-   vault fingerprint. Then invoke the actual API CLI wrapper while an anonymous
+8. Require the browser's run to reach complete SQL capture; retain event, graph
+   and output digests. Restart again; require a different gateway `bootId` with
+   the same release and vault fingerprint. Sign in as the same owner, list and
+   reopen that same run, and require all event identities and digests to match,
+   with no new Observe submission and Linear still selected by default.
+   Then invoke the actual API CLI wrapper while an anonymous
    browser follows live, requiring provider and exact outcome visits. This also
    exercises vault-backed providers after the confirmed restart.
 9. On Windows, build the separately pinned input provider, install the actual
@@ -178,6 +187,22 @@ authenticated Kudu to fingerprint ciphertext, discarding bytes and publishing
 credentials in memory. Subsequent releases use the private metadata route.
 
 ## Failure, rollback and evidence
+
+Durable run capture uses separate sticky Key Vault references named
+`SFX_EVIDENCE_SERVICE_KEY` and `SFX_EVIDENCE_CALLERS`. The one-time operator tool
+`node deploy/staging/provision-evidence.mjs` provisions those secrets and grants
+the staging managed identity access to just those secrets; it does not restart
+or bind staging. The workflow enables their references only after binding the
+candidate identity host. Recovery records references only and restores the old
+settings with the old image when it still owns the binding. The CI identity does
+not receive the capture secrets. The gateway gives the writer key only to the
+observer and the caller registry only to the private identity service.
+
+Complete captures survive container restarts. This does not resume execution
+inside a terminated kernel, recover material never captured, or grant a trust
+verdict. An unavailable run returns controls to the user, hides Resume, and
+explains that a new Observe is a new execution. Temporary stream failures remain
+resumable. No error path automatically submits another run.
 
 `state.json` retains previous/candidate digests and a flag persisted before
 binding. A failed deployment, browser, replay, restart, external flow or Windows

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { exactImage, composite, unchangedRuntime, rollbackAllowed, releaseChanges, websiteRetired } from './policy.mjs';
+import { exactImage, composite, unchangedRuntime, identityUpdate, rollbackAllowed, releaseChanges, websiteRetired } from './policy.mjs';
 const digest = 'sha256:' + 'a'.repeat(64), image = 'registry/repository@' + digest;
 const previous = { id: 'r15', kernelDigest: digest, kernelLanguage: 'csharp', retrieval: { executable: digest, dal: digest }, identity: { executable: digest, dal: digest, policy: digest }, circuit: { sourceCommit: 'abc' } };
 test('website-only, mutable and foreign images cannot qualify', () => {
@@ -18,6 +18,16 @@ test('rollback must own the binding; uncertain PATCH can still recover', () => {
   const state = { bindAttempted: true, candidateImage: image };
   assert(rollbackAllowed(state, image)); assert(!rollbackAllowed(state, 'another-release'));
   assert(!rollbackAllowed({ ...state, bindAttempted: false }, image));
+});
+test('identity update requires pinned sources and inventoried binaries; kernel and retrieval stay unchanged', () => {
+  const sources = { providers: '1'.repeat(40), dal: '2'.repeat(40) };
+  const next = { ...previous, identity: { executable: digest, dal: digest, sources },
+    circuit: { files: { 'identity/sfx-identity-host.dll': digest, 'identity/SFX.Identity.DAL.dll': digest } } };
+  identityUpdate(previous, next, sources);
+  assert.throws(() => identityUpdate(previous, next, { ...sources, dal: 'main' }));
+  assert.throws(() => identityUpdate(previous, { ...next, kernelDigest: 'changed' }, sources));
+  assert.throws(() => identityUpdate(previous, { ...next, retrieval: { ...next.retrieval, dal: 'changed' } }, sources));
+  assert.throws(() => identityUpdate(previous, { ...next, circuit: { files: {} } }, sources));
 });
 test('host and circuit files ship; infrastructure changes do not', () => {
   releaseChanges(['live-circuit/circuit/explorer.js', 'deploy/sda-kernel/gateway.mjs', 'deploy/sda-kernel/api.mjs',

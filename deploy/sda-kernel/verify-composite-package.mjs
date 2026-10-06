@@ -55,6 +55,20 @@ try {
   assert.notEqual(invoke(path.join(root, 'mutable'), 'example.invalid/fixture:latest').status, 0);
   assert.notEqual(invoke(path.join(root, 'same'), components, previous.id).status, 0);
   assert.notEqual(invoke(path.join(root, 'incomplete'), components, 'fixture-after', incomplete).status, 0);
+  const published = path.join(root, 'publish'); fs.mkdirSync(published);
+  for (const name of ['sfx-identity-host', 'sfx-identity-host.dll', 'SFX.Identity.DAL.dll']) fs.writeFileSync(path.join(published, name), 'packaging fixture ' + name);
+  const sources = { providers: '1'.repeat(40), dal: '2'.repeat(40) }, sourcesFile = path.join(root, 'sources.json');
+  fs.writeFileSync(sourcesFile, JSON.stringify(sources));
+  const identityOut = path.join(root, 'identity-candidate');
+  const update = spawnSync(process.execPath, [packager, previousFile, identityOut, 'fixture-identity', components, published, sourcesFile], { encoding: 'utf8' });
+  assert.equal(update.status, 0, update.stderr);
+  const updated = JSON.parse(fs.readFileSync(path.join(identityOut, 'runtime/release.json')));
+  assert.deepEqual(updated.identity.sources, sources); assert.deepEqual(updated.retrieval, previous.retrieval);
+  assert.equal(updated.kernelDigest, previous.kernelDigest);
+  assert.equal(updated.identity.executable, sha(path.join(published, 'sfx-identity-host.dll')));
+  assert.equal(updated.identity.dal, sha(path.join(published, 'SFX.Identity.DAL.dll')));
+  fs.writeFileSync(sourcesFile, JSON.stringify({ ...sources, dal: 'main' }));
+  assert.notEqual(spawnSync(process.execPath, [packager, previousFile, path.join(root, 'unpinned'), 'fixture-unpinned', components, published, sourcesFile]).status, 0);
   console.log(JSON.stringify({ scope: 'stand-in composite packaging conformance', files: actual.length, base: next.composite.base,
     preserved: ['kernel', 'api', 'retrieval', 'identity', 'installed delivery', 'vault bootstrap'], website: false,
     rejected: ['existing destination', 'mutable components image', 'same release id', 'incomplete components release'], manifestComplete: true }));

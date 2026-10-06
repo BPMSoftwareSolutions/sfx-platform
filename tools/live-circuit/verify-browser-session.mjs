@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
+import { durableSnapshot } from './durable-snapshot.mjs';
 
 let input = ''; for await (const chunk of process.stdin) input += chunk;
 const fixture = JSON.parse(input); input = '';
@@ -144,6 +145,13 @@ try {
   });
   assert(attributed.principalId === login.principalId && attributed.runs.some(r => r.runId === runId));
   record('Signed-in browser Observe completes with live operation/provider/outcome visits and principal attribution');
+
+  if (process.env.SFX_REQUIRE_DURABLE_RUNS === '1') {
+    stage('Waiting for complete SQL capture before restart');
+    const snapshot = await durableSnapshot(origin, runId, cookie);
+    fs.writeFileSync(path.join(evidence, 'durable-before.json'), JSON.stringify(snapshot, null, 2));
+    record('Complete SQL trace, graph and output retained before restart');
+  }
 
   stage('Checking browser sign-out');
   let logoutStatus;

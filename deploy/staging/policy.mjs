@@ -17,6 +17,16 @@ export function unchangedRuntime(previous, next) {
   for (const service of ['retrieval', 'identity'])
     for (const key of ['executable', 'dal']) assert.equal(next[service]?.[key], previous[service]?.[key], `Release changed ${service}.${key}`);
 }
+// Identity transport may be rebuilt only from the two explicitly pinned inputs.
+// The Docker build independently proves all other installed trees unchanged.
+export function identityUpdate(previous, next, sources) {
+  for (const value of Object.values(sources)) assert(/^[a-f0-9]{40}$/.test(value), 'Pinned identity source required');
+  assert.deepEqual(Object.keys(sources).sort(), ['dal', 'providers']);
+  assert.deepEqual(next.identity.sources, sources, 'Identity source pins must match release policy');
+  unchangedRuntime(previous, { ...next, identity: previous.identity });
+  for (const [key, file] of [['executable', 'sfx-identity-host.dll'], ['dal', 'SFX.Identity.DAL.dll']])
+    assert.equal(next.identity[key], next.circuit.files['identity/' + file], 'Identity binary must be inventoried');
+}
 export function rollbackAllowed(state, current) {
   return Boolean(state.bindAttempted && state.candidateImage && current === state.candidateImage);
 }

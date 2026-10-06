@@ -1,9 +1,10 @@
 # One composite Live Circuit image (revamp P2), built from this repository:
 #   - the pinned Node runtime (the same base the website image used);
 #   - the admitted components of an accepted image, copied by digest and proved
-#     unchanged: installed kernel, SDA API build, retrieval and identity hosts,
+#     unchanged: installed kernel, SDA API build, retrieval host,
 #     installed delivery configuration and the encrypted vault bootstrap;
 #   - this repository's host files and live-circuit/ (placed by prepare-composite.mjs).
+# Identity is copied unchanged unless the pinned source publish is staged.
 # The Next.js website (/app) is not part of this image.
 ARG COMPONENTS_IMAGE
 FROM ${COMPONENTS_IMAGE} AS components
@@ -22,17 +23,25 @@ COPY --from=components /opt/sfx/identity /opt/sfx/identity
 COPY --from=components /opt/sfx/vault-bootstrap.tar.gz /opt/sfx/vault-bootstrap.tar.gz
 COPY --from=components /opt/sfx/estate/sfx.config.json /opt/sfx/estate/sfx.config.json
 COPY --from=components /tmp/components /tmp/components-source
-COPY runtime/ /opt/sfx/
 COPY component-fingerprint.sh /tmp/component-fingerprint.sh
 # Refuse the image unless the copied components are byte-identical to their source
 # and every repository-placed file equals its release manifest digest.
 RUN sh /tmp/component-fingerprint.sh /tmp/components-copied \
  && diff -r /tmp/components-source /tmp/components-copied \
- && mkdir -p /opt/sfx/.components && cp /tmp/components-copied/* /opt/sfx/.components/ \
+ && mkdir -p /opt/sfx/.components && cp /tmp/components-copied/* /opt/sfx/.components/
+COPY runtime/ /tmp/runtime/
+# A declared identity publish replaces the entire old directory; no stale DLLs.
+# Other installed components cannot be overwritten by the staged runtime.
+RUN node -e "const fs=require('node:fs'); for(const p of ['kernel','api','procedure-extract','vault-bootstrap.tar.gz','estate/sfx.config.json']) if(fs.existsSync('/tmp/runtime/'+p)) throw Error('COMPONENT_OVERRIDE: '+p); if(fs.existsSync('/tmp/runtime/identity')) fs.rmSync('/opt/sfx/identity',{recursive:true});" \
+ && cp -a /tmp/runtime/. /opt/sfx/ \
+ && chmod +x /opt/sfx/identity/sfx-identity-host \
  && node -e "const fs=require('node:fs'),crypto=require('node:crypto'); const r=JSON.parse(fs.readFileSync('/opt/sfx/release.json')); \
 for (const [p,want] of Object.entries(r.circuit.files)) { const got='sha256:'+crypto.createHash('sha256').update(fs.readFileSync('/opt/sfx/'+p)).digest('hex'); if (got!==want) throw Error('RELEASE_FILE_MISMATCH: '+p); } \
 if (r.composite?.website !== false || fs.existsSync('/app')) throw Error('WEBSITE_PRESENT');" \
- && rm -rf /tmp/components-source /tmp/components-copied /tmp/component-fingerprint.sh \
+ && sh /tmp/component-fingerprint.sh /tmp/components-final \
+ && for component in kernel api procedure-extract vault-bootstrap.tar.gz sfx.config.json; do cmp /tmp/components-source/$component /tmp/components-final/$component; done \
+ && cp /tmp/components-final/* /opt/sfx/.components/ \
+ && rm -rf /tmp/runtime /tmp/components-source /tmp/components-copied /tmp/components-final /tmp/component-fingerprint.sh \
  && chown -R node:node /opt/sfx
 ENV NODE_ENV=production HOME=/home/sjones XDG_DATA_HOME=/home/sjones/.local/share PORT=3000
 WORKDIR /opt/sfx

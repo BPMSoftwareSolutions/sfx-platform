@@ -4,7 +4,11 @@ import {config, rest, read, write, json} from './common.mjs';
 const state = read('state.json');
 assert.equal((await rest('get','/config/web')).properties.linuxFxVersion, 'DOCKER|'+state.candidateImage);
 assert.equal((await json(config.origin+'/healthz')).release,state.candidateRelease);
+const durable = read('durable-restart.json');
+assert.equal(durable.persistence, 'complete'); assert(durable.events > 0);
+assert.notEqual(durable.previousBoot, durable.bootId); assert.equal(durable.admissions, 0);
 const receipt = {acceptedAt:new Date().toISOString(),release:state.candidateRelease,image:state.candidateImage,sourceCommit:state.sourceCommit,
+  durableRun: durable,
   rollbackImage:state.previousImage,workflow:`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`};
 fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Accepted **${receipt.release}**\n\nImage: \`${receipt.image}\`\n\nRollback: \`${receipt.rollbackImage}\`\n\nReal browser/live flow, replay, restart/vault, external API CLI and Windows login gates passed.\n`);
 write('accepted.json',receipt);

@@ -3,6 +3,14 @@
 Recorded 2026-10-06 from two reviews of the run-evidence and resident-kernel work.
 It records what each repository needs to address next.
 
+Update 2026-10-06: X1 closed by `3275616` and accepted workflow run
+`37513029598`. X2 closed: DAL `24fee68`, `8461695` and Linux restore lock
+`bcaae40` are pushed. X3 closed: provider commits through `a020024` are pushed.
+The identity transport's staging rollout is being delivered through the staging
+workflow with a complete-capture readback gate after a confirmed restart.
+The original observations below remain historical; unrelated X9 files remain
+with their owner.
+
 **State this document describes.**
 
 | Repository | Commit | Push state |

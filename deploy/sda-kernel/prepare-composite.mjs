@@ -2,6 +2,7 @@
 // live-circuit/, plus a manifest naming the admitted components image they are
 // combined with. The installed kernel, SDA API, retrieval and identity hosts and
 // the vault bootstrap are copied from that exact image by Dockerfile.composite.
+// An optional identity publish replaces only identity, with pinned source inputs.
 // node prepare-composite.mjs <previous-release.json> <fresh-destination> <release-id> <components-image@sha256>
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,9 +11,10 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { copyLiveCircuit } from './live-circuit.mjs';
 
-const [previousFile, destination, id, componentsImage, extra] = process.argv.slice(2);
+const [previousFile, destination, id, componentsImage, publishedIdentity, identitySourcesFile, extra] = process.argv.slice(2);
 if (!previousFile || !destination || !id || !componentsImage || extra !== undefined)
   throw new Error('Expected previous-release.json fresh-destination release-id exact-components-image');
+if (Boolean(publishedIdentity) !== Boolean(identitySourcesFile)) throw new Error('IDENTITY_PUBLISH_AND_SOURCES_REQUIRED');
 if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(id)) throw new Error('INVALID_RELEASE_ID');
 if (!/^[^\s@]+@sha256:[a-f0-9]{64}$/.test(componentsImage)) throw new Error('EXACT_COMPONENTS_IMAGE_REQUIRED');
 if (fs.existsSync(destination)) throw new Error('FRESH_RELEASE_DIRECTORY_REQUIRED');
@@ -31,6 +33,16 @@ fs.mkdirSync(path.join(runtime, 'host'), { recursive: true });
 for (const name of ['gateway.mjs', 'api.mjs', 'initialize.sh', 'identity-policy.json', 'retrieval-policy.json'])
   fs.writeFileSync(path.join(runtime, 'host', name), fs.readFileSync(path.join(here, name), 'utf8').replaceAll('\r\n', '\n'));
 copyLiveCircuit(runtime);
+let identitySources;
+if (publishedIdentity) {
+  identitySources = JSON.parse(fs.readFileSync(identitySourcesFile, 'utf8'));
+  for (const value of Object.values(identitySources))
+    if (!/^[a-f0-9]{40}$/.test(value)) throw new Error('PINNED_IDENTITY_SOURCE_REQUIRED');
+  if (!identitySources.providers || !identitySources.dal || Object.keys(identitySources).length !== 2) throw new Error('IDENTITY_SOURCES_REQUIRED');
+  for (const name of ['sfx-identity-host', 'sfx-identity-host.dll', 'SFX.Identity.DAL.dll'])
+    if (!fs.statSync(path.join(publishedIdentity, name)).isFile()) throw new Error('PUBLISHED_LINUX_IDENTITY_REQUIRED');
+  fs.cpSync(publishedIdentity, path.join(runtime, 'identity'), { recursive: true });
+}
 
 const sha = file => 'sha256:' + createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const files = {};
@@ -49,7 +61,7 @@ const release = {
   kernelDigest: previous.kernelDigest, kernelLanguage: previous.kernelLanguage,
   retrieval: previous.retrieval,
   // Binaries come from the components image; the placed policy is this repository's.
-  identity: { ...previous.identity, policy: files['host/identity-policy.json'] },
+  identity: { ...(identitySources ? { executable: files['identity/sfx-identity-host.dll'], dal: files['identity/SFX.Identity.DAL.dll'], sources: identitySources } : previous.identity), policy: files['host/identity-policy.json'] },
   circuit: { runtime: files['estate/demo/circuit/circuit-runtime.js'], traversal: files['estate/demo/circuit/traversal.js'], sourceCommit, files },
   composite: { kind: 'composite', base, componentsImage, componentsRelease: previous.id, previousManifest: sha(previousFile), website: false }
 };

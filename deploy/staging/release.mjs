@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { azure, config, root, evidence, az, rest, run, read, write, token, json, sleep } from './common.mjs';
-import { exactImage, composite, unchangedRuntime, rollbackAllowed, releaseChanges, websiteRetired } from './policy.mjs';
+import { exactImage, composite, identityUpdate, rollbackAllowed, releaseChanges, websiteRetired } from './policy.mjs';
+import { desiredEvidenceSettings, evidenceSettings, applyEvidenceSettings } from './evidence-settings.mjs';
 const mode = process.argv[2];
 const binding = async () => (await rest('get', '/config/web')).properties.linuxFxVersion.replace(/^DOCKER\|/, '');
 const validate = image => exactImage(image, azure.registryServer, azure.imageRepository);
@@ -48,6 +49,13 @@ async function rollback() {
   if (current === state.previousImage) { write('rollback.json', { alreadyAtPrevious: true, image: current }); return; }
   if (!rollbackAllowed(state, current)) throw new Error('ROLLBACK_REFUSED: another deployment owns the slot');
   validate(state.previousImage);
+  if (state.settingsAttempted) {
+    const settings = await evidenceSettings();
+    if (JSON.stringify(settings) !== JSON.stringify(state.evidenceSettingsBefore)) {
+      assert.deepEqual(settings, desiredEvidenceSettings(), 'Another operation changed evidence settings; preserve them');
+      await applyEvidenceSettings(state.evidenceSettingsBefore);
+    }
+  }
   await rest('patch', '/config/web', { properties: { linuxFxVersion: 'DOCKER|' + state.previousImage } });
   await restart(); await ready(state.previousRelease.id);
   write('rollback.json', { restoredAt: new Date().toISOString(), image: state.previousImage, release: state.previousRelease.id });
@@ -74,17 +82,20 @@ async function deploy() {
   const bearer = await token();
   console.log('Fingerprinting existing encrypted vault.');
   const vault = baseline.bootId ? (await privateRead(bearer)).vault : await oldVault();
-  const state = { sourceCommit: commit, previousImage, previousRelease: previous, vaultBefore: vault, bindAttempted: false, startedAt: new Date().toISOString() };
+  const state = { sourceCommit: commit, previousImage, previousRelease: previous, vaultBefore: vault,
+    evidenceSettingsBefore: await evidenceSettings(), bindAttempted: false, startedAt: new Date().toISOString() };
   write('state.json', state);
   await lock(previousImage);
   const id = `composite-${commit.slice(0, 12)}-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`;
   const context = path.join(path.dirname(evidence), 'staging-context');
   // One image from the pinned Node base: the previous exact image supplies only its
-  // admitted components (kernel, API, retrieval, identity, delivery config, vault
-  // bootstrap); every host and circuit file comes from this commit. No website.
-  await run(process.execPath, ['deploy/sda-kernel/prepare-composite.mjs', path.join(evidence, 'previous-release.json'), context, id, previousImage]);
+  // admitted components (kernel, API, retrieval, delivery config, vault bootstrap).
+  // Identity comes from the pinned publish; host and circuit come from this commit.
+  const sourcesFile = path.join(root, 'deploy/staging/identity-sources.json');
+  await run(process.execPath, ['deploy/sda-kernel/prepare-composite.mjs', path.join(evidence, 'previous-release.json'), context, id, previousImage,
+    path.join(root, 'artifacts/identity-publish'), sourcesFile]);
   const next = JSON.parse(fs.readFileSync(path.join(context, 'runtime/release.json')));
-  composite(next); websiteRetired(next); unchangedRuntime(previous, next);
+  composite(next); websiteRetired(next); identityUpdate(previous, next, JSON.parse(fs.readFileSync(sourcesFile)));
   write('release.json', next);
   console.log('Building composite image ' + id);
   await az(['acr', 'build', '-r', azure.registryName, '-t', azure.imageRepository + ':' + id, '--platform', 'linux/amd64', '--build-arg', 'COMPONENTS_IMAGE=' + previousImage, '--no-logs', context]);
@@ -97,6 +108,10 @@ async function deploy() {
   // Persist before PATCH: an uncertain HTTP response may still have applied it.
   state.bindAttempted = true; write('state.json', state);
   await rest('patch', '/config/web', { properties: { linuxFxVersion: 'DOCKER|' + state.candidateImage } });
+  if (JSON.stringify(state.evidenceSettingsBefore) !== JSON.stringify(desiredEvidenceSettings())) {
+    state.settingsAttempted = true; write('state.json', state);
+    await applyEvidenceSettings(desiredEvidenceSettings());
+  }
   await restart(); await ready(id, baseline.bootId);
   const installed = await privateRead(bearer);
   assert.deepEqual(installed.release, next, 'Running manifest must equal the packaged manifest');
