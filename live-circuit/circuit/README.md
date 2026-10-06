@@ -33,6 +33,25 @@ image the estate directory is `/opt/sfx/estate`, two levels above this file. The
 reader/transport limits from `live-circuit/circuit/circuit-host.json`. No package install,
 build, source checkout or generator import participates.
 
+## Capability details reading
+
+`GET /api/circuit/v1/capability-details?capabilityId=…&namespaceId=…` returns the
+complete capability details reading as one document (`capability-details.v1`):
+every result set of the estate's `analysis.read_capability_details`, in emission
+order, ending with `capability_navigation`. That set holds the Explorer's
+declared tree, tabs, counts, badges and per-scenario attribution. The host invokes
+the declared capability `read-capability-details` through the installed kernel
+(the `details` reader in `circuit-host.json`), with the same queue, timeout,
+response-size limit and cache as the scenario reader.
+
+The host passes the document through unchanged. It never selects, counts or
+interprets the sets. A capability that is unknown or not selected returns 404
+(`CAPABILITY_NOT_FOUND`, `CAPABILITY_NOT_SELECTED`), a namespace mismatch returns
+409, and a reading that fails in the estate returns 422 with its kernel code
+(for example `CELL_EXECUTION_FAILED`). None of these responses carry sets, so a
+failure is never shown as an empty workspace.
+`verify-capability-details.mjs` checks a running host against real capabilities.
+
 ## Provider database inspection
 
 Open a declared provider through a circuit label or **Explore component**.

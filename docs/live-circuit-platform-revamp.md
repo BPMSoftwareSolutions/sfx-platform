@@ -43,9 +43,26 @@ The policy is declared, and the capability reading returns
 attribution). By decision, the routing-law regression stays with its owner:
 the Explorer shows those 11 capabilities as a visible reading failure.
 
-**Next:** P3 step 2, a kernel-invoked Explorer reading (one JSON value)
-declared like `read-live-scenario-circuit` and added to `circuit-host.json`
-readers; then P4, the workspace. Alongside: P0 credential custody in its
+**P3 steps 2 and 3, 2026-10-06.**
+
+- **Step 2, in the estate (`e6e5c81`):** the capability reading gained a
+  document mode, and the estate declares `read-capability-details`. It returns
+  one document, `capability-details.v1`, holding all 45 sets with
+  `capability_navigation` last
+  ([closeout](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/research/coherence-conformance/capability-details-document-closeout.md)).
+- **Step 3, in the circuit host:** it serves the document at
+  `GET /api/circuit/v1/capability-details` through the installed kernel. This is
+  the `details` reader, with the scenario reader's queue, timeout, size cap and
+  cache.
+- **Refusals:** unknown or not-selected capabilities return 404, a namespace
+  mismatch returns 409, and a reading that fails in the estate returns 422 with
+  its kernel code. None carry sets.
+- **Local check:** `verify-capability-details.mjs` passed on five capabilities
+  (1–20 scenarios) and the four refusals. Public staging acceptance now also
+  requires the document for the release fixture capability, and 404 for an
+  unknown one.
+
+**Next:** P4, the Explorer workspace, built on this document. Alongside: P0 credential custody in its
 own window, P5 (remove the Next.js code and the now-unused overlay packagers),
 and the remaining P1 local-observer cleanup.
 
@@ -78,7 +95,7 @@ rollback target. The old Next.js website still answers `/`.
 | r15 close-out | **Open.** Replay at r15, a restart with the vault check, and external CLI visibility are not recorded. The receipt and runbook update are not committed | "Next" item 1 |
 | Home page | **Designed and built, not released.** H1 (`1507752`), then H2 from another session; H2 implemented at `/circuit/home` with the sign-in page restyled to match (`0ca7388`) | [Home page design](home-page-design.md) |
 | P2 One image without Next.js | **Accepted 2026-10-06** (`composite-e82d47d8a901-37403470208-1`) | §4 P2 |
-| P3 Explorer data path | **Step 1 done** (DC-05a installed 2026-10-06); step 2, the kernel-invoked reading, is next. 11 capabilities fail their reading until the routing-law owner repairs it | §4 P3, §6 |
+| P3 Explorer data path | **Steps 1–3 done 2026-10-06**: navigation installed, `read-capability-details` declared, served at `/api/circuit/v1/capability-details`. Uncached host reads take 3.9–5.0 s, over the 3-second bound (see §4 P3); cached reads are immediate. 11 capabilities fail their reading until the routing-law owner repairs it | §4 P3, §6 |
 | P4 Explorer workspace | **Not started** (needs P3) | §4 P4 |
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
 | P6 Deployment evolution | **Started.** Observe requires sign-in; per-user authority inside the API, durable run history and production promotion remain | §4 P6 |
@@ -290,7 +307,15 @@ Preflight, before the first push: `az acr run` built the composite against
 2. Declare a reading capability that the kernel invokes, like
    `read-live-scenario-circuit`, and add it to `circuit-host.json` readers with
    the same timeouts, size cap, queueing and cache. This keeps one invocation
-   path for CLI, API and UI.
+   path for CLI, API and UI. **Done 2026-10-06**:
+   - `read-capability-details` (estate `e6e5c81`) is served at
+     `/api/circuit/v1/capability-details`.
+   - **Timing:** uncached host reads took 3.9–5.0 s locally, which misses the
+     3-second bound. About 1.5–2.7 s is SQL. The rest is the per-request
+     kernel process start-up, which every circuit reader pays; this is the
+     invocation cost in the estate's `docs/performance-optimization.md`, not
+     something specific to this reading. Repeat reads within the 30-second
+     cache TTL are immediate.
 3. Keep `analysis.compare_capability_story` (History) on demand.
 
 The alternative, allowlisting the reading in retrieval, would tie every reading

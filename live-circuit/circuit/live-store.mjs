@@ -116,6 +116,28 @@ export async function readScenario(selection, refresh = false) {
   const scene=slide=>({...slide,svgDigest:hash(slide.svg),imageUrl:`data:image/svg+xml;base64,${Buffer.from(slide.svg).toString('base64')}`});
   return { ...data, source: 'database', slides:data.slides.map(scene),detailSlides:(data.detailSlides ?? []).map(scene) };
 }
+// The complete capability details reading (every set, navigation included) as
+// one kernel-invoked document. Statuses other than READ carry no sets and are
+// refused, never shown as an empty workspace.
+const detailsRefusals = { NOT_FOUND: ['CAPABILITY_NOT_FOUND', 404], NOT_SELECTED: ['CAPABILITY_NOT_SELECTED', 404],
+  NAMESPACE_MISMATCH: ['CAPABILITY_NAMESPACE_MISMATCH', 409] };
+export async function readCapabilityDetails(selection, refresh = false) {
+  const payload = {};
+  for (const key of ['capabilityId', 'namespaceId']) {
+    const value = selection[key];
+    if (value == null || value === '') continue;
+    if (typeof value !== 'string' || value.length > 400 || /[\u0000-\u001f]/.test(value)) throw new CircuitReadError('INVALID_CIRCUIT_SELECTION', 400);
+    payload[key] = value;
+  }
+  if (!payload.capabilityId) throw new CircuitReadError('CAPABILITY_REQUIRED', 400);
+  const { data } = await read('details', payload, refresh);
+  if (data.capabilityId !== payload.capabilityId) throw new CircuitReadError('CIRCUIT_SELECTION_MISMATCH');
+  if (detailsRefusals[data.status]) throw new CircuitReadError(...detailsRefusals[data.status]);
+  if (data.status !== 'READ' || payload.namespaceId && data.namespaceId !== payload.namespaceId ||
+      !data.sets || !Array.isArray(data.sets.capability_navigation))
+    throw new CircuitReadError('CAPABILITY_DETAILS_CONTRACT_MISMATCH');
+  return { ...data, source: 'database' };
+}
 async function readProviderInspection(selection) {
   const endpoint = process.env.PROCEDURE_EXTRACT_ENDPOINT;
   if (!endpoint) throw new CircuitReadError('PROCEDURE_RETRIEVAL_NOT_CONFIGURED', 503);
@@ -157,6 +179,7 @@ export async function serveCircuitApi(req, res, url) {
     let data;
     if (url.pathname === '/api/circuit/v1/capabilities') data = await readCatalog(refresh);
     else if (url.pathname === '/api/circuit/v1/scenario') data = await readScenario(Object.fromEntries(['capabilityId', 'namespaceId', 'scenarioId', 'detailId', 'detailPointer', 'expectedSnapshotDigest'].map(k => [k, url.searchParams.get(k)])), refresh);
+    else if (url.pathname === '/api/circuit/v1/capability-details') data = await readCapabilityDetails(Object.fromEntries(['capabilityId', 'namespaceId'].map(k => [k, url.searchParams.get(k)])), refresh);
     else if (url.pathname === '/api/circuit/v1/provider-inspection') data = await readProviderInspection(Object.fromEntries(['capabilityId', 'namespaceId', 'scenarioId', 'detailId', 'expectedSnapshotDigest'].map(k => [k, url.searchParams.get(k)])));
     else throw new CircuitReadError('CIRCUIT_RESOURCE_NOT_FOUND', 404);
     if (res.destroyed) return true;

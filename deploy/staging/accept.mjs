@@ -54,6 +54,15 @@ try {
     assert.equal(await robots.text(), 'User-agent: *\nDisallow: /\n', 'Staging must disallow indexing');
     checks.push({route:'/',content:'platform home'},{route:'/robots.txt',content:'disallow all'});
     const catalog = await json(config.origin + '/api/circuit/v1/capabilities'); assert(catalog.capabilities?.length > 0);
+    // The Explorer's capability details reading through the kernel: every set, navigation resolved; unknown refused.
+    const details = await json(config.origin + '/api/circuit/v1/capability-details?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace}));
+    assert.equal(details.contractId,'capability-details.v1'); assert.equal(details.status,'READ'); assert.equal(details.capabilityId,config.observe.subject);
+    const navigation = details.sets?.capability_navigation; assert(Array.isArray(navigation) && navigation.length, 'Navigation rows required');
+    assert.equal(navigation.find(r=>r.row_kind==='POLICY')?.state,'RESOLVED'); assert(!navigation.some(r=>r.row_kind==='COVERAGE'), 'No coverage violations');
+    const unknown = await fetch(config.origin + '/api/circuit/v1/capability-details?capabilityId=no-such-capability-for-details',{redirect:'error',signal:AbortSignal.timeout(90000)});
+    assert.equal(unknown.status,404); assert.equal((await unknown.json()).error,'CAPABILITY_NOT_FOUND');
+    checks.push({route:'/api/circuit/v1/capability-details',sets:Object.keys(details.sets).length,navigationRows:navigation.length,readingDefinitionSha256:details.readingDefinitionSha256},
+      {route:'/api/circuit/v1/capability-details',capabilityId:'no-such-capability-for-details',status:404});
     const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
     const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);
     const inspections = [];
