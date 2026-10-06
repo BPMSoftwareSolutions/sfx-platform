@@ -1,0 +1,316 @@
+{
+  "acceptedAt": "2026-10-06T01:03:00.147Z",
+  "release": "circuit-e52b3eb246e8-37396070778-1",
+  "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:bc94ae5f17ac3bf3670638ebc406ee940e372d2c85507ca7be1ffe98c475ff9f",
+  "sourceCommit": "e52b3eb246e8db84fa0db5f56acee463b9288949",
+  "rollbackImage": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:b926002b4828811a8296e70555775d02002e625479b2ac239b9e1769b37b783e",
+  "workflow": "https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37396070778",
+  "workflowEvent": "push",
+  "workflowConclusion": "success",
+  "jobs": [
+    {
+      "name": "checks",
+      "conclusion": "success"
+    },
+    {
+      "name": "deploy",
+      "conclusion": "success"
+    },
+    {
+      "name": "windows-cli",
+      "conclusion": "success"
+    },
+    {
+      "name": "finish",
+      "conclusion": "success"
+    }
+  ],
+  "target": {
+    "resourceGroup": "sidefx_group",
+    "app": "sidefx",
+    "slot": "staging"
+  },
+  "preservedRuntime": {
+    "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e",
+    "kernelLanguage": "csharp",
+    "retrieval": {
+      "executable": "sha256:d86ff8a28a9951ee52c44fc45f6bb388bc7f9ca81e8b9b4cc7bb45ebb692c537",
+      "dal": "sha256:6788030836b0942f570a6928d5801af278cf590d41b70f4e874d0cf93ebdebbe",
+      "circuitWired": true
+    },
+    "identity": {
+      "executable": "sha256:7c173cda12edfa86d6332a9e880f52981e00d61b25ed28658d99aeb9c1c5d6de",
+      "dal": "sha256:2bd22193ac383a5bff196ee4feaaedea993509dfe21496aa6d8af9bd772649ab",
+      "policy": "sha256:5f716838969e097c148728783a4a4b4f6d3a2f1a91295f53be8048d6a69d0e50",
+      "traversal": "sha256:507db3e43b222f922d3068059a184ad01e6afde2da457c2b04e500e4bf62cd5e"
+    }
+  },
+  "public": {
+    "checkedAt": "2026-10-06T00:57:01.376Z",
+    "checks": [
+      {
+        "route": "/",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "route": "/circuit",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "route": "/circuit/home",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "route": "/circuit/login",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "route": "/healthz",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "route": "/readyz",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "route": "/v1/runs/ready",
+        "method": "GET",
+        "status": 401
+      },
+      {
+        "route": "/internal/deployment",
+        "method": "GET",
+        "status": 401
+      },
+      {
+        "route": "/events",
+        "method": "POST",
+        "status": 405
+      },
+      {
+        "route": "/api/circuit/v1/scenario",
+        "method": "POST",
+        "status": 405
+      },
+      {
+        "route": "/procedure-extract/json",
+        "method": "POST",
+        "status": 401
+      }
+    ],
+    "catalogCount": 350,
+    "providers": 3,
+    "inspections": [
+      {
+        "id": "provider:google/gemini-select",
+        "status": "retrieved",
+        "resultSets": 8
+      },
+      {
+        "id": "provider:google/gemini-summary",
+        "status": "retrieved",
+        "resultSets": 8
+      },
+      {
+        "id": "provider:ScenarioKernel.NodePlatform",
+        "status": "held",
+        "reason": "DECLARED_PROVIDER_REQUIRED"
+      }
+    ]
+  },
+  "browser": {
+    "checkedAt": "2026-10-06T00:57:43.554Z",
+    "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "runId": "72c3e80c-f044-4921-80c0-e61e04991f5b",
+    "sceneDigest": "8482a47e4e4fcd2c6f824a13dfcdba3c2534f8420ae0ad92c0747eddf431de5d",
+    "checks": [
+      "Anonymous Observe refused before admission",
+      "Real wrong password refused without a cookie",
+      "Real browser sign-in; __Host-, HttpOnly, Secure, Strict cookie; no script bearer",
+      "Signed-in browser Observe completes with live operation/provider/outcome visits and principal attribution",
+      "Sign-out revokes the real session; replayed cookie cannot Observe",
+      "No password or bearer in browser console, run output or observer testimony",
+      "Azure log sample contains no acceptance password/session bearer or bearer-like credential"
+    ],
+    "errors": [],
+    "sampleCount": 1015,
+    "visited": [
+      "input:request-capability-from-objective-v3/payload",
+      "operation:request-capability-from-objective-v3.v1:1",
+      "operation:request-capability-from-objective-v3.v1:2",
+      "provider:google/gemini-select",
+      "provider:ScenarioKernel.NodePlatform",
+      "provider:google/gemini-summary",
+      "variant:request-capability-from-objective-v3:ADMITTED"
+    ],
+    "serverLogCheck": {
+      "performed": true,
+      "httpStatus": 200,
+      "actualHostOutput": true,
+      "sampledCharacters": 1741185,
+      "truncated": false,
+      "rawLogsRetained": false
+    },
+    "basis": "Real identity session and fresh capability execution through product browser UI; no response mocks or replay overrides"
+  },
+  "replay": {
+    "checkedAt": "2026-10-06T00:59:59.453Z",
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "capabilityId": "request-capability-from-objective-v3",
+    "runId": "sfx-observer:d291f13327d94fc6c6bbefbe:849",
+    "capture": "/home/runner/work/sfx-platform/sfx-platform/artifacts/staging/browser/capture.sse",
+    "candidateOverride": false,
+    "basis": "Browser replay of unchanged retained real capture; no execution or observer writes",
+    "measurements": [
+      {
+        "rate": 1,
+        "capturedMilliseconds": 11738.184814453125,
+        "expectedMilliseconds": 11738.184814453125,
+        "measuredMilliseconds": 11749,
+        "deviationMilliseconds": 10.815185546875,
+        "providers": [
+          {
+            "provider": "provider:google/gemini-select",
+            "capturedMilliseconds": 5472.0458984375,
+            "frames": 329,
+            "providerFrames": 26,
+            "timingBasis": "captured owning operation; transport location is schematic"
+          },
+          {
+            "provider": "provider:ScenarioKernel.NodePlatform",
+            "capturedMilliseconds": 2177.16162109375,
+            "frames": 131,
+            "providerFrames": 11,
+            "timingBasis": "captured owning operation; transport location is schematic"
+          },
+          {
+            "provider": "provider:google/gemini-summary",
+            "capturedMilliseconds": 3830.869140625,
+            "frames": 229,
+            "providerFrames": 20,
+            "timingBasis": "captured owning operation; transport location is schematic"
+          }
+        ]
+      },
+      {
+        "rate": 0.1,
+        "capturedMilliseconds": 11738.184814453125,
+        "expectedMilliseconds": 117381.84814453125,
+        "measuredMilliseconds": 117392.29999999999,
+        "deviationMilliseconds": 10.451855468738358,
+        "providers": [
+          {
+            "provider": "provider:google/gemini-select",
+            "capturedMilliseconds": 5472.0458984375,
+            "frames": 3284,
+            "providerFrames": 261,
+            "timingBasis": "captured owning operation; transport location is schematic"
+          },
+          {
+            "provider": "provider:ScenarioKernel.NodePlatform",
+            "capturedMilliseconds": 2177.16162109375,
+            "frames": 1307,
+            "providerFrames": 115,
+            "timingBasis": "captured owning operation; transport location is schematic"
+          },
+          {
+            "provider": "provider:google/gemini-summary",
+            "capturedMilliseconds": 3830.869140625,
+            "frames": 2295,
+            "providerFrames": 203,
+            "timingBasis": "captured owning operation; transport location is schematic"
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "restart": {
+    "checkedAt": "2026-10-06T01:00:30.549Z",
+    "previousBoot": "22e7a8ee-9404-4560-a3bd-a1d931e40402",
+    "bootId": "ba4f58af-0207-43d8-9e50-0c92963b40e7",
+    "vault": {
+      "bytes": 2092,
+      "sha256": "2dc758d5a52dac01ecf600aa264541bf7dbeaa03445e174c0e6438a068653085"
+    }
+  },
+  "external": {
+    "checkedAt": "2026-10-06T01:00:54.805Z",
+    "origin": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+    "capability": "request-capability-from-objective-v3",
+    "exitCode": 0,
+    "errors": [],
+    "frames": 1076,
+    "liveFrames": 861,
+    "providers": [
+      "provider:google/gemini-select",
+      "provider:ScenarioKernel.NodePlatform",
+      "provider:google/gemini-summary"
+    ],
+    "declaredProviders": [
+      "provider:google/gemini-select",
+      "provider:google/gemini-summary",
+      "provider:ScenarioKernel.NodePlatform"
+    ],
+    "pages": [
+      "scenario-1",
+      "scenario-2"
+    ],
+    "outcomes": [
+      "variant:request-capability-from-objective-v3:ADMITTED"
+    ],
+    "terminalObserved": true,
+    "commandCompletedAt": 1791248453832,
+    "outcomePaintedAt": 1791248453840,
+    "replayUsed": false
+  },
+  "windowsCli": {
+    "checks": [
+      "Installed interactive Ctrl+C restores prompt and creates no session",
+      "Installed interactive login uses hidden provider prompt, real HTTPS and real database",
+      "Real HTTPS login persisted with Windows DPAPI",
+      "sfx-api selects the same exact user bearer",
+      "Installed whoami validates real session from outside checkout",
+      "Installed logout confirms server revocation and local deletion",
+      "Identity database rejects revoked session",
+      "Installed whoami fails after logout",
+      "Installed login refuses redirected input",
+      "Installed CLI refuses password flags without echoing their values",
+      "Installed login help works outside an estate",
+      "CLI output and persisted metadata contain no password or bearer"
+    ],
+    "count": 12,
+    "inputMode": "Windows ConPTY installed command",
+    "endpoint": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net"
+  },
+  "postWorkflowConfirmation": {
+    "checkedAt": "2026-10-06T01:03:55.832Z",
+    "binding": "DOCKER|bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:bc94ae5f17ac3bf3670638ebc406ee940e372d2c85507ca7be1ffe98c475ff9f",
+    "health": {
+      "ready": true,
+      "release": "circuit-e52b3eb246e8-37396070778-1",
+      "bootId": "ba4f58af-0207-43d8-9e50-0c92963b40e7",
+      "kernelDigest": "sha256:f50865d3feb452a148ae02c3845296a1bf7f096551345108915005951e09127e",
+      "kernelLanguage": "csharp"
+    }
+  },
+  "priorFailedGateRollback": {
+    "workflow": "https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37390693755",
+    "restoredAt": "2026-10-05T23:55:54.279Z",
+    "image": "bpmaiengineacr.azurecr.io/sidefx/sfx-platform@sha256:b926002b4828811a8296e70555775d02002e625479b2ac239b9e1769b37b783e",
+    "release": "sda-f50865d3feb4-r15"
+  },
+  "limits": [
+    "Circuit/gateway overlay; installed kernel, API, retrieval, identity and vault bootstrap inherited from the locked base image.",
+    "Selected end-to-end capability path, not acceptance of every estate capability.",
+    "Node Platform catalog inspection remains explicitly held: DECLARED_PROVIDER_REQUIRED.",
+    "This capture has owning-operation timing; provider transport location is schematic, not a separately measured request duration.",
+    "Detailed workflow artifacts expire after 30 days; this compact receipt is version controlled."
+  ]
+}

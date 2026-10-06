@@ -7,6 +7,20 @@ implementation and acceptance/rollback contract. This supersedes the manual
 deployment choice in the historical dashboard below. P2 retains automatic
 delivery while replacing overlay assembly.
 
+**Accepted 2026-10-06, 01:03 UTC:** automatic
+[run 37396070778](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37396070778)
+passed checks, Linux deployment/live acceptance, Windows CLI acceptance and
+final confirmation. The current release is `circuit-e52b3eb246e8-37396070778-1`
+(locked digest `bc94ae5f…`), with r15 retained as rollback. H2 is now served at
+`/circuit/home`; `/` remains the inherited website. The installed kernel,
+retrieval, identity and persistent vault are unchanged. The previously outstanding
+replay, restart/vault and external CLI gates passed on this new release;
+the [durable receipt](releases/staging-automation-2026-10-06.json) records them.
+
+**Next:** P0 credential custody in its own window, P2 composite assembly without
+Next.js, the estate's P3 prerequisites, and the remaining P1 local-observer
+cleanup. Automatic deployment is implemented and does not wait for those tasks.
+
 Decided **2026-10-05**. This plan turns `sfx-platform` from a Next.js website
 prototype plus a separately copied circuit into one product: the **SFX Live
 Circuit Platform**, the Capability Explorer workspace around the existing Live
@@ -15,11 +29,12 @@ Circuit, built and released from this repository.
 The UX direction is settled in the estate's
 [Capability Explorer specification](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/research/coherence-conformance/capability-explorer-specification.md)
 and [visual target](https://github.com/BPMSoftwareSolutions/sfx-embody/blob/main/docs/research/coherence-conformance/capability-explorer-visual-target.md).
-The current deployment is documented in
-[live-circuit-staging-deployment.md](live-circuit-staging-deployment.md), which
-stays authoritative for releases until phase P2 replaces its release path.
+The runtime topology is documented in
+[live-circuit-staging-deployment.md](live-circuit-staging-deployment.md).
+[Automatic staging releases](automatic-staging-deployment.md) owns normal
+delivery now; P2 replaces image assembly while retaining that delivery policy.
 
-## Where we are (2026-10-05, 23:30 UTC)
+## Historical baseline (2026-10-05, 23:30 UTC)
 
 **Staging runs r15** (`sda-f50865d3feb4-r15`, image `b926002b…`), on the same C#
 kernel (`f50865d3…`). Both r14 and r15 are locked in the registry; r14 is the
@@ -40,7 +55,7 @@ rollback target. The old Next.js website still answers `/`.
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
 | P6 Deployment evolution | **Started.** Observe requires sign-in; per-user authority inside the API, durable run history and production promotion remain | §4 P6 |
 
-## Next, in order
+## Historical sequence before automatic delivery
 
 1. **Close out r15.**
    - Run the hosted checks still outstanding:

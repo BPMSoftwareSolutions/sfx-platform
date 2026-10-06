@@ -2,15 +2,17 @@
 
 This describes the original website-only deployment path in design spec §§8.4–8.7.
 Its September baseline, publication checks and workflow are retained below.
-For the **current composite sidefx/staging deployment**, including the Live Circuit,
-SDA Kernel API, retrieval, identity and persistent vault, use
-[the Live Circuit staging runbook](live-circuit-staging-deployment.md).
+For **current automatic sidefx/staging deployment**, use
+[Automatic Live Circuit staging releases](automatic-staging-deployment.md).
+The composite image includes the Live Circuit, SDA Kernel API, retrieval,
+identity and persistent vault. Runtime changes on `main` trigger its build,
+deployment, real acceptance checks and automatic rollback on failed gates.
 
-As verified on 2026-10-05, the website-only workflow is still enabled and targets
-the same slot. A successful run can replace the composite image with the website
-alone. Coordinate that job before releasing or pushing to its deployment branches;
-it is not the complete-image release pipeline. The runtime and health semantics
-below apply to the website image, not the composite gateway.
+The website-only deployment job was removed on 2026-10-05. `container.yml`
+only builds and tests; `AZURE_STAGING_ENABLED` remains false. Do not run the
+legacy bootstrap or enable its old deployment instructions for this host.
+The remaining September procedure below is historical. Its runtime and health
+semantics describe the website image, not the composite gateway.
 
 ## Verified baseline
 
@@ -49,7 +51,7 @@ The manifest pins their bytes. Runtime and build share schema, publication ident
 owner/scenario and coverage checks. This verifies the stored publication, not the absent upstream
 query result; upstream source digests remain retained provenance.
 
-## Staging setup and release
+## Historical website staging setup and release (retired)
 
 Run `infra/bootstrap-staging.ps1` from PowerShell 7 with Azure and GitHub administrative access.
 It creates a staging slot on the existing plan, assigns the slot an ACR pull identity and creates
@@ -61,15 +63,16 @@ mode; no registry admin password is used. An ABAC registry requires revising the
 
 The GitHub `staging` environment trusts only `main` and the implementation branch
 `codex/azure-container-deployment`. Client, tenant and subscription IDs are nonsecret environment
-variables. Set repository variable `AZURE_STAGING_ENABLED=true` to enable staging delivery.
-Future branches require a deliberate environment-policy change. Bootstrap does not enable this flag.
+variables. The former deployment used `AZURE_STAGING_ENABLED=true`; that job
+has been removed and the flag remains false. Current automatic delivery uses
+`staging.yml`. Future branches require a deliberate environment-policy change.
 The actual OIDC subject includes numeric owner/repository IDs; its exact observed value is recorded
 in `infra/azure.json`. A name-only subject failed authentication in the first run. Preserve the
 ID-qualified trust boundary; inspect the actual claim again if repository ownership changes.
 
-`.github/workflows/container.yml` builds and tests on pull requests and the two selected branches.
-Only a non-PR run with the flag enabled can enter the OIDC staging job. Build actions are pinned
-to commit digests. The build job has no Azure token permission.
+`.github/workflows/container.yml` still builds and tests on pull requests and
+the two selected branches. Its former OIDC staging job no longer exists.
+Build actions are pinned to commit digests. The build job has no Azure token permission.
 
 The workflow runs the final image, checks representative pages and all their static references,
 redirect/404 behavior, server-rendered circuits and staging noindex. It removes a circuit artifact
@@ -143,5 +146,6 @@ The root Dockerfile/workflow described above still produces the website-only
 image. Building it does not package these services. The older
 `services/capability-api` discussion in [capability-execution.md](capability-execution.md)
 must not be used as an inventory or deployment prescription for the SDA host.
-Use [the composite runbook](live-circuit-staging-deployment.md) for packaging,
-authentication, persistence, readiness, verification, rollback and observed gaps.
+Use [automatic staging releases](automatic-staging-deployment.md) for normal
+delivery and [the composite runbook](live-circuit-staging-deployment.md) for
+runtime topology, persistence and incident procedures.

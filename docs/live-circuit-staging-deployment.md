@@ -7,6 +7,17 @@ CLI, replay, restart/vault gates and automatic rollback. See
 delivery path. The r14 audit below is historical; its manual steps remain an
 incident/full-runtime reference rather than a required operator procedure.
 
+**Current accepted release, 2026-10-06 01:03 UTC:**
+`circuit-e52b3eb246e8-37396070778-1`, ACR build `ca5j`, image
+`sha256:bc94ae5f17ac3bf3670638ebc406ee940e372d2c85507ca7be1ffe98c475ff9f`.
+The [automatic workflow](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37396070778)
+passed all four jobs. Its [compact durable receipt](releases/staging-automation-2026-10-06.json)
+records real browser/CLI execution, 1x and 0.1x replay, restart/vault preservation,
+Windows CLI acceptance, the post-workflow binding, and exercised rollback.
+Kernel and installed services remain the r15 identities; rollback is the locked
+r15 digest `b926002b…`. H2 is published at `/circuit/home`; `/` is still the
+inherited website. The tables below retain the earlier r14 audit context.
+
 This is the operational runbook for the **composite Live Circuit deployment** at
 <https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit>.
 It covers the website, observer, SDA Run API, installed kernel, procedure retrieval,

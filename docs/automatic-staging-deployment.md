@@ -6,13 +6,43 @@ required. PRs run checks without Azure credentials. `workflow_dispatch` is an
 optional recovery trigger; only `main` can bind the slot.
 
 Push paths cover the circuit, host/packagers, release tools, CLI and acceptance
-tools, Azure binding and this workflow. Documentation-only changes do not
-restart staging. No release label or operator command is needed for runtime
-changes under those paths.
+tools, Azure binding and this workflow. Changes confined to `docs/` or the root
+README do not restart staging. All changes under the watched directories,
+including their local documentation, trigger the release. No release label or
+operator command is needed for runtime changes under those paths.
 
 The target is `sidefx/staging` in `sidefx_group`. Production is never swapped or
 rebound. The website-only `container.yml` remains build/test only. Its old
 `AZURE_STAGING_ENABLED=false` switch stays false; the new workflow does not use it.
+
+## Accepted automatic release
+
+[Push-triggered run 37396070778](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37396070778)
+passed all four jobs on **2026-10-06 at 01:03 UTC**. Staging runs
+`circuit-e52b3eb246e8-37396070778-1`, image digest
+`sha256:bc94ae5f17ac3bf3670638ebc406ee940e372d2c85507ca7be1ffe98c475ff9f`.
+The tag and manifest are write/delete locked. ARM binding and public health
+were checked again after completion and matched the accepted release.
+
+The [version-controlled receipt](releases/staging-automation-2026-10-06.json)
+retains browser sign-in/Observe, all three providers visited live, exact
+`ADMITTED` outcomes, replay timing, unchanged vault after a confirmed process
+restart, external CLI follow and all 12 installed Windows CLI checks.
+The 11,738.185 ms captured scenario replayed in 11,749 ms at 1x and
+117,392.3 ms at 0.1x, within the 50 ms measurement tolerance at each rate.
+This acceptance uses actual execution evidence; the timing qualification below
+still applies to provider transport within the captured operation.
+
+Automatic rollback was exercised during bring-up: a failed acceptance gate in
+[run 37390693755](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37390693755)
+restored the exact r15 digest. Its recovery receipt is retained with the accepted
+release evidence. The final workflow also rolls back a failed final binding check.
+
+The external-flow harness waits for both `run-end` and a painted exact outcome,
+not merely CLI process exit. Real verification exposed independent CLI and SSE
+completion: the local proving run painted the outcome 118 ms after CLI exit;
+the accepted GitHub run painted it 8 ms afterward. Stopping at process exit
+would falsely fail an otherwise correct live circuit.
 
 ## What a push releases
 
