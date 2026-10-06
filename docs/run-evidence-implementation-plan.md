@@ -1,8 +1,9 @@
 # Run evidence and the trust ledger: implementation plan
 
-Prepared 2026-10-06. Status: **implementation underway; run capture installed in
-sfx-identity, candidate hosts and Explorer verified locally against a fresh
-staging execution. The trust ledger and staging service rollout remain open.**
+Prepared 2026-10-06. Status: **implementation underway; run capture and the trust
+authority reference are installed in sfx-identity. The declared C1 evaluator is
+installed in the estate. Claim history, evaluator integration and staging service
+rollout remain open.**
 
 ## Implementation checkpoint — 2026-10-06
 
@@ -14,21 +15,34 @@ staging execution. The trust ledger and staging service rollout remain open.**
 | Background capture, durable history and authenticated archive replay independent of execution-host availability | [E11: recovery and retained capture](run-evidence-plan/evidence/E11-retained-capture-acceptance.json): 1,893 records; outage and lost-acknowledgement retries; identity-host restart; exact readback. |
 | Fresh staging execution through candidate local hosts | [E12: fresh execution](run-evidence-plan/evidence/E12-fresh-execution-acceptance.json): run `b1827f03-25b9-45cc-a9fb-ed440e509482`, 1,894 records, 24 chunks, 11 operations and 3 providers; exact source/stored event, graph, output and timeline equality. Archive readback passes with the execution connection removed. Disposable test principals and their stored test material were cleaned up. |
 | SDA boundary specified | [S0–S3 request](../../sfx-embody/docs/request-sda-run-evidence.md): attributable executor identity, content delivery, exact ownership and independent evidence budgets. No SDA source or evidence-emission authority was changed. |
+| Trust vocabulary and declared C1 evaluator installed | Estate commits `ad9a61d`, `4435ba6`; [32-fixture acceptance](../../sfx-embody/sql/inspect/run-evidence-trust/evaluator-acceptance.json). SQL rollback, uncommitted kernel invocation, installed CLI and idempotence pass. Complete synthetic C1 evidence returns `SATISFIED` / eligible `OBSERVED`; no claim or disposition is written by the reader. |
+| Exact authority reference, CodeLightly DAL and private read API | DAL `8461695`, provider host `76303ae`; migration `003-trust-authority`, 17 total tables, 16 typed procedures, 213 manifest-checked files. [E13: private API acceptance](run-evidence-plan/evidence/E13-trust-authority-private-api.json) verifies service/session checks, exact policy/evaluator hashes, vocabulary counts and refusal of unknown pins. |
+| Incomplete staging basis stays unavailable | [Installed evaluator result](../../sfx-embody/sql/inspect/run-evidence-trust/staging-pending-evaluation.json): the retained E12 acceptance receipt, without invented executor identity or cleaned-up trace bytes, returns `NOT_OBSERVABLE` and no eligible state. This is a missing-basis check, not another full-run replay. |
 
 The numbered baseline below remains the **pre-implementation** baseline. The
-candidate services are not deployed to staging. Database migration `002` now
-contains only run material; reserve a subsequent migration for the ledger after
-the estate vocabulary/rules are declared. W2.1–W2.5 are partial, not complete.
-No L0–L10 trust gate is claimed by the transport checks. `ADMITTED` in E12 is the
-capability's returned outcome; the stored run explicitly says `NOT_EVALUATED`.
+candidate services are not deployed to staging. Database migration `002` contains
+run material; `003` contains the pinned authority reference and vocabulary.
+Reserve `004-trust-ledger` for subjects, claims and append-only decision history.
+W2.1–W2.5 are partial, not complete. E13 establishes the reference-copy portion of
+L0; no persisted-disposition or historical replay gate is claimed. `ADMITTED` in
+E12 is the capability's returned outcome; run trust remains `NOT_EVALUATED`.
 
-Remaining delivery order: declare vocabulary and evaluator rules; implement the
-claim ledger and replay/contradiction fixtures; close attributable executor
+Remaining delivery order: implement the claim ledger and authenticated producer
+bindings; invoke the installed evaluator from protected stored inputs and persist
+its complete basis; verify historical replay and invalidation; close attributable executor
 identity through S0; add retention/tombstones and staging caller credentials;
 package the changed identity binary, deploy and prove full-container restart;
 then close S1–S3 and the content/producer gates. Q7/Q8 rules remain unavailable
 until their prerequisites are settled. The detailed work items below remain the
-completion criteria.
+completion criteria. The evaluator is a pure consistency reading: direct callers
+cannot authenticate themselves by submitting JSON, and its eligible state is not
+a stored disposition. Its current implementation refuses a different evaluator
+pin; historical replay must execute the matching retained implementation.
+
+Installed policy digest:
+`98b97712ba40153553186212b6094970433b9b4fee810fb67e2c9921368f4454`.
+Installed evaluator document digest:
+`0d8869aafd2ae49894f26b76b1d8bf2ea347289b355fd8d0009f13cb106e25a1`.
 
 **Revision 3 (2026-10-06): claim-scoped trust integrated into delivery.**
 
@@ -506,10 +520,13 @@ The plan:
    - provers of the derivable obligations;
    - the estate's admission step.
 
-### 5.2 The ledger (proposed, migration `002-trust-ledger`)
+### 5.2 The ledger (remaining history in migration `004-trust-ledger`)
 
-Spikes W0.3–W0.5 and the vocabulary declaration (W0.6) confirm the columns
-before installation.
+Migration `002-run-evidence` already holds pending run material. Migration
+`003-trust-authority` holds the exact authority reference, `trust_state`,
+`evidence_class`, `claim_kind` and `evaluation_rule`. The claim/history tables
+below remain proposed for `004`; the completed reference unit does not satisfy
+their invariants by itself.
 
 | Table | Holds | Key columns |
 | --- | --- | --- |
@@ -725,7 +742,7 @@ W1.2 covers:
 
 | # | Work | Repo |
 | --- | --- | --- |
-| W2.1 | Migration `002-trust-ledger`, creating the `ledger` and `evidence` schemas with the I1–I10 constraints, grants and procedures. Preflight with rollback, then commit, through `tools/identity-database`. Regenerate `SFX.Identity.DAL`. Retain the preflight, install, idempotence and generation receipts, as for `001` (`sfx-dal/identity/verification/`). | sfx-dal |
+| W2.1 | Migrations `002-run-evidence` and `003-trust-authority` are installed. Implement `004-trust-ledger` for the remaining I1–I10 claim/history constraints, grants and procedures. Preflight with rollback, then commit, through `tools/identity-database`; regenerate CodeLightly DAL and retain all receipts. | sfx-dal |
 | W2.2 | Identity host endpoints under `/ledger/v1/*` and `/evidence/v1/*`: identify, assert, attach, decide, append trace, complete, and read for a validated principal. Each caller gets its own service key (Key Vault plus a vault reference, custody as identity-login.md:55-65). Host tests in `providers/cli-login/host-tests`. | sfx-providers |
 | W2.3 | Circuit host. See below. Evidence-write failure does not change execution outcome; bounded retry and reconciliation record incomplete capture when storage recovers. While unavailable, the UI reports evidence persistence unconfirmed and grants no trust from that write. | sfx-platform |
 | W2.4 | Evaluator rule set v1 as a declared capability (D8). It evaluates C1 against the identity, declaration, authority and observation prerequisites. It records exact executor/definition digests and limitations; contradiction, invalidation and replay use the same declared rules (I10). | sfx-embody (declaration) |
@@ -926,6 +943,8 @@ SHA-256 values are in that folder's `README.md`.
 | E03 | Local Gemini run `29807fa4`: run record, output, evidence references, the 4 evidence events, event-kind counts, and the 501 from `GET /v1/evidence/{ref}` | Local SDA API on the installed kernel |
 | E04 | Local equity run `52d5fe1e`: run record, output, references, 4 exchange events, 8 provider cell receipts with authorities from `/graph` | Same |
 | E05 | Trace sizes, raw and compressed, for a local and a staging run | Node `zlib` |
+| E10–E12 | Durable run transport, retained replay recovery and fresh staging execution | Candidate local hosts against live sfx-identity, with disposable fixture principals |
+| E13 | Pinned trust authority through generated DAL and authenticated private API | Installed migration 003; candidate local identity host; exact byte hashes and service/session refusal checks |
 
 Related retained evidence:
 
