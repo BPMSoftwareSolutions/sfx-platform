@@ -28,7 +28,7 @@ const events = selected.records.map((record, index) => ({ runId, cursor: index +
 events[0].at = selected.run.startedAt; events.at(-1).at = model.endedAt;
 const apiRun = { runId, state: 'completed', capability: { subject: deck.capabilityId }, startedAt: selected.run.startedAt, endedAt: model.endedAt, exitCode: selected.run.exitCode, partial: false };
 const output = { contractId: 'fixture-output.v1', payload: { summary: 'Transport fixture output' } };
-let streamFailure = 0, admissions = 0;
+let streamFailure = 0, admissions = 0, authenticated = true;
 const sse = selected.records.map(r => 'data: ' + JSON.stringify(r) + '\n\n').join('');
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -36,12 +36,15 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === '/events') { res.writeHead(200, { 'content-type': 'text/event-stream' }); return res.end(url.searchParams.get('run') === 'current' ? sse : ': fixture observer\n\n'); }
   if (url.pathname === '/api/circuit/v1/scenario') return json(deck);
   if (url.pathname === '/api/circuit/v1/capability-details') return json({ error: 'Offline fixture: navigation not included' }, 503);
-  if (url.pathname === '/api/circuit/v1/session') return json({ authenticated: true, principalId: 'fixture-principal', identifier: 'Offline acceptance' });
+  if (url.pathname === '/api/circuit/v1/session') return json({ authenticated, observeRequiresSession: true, principalId: 'fixture-principal', identifier: 'Offline acceptance' });
   if (url.pathname === '/api/circuit/v1/session/runs') return json({ principalId: 'fixture-principal', runs: listed });
   if (url.pathname === '/api/circuit/v1/capabilities') return json({ capabilities: [{ capabilityId: deck.capabilityId, namespaceId: deck.namespaceId }] });
   if (url.pathname === '/api/circuit/v1/home') return json({ environment: 'OFFLINE ACCEPTANCE' });
   if (url.pathname === '/api/circuit/v1/execution') return json({ configured: true });
-  if (url.pathname === '/api/circuit/v1/runs' && req.method === 'POST') { admissions++; return json({ runId }, 202); }
+  if (url.pathname === '/api/circuit/v1/runs' && req.method === 'POST') {
+    if (!authenticated) return json({ disposition: 'SIGN_IN_REQUIRED', error: 'Sign in to observe.' }, 401);
+    admissions++; return json({ runId }, 202);
+  }
   if (url.pathname.endsWith(`/runs/${runId}/events/stream`)) {
     if (streamFailure) return json({ error: 'Explicit stream failure fixture' }, streamFailure);
     res.writeHead(200, { 'content-type': 'text/event-stream' });
@@ -101,6 +104,36 @@ try {
   await page.setViewportSize({ width: 390, height: 844 }); await page.locator('#toggle-context').click(); await page.locator('#tab-runs').click();
   assert(await page.locator('#runs-list').isVisible());
   await page.setViewportSize({ width: 1680, height: 1100 });
+  // An expired/missing session needs sign-in, not a repeated stream request.
+  streamFailure = 503;
+  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
+  await page.waitForFunction(() => !document.querySelector('#observe-resume').hidden);
+  assert((await page.locator('#identity').textContent()).includes('Signed in as'));
+  streamFailure = 401; authenticated = false;
+  await page.locator('#observe-resume').click();
+  await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes('Your session is missing or has ended'));
+  await page.waitForFunction(() => document.querySelector('#identity a')?.textContent === 'Sign in');
+  assert(await page.locator('#observe-resume').isHidden());
+  assert(await page.locator('#observe').isDisabled());
+  assert(await page.locator('#payload').isEnabled());
+  const loginLink = new URL(await page.locator('#observe-sign-in').getAttribute('href'), origin);
+  const returnTo = new URL(loginLink.searchParams.get('return'), origin);
+  assert.equal(loginLink.pathname, '/circuit/login'); assert.equal(returnTo.searchParams.get('run'), runId);
+  assert.equal(returnTo.searchParams.get('capability'), deck.capabilityId);
+  assert.equal(admissions, 0, '401 must not resubmit');
+  // Simulate the normal login return URL after the session has been renewed.
+  streamFailure = 0; authenticated = true; await page.goto(returnTo.href);
+  await page.waitForFunction(() => document.querySelector('#run-report').textContent.includes('Transport fixture output'));
+  assert(await page.locator('#observe-sign-in').isHidden()); assert.equal(admissions, 0);
+  authenticated = false;
+  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId }));
+  await page.waitForFunction(() => !document.querySelector('#observe').disabled);
+  await page.locator('#payload').fill('{}'); await page.locator('#observe').click();
+  await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes('This request was not admitted'));
+  assert(await page.locator('#observe').isDisabled()); assert(await page.locator('#payload').isEnabled());
+  const admissionLogin = new URL(await page.locator('#observe-sign-in').getAttribute('href'), origin);
+  assert.equal(new URL(admissionLogin.searchParams.get('return'), origin).searchParams.has('run'), false);
+  assert.equal(admissions, 0); authenticated = true;
   // A restart/eviction 404 is terminal for this observation; no implicit rerun.
   streamFailure = 404;
   await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
@@ -120,5 +153,5 @@ try {
   assert(await page.locator('#observe-resume').isHidden());
   assert.equal(admissions, 0, 'Resume must read the same run, not create one');
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '404 releases controls without resubmission', '503 resumes original run'], errors, status: 'PASS' }));
+  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run'], errors, status: 'PASS' }));
 } finally { await browser.close(); server.closeAllConnections(); await new Promise(r => server.close(r)); }

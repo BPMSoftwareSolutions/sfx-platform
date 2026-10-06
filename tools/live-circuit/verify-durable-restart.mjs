@@ -19,12 +19,21 @@ const errors = [];
 page.on('pageerror', error => errors.push(error.message));
 page.on('request', r => { if (r.method() === 'POST' && new URL(r.url()).pathname === '/api/circuit/v1/runs') admissions++; });
 try {
-  await page.goto(origin + '/circuit/login');
+  const selected = origin + '/circuit/explorer?' + new URLSearchParams({ capability: request.subject, namespace: request.namespace,
+    scenario: request.subject, page: 'scenario-1', run: before.runId });
+  await page.goto(selected);
+  await page.waitForFunction(() => document.querySelector('#observe-status')?.textContent.includes('Your session is missing or has ended'), null, { timeout: 145000 });
+  assert.equal(await page.locator('#observe-resume').isVisible(), false);
+  assert.equal(await page.locator('#observe').isEnabled(), false);
+  const loginUrl = new URL(await page.locator('#observe-sign-in').getAttribute('href'), origin);
+  assert.equal(new URL(loginUrl.searchParams.get('return'), origin).searchParams.get('run'), before.runId);
+  await page.locator('#observe-sign-in').click();
   await page.locator('#identifier').fill(fixture.identifier);
   await page.locator('#password').fill(fixture.password);
   const login = page.waitForResponse(r => r.url() === origin + '/api/circuit/v1/session' && r.request().method() === 'POST', { timeout: 145000 });
   await page.locator('#submit').click(); assert.equal((await login).status(), 200);
-  await page.locator('#signed-in').waitFor({ state: 'visible', timeout: 145000 });
+  await page.waitForFunction(() => /API run .* · completed/.test(document.querySelector('#observe-status')?.textContent ?? ''), null, { timeout: 145000 });
+  assert.equal(new URL(page.url()).searchParams.get('run'), before.runId);
   const session = (await context.cookies()).find(c => c.name === '__Host-sfx-session'); assert(session);
   cookie = session.name + '=' + session.value;
   const runsResponse = await fetch(origin + '/api/circuit/v1/session/runs', { headers: { cookie }, signal: AbortSignal.timeout(90000) });
@@ -32,9 +41,8 @@ try {
   assert((await runsResponse.json()).runs.some(r => r.runId === before.runId), 'Run remains listed for the same owner');
   const after = await durableSnapshot(origin, before.runId, cookie);
   assert.deepEqual(after, before, 'Every captured event, graph and output must survive the restart');
-  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: request.subject, namespace: request.namespace,
-    scenario: request.subject, page: 'scenario-1', run: before.runId }));
-  await page.waitForFunction(() => /API run .* · completed/.test(document.querySelector('#observe-status')?.textContent ?? ''), null, { timeout: 145000 });
+  await page.waitForFunction(() => document.querySelector('#run-report')?.textContent.includes('Evidence persistence: complete.') &&
+    !document.querySelector('#run-report')?.textContent.includes('No retained API output'), null, { timeout: 90000 });
   assert.equal(await page.locator('#view-linear').getAttribute('aria-pressed'), 'true', 'Linear circuit remains the default');
   assert.equal(await page.locator('#observe-resume').isVisible(), false);
   assert.equal(admissions, 0, 'Reopening retained evidence must not re-execute');
@@ -42,7 +50,7 @@ try {
   await page.screenshot({ path: path.join(directory, 'durable-after-restart.png'), fullPage: true });
   fs.writeFileSync(path.join(directory, 'durable-restart.json'), JSON.stringify({ checkedAt: new Date().toISOString(),
     ...after, previousBoot: restart.previousBoot, bootId: restart.bootId, admissions, browserErrors: errors,
-    checks: ['same owner lists run', 'complete SQL capture', 'all event identities and bytes match', 'graph and output match', 'browser reopens original run', 'no new execution'] }, null, 2));
+    checks: ['401 offers sign-in instead of Resume', 'sign-in returns to original run', 'same owner lists run', 'complete SQL capture', 'all event identities and bytes match', 'graph and output match', 'browser displays retained output', 'Linear is the default', 'no new execution'] }, null, 2));
   console.log('Same owner reopened the same SQL run after restart; events, graph and output identical; no new execution.');
 } finally {
   if (cookie) await fetch(origin + '/api/circuit/v1/session/logout', { method: 'POST', headers: { origin, cookie, 'content-type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(90000) }).catch(() => {});

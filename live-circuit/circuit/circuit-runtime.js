@@ -374,6 +374,7 @@ export function createCircuitRuntime(shell) {
     admitted: id => { source?.close(); stopReplay(); Object.assign(state, { apiOwned: true, apiRun: null, apiGap: false, apiId: id, apiResult: null, output: undefined, outputError: null }); state.connection = `API run ${id}`; context.tab('run'); shell.location(false); schedule(); },
     completed: (result, output, error) => { state.apiResult = result; state.output = output; state.outputError = error; schedule(); },
     failed: message => { state.outputError = message; schedule(); },
+    authenticationRequired: () => shell.authenticationRequired?.(),
     record: record => {
       if (record.kind === 'run-start') { state.apiRun = newRun(record); state.apiRun.ambiguous = Boolean(state.apiGap); }
       else if (state.apiRun) applyRecord(state.apiRun, record);

@@ -213,6 +213,13 @@ verdict. An unavailable run returns controls to the user, hides Resume, and
 explains that a new Observe is a new execution. Temporary stream failures remain
 resumable. No error path automatically submits another run.
 
+A 401 is a separate recovery path: the Explorer refreshes the identity header,
+hides Resume, and offers sign-in with a return link to the selected run. Observe
+is disabled until authentication is renewed; the input remains editable. A 401
+at admission states that the request was not admitted. The restart acceptance
+opens the stored run without a cookie first, follows this sign-in link, and
+requires the same run and retained output afterward with zero new submissions.
+
 `state.json` retains previous/candidate digests and a flag persisted before
 binding. A failed deployment, browser, replay, restart, external flow or Windows
 CLI gate restores the prior exact digest and waits for readiness. Rollback acts

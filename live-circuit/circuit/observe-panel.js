@@ -119,11 +119,30 @@ export function apiRecord(event, graph) {
 
 export function createObservePanel(hooks) {
   const $ = id => document.getElementById(id), prefix = '/api/circuit/v1/runs';
-  let key = '', serial = 0, schema, template, ready = false, busy = false, run = null, feed, controls = [];
+  let key = '', serial = 0, schema, template, ready = false, busy = false, authenticationNeeded = false, run = null, feed, controls = [];
   const drafts = new Map();
+  let signInRun = null;
   const status = (text, error = false) => { $('observe-status').textContent = text; $('observe-status').className = error ? 'error' : 'muted'; };
-  const buttons = () => { $('observe').disabled = !ready || !key || busy; $('payload').disabled = busy; $('payload-template').disabled = busy || template === undefined;
+  const buttons = () => { $('observe').disabled = !ready || !key || busy || authenticationNeeded; $('payload').disabled = busy; $('payload-template').disabled = busy || template === undefined;
     for (const { control } of controls) control.disabled = busy; };
+  function signInLink(id) {
+    const target = new URL(location.href);
+    if (id) target.searchParams.set('run', id); else target.searchParams.delete('run');
+    const link = $('observe-sign-in');
+    link.href = '/circuit/login?return=' + encodeURIComponent(target.pathname + target.search);
+    link.textContent = id ? 'Sign in to reopen this run' : 'Sign in to Observe';
+  }
+  $('observe-sign-in').addEventListener('click', () => signInLink(signInRun));
+  function requireSignIn(id) {
+    authenticationNeeded = true; busy = false; signInRun = id ?? null;
+    signInLink(signInRun); $('observe-sign-in').hidden = false;
+    $('observe-resume').hidden = true;
+    const message = id
+      ? `Sign in to read run ${id}. Your session is missing or has ended. Signing in returns to this run without submitting another execution.`
+      : 'Sign in before observing. This request was not admitted.';
+    hooks.failed?.(message); status(message, true); buttons();
+    hooks.authenticationRequired?.();
+  }
   // The fields write the JSON input; editing the JSON updates the fields.
   function writeField(field, control) {
     let input;
@@ -158,6 +177,7 @@ export function createObservePanel(hooks) {
   async function follow() {
     const selected = run;
     if (!selected) return;
+    authenticationNeeded = false; $('observe-sign-in').hidden = true;
     feed?.abort(); feed = new AbortController(); const signal = feed.signal;
     busy = true; buttons(); $('observe-resume').hidden = true;
     status(`Observing API run ${selected.id}`);
@@ -186,10 +206,11 @@ export function createObservePanel(hooks) {
         $('observe-result').hidden = false;
         hooks.completed?.(result, output);
         watchPersistence(selected, result, output, undefined, signal);
-      } catch (error) { $('observe-output').textContent = error.message; $('observe-result').hidden = false; hooks.completed?.(result, undefined, error.message); watchPersistence(selected, result, undefined, error.message, signal); }
+      } catch (error) { if (error.status === 401) throw error; $('observe-output').textContent = error.message; $('observe-result').hidden = false; hooks.completed?.(result, undefined, error.message); watchPersistence(selected, result, undefined, error.message, signal); }
       selected.finished = true;
     } catch (error) {
       if (!signal.aborted && run === selected) {
+        if (error.status === 401) { requireSignIn(selected.id); return; }
         selected.unavailable = error.status === 404 && error.runRead;
         const message = selected.unavailable
           ? `Run ${selected.id} is no longer available to this session. It may have expired or been lost during a server restart. Resume cannot recover it. Check Runs for a retained capture, or click Observe to start a new execution.`
@@ -197,7 +218,7 @@ export function createObservePanel(hooks) {
         hooks.failed?.(message); status(message, true); $('observe-resume').hidden = selected.unavailable;
       }
     } finally {
-      if (run === selected && !signal.aborted) { busy = !selected.finished && !selected.unavailable; buttons(); }
+      if (run === selected && !signal.aborted) { busy = !selected.finished && !selected.unavailable && !authenticationNeeded; buttons(); }
     }
   }
   // Execution can finish before its final durable write. Refresh the report's
@@ -208,13 +229,13 @@ export function createObservePanel(hooks) {
       await new Promise(resolve => setTimeout(resolve, 2000));
       if (run !== selected || signal.aborted) return;
       try { result = await request(`${prefix}/${encodeURIComponent(selected.id)}`, { signal }); }
-      catch { return; }
+      catch (error) { if (error.status === 401) requireSignIn(selected.id); return; }
       if (run !== selected || signal.aborted) return;
       hooks.completed?.(result, output, error);
     }
   }
   $('observe').addEventListener('click', async () => {
-    if (busy || !ready || !key) return;
+    if (busy || !ready || !key || authenticationNeeded) return;
     let input;
     try { input = JSON.parse($('payload').value); }
     catch (error) { status(`Invalid JSON: ${error.message}`, true); $('payload').focus(); return; }
@@ -234,6 +255,7 @@ export function createObservePanel(hooks) {
       hooks.admitted(run.id); await follow();
     } catch (error) {
       if (key !== selectedKey || serial !== generation) return;
+      if (error.status === 401) { requireSignIn(); return; }
       status(`${error.message} Admission key: ${admissionKey}. An interrupted response may already have admitted a run.`, true);
       busy = false; buttons();
     }
@@ -242,7 +264,9 @@ export function createObservePanel(hooks) {
   $('payload').addEventListener('input', () => { drafts.set(key, $('payload').value); syncFields(); });
   $('observe-resume').addEventListener('click', follow);
   function release() {
-    feed?.abort(); run = null; busy = false; $('observe-resume').hidden = true; $('observe-external').hidden = true; hooks.release(); buttons();
+    feed?.abort(); run = null; signInRun = null; busy = false; $('observe-resume').hidden = true; $('observe-external').hidden = true;
+    if (authenticationNeeded) signInLink();
+    hooks.release(); buttons();
   }
   $('observe-external').addEventListener('click', () => { release(); status('Following externally observed runs. A submitted API execution continues on the server.'); });
   request('/api/circuit/v1/execution').then(config => { ready = config.configured; if (!ready) status('Observe unavailable: configure the circuit host’s SDA API connection.', true); buttons(); }).catch(error => status(error.message, true));

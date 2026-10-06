@@ -26,7 +26,8 @@ const runtime = createCircuitRuntime({
   loadRoot: async () => { Object.assign(state, { scenario: '', row: null, component: null }); syncUrl(false); await readScene(false, {}); },
   scenario: id => changeScenario(id),
   location: push => syncUrl(push),
-  component: id => selectComponent(id)
+  component: id => selectComponent(id),
+  authenticationRequired: () => identity().catch(() => {})
 });
 const deck = () => runtime.state.deck;
 
