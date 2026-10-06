@@ -44,6 +44,20 @@ try {
   const child = spawn(command, args, { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
   child.stdout.pipe(process.stdout); child.stderr.pipe(process.stderr);
   const exitCode = await new Promise((resolve, reject) => { child.on('error', reject); child.on('close', resolve); });
+  const commandCompletedAt = Date.now();
+  // The CLI response and the browser's SSE transport finish independently.
+  // Keep sampling until the actual terminal receipt is painted; command exit
+  // alone does not establish that the viewer has consumed its final receipt.
+  let terminalObserved = false;
+  if (exitCode === 0) {
+    try {
+      await page.waitForFunction(({graph, variant}) =>
+        window.externalRecords.some(r => r.kind === 'run-end') &&
+        window.externalSamples.some(s => s.graph === graph && s.current.some(n => n.kind === 'variant' && n.id.endsWith(':' + variant))),
+        {graph:'graph:' + capability, variant}, {timeout:90000});
+      terminalObserved = true;
+    } catch {} // Preserve the captured receipts and frames before refusing.
+  }
   const { samples, records } = await page.evaluate(() => {
     cancelAnimationFrame(window.externalFrame); window.externalSource.close();
     return { samples: window.externalSamples, records: window.externalRecords };
@@ -57,10 +71,13 @@ try {
   const outcomes = [...new Set(samples.flatMap(s => s.current.filter(n => n.kind === 'variant').map(n => n.id)))];
   const receipt = { checkedAt: new Date().toISOString(), origin, capability, exitCode, errors,
     frames: samples.length, liveFrames: live.length, providers, declaredProviders: declared,
-    pages: [...new Set(live.map(s => s.page))], outcomes, replayUsed: samples.some(s => s.mode.includes('REPLAY')) };
+    pages: [...new Set(live.map(s => s.page))], outcomes, terminalObserved, commandCompletedAt,
+    outcomePaintedAt: samples.find(s => s.graph === 'graph:' + capability && s.current.some(n => n.kind === 'variant' && n.id.endsWith(':' + variant)))?.at ?? null,
+    replayUsed: samples.some(s => s.mode.includes('REPLAY')) };
   fs.writeFileSync(path.join(evidence, 'receipt.json'), JSON.stringify(receipt, null, 2));
   assert.equal(exitCode, 0); assert.equal(errors.length, 0); assert(!receipt.replayUsed);
   assert(providers.length, 'Provider must be painted current while external run is open');
+  assert(terminalObserved, 'Browser must receive run-end and paint the exact outcome within 90 seconds');
   assert(outcomes.some(id => id.endsWith(':' + variant)), 'Expected exact outcome must be painted');
   console.log(JSON.stringify(receipt));
 } finally { await browser.close(); }
