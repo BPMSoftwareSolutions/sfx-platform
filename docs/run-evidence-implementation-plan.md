@@ -41,6 +41,12 @@ Appendices: [A. Evidence index](#appendix-a-evidence-index) ·
 Statements about the future are labelled *proposed*. Estimates are left out on
 purpose; the team sizes the work items.
 
+**Reconnaissance.** A read-only, six-lane review of this plan against the
+repositories, the verified plan corrections it produced, and the resulting
+3-turn execution analysis are retained under
+[`run-evidence-plan/analysis/`](run-evidence-plan/analysis/README.md). Those
+documents size the work items; they do not change this plan's authority.
+
 **Design reference.** The user-designated designs are the eight-slide
 [run-evidence-E1.pptx](C:/lab/repos/sfx-providers/outputs/capability-estate/live-circuit-platform-explorer/E1/run-evidence-E1.pptx),
 documented in [Design E1](explorer-run-evidence-design.md). Verified SHA-256:
