@@ -17,19 +17,28 @@ retrieval, identity and persistent vault are unchanged. The previously outstandi
 replay, restart/vault and external CLI gates passed on this new release;
 the [durable receipt](releases/staging-automation-2026-10-06.json) records them.
 
-**P2 implemented 2026-10-06** (one composite image, no Next.js). Each push to
+**P2 accepted 2026-10-06, 02:29 UTC.** Automatic
+[run 37403470208](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37403470208)
+passed all four jobs (checks, Linux deployment and live acceptance, Windows CLI,
+final confirmation). Staging runs `composite-e82d47d8a901-37403470208-1`, image
+`558cc02e…`, built from `e82d47d` with no website; rollback is the overlay
+release `54be0b60…`. Kernel `f50865d3…` (C#), retrieval, identity and the vault
+are unchanged. After the run, `/` served the home page; `/capabilities`,
+`/about` and `/sitemap.xml` answered 404; `/robots.txt` disallowed all.
+
+**What P2 changed** (one composite image, no Next.js). Each push to
 `main` now builds one image from the pinned Node base, copies the admitted
 components from the bound image by digest and proves them byte-identical, and
 places every host file and `live-circuit/` from the commit. The gateway no
 longer starts the website: `/` serves the H2 home page, `/robots.txt` is the
 gateway's own, and the website's routes answer 404. An ACR build-only preflight
-against the current release passed (§4 P2). The first composite release goes
-through the normal automatic workflow with acceptance and rollback; its result
-is recorded below when it completes.
+against the current release passed (§4 P2), and the first composite release
+passed the normal automatic workflow above.
 
-**Next:** P0 credential custody in its own window, the estate's P3
-prerequisites, P5 (remove the Next.js code and the overlay packagers once the
-first composite release is accepted), and the remaining P1 local-observer cleanup.
+**Next:** the Capability Explorer (P3 data path, then P4 workspace), starting
+with the estate's P3 prerequisites (§6). Alongside: P0 credential custody in its
+own window, P5 (remove the Next.js code and the now-unused overlay packagers),
+and the remaining P1 local-observer cleanup.
 
 Decided **2026-10-05**. This plan turns `sfx-platform` from a Next.js website
 prototype plus a separately copied circuit into one product: the **SFX Live
@@ -59,7 +68,7 @@ rollback target. The old Next.js website still answers `/`.
 | Browser sign-in | **Released in r15.** Hosted checks passed at 22:31 UTC: real sign-in and cookie, wrong password refused, anonymous Observe refused, signed-in live Observe with providers visited and attribution, sign-out revocation, CLI login unchanged, no secrets in logs | `46098e1`; r15 evidence (not yet committed) |
 | r15 close-out | **Open.** Replay at r15, a restart with the vault check, and external CLI visibility are not recorded. The receipt and runbook update are not committed | "Next" item 1 |
 | Home page | **Designed and built, not released.** H1 (`1507752`), then H2 from another session; H2 implemented at `/circuit/home` with the sign-in page restyled to match (`0ca7388`) | [Home page design](home-page-design.md) |
-| P2 One image without Next.js | **Implemented 2026-10-06**; first composite release pending its automatic run | §4 P2 |
+| P2 One image without Next.js | **Accepted 2026-10-06** (`composite-e82d47d8a901-37403470208-1`) | §4 P2 |
 | P3 Explorer data path | **Blocked** in the estate: DC-05a is paused, and a routing-law regression makes 11 capability readings fail | §6 |
 | P4 Explorer workspace | **Not started** (needs P3) | §4 P4 |
 | P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
