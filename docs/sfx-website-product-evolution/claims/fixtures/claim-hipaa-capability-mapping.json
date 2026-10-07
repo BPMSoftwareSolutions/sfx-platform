@@ -1,0 +1,25 @@
+{
+  "document": "ui-claim.v1",
+  "claimId": "claim-hipaa-capability-mapping",
+  "revision": 3,
+  "statement": "SFX provides capability-level authority, execution evidence, traceability and control surfaces that organizations and assessors can map to applicable regulatory obligations.",
+  "classification": "product-claim",
+  "status": "current",
+  "basis": "SFX declares capability authority, provider bindings and execution receipts as estate data. No assessor attestation exists, so the statement stops at mapping support; the mapping is performed by the customer's assessors.",
+  "sourceRefs": [
+    { "kind": "estate-declaration", "locator": "sidefx_ui.ui_page_definition/ui-page-home@r4", "digest": "sha256:9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f", "observedAt": "2026-10-07T00:00:00.000Z" },
+    { "kind": "repo-path", "locator": "docs/sfx-website-product-evolution/implementation-strategy.md:775-779" },
+    { "kind": "external-url", "locator": "https://www.hhs.gov/hipaa/for-professionals/regulatory-initiatives/index.html", "observedAt": "2026-10-07T00:00:00.000Z" }
+  ],
+  "limits": "No certification, attestation or assessor report is claimed; nothing here discharges a regulatory obligation.",
+  "copyVariants": [
+    {
+      "text": "SFX provides capability-level control surfaces; organizations map them to applicable regulatory obligations.",
+      "basis": "Same estate declarations as the primary statement; this variant is a shortened placement of the approved reading."
+    }
+  ],
+  "observedAt": "2026-10-07T00:00:00.000Z",
+  "effectiveAt": "2026-10-07T00:00:00.000Z",
+  "supersedes": null,
+  "supersededBy": null
+}

@@ -1,0 +1,18 @@
+{
+  "document": "ui-claim.v1",
+  "claimId": "claim-explorer-component-count",
+  "revision": 1,
+  "statement": "The Explorer admitted ten declared component kinds at revision 4 of the home page reading.",
+  "classification": "sfx-interpretation",
+  "status": "superseded",
+  "basis": "Counted from the revision 4 home declaration retained under live-circuit/circuit/fixtures/pages/home.json; superseded when the component contract roles were rendered.",
+  "sourceRefs": [
+    { "kind": "repo-path", "locator": "live-circuit/circuit/fixtures/pages/home.json" }
+  ],
+  "limits": "A point-in-time count of declared kinds, not a statement about everything the platform can do.",
+  "observedAt": "2026-09-01T00:00:00.000Z",
+  "effectiveAt": "2026-09-01T00:00:00.000Z",
+  "supersedes": null,
+  "supersededBy": "claim-explorer-component-count@2",
+  "supersededAt": "2026-10-06T00:00:00.000Z"
+}

@@ -1,0 +1,18 @@
+{
+  "document": "ui-claim.v1",
+  "claimId": "claim-hipaa-compliance",
+  "revision": 1,
+  "statement": "SFX is HIPAA compliant and can be trusted with protected health information.",
+  "classification": "product-claim",
+  "status": "current",
+  "basis": "Internal architecture review found access controls and audit logs align with common safeguarding patterns for protected health information handling.",
+  "sourceRefs": [
+    { "kind": "estate-declaration", "locator": "sidefx_ui.ui_page_definition/ui-page-home@r4", "digest": "sha256:a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb", "observedAt": "2026-10-07T00:00:00.000Z" },
+    { "kind": "repo-path", "locator": "docs/sfx-website-product-evolution/analysis/08-claim-provenance-tooling.md:6" }
+  ],
+  "limits": "No attestation receipt is retained for this wording.",
+  "observedAt": "2026-10-07T00:00:00.000Z",
+  "effectiveAt": "2026-10-07T00:00:00.000Z",
+  "supersedes": null,
+  "supersededBy": null
+}

@@ -1,0 +1,19 @@
+{
+  "document": "ui-claim.v1",
+  "rulesVersion": 1,
+  "claimId": "claim-provenance-reader-preview",
+  "revision": 1,
+  "statement": "The provenance reader will return a page's pinned claim documents inside the served ui-page.v1 reading with classification and status rendered verbatim.",
+  "classification": "proposed-architecture",
+  "status": "proposed",
+  "basis": "Proposed in the pending-architecture wave; the reader join and claim tables are not installed, so the statement describes intended behaviour rather than present behaviour.",
+  "sourceRefs": [
+    { "kind": "repo-path", "locator": "docs/sfx-website-product-evolution/analysis/08-claim-provenance-tooling.md:75-86" }
+  ],
+  "limits": "No reader, table or renderer exists yet; nothing here is available today.",
+  "label": "Lab",
+  "observedAt": "2026-10-07T00:00:00.000Z",
+  "effectiveAt": "2026-11-15T00:00:00.000Z",
+  "supersedes": null,
+  "supersededBy": null
+}

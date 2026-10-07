@@ -1,0 +1,18 @@
+{
+  "document": "ui-claim-fixture-expectations.v1",
+  "note": "Expected outcomes for verify-claims.mjs --fixtures. A fixture passes when its refusals equal its expectation exactly.",
+  "claims": {
+    "claim-hipaa-capability-mapping": { "refusals": [] },
+    "claim-explorer-component-count": { "refusals": [] },
+    "claim-provenance-reader-preview": { "refusals": [] },
+    "claim-hipaa-compliance": { "refusals": ["CLAIM_COMPLIANCE_UNSUPPORTED"] }
+  },
+  "placements": {
+    "home-hipaa-approved": { "refusals": [] },
+    "home-hipaa-variant-approved": { "refusals": [] },
+    "home-hipaa-overclaim": { "refusals": ["CLAIM_TEXT_MISMATCH"] },
+    "home-free-compliance-copy": { "refusals": ["CLAIM_REQUIRED"] },
+    "home-verification-wording": { "refusals": [] },
+    "home-unknown-claim": { "refusals": ["CLAIM_NOT_DECLARED"] }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "document": "ui-claim-placements.v1",
+  "note": "Fixture copy units for the copy-must-equal-approved-statement and CLAIM_REQUIRED drills; page sections, claimsPosture and the publisher are not wired in yet.",
+  "placements": [
+    {
+      "sectionId": "home-hipaa-approved",
+      "component": "text",
+      "text": "SFX provides capability-level authority, execution evidence, traceability and control surfaces that organizations and assessors can map to applicable regulatory obligations.",
+      "claims": ["claim-hipaa-capability-mapping@3"]
+    },
+    {
+      "sectionId": "home-hipaa-variant-approved",
+      "component": "text",
+      "text": "SFX provides capability-level control surfaces; organizations map them to applicable regulatory obligations.",
+      "claims": ["claim-hipaa-capability-mapping@3"]
+    },
+    {
+      "sectionId": "home-hipaa-overclaim",
+      "component": "text",
+      "text": "SFX is HIPAA compliant.",
+      "claims": ["claim-hipaa-capability-mapping@3"]
+    },
+    {
+      "sectionId": "home-free-compliance-copy",
+      "component": "text",
+      "text": "SFX is HIPAA compliant.",
+      "claims": []
+    },
+    {
+      "sectionId": "home-verification-wording",
+      "component": "text",
+      "text": "Designed for verification and can generate deterministic proof obligations.",
+      "claims": []
+    },
+    {
+      "sectionId": "home-unknown-claim",
+      "component": "text",
+      "text": "SFX provides capability-level authority.",
+      "claims": ["claim-does-not-exist@1"]
+    }
+  ]
+}

@@ -306,9 +306,20 @@ function catalogMatch(catalogValue, item) {
   return { known: true, match };
 }
 
+// The catalog for a card list: the declared `catalog` value, else the body of
+// the declared source named by `catalogSourceId` in the runtime context. Both
+// declaration paths resolve to the same capability list.
+function catalogValue(context, entry) {
+  const direct = declared(context, entry, 'catalog');
+  if (direct !== undefined) return direct;
+  const sourceId = declared(context, entry, 'catalogSourceId');
+  if (typeof sourceId !== 'string' || !sourceId) return undefined;
+  const record = context?.sources?.[sourceId];
+  return record?.ok ? record.body : undefined;
+}
+
 function cardNode(context, entry, item) {
-  const catalogValue = declared(context, entry, 'catalog');
-  const { known, match } = catalogMatch(catalogValue, item);
+  const { known, match } = catalogMatch(catalogValue(context, entry), item);
   const missing = Boolean(known && !match);
   const card = h('article', { class: `card panel${missing ? ' missing' : ''}`, id: item?.id });
   card.append(h('h3', { text: item?.title ?? '' }));
@@ -423,7 +434,7 @@ function renderNotice(container, entry, context) {
   if (title) node.append(h('strong', { class: 'notice-title', text: title }));
   const body = declaredText(context, entry, 'body');
   if (body) node.append(h('p', { class: 'notice-body', text: body }));
-  const actionId = declared(context, entry, 'actionId');
+  const actionId = declared(context, entry, 'actionId') ?? declared(context, entry, 'action');
   if (typeof actionId === 'string' && actionId) {
     const action = actionFor(entry, actionId);
     if (action) node.append(' ', actionControl(context, entry, actionId, { class: 'button secondary small' }, 'Continue'));
@@ -444,55 +455,98 @@ function renderEntry(container, entry, context) {
   adapter.render(container, entry, context);
 }
 
-export const UI_COMPONENTS = {
+// The single exported role table: one place per kind declares its role
+// vocabulary. `roles` are the roles the adapter resolves through declared()
+// (prop or binding), `props` are the remaining admitted controls, and `states`
+// are the states the shell can render. UI_COMPONENTS derives from this table,
+// so no adapter can admit a role it does not consume.
+export const UI_COMPONENT_ROLES = {
   hero: {
     version: 1,
-    supportedRoles: ['eyebrow', 'headline', 'lede', 'figure', 'primaryActionId'],
-    render: renderHero,
+    roles: ['eyebrow', 'headline', 'lede', 'figure'],
+    props: ['primaryActionId'],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   section: {
     version: 1,
-    supportedRoles: ['heading', 'body', 'actions'],
-    render: renderSection,
+    roles: ['heading', 'body', 'actions'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   text: {
     version: 1,
-    supportedRoles: ['eyebrow', 'display', 'lede', 'micro', 'section-title', 'paragraph', 'note', 'role', 'text'],
-    render: renderText,
+    roles: ['eyebrow', 'display', 'lede', 'micro', 'section-title', 'paragraph', 'note', 'text'],
+    props: ['role'],
+    states: ['ready'],
   },
   heading: {
     version: 1,
-    supportedRoles: ['level', 'chips', 'badges', 'text'],
-    render: renderHeading,
+    roles: ['text', 'chips', 'badges'],
+    props: ['level'],
+    states: ['ready'],
   },
   stat: {
     version: 1,
-    supportedRoles: ['value', 'label', 'sub'],
-    render: renderStat,
+    roles: ['value', 'label', 'sub'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   card: {
     version: 1,
-    supportedRoles: ['title', 'body', 'promise', 'meta', 'link', 'missing'],
-    render: renderCard,
+    roles: ['title', 'body', 'promise', 'meta', 'link', 'missing'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   'card-list': {
     version: 1,
-    supportedRoles: ['cards', 'catalog', 'title', 'catalogSourceId'],
-    render: renderCardList,
+    roles: ['cards', 'catalog', 'title', 'catalogSourceId'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   list: {
     version: 1,
-    supportedRoles: ['items', 'current', 'empty'],
-    render: renderList,
+    roles: ['items', 'current', 'empty'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   'media.figure': {
     version: 1,
-    supportedRoles: ['svg', 'src', 'alt', 'caption', 'link', 'digest'],
-    render: renderMediaFigure,
+    roles: ['svg', 'src', 'alt', 'caption', 'link', 'digest'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
   },
   notice: {
     version: 1,
-    supportedRoles: ['title', 'body', 'action', 'state', 'tone', 'actionId'],
-    render: renderNotice,
+    roles: ['title', 'body', 'action', 'state', 'actionId'],
+    props: ['tone'],
+    states: ['info', 'warning', 'error', 'empty'],
   },
 };
+
+// The admitted role set of a kind is the union of its table entries, in table
+// order, de-duplicated: supportedRoles is derived, never hand-kept.
+function supportedRolesOf(kind) {
+  const entry = UI_COMPONENT_ROLES[kind] ?? {};
+  const names = [];
+  for (const name of [...(entry.roles ?? []), ...(entry.props ?? [])]) if (!names.includes(name)) names.push(name);
+  return names;
+}
+
+const UI_COMPONENT_RENDERERS = {
+  hero: renderHero,
+  section: renderSection,
+  text: renderText,
+  heading: renderHeading,
+  stat: renderStat,
+  card: renderCard,
+  'card-list': renderCardList,
+  list: renderList,
+  'media.figure': renderMediaFigure,
+  notice: renderNotice,
+};
+
+export const UI_COMPONENTS = Object.fromEntries(Object.keys(UI_COMPONENT_ROLES).map(kind => [kind, {
+  version: UI_COMPONENT_ROLES[kind].version,
+  supportedRoles: supportedRolesOf(kind),
+  render: UI_COMPONENT_RENDERERS[kind],
+}]));

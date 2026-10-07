@@ -5,6 +5,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { UI_COMPONENT_ROLES } from './ui-components.js';
 
 // The estate directory holds the delivery configuration (sfx.config.json) that
 // selects the installed kernel. The image places it two levels up; development
@@ -353,10 +354,24 @@ async function readProviderInspection(selection) {
 // The deployed shell registry the client validator and the publish gate consume.
 // Kinds, actions, sources and routes change only with a shell deploy; component
 // contract digests are deliberately absent because the shell does not know the
-// estate's authored digests.
+// estate's authored digests. Component roles/states are derived from the
+// exported role table (K1) so the manifest cannot drift from the adapters;
+// circuit-host.json `ui.components` stays the kind/version allowlist.
+function componentRoles(kind) {
+  const entry = UI_COMPONENT_ROLES[kind] ?? {};
+  const names = [];
+  for (const name of [...(entry.roles ?? []), ...(entry.props ?? [])]) if (!names.includes(name)) names.push(name);
+  return names;
+}
+const uiComponents = (policy.ui?.components ?? []).map(component => ({
+  kind: component.kind,
+  version: component.version,
+  roles: componentRoles(component.kind),
+  states: [...(UI_COMPONENT_ROLES[component.kind]?.states ?? [])],
+}));
 const uiRegistry = { contractId: 'ui-registry.v1',
   shell: { routeHostVersion: '1', pageContractVersions: ['ui-page.v1', 'ui-page-definition.v1', 'ui-layout.v1', 'ui-component.v1'] },
-  components: policy.ui?.components ?? [],
+  components: uiComponents,
   actions: [
     { kind: 'navigate', dispatchClass: 'local', inputs: [] },
     { kind: 'select', dispatchClass: 'local', inputs: [] },

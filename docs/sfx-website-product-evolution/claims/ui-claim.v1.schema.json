@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ui-claim.v1",
+  "description": "Public-claim provenance document. A claim is a reading with declared basis and sources, never a receipt that the claim is true. Vocabularies are closed and mirrored by live-circuit/circuit/claim-rules.v1.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "claimId", "revision", "statement", "classification", "status", "basis", "sourceRefs", "observedAt", "effectiveAt", "supersedes", "supersededBy"],
+  "properties": {
+    "document": { "const": "ui-claim.v1" },
+    "rulesVersion": { "type": "integer", "minimum": 1 },
+    "claimId": { "type": "string", "pattern": "^claim-[a-z0-9]+(-[a-z0-9]+)*$" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "statement": { "type": "string", "minLength": 1 },
+    "classification": { "enum": ["external-fact", "sfx-interpretation", "product-claim", "proposed-architecture"] },
+    "status": { "enum": ["current", "superseded", "proposed", "historical"] },
+    "basis": { "type": "string", "minLength": 40 },
+    "sourceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "locator"],
+        "properties": {
+          "kind": { "enum": ["external-url", "repo-path", "estate-declaration", "reader-observation", "evidence-receipt"] },
+          "locator": { "type": "string", "minLength": 1 },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "sourceTag": { "type": "string" },
+          "lifecycle": { "enum": ["in-force", "proposed", "final"] },
+          "observedAt": { "type": "string", "format": "date-time" }
+        },
+        "allOf": [
+          {
+            "if": { "required": ["kind"], "properties": { "kind": { "enum": ["estate-declaration", "reader-observation", "evidence-receipt"] } } },
+            "then": { "required": ["digest", "observedAt"] }
+          },
+          {
+            "if": { "required": ["kind"], "properties": { "kind": { "const": "external-url" } } },
+            "then": { "required": ["observedAt"] }
+          }
+        ]
+      }
+    },
+    "limits": { "type": "string" },
+    "label": { "enum": ["Lab", "Preview"] },
+    "copyVariants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "basis"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "basis": { "type": "string", "minLength": 40 }
+        }
+      }
+    },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "effectiveAt": { "type": "string", "format": "date-time" },
+    "supersededAt": { "type": "string", "format": "date-time" },
+    "supersedes": { "type": ["string", "null"], "pattern": "^claim-[a-z0-9]+(-[a-z0-9]+)*@[1-9][0-9]*$" },
+    "supersededBy": { "type": ["string", "null"], "pattern": "^claim-[a-z0-9]+(-[a-z0-9]+)*@[1-9][0-9]*$" }
+  }
+}

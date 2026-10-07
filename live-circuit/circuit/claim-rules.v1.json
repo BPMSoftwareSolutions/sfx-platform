@@ -1,0 +1,139 @@
+{
+  "contractId": "claim-rules.v1",
+  "rulesVersion": 1,
+  "knownRulesVersions": [1],
+  "statusLifecycleNote": "superseded is a lifecycle state appended by a successor revision; it is admitted for every classification.",
+  "classification": ["external-fact", "sfx-interpretation", "product-claim", "proposed-architecture"],
+  "status": ["current", "superseded", "proposed", "historical"],
+  "sourceKinds": ["external-url", "repo-path", "estate-declaration", "reader-observation", "evidence-receipt"],
+  "basisMinimumCharacters": 40,
+  "boilerplateBasis": ["n/a", "na", "none", "tbd", "to be determined", "see statement", "as above", "pending"],
+  "claimRefPattern": "^claim-[a-z0-9]+(-[a-z0-9]+)*@[1-9][0-9]*$",
+  "lifecycles": ["in-force", "proposed", "final"],
+  "digestRequiredKinds": ["estate-declaration", "reader-observation", "evidence-receipt"],
+  "observedAtRequiredKinds": ["external-url", "estate-declaration", "reader-observation", "evidence-receipt"],
+  "statusRules": [
+    { "classification": "external-fact", "admittedStatuses": ["current", "historical", "superseded"] },
+    { "classification": "sfx-interpretation", "admittedStatuses": ["current", "proposed", "historical", "superseded"] },
+    { "classification": "product-claim", "admittedStatuses": ["current", "proposed", "superseded"] },
+    { "classification": "proposed-architecture", "admittedStatuses": ["proposed", "historical", "superseded"] }
+  ],
+  "sourceRequirements": [
+    { "classification": "external-fact", "anyOfKinds": ["external-url", "repo-path"], "basisMustAttribute": true },
+    { "classification": "sfx-interpretation", "anyOfKinds": ["external-url", "repo-path", "estate-declaration", "reader-observation", "evidence-receipt"], "basisMustNameFacts": true },
+    { "classification": "product-claim", "anyOfKinds": ["reader-observation", "evidence-receipt", "estate-declaration"], "fresh": true },
+    { "classification": "proposed-architecture", "anyOfKinds": ["repo-path", "estate-declaration"], "requireLabel": true }
+  ],
+  "freshness": [
+    { "kind": "reader-observation", "days": 30, "staleCode": "CLAIM_OBSERVATION_STALE" },
+    { "kind": "evidence-receipt", "days": 90, "staleCode": "CLAIM_OBSERVATION_STALE" },
+    { "kind": "estate-declaration", "days": 180, "staleCode": "CLAIM_OBSERVATION_STALE" }
+  ],
+  "admittedWording": [
+    { "phrase": "designed for verification", "classification": ["proposed-architecture"] },
+    { "phrase": "can generate deterministic proof obligations", "classification": ["proposed-architecture"] },
+    { "phrase": "map to applicable regulatory obligations", "classification": ["sfx-interpretation", "product-claim"] }
+  ],
+  "wording": [
+    {
+      "id": "compliance-attestation",
+      "code": "CLAIM_COMPLIANCE_UNSUPPORTED",
+      "describe": "Compliance, certification or attestation wording is admitted only for an external fact backed by a retained attestation receipt.",
+      "patterns": [
+        "(hipaa|pci[- ]?dss|sox|gdpr|soc ?2|iso ?27001|fedramp)[^.]{0,48}(compliant|compliance|certified|certification|audited|attested|accredited)",
+        "(compliant|certified|audited|attested|accredited)[^.]{0,48}(hipaa|pci[- ]?dss|sox|gdpr|soc ?2|iso ?27001|fedramp)"
+      ],
+      "admitted": { "classification": ["external-fact"], "requireSource": { "kind": "evidence-receipt", "sourceTag": "attestation" } }
+    },
+    {
+      "id": "coverage-universal",
+      "code": "CLAIM_COVERAGE_UNSOURCED",
+      "staleCode": "CLAIM_COVERAGE_STALE",
+      "describe": "Universal, counted or inventory coverage wording needs a fresh reader observation of the same measure.",
+      "patterns": [
+        "\\ball providers\\b",
+        "\\bevery (provider|model|integration|endpoint|carrier)\\b",
+        "\\buniversal integration\\b",
+        "\\b\\d{2,}\\+? (providers|models|integrations|endpoints|carriers)\\b",
+        "\\b[23]m\\+\\b",
+        "\\bthousands of\\b"
+      ],
+      "admitted": { "classification": ["external-fact", "product-claim"], "requireSource": { "kind": "reader-observation", "freshDays": 30 } }
+    },
+    {
+      "id": "formal-verification",
+      "code": "CLAIM_VERIFICATION_UNSUPPORTED",
+      "describe": "Formal-verification wording is admitted only for an external fact backed by a proof-discharge receipt.",
+      "patterns": ["\\bformally verified\\b", "\\bproven correct\\b", "\\bmachine-checked proof\\b"],
+      "admitted": { "classification": ["external-fact"], "requireSource": { "kind": "evidence-receipt", "sourceTag": "proof-discharge" } }
+    },
+    {
+      "id": "availability",
+      "code": "CLAIM_AVAILABILITY_UNSUPPORTED",
+      "describe": "Availability wording is admitted only for a current product claim backed by a fresh release receipt.",
+      "patterns": ["\\bgenerally available\\b", "\\bga\\b", "\\bin production\\b", "\\bavailable today\\b", "\\bproduction-ready\\b"],
+      "admitted": { "classification": ["product-claim"], "status": ["current"], "requireSource": { "kind": "evidence-receipt", "sourceTag": "release", "freshDays": 90 } }
+    },
+    {
+      "id": "absolutes",
+      "code": "CLAIM_ABSOLUTE_UNSUPPORTED",
+      "describe": "Absolute or guarantee wording is admitted only for a quoted external fact or when the limits note explicitly softens it.",
+      "patterns": ["\\bnever\\b", "\\balways\\b", "\\bguarantee(s|d)?\\b", "\\beliminates? risk\\b", "\\bzero risk\\b"],
+      "admitted": [
+        { "classification": ["external-fact"] },
+        { "requireLimits": true, "limitsContainsAny": ["designed", "intended", "no guarantee", "cannot", "does not", "not claimed", "stops at", "planned"] }
+      ]
+    },
+    {
+      "id": "standard-state",
+      "code": "CLAIM_STANDARD_STATE_UNSOURCED",
+      "describe": "Standard lifecycle assertions need an external-url ref with a declared lifecycle and a present effectiveAt.",
+      "patterns": [
+        "\\b(hipaa|gdpr|sox|pci[- ]?dss)[^.]{0,40}\\b(requires|mandates)\\b",
+        "\\bis in force\\b",
+        "\\bproposed rule\\b",
+        "\\b(takes effect|became effective|was finalized)\\b"
+      ],
+      "admitted": { "requireEffectiveAt": true, "requireSource": { "kind": "external-url", "requireLifecycle": true } }
+    },
+    {
+      "id": "architecture-as-product",
+      "code": "CLAIM_LAB_LABEL_MISSING",
+      "describe": "Proposed architecture or proposed status needs a visible Lab or Preview label; page posture is enforced by the publisher.",
+      "appliesTo": [
+        { "classification": ["proposed-architecture"] },
+        { "status": ["proposed"] }
+      ],
+      "admitted": { "requireLabel": ["Lab", "Preview"] }
+    }
+  ],
+  "refusalCodes": {
+    "CLAIM_NOT_DECLARED": { "enforcedBy": ["verify-claims"], "meaning": "A referenced claim revision is not declared." },
+    "CLAIM_DIGEST_MISMATCH": { "enforcedBy": ["publish", "read"], "meaning": "A pinned claim digest does not match the declared document digest." },
+    "CLAIM_CONTRACT_UNSUPPORTED": { "enforcedBy": ["verify-claims", "read"], "meaning": "The document contract is not ui-claim.v1 at a known version." },
+    "CLAIM_CLASSIFICATION_INVALID": { "enforcedBy": ["verify-claims"], "meaning": "Classification is outside the closed vocabulary." },
+    "CLAIM_STATUS_INVALID": { "enforcedBy": ["verify-claims"], "meaning": "Status is outside the closed vocabulary or not admitted for the classification." },
+    "CLAIM_BASIS_MISSING": { "enforcedBy": ["verify-claims"], "meaning": "Basis is absent, under 40 characters, boilerplate, identical to the statement, or a copy variant lacks its own basis." },
+    "CLAIM_SOURCE_REQUIRED": { "enforcedBy": ["verify-claims"], "meaning": "sourceRefs are missing, lack a required digest or locator, or the classification's required evidence kind is absent." },
+    "CLAIM_SOURCE_KIND_UNSUPPORTED": { "enforcedBy": ["verify-claims"], "meaning": "A sourceRef kind is outside the closed vocabulary." },
+    "CLAIM_DATE_MISSING": { "enforcedBy": ["verify-claims"], "meaning": "observedAt, effectiveAt or a required ref observedAt is absent or malformed." },
+    "CLAIM_OBSERVEDAT_FUTURE": { "enforcedBy": ["verify-claims"], "meaning": "observedAt is in the future." },
+    "CLAIM_EFFECTIVE_FUTURE_STATUS": { "enforcedBy": ["verify-claims"], "meaning": "effectiveAt is in the future for a status other than proposed." },
+    "CLAIM_RULES_VERSION_UNSUPPORTED": { "enforcedBy": ["verify-claims", "read"], "meaning": "The document names a rules version the rules file does not know." },
+    "CLAIM_COMPLIANCE_UNSUPPORTED": { "enforcedBy": ["verify-claims"], "meaning": "Compliance or attestation wording without an external fact backed by an attestation receipt." },
+    "CLAIM_COVERAGE_UNSOURCED": { "enforcedBy": ["verify-claims"], "meaning": "Coverage or universal wording without a fresh reader observation of the same measure." },
+    "CLAIM_COVERAGE_STALE": { "enforcedBy": ["verify-claims", "read"], "meaning": "Coverage wording whose required reading observation is older than its freshness window." },
+    "CLAIM_OBSERVATION_STALE": { "enforcedBy": ["verify-claims", "read"], "meaning": "A digest-backed observation ref is older than its freshness window." },
+    "CLAIM_VERIFICATION_UNSUPPORTED": { "enforcedBy": ["verify-claims"], "meaning": "Formal-verification wording without a proof-discharge receipt." },
+    "CLAIM_AVAILABILITY_UNSUPPORTED": { "enforcedBy": ["verify-claims"], "meaning": "Availability wording without a current product claim backed by a fresh release receipt." },
+    "CLAIM_ABSOLUTE_UNSUPPORTED": { "enforcedBy": ["verify-claims"], "meaning": "Absolute or guarantee wording without a quoted external fact or a limits note that softens it." },
+    "CLAIM_STANDARD_STATE_UNSOURCED": { "enforcedBy": ["verify-claims"], "meaning": "Standard lifecycle wording without an external-url ref declaring its lifecycle and a present effectiveAt." },
+    "CLAIM_LAB_LABEL_MISSING": { "enforcedBy": ["verify-claims", "render"], "meaning": "Proposed architecture or proposed status without a Lab or Preview label." },
+    "CLAIM_PROPOSED_POSTURE_MISMATCH": { "enforcedBy": ["publish"], "meaning": "A proposed claim on a page without research posture; not wired in this tool half." },
+    "CLAIM_TEXT_MISMATCH": { "enforcedBy": ["verify-claims", "publish", "read"], "meaning": "Claim-bound copy does not equal the approved statement or a basis-bearing copy variant." },
+    "CLAIM_REQUIRED": { "enforcedBy": ["verify-claims", "publish", "read"], "meaning": "Copy triggers a wording rule with no claim attachment." },
+    "CLAIM_SUPERSEDED_REFERENCED": { "enforcedBy": ["publish", "read"], "meaning": "A current section references a superseded revision without historical context; not wired in this tool half." },
+    "CLAIM_HISTORICAL_WITHOUT_WINDOW": { "enforcedBy": ["verify-claims"], "meaning": "Historical status without effectiveAt and supersededAt." },
+    "CLAIM_HISTORICAL_RENDERED_CURRENT": { "enforcedBy": ["render"], "meaning": "Historical claim rendered as current; not wired in this tool half." }
+  }
+}
