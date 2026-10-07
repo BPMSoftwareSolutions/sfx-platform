@@ -1,0 +1,18 @@
+{
+  "gate": "WP0.5",
+  "at": "2026-10-07T20:20:00Z",
+  "base": "https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net",
+  "page": "/circuit/home",
+  "revision": 4,
+  "pageDigest": "b589288708f43051484b4375b340b5add0c54b430ea1751abeabee5f144d8cd8",
+  "method": "stopwatch over GET /api/circuit/v1/page: cold = refresh=1 kernel invoke, warm = the existing cached read",
+  "coldMilliseconds": [1378, 1148, 1128],
+  "warmMilliseconds": [49, 50, 40],
+  "budget": {
+    "timeoutMilliseconds": 30000,
+    "cache": "24 entries / 32 MiB / 30 s TTL; errors and degradations no-store",
+    "maximumConcurrentReads": 2,
+    "maximumQueuedReads": 32
+  },
+  "note": "One kernel invoke per page read; well inside the declared budget. Cold reads are heavier than the canonical scenario read; the page declares at most 8 sources."
+}
