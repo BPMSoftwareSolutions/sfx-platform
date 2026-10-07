@@ -103,6 +103,66 @@ media is a class (a) deploy (§4.6, C5).
 
 ---
 
+## Phase 0 status (2026-10-07)
+
+Phase 0 has started after the Revision 3 entry decisions (G1, G4, G6). This is a status record, not
+a change to the phase deliverables or exit criteria in §10.
+
+**Work landed.**
+
+- **P0.1 — `sfx-embody` `5c4b3b4`, "Declare the UI page reading and its publication mechanics":**
+  the `sidefx_ui` declaration content, the `read-ui-page` kernel reader, the CAS
+  `stage_ui_page`/`promote_ui_page`/`rollback_ui_page` procedures (a stale promote is refused
+  in-transaction as `UI_PAGE_POINTER_MOVED`, `declare-ui-page-reading.commit.sql:639-662`) and the
+  `tools/publish-ui-page.mjs` orchestrator.
+- **P0.2–P0.4 — `sfx-platform` `a75ea60`, "Serve declared UI pages from the estate":** the
+  `readers.page` host reader, `page-runtime.js`, `ui-components.js`, `page.html`/`page.js`, the
+  generic `/circuit/<slug>` route host, the home conversion, the page fixtures and
+  `verify-pages.mjs`. `bcf1e52`, "Render the declared component contract roles", corrects the
+  adapters to the `ui-component.v1` role vocabulary.
+- **Receipt commits.** `cfc4341` records the first data-only home publication; `9139d23` records
+  the declared page read latency receipt.
+- **Staging.** Run `37678767890` is green for `composite-a75ea60168cd-37678767890-1` (head
+  `a75ea60`); run `37686014991` is green for the role-vocabulary fix (head `bcf1e52`). Both run
+  `verify-pages.mjs --fixtures` in checks; the public acceptance reads
+  `/api/circuit/v1/page?path=/circuit/home` and `/api/circuit/v1/ui-registry` and exercises the
+  page 404/409/400 refusals (`deploy/staging/accept.mjs`).
+
+**Acceptance gates (§9.2).**
+
+| Gate | Status | Evidence |
+| --- | --- | --- |
+| WP0.1 | Done | `evidence/WP0-publish-2026-10-07T200052.json`: revision 4 promoted, candidate and post-promotion reads at digest `b589288708f43051484b4375b340b5add0c54b430ea1751abeabee5f144d8cd8`; an earlier attempt refused `UI_PAGE_REVISION_EXISTS` (`…T200044.json`). |
+| WP0.2 | Done | Named refusals exercised by `verify-pages.mjs --fixtures` over `fixtures/pages/unknown-component.json` and `unknown-action.json` (`422 UI_DECLARATION_INVALID`, no sections served); green in both staging runs. |
+| WP0.3 | Done | Digest pin/mismatch/malformed groups (200/409/400) in `verify-pages.mjs --fixtures`; staged public acceptance asserts `PAGE_SNAPSHOT_CHANGED` 409 and malformed-digest 400 on `/api/circuit/v1/page`; degraded fallback exercised by `fixtures/pages/degraded.json`. |
+| WP0.4 | Done | `evidence/WP0-publish-rev2.json` (clean promote) and `evidence/WP0-publish-rev3.json` (post-verify failure → automatic CAS rollback to revision 2, `UI_PAGE_POST_VERIFY_FAILED_DRILL`); the stale-promote CAS refusal is proved in-transaction by the migration pair (`declare-ui-page-reading.commit.sql:639-662`). |
+| WP0.5 | Done | `evidence/WP0-latency-2026-10-07.json`: revision 4, cold 1,128–1,378 ms, warm 40–50 ms, inside the declared budget. |
+| WP0.6 | **Pending** | Signed-in home was not captured: `capture.json` marks `home-signed-in-desktop`/`mobile` pending, reason `TEST_PRINCIPAL_CREDENTIALS_UNAVAILABLE`; the test-principal credentials are acquired only in CI through the workflow's OIDC identity (`deploy/staging/accept.mjs:1`). Plan: capture through the staging browser gate (`accept.mjs browser`). |
+| WP0.7 | **Source-checked only** | `verify-pages.mjs --safety` checks `textContent`/`safeUrl` and the unsafe fixtures; its own limitation note says DOM execution proof needs the browser gate. The DOM proof is pending. |
+
+**Visual review deck (U1).** `sfx-providers/outputs/capability-estate/live-circuit-platform-explorer/U1/declarative-ui-circuits-U1.pptx`
+(with `sources/visual/capture.json` and its render PNGs) is built from real captures of the running
+local host at revision 4 / digest `b5892887…d8cd8` — signed-out home (desktop and mobile) and
+Explorer — and its annotation slides place the measured DOM rectangles of all ten declared
+sections on the captures; `verify_deck.py` re-checks image hashes and rectangle geometry against
+the capture (254 checks, 0 failures). This capture exposed the role-vocabulary defect (the adapters
+used internal prop names instead of the `ui-component.v1` roles, so most home sections refused at
+render); it is fixed in `bcf1e52` and redeployed in run `37686014991`. The deck's signed-in
+captures remain pending with WP0.6.
+
+**One shared database.** Local development (observer `8788` plus local API `8799` over the
+installed `database-memory` kernel delivery, `SDA_ESTATE_DIR=sfx-embody`) and staging read one
+estate database, so the `declare-ui-page-reading` pair is installed once: staging acceptance in
+run `37678767890` read the published `/circuit/home` as `READ` with no staging-side install step,
+and the U1 capture set shows the same revision 4 the local publisher wrote.
+
+**Unconfirmed.** WP0.2 and WP0.3 have no standalone `evidence/WP0-<date>.json` receipts as the
+§9.2 convention expects; their evidence is the green CI `verify-pages.mjs --fixtures` step and the
+staged acceptance assertions. All other items above are supported by the cited commits, receipts,
+runs or files.
+
+---
+
 ## 2. Problem and evidence
 
 ### 2.1 Deploy-per-change
