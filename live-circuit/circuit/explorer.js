@@ -7,6 +7,7 @@ import { el } from './circuit-viewer.js';
 import { createCircuitRuntime } from './circuit-runtime.js';
 import { workspace, nodeStatus, nodeRows, sceneKey, selectionForScene, rowLabel } from './explorer-model.mjs';
 import { createPaneLayout } from './pane-layout.js';
+import { createObjectiveRun, admissionBody, OBJECTIVE_CAPABILITY } from './objective-run.js';
 
 const params = new URLSearchParams(location.search);
 const requestedFrom = p => ({ page: p.get('page'), detail: p.get('detail'), pointer: p.get('pointer') ?? '', detailPage: p.get('detailPage'), view: p.get('view'), run: p.get('run') });
@@ -287,6 +288,26 @@ const layout = createPaneLayout({
     { id: 'tree', variable: '--tree', side: 'left', handle: 'resizer-tree', aside: 'tree', toggle: 'toggle-tree', name: 'sections', minimum: 220, maximum: 640, defaultWidth: 300 },
     { id: 'context', variable: '--context', side: 'right', handle: 'resizer-context', aside: 'context', toggle: 'toggle-context', name: 'details', minimum: 300, maximum: 760, defaultWidth: 380 }
   ]
+});
+// The universal capability's objective row, above the run bar. Run admits it,
+// then the Explorer switches to that circuit and follows the run.
+async function followObjectiveRun(runId) {
+  if (state.capability !== OBJECTIVE_CAPABILITY) {
+    Object.assign(state, { capability: OBJECTIVE_CAPABILITY, namespace: '', scenario: '', node: '', row: null, component: null });
+    $('capability').value = state.capability;
+    syncUrl(true);
+    await open(false, { run: runId });
+  } else {
+    await runtime.openRun(runId);
+  }
+}
+createObjectiveRun({
+  admit: objective => json('/api/circuit/v1/runs', { method: 'POST',
+    headers: { 'idempotency-key': crypto.randomUUID() }, body: JSON.stringify(admissionBody(objective)) }),
+  follow: followObjectiveRun,
+  signIn: () => { location.assign('/circuit/login?return=' + encodeURIComponent(location.pathname + location.search)); },
+  currentCapability: () => state.capability,
+  runState: () => ({ id: runtime.state.apiId, result: runtime.state.apiResult, output: runtime.state.output, error: runtime.state.outputError })
 });
 window.addEventListener('popstate', () => {
   const p = new URLSearchParams(location.search), previous = { ...state }, requested = requestedFrom(p);

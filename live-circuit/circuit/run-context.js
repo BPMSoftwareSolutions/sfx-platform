@@ -1,5 +1,6 @@
 import { el } from './circuit-viewer.js';
 import { evidenceModel, componentEvidence, milliseconds, runLink, traceCsv } from './run-evidence.mjs';
+import { summaryPlayer } from './objective-run.js';
 
 const $ = id => document.getElementById(id);
 const p = (text, cls = 'note') => el('p', { text, class: cls });
@@ -70,6 +71,8 @@ export function createRunContext(hooks) {
     root.append(heading('Asked'), missing('Input is not retained in the run API. The editable input below is a draft, not a record of this run.'), heading('Answered'));
     if (current.output !== undefined) root.append(values(current.output));
     else root.append(missing(current.outputError ?? 'No retained API output is available for this capture.'));
+    const summary = current.output && typeof current.output === 'object' ? current.output.summary : null;
+    if (typeof summary === 'string' && summary.trim()) root.append(summaryPlayer(summary));
     root.append(heading('Providers called'));
     for (const call of model.providers) root.append(button(`${call.label} · ${milliseconds(call.duration)} · ${call.outcomeVariant ?? call.disposition ?? 'observed'}`, () => hooks.select(call.nodeId)),
       p(`${call.operation} · owning operation. Exchange: ${milliseconds(call.exchangeDuration)}.`));

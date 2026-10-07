@@ -36,6 +36,7 @@ jobs:
       - run: node deploy/sda-kernel/verify-composite-package.mjs
       - run: node live-circuit/circuit/verify-identity-session.mjs
       - run: node live-circuit/circuit/verify-run-api.mjs
+      - run: node live-circuit/circuit/verify-objective.mjs
       - run: node live-circuit/dispatch-pair/verify-run-scoped-sse.mjs
       - run: node deploy/sda-kernel/verify-observer-bridge.mjs
 

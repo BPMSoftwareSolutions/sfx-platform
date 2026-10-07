@@ -129,6 +129,35 @@
   .input-field .invalid { border-color: var(--amber); }
   #payload { min-height: 92px; }
   .json-label { display: block; color: var(--dim); font-size: 12px; margin: 10px 0 4px; }
+  /* Objective row: the universal capability's composer, above the run bar. */
+  .objective-panel { margin: 0 0 10px; }
+  .objective-row { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; background: rgba(8, 26, 43, .92); border: 1px solid var(--line); border-radius: 8px; }
+  .objective-field { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  #objective-input { width: 100%; min-height: 34px; max-height: 140px; resize: vertical; border: 0; background: transparent; color: var(--white); font: 14px/1.5 Arial, sans-serif; padding: 4px 0 0; }
+  #objective-input:focus-visible { outline: 0; }
+  .objective-field .voice-status { min-height: 16px; color: var(--dim); font-size: 11px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .objective-field .voice-status.listening { color: var(--observation); }
+  .objective-mic { height: 34px; width: 38px; display: inline-flex; align-items: center; justify-content: center; flex: none; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 6px; color: var(--white); cursor: pointer; }
+  .objective-mic:hover:not(:disabled) { border-color: var(--observation); }
+  .objective-mic .objective-mic-icon { width: 20px; height: 20px; display: block; fill: currentColor; }
+  .objective-mic.listening { color: var(--bg); background: var(--observation); border-color: var(--observation); }
+  .objective-mic:disabled { opacity: .45; cursor: default; }
+  .objective-run { min-width: 66px; height: 34px; }
+  .objective-status { color: var(--muted); font-size: 12px; margin: 4px 0 0; overflow-wrap: anywhere; }
+  .objective-status.error { color: var(--red); }
+  .summary-strip { display: flex; gap: 10px; align-items: center; margin-top: 6px; padding: 6px 10px; background: rgba(8, 26, 43, .92); border: 1px solid var(--line); border-radius: 8px; }
+  .summary-strip[hidden] { display: none; }
+  .summary-player { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .summary-player .summary-label { color: var(--violet); font-size: 13px; }
+  .summary-player .summary-note { color: var(--dim); font-size: 12px; }
+  .summary-rate { font: 12px Arial, sans-serif; padding: 4px 6px; color: var(--white); background: var(--panel-solid); border: 1px solid var(--line); border-radius: 6px; }
+  .requested-strip { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; }
+  .requested-strip[hidden] { display: none; }
+  .requested-chip { border: 1px solid var(--line); border-radius: 9px; padding: 2px 10px; font-size: 12px; color: var(--white); background: rgba(8, 26, 43, .9); }
+  .requested-chip[data-state="running"] { border-color: var(--observation); color: var(--observation); }
+  .requested-chip[data-state="completed"] { border-color: var(--green); color: var(--green); }
+  .requested-chip[data-state="failed"] { border-color: var(--red); color: var(--red); }
+  .requested-chip[data-state="not-observable"] { border-style: dashed; border-color: var(--amber); color: var(--amber); }
   .observe-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 6px; }
   #observe-status { font-size: 12px; overflow-wrap: anywhere; margin: 6px 0; }
   @media (max-width: 1150px) { .evidence-grid { grid-template-columns: 1fr; } }
@@ -176,6 +205,23 @@
     <div class="scenario-bar" id="scenario-bar" hidden><label for="scenario">Scenario</label><select id="scenario"></select><span id="scenario-note"></span></div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Capability sections"></nav>
     <section class="panel circuit-panel" aria-label="Scenario circuit">
+      <section class="objective-panel" aria-label="Objective (universal capability)">
+        <form class="objective-row" id="objective-form">
+          <div class="objective-field">
+            <textarea id="objective-input" rows="1" spellcheck="true" autocomplete="off" aria-label="Objective" placeholder="Describe the objective — the universal capability picks and runs one."></textarea>
+            <span class="voice-status" id="objective-voice-status" aria-live="polite">Voice ready</span>
+          </div>
+          <button class="objective-mic" id="objective-mic" type="button" aria-pressed="false" title="Start dictation" aria-label="Start dictation">
+            <svg class="button-icon objective-mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18.585 13.412a.9.9 0 0 1 1.668.676 8.91 8.91 0 0 1-7.353 5.516V22a.9.9 0 0 1-1.8 0v-2.396a8.91 8.91 0 0 1-7.352-5.516.9.9 0 0 1 1.668-.676 7.104 7.104 0 0 0 13.169 0"></path>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.35a4.9 4.9 0 0 1 4.9 4.9v4.483a4.9 4.9 0 0 1-9.8 0V6.25a4.9 4.9 0 0 1 4.9-4.9m0 1.8a3.1 3.1 0 0 0-3.1 3.1v4.483a3.1 3.1 0 1 0 6.2 0V6.25a3.1 3.1 0 0 0-3.1-3.1"></path>
+            </svg>
+          </button>
+          <button class="button primary small objective-run" id="objective-run" type="submit">Run</button>
+        </form>
+        <div class="objective-status" id="objective-run-status" role="status" aria-live="polite"></div>
+        <div class="summary-strip" id="summary-strip" hidden></div>
+      </section>
       <div class="run-bar">
         <strong id="mode" class="mode live">LIVE RECEIPTS · real-time</strong>
         <button id="replay" type="button" disabled>Replay latest run</button>
@@ -203,6 +249,7 @@
       </div>
       <div class="legend">Bright: latest receipt / recorded interval · Dim: observed history · <span class="warning">Input</span> · <span style="color:var(--green)">Completed</span> · <span class="error">Failure</span> · Dashed input: field presence unavailable · Unlit: no matching evidence</div>
       <section id="invocation-timeline" aria-label="Invocation timing" hidden></section>
+      <section id="requested-capabilities" class="requested-strip" aria-label="Requested capabilities" hidden></section>
     </section>
     <details class="panel run-evidence"><summary>Run evidence: verification and execution testimony</summary>
       <div class="evidence-grid"><section id="verification"></section><section id="inventory"></section></div></details>

@@ -9,7 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { workspace, nodeStatus, nodeRows } from './explorer-model.mjs';
 const [base, ...capabilities] = process.argv.slice(2);
 assert(base && capabilities.length, 'Supply base URL and capability IDs');
-const sources = Object.fromEntries(await Promise.all(['explorer.js', 'explorer-model.mjs', 'explorer.html', 'pane-layout.js']
+const sources = Object.fromEntries(await Promise.all(['explorer.js', 'explorer-model.mjs', 'explorer.html', 'pane-layout.js', 'objective-run.js']
   .map(async file => [file, await readFile(new URL(`./${file}`, import.meta.url), 'utf8')])));
 const client = Object.values(sources).join('\n');
 // The two sidebars are focusable separators; the layout module owns their behavior.
@@ -21,6 +21,7 @@ for (const [id, pane] of [['resizer-tree', 'tree'], ['resizer-context', 'context
   assert.match(tag, /tabindex="0"/, `${id} is keyboard reachable`);
 }
 assert.match(client, /createPaneLayout\(/, 'The layout module drives the splitters');
+
 const evidence = [];
 for (const capabilityId of capabilities) {
   const response = await fetch(new URL(`/api/circuit/v1/capability-details?${new URLSearchParams({ capabilityId })}`, base));

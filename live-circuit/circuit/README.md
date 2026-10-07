@@ -69,6 +69,12 @@ gone; `/circuit` and `/circuit/` redirect here, keeping their query. The regions
   **Sections** and **Observe & details** buttons collapse them, and widths plus
   collapsed state persist per browser. Below 1150 px the same buttons open the
   drawers instead.
+- **Objective row:** above the run bar, the universal `request-capability-from-objective-v3`
+  composer. Type or dictate an objective (the prompt shell's mic icon and voice status), press
+  **Run**, and the Explorer switches to that capability and follows the run. The
+  requested-capabilities strip sits under the circuit with honest attribution, and the summary
+  player speaks only the returned `summary` field. Text always works when dictation or audio is
+  unavailable.
 - **Circuit and run bar:** the selected scenario's database scene, drawn by
   `renderCircuitViewer`, with the circuit runtime mounted on it: live following of
   observer runs, captured replay (pause, step, speed, return to live), follow

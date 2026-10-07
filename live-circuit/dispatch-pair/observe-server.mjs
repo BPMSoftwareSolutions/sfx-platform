@@ -31,6 +31,7 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/circuit-runtime.js', ['circuit-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer-model.mjs', ['explorer-model.mjs', 'text/javascript; charset=utf-8']],
   ['/circuit/pane-layout.js', ['pane-layout.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/objective-run.js', ['objective-run.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-canvas.css', ['circuit-canvas.css', 'text/css; charset=utf-8']],
   ['/circuit/site.js', ['site.js', 'text/javascript; charset=utf-8']],
   ['/circuit/site.css', ['site.css', 'text/css; charset=utf-8']],
