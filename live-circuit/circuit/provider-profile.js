@@ -132,17 +132,31 @@ export function renderProviderProfile(data) {
   }
 
   host.append(el('h4', { text: 'Instructions \u00b7 SYSTEM / USER declarations, projections, fixtures' }));
-  if (!model.instructions.rows.length) host.append(el('p', { class: 'note', text: 'No instruction rows.' }));
-  for (const instruction of model.instructions.rows) {
-    const kind = show(first(instruction, ['instruction_kind', 'kind']));
-    const path = show(first(instruction, ['json_path', 'path', 'member_path']));
-    const value = first(instruction, ['value', 'instruction_value', 'template', 'member_value']);
-    const editable = /^DECLARED_/.test(kind) && first(instruction, ['definition_digest', 'digest']) != null;
-    const fold = el('details', { class: 'record' }, [el('summary', { text: `${kind} \u00b7 ${path}` }),
-      el('div', { class: 'answer-fields' }, Object.entries(instruction).flatMap(([k, v]) => [el('dt', { text: k }), el('dd', { text: show(v) })])),
-      ...(editable ? [instructionEditor(fold, data, instruction)] : [el('p', { class: 'note', text: 'Fixture, projected or mapped copy \u2014 not the declared template; view only.' })])]);
-    host.append(fold);
-  }
+  const instructionHost = el('div', {});
+  host.append(instructionHost);
+  const renderInstructions = limit => {
+    instructionHost.replaceChildren();
+    const rows = model.instructions.rows;
+    if (!rows.length) { instructionHost.append(el('p', { class: 'note', text: 'No instruction rows.' })); return; }
+    if (rows.length > limit) instructionHost.append(el('p', { class: 'note', text: `${rows.length} instruction rows; showing the first ${limit}. A fixture-heavy provider lists every instruction-bearing transformation.` }));
+    for (const instruction of rows.slice(0, limit)) {
+      const kind = show(first(instruction, ['instruction_kind', 'kind']));
+      const path = show(first(instruction, ['json_path', 'path', 'member_path']));
+      const editable = /^DECLARED_/.test(kind) && first(instruction, ['definition_digest', 'digest']) != null;
+      const fold = el('details', { class: 'record' });
+      fold.append(el('summary', { text: `${kind} \u00b7 ${path}` }),
+        el('div', { class: 'answer-fields' }, Object.entries(instruction).flatMap(([k, v]) => [el('dt', { text: k }), el('dd', { text: show(v) })])),
+        ...(editable ? [] : [el('p', { class: 'note', text: 'Fixture, projected or mapped copy \u2014 not the declared template; view only.' })]));
+      if (editable) instructionEditor(fold, data, instruction);
+      instructionHost.append(fold);
+    }
+    if (rows.length > limit) {
+      const more = el('button', { type: 'button', class: 'button secondary small', text: `Show all ${rows.length} instructions` });
+      more.addEventListener('click', () => renderInstructions(rows.length));
+      instructionHost.append(more);
+    }
+  };
+  renderInstructions(200);
 
   host.append(el('h4', { text: 'Invocations \u00b7 fixtures' })); table(host, model.invocations);
   host.append(el('h4', { text: 'Summary' })); table(host, model.summary);
