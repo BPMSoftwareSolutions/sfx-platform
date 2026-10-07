@@ -8,7 +8,8 @@ This document is current for the platform after the 2026-10-07 revamp. It covers
 - `analysis.read_provider_details` — the complete provider reading (DAL-registered;
   admitted by the retrieval policy).
 - `model.install_provider_details_change` — the atomic provider-details writer
-  (installed in the estate; DAL registration is a one-time step below).
+  (installed in the estate and registered in `sfx-dal` as
+  `ModelInstallProviderDetailsChangeRepository`).
 - The layer writers it composes, which are already DAL-registered:
   `model.configure_provider`, `model.patch_port_configuration` /
   `model.replace_port_configuration`, `model.update_definition_member`.
@@ -216,11 +217,11 @@ Notes:
   repository after the one-time registration below; call it from a server-side
   tool, never from browser script, and keep the transaction at the caller.
 
-### One-time DAL registration for the atomic writer
+### DAL registration for the atomic writer
 
-The layer writers are already in `sfx-dal/SFX.DAL.Config.json`; the atomic
-writer needs one entry so platform services can call it through the generated
-DAL:
+The atomic writer is registered (`sfx-dal` `5973ca9`): the generated
+`ModelInstallProviderDetailsChangeRepository` is available to platform services.
+The recipe, for future procedures:
 
 1. In `sfx-dal/SFX.DAL.Config.json`, beside `configure_provider` and
    `update_definition_member`, add:
