@@ -1,0 +1,43 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/unsafe",
+  "pageId": "ui-page-unsafe",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "copyBasis": "Rendering-safety fixture (WP0.7). The text role must render script markup as literal text and the refused link scheme must never reach an href.",
+  "sections": [
+    {
+      "sectionId": "unsafe-text",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+      "props": {
+        "as": "paragraph",
+        "text": "<script>alert(1)</script>",
+        "link": { "href": "javascript:alert(1)", "label": "This destination must never become an href" }
+      },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "unsafe-notice",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
+      "props": { "kind": "warning", "text": "Markup in text roles is data and renders as literal text." },
+      "bindings": {},
+      "actions": []
+    }
+  ]
+}

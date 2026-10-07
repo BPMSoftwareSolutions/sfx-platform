@@ -45,6 +45,7 @@ try {
     const checks = [];
     for (const [route, method, expected] of [
       ['/', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/circuit-runtime.js', 'GET', 200], ['/circuit/app.js', 'GET', 404], ['/circuit/session-status.js', 'GET', 404], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200], ['/circuit/pane-layout.js', 'GET', 200], ['/circuit/objective-run.js', 'GET', 200], ['/circuit/provider-profile.js', 'GET', 200],
+      ['/circuit/page.html', 'GET', 200], ['/circuit/page.js', 'GET', 200], ['/circuit/page-runtime.js', 'GET', 200], ['/circuit/ui-components.js', 'GET', 200],
       ['/healthz','GET',200], ['/readyz','GET',200], ['/v1/runs/ready','GET',401], ['/internal/deployment','GET',401],
       ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/procedure-extract/json','POST',401],
       ['/robots.txt','GET',200], ['/favicon.ico','GET',200], ['/capabilities','GET',404], ['/about','GET',404], ['/sitemap.xml','GET',404]
@@ -76,6 +77,23 @@ try {
     assert.equal(unknown.status,404); assert.equal((await unknown.json()).error,'CAPABILITY_NOT_FOUND');
     checks.push({route:'/api/circuit/v1/capability-details',sets:Object.keys(details.sets).length,navigationRows:navigation.length,readingDefinitionSha256:details.readingDefinitionSha256},
       {route:'/api/circuit/v1/capability-details',capabilityId:'no-such-capability-for-details',status:404});
+    // The declarative UI circuit: the deployed registry manifest, a declared
+    // page read, and the digest/refusal paths.
+    const registry = await json(config.origin + '/api/circuit/v1/ui-registry');
+    assert.equal(registry.contractId,'ui-registry.v1');
+    const declaredPage = await json(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home'));
+    assert.equal(declaredPage.contractId,'ui-page.v1'); assert.equal(declaredPage.status,'READ'); assert(declaredPage.pageDigest,'pageDigest required');
+    const missingPage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/does-not-exist'),{redirect:'error',signal:AbortSignal.timeout(90000)});
+    assert.equal(missingPage.status,404); assert.equal((await missingPage.json()).error,'PAGE_NOT_FOUND');
+    const stalePage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home') + '&expectedPageDigest=' + '0'.repeat(64),{redirect:'error',signal:AbortSignal.timeout(90000)});
+    assert.equal(stalePage.status,409); assert.equal((await stalePage.json()).error,'PAGE_SNAPSHOT_CHANGED');
+    const malformedPage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home') + '&expectedPageDigest=xyz',{redirect:'error',signal:AbortSignal.timeout(90000)});
+    assert.equal(malformedPage.status,400); assert.equal((await malformedPage.json()).error,'INVALID_CIRCUIT_SELECTION');
+    checks.push({route:'/api/circuit/v1/ui-registry',contractId:registry.contractId,components:registry.components.length},
+      {route:'/api/circuit/v1/page',path:'/circuit/home',status:declaredPage.status,pageDigest:typeof declaredPage.pageDigest === 'string'},
+      {route:'/api/circuit/v1/page',path:'/circuit/does-not-exist',status:404},
+      {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'stale',status:409},
+      {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'malformed',status:400});
     const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
     const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);
     const inspections = [];

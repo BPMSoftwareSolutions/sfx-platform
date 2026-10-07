@@ -1,0 +1,10 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "SNAPSHOT_CHANGED",
+  "path": "/circuit/stale",
+  "pageId": "ui-page-home",
+  "revision": 1,
+  "pageDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reason": "The pinned expectedPageDigest no longer matches the published revision; the file-backed fixture source returns the declared refusal.",
+  "error": "PAGE_SNAPSHOT_CHANGED"
+}

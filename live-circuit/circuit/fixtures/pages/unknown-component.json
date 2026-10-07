@@ -1,0 +1,32 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/unknown-component",
+  "pageId": "ui-page-unknown-component",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "1111111111111111111111111111111111111111111111111111111111111111",
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "refusal": "UI_DECLARATION_INVALID",
+  "reason": "Section home-unknown-declares a component kind the deployed ui-registry does not support; the reading refuses instead of dropping the section.",
+  "error": "UI_DECLARATION_INVALID",
+  "sections": [
+    {
+      "sectionId": "home-unknown-component",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "galaxy", "version": 1, "contractDigest": "2222222222222222222222222222222222222222222222222222222222222222" },
+      "props": { "text": "This section names a component kind the shell has never admitted." },
+      "bindings": {},
+      "actions": []
+    }
+  ]
+}

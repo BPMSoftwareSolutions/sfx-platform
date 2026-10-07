@@ -230,6 +230,76 @@ export async function readCapabilityDetails(selection, refresh = false) {
     throw new CircuitReadError('CAPABILITY_DETAILS_CONTRACT_MISMATCH');
   return { ...data, source: 'database' };
 }
+// The complete declared-page reading (ui-page.v1), validated server-side against
+// the deployed registry before it is served. An unknown component kind, action
+// kind or source is a named refusal; a READ page with no sections is never
+// served as an empty shell.
+const pageRefusals = { NOT_FOUND: ['PAGE_NOT_FOUND', 404], NOT_DECLARED: ['PAGE_NOT_DECLARED', 404],
+  SNAPSHOT_CHANGED: ['PAGE_SNAPSHOT_CHANGED', 409] };
+const pageActions = new Set(['navigate', 'select', 'session', 'observe', 'objective', 'playback', 'view',
+  'toggle', 'pane', 'copy/download', 'stage-change', 'refresh']);
+const pageSources = new Set(['catalog', 'scenario', 'details', 'provider-inspection', 'session', 'release']);
+function pageSourceNamed(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  if (typeof value.reader === 'string') return value.reader;
+  return typeof value.source === 'string' ? value.source : null;
+}
+function validatePage(data) {
+  if (data.status === 'READ' && (!Array.isArray(data.sections) || data.sections.length === 0))
+    throw new CircuitReadError('UI_DECLARATION_INVALID', 422);
+  const allowed = new Map((policy.ui?.components ?? []).map(component => [component.kind, component.version]));
+  for (const section of data.sections ?? []) {
+    if (allowed.get(section?.component?.kind) !== section?.component?.version)
+      throw new CircuitReadError('UI_DECLARATION_INVALID', 422);
+    for (const binding of Object.values(section.bindings ?? {})) {
+      const source = pageSourceNamed(binding);
+      if (source && !pageSources.has(source)) throw new CircuitReadError('UI_DECLARATION_INVALID', 422);
+    }
+    for (const action of section.actions ?? []) {
+      if (!pageActions.has(action?.kind)) throw new CircuitReadError('UI_DECLARATION_INVALID', 422);
+      for (const binding of Object.values(action.input ?? {})) {
+        const source = pageSourceNamed(binding);
+        if (source && !pageSources.has(source)) throw new CircuitReadError('UI_DECLARATION_INVALID', 422);
+      }
+    }
+  }
+}
+export async function readPage(selection, refresh = false) {
+  const payload = {};
+  for (const key of ['path', 'expectedPageDigest', 'revision']) {
+    const value = selection[key];
+    if (value == null || value === '') continue;
+    if (typeof value !== 'string' || value.length > 400 || /[\u0000-\u001f]/.test(value))
+      throw new CircuitReadError(key === 'path' ? 'PAGE_REQUIRED' : 'INVALID_CIRCUIT_SELECTION', 400);
+    payload[key] = value;
+  }
+  if (!payload.path) throw new CircuitReadError('PAGE_REQUIRED', 400);
+  if (payload.expectedPageDigest && !/^[a-f0-9]{64}$/.test(payload.expectedPageDigest)) throw new CircuitReadError('INVALID_CIRCUIT_SELECTION', 400);
+  if (payload.revision && !/^[0-9]+$/.test(payload.revision)) throw new CircuitReadError('INVALID_CIRCUIT_SELECTION', 400);
+  const fixtureDirectory = process.env.SFX_PAGE_FIXTURE_DIR;
+  if (fixtureDirectory) {
+    const slug = payload.path.split('/').filter(Boolean).pop();
+    if (!slug || /[\\/]/.test(slug)) throw new CircuitReadError('PAGE_NOT_FOUND', 404);
+    let text;
+    try { text = await readFile(path.join(path.resolve(fixtureDirectory), `${slug}.json`), 'utf8'); }
+    catch { throw new CircuitReadError('PAGE_NOT_FOUND', 404); }
+    const document = JSON.parse(text);
+    if (typeof document?.error === 'string') {
+      const status = document.error.includes('NOT_FOUND') || document.error.includes('NOT_DECLARED') ? 404
+        : document.error.includes('SNAPSHOT_CHANGED') ? 409 : 422;
+      throw new CircuitReadError(document.error, status);
+    }
+    return { ...document, source: 'fixture' };
+  }
+  const { data } = await read('page', payload, refresh);
+  if (data.path !== payload.path) throw new CircuitReadError('CIRCUIT_SELECTION_MISMATCH');
+  if (pageRefusals[data.status]) throw new CircuitReadError(...pageRefusals[data.status]);
+  if (data.status !== 'READ' && data.status !== 'DEGRADED') throw new CircuitReadError('UI_DECLARATION_INVALID', 422);
+  if (payload.expectedPageDigest && String(data.pageDigest ?? '').replace(/^sha256:/, '') !== payload.expectedPageDigest)
+    throw new CircuitReadError('PAGE_SNAPSHOT_CHANGED', 409);
+  validatePage(data);
+  return { ...data, source: 'database' };
+}
 async function readProviderInspection(selection) {
   const endpoint = process.env.PROCEDURE_EXTRACT_ENDPOINT;
   if (!endpoint) throw new CircuitReadError('PROCEDURE_RETRIEVAL_NOT_CONFIGURED', 503);
@@ -280,6 +350,36 @@ async function readProviderInspection(selection) {
       ...(fallback ? { readerFallback: fallback } : {}), readAt: new Date().toISOString(), resultSets };
   } finally { release(); }
 }
+// The deployed shell registry the client validator and the publish gate consume.
+// Kinds, actions, sources and routes change only with a shell deploy; component
+// contract digests are deliberately absent because the shell does not know the
+// estate's authored digests.
+const uiRegistry = { contractId: 'ui-registry.v1',
+  shell: { routeHostVersion: '1', pageContractVersions: ['ui-page.v1', 'ui-page-definition.v1', 'ui-layout.v1', 'ui-component.v1'] },
+  components: policy.ui?.components ?? [],
+  actions: [
+    { kind: 'navigate', dispatchClass: 'local', inputs: [] },
+    { kind: 'select', dispatchClass: 'local', inputs: [] },
+    { kind: 'session', dispatchClass: 'session-post', inputs: ['intent', 'return'] },
+    { kind: 'observe', dispatchClass: 'session-post', inputs: ['subject', 'namespace', 'input'] },
+    { kind: 'objective', dispatchClass: 'session-post', inputs: ['objective'] },
+    { kind: 'playback', dispatchClass: 'local', inputs: [] },
+    { kind: 'view', dispatchClass: 'local', inputs: [] },
+    { kind: 'toggle', dispatchClass: 'local', inputs: [] },
+    { kind: 'pane', dispatchClass: 'local', inputs: [] },
+    { kind: 'copy/download', dispatchClass: 'local', inputs: [] },
+    { kind: 'stage-change', dispatchClass: 'local', inputs: [] },
+    { kind: 'refresh', dispatchClass: 'read', inputs: [] }
+  ],
+  sources: [
+    { sourceId: 'catalog', reader: 'catalog', route: '/api/circuit/v1/capabilities' },
+    { sourceId: 'scenario', reader: 'scenario', route: '/api/circuit/v1/scenario' },
+    { sourceId: 'details', reader: 'details', route: '/api/circuit/v1/capability-details' },
+    { sourceId: 'provider-inspection', reader: 'provider-inspection', route: '/api/circuit/v1/provider-inspection' },
+    { sourceId: 'session', reader: 'session', route: '/api/circuit/v1/session' },
+    { sourceId: 'release', reader: 'release', route: '/healthz' }
+  ],
+  limits: { maximumSources: policy.ui?.maximumSources } };
 export async function serveCircuitApi(req, res, url) {
   if (req.method !== 'GET' || !url.pathname.startsWith('/api/circuit/v1/')) return false;
   try {
@@ -288,6 +388,8 @@ export async function serveCircuitApi(req, res, url) {
     if (url.pathname === '/api/circuit/v1/capabilities') data = await readCatalog(refresh);
     else if (url.pathname === '/api/circuit/v1/scenario') data = await readScenario(Object.fromEntries(['capabilityId', 'namespaceId', 'scenarioId', 'detailId', 'detailPointer', 'expectedSnapshotDigest'].map(k => [k, url.searchParams.get(k)])), refresh);
     else if (url.pathname === '/api/circuit/v1/capability-details') data = await readCapabilityDetails(Object.fromEntries(['capabilityId', 'namespaceId'].map(k => [k, url.searchParams.get(k)])), refresh);
+    else if (url.pathname === '/api/circuit/v1/page') data = await readPage(Object.fromEntries(['path', 'expectedPageDigest', 'revision'].map(k => [k, url.searchParams.get(k)])), refresh);
+    else if (url.pathname === '/api/circuit/v1/ui-registry') data = uiRegistry;
     else if (url.pathname === '/api/circuit/v1/provider-inspection') data = await readProviderInspection(Object.fromEntries(['capabilityId', 'namespaceId', 'scenarioId', 'detailId', 'expectedSnapshotDigest'].map(k => [k, url.searchParams.get(k)])));
     else throw new CircuitReadError('CIRCUIT_RESOURCE_NOT_FOUND', 404);
     if (res.destroyed) return true;

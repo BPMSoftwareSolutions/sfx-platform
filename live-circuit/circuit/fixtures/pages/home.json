@@ -1,0 +1,292 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/home",
+  "pageId": "ui-page-home",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "title": "SFX Live Circuit Platform",
+  "pageDigest": "05ed5adc2ce23410783201d50d4b5c81f7d24735e2d4bbba0a436d2e97119a9f",
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "failure": {
+    "readFailed": "This page could not be read. The reading failed; no section is silently omitted.",
+    "unknownComponent": "This page declares a component the deployed shell does not support."
+  },
+  "sections": [
+    {
+      "sectionId": "home-hero",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "hero", "version": 1, "contractDigest": "a37c65a82d3fc1b93f1ca2fab570fba332c3fcde75f69bf4873e472d7ed6f739" },
+      "props": {
+        "eyebrow": "Your Live Circuit workspace",
+        "headline": "Follow a declared circuit from intent to effect",
+        "lede": "Choose a capability and follow its execution.",
+        "micro": "Runs you start carry your identity once you sign in.",
+        "primaryActionId": "open-explorer",
+        "primaryLabel": "Open the Live Circuit",
+        "secondaryActionId": "open-sign-in",
+        "secondaryLabel": "Sign in to observe",
+        "figureLabel": "Circuit"
+      },
+      "bindings": {
+        "figure": {
+          "kind": "read",
+          "reader": "scenario",
+          "input": { "capabilityId": "authenticate-ide-user", "namespaceId": "sidefx:capabilities", "page": "scenario-1" },
+          "pointer": "/slides/0"
+        }
+      },
+      "actions": [
+        { "actionId": "open-explorer", "kind": "navigate", "dispatchClass": "local", "to": "/circuit/explorer" },
+        { "actionId": "open-sign-in", "kind": "navigate", "dispatchClass": "local", "to": "/circuit/login?return=%2Fcircuit%2Fhome" }
+      ]
+    },
+    {
+      "sectionId": "home-counts",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "stat", "version": 1, "contractDigest": "a9da088e6b3b2088288c8a5e3ae29c7ade8cbd5ed77db07e5916f8f373d12f12" },
+      "props": {
+        "id": "counts",
+        "ariaLabel": "Live estate counts",
+        "items": [
+          { "valueId": "c-total", "label": "capabilities", "metric": "catalog.total", "binding": "catalog", "subId": "c-split" },
+          { "valueId": "c-scenarios", "label": "scenarios", "metric": "catalog.scenarios", "binding": "catalog", "sub": "Declared across the estate" },
+          { "valueId": "c-multi", "label": "multi-scenario capabilities", "metric": "catalog.multi", "binding": "catalog", "sub": "One circuit per scenario" },
+          { "valueId": "c-kernel", "label": "installed kernel", "metric": "kernel.language", "subMetric": "kernel.release", "binding": "release", "subId": "c-release", "sub": "Release not reported by this host" }
+        ]
+      },
+      "bindings": {
+        "catalog": { "kind": "read", "reader": "catalog", "pointer": "/capabilities" },
+        "release": { "kind": "read", "reader": "release" }
+      },
+      "actions": [
+        { "actionId": "refresh-counts", "kind": "refresh", "dispatchClass": "read", "source": "catalog" }
+      ]
+    },
+    {
+      "sectionId": "home-featured",
+      "regionId": "main",
+      "order": 3,
+      "component": { "kind": "card-list", "version": 1, "contractDigest": "5a68c842fd224c530eb0393ef9d2fab7f2840273813de124bf5fdf47613f54f2" },
+      "props": {
+        "heading": "Capabilities to explore",
+        "binding": "catalog",
+        "items": [
+          { "capabilityId": "authenticate-ide-user", "namespaceId": "sidefx:capabilities", "title": "Private sign-in", "body": "Receive an IDE session after credential verification.", "promise": "Separate principal, credential and session providers." },
+          { "capabilityId": "resolve-equity-market-price-evidence", "namespaceId": "sidefx:capabilities", "title": "Market-price evidence", "body": "Request observed equity prices through one canonical input.", "promise": "A consistent evidence outcome across suppliers." },
+          { "capabilityId": "execute-governed-model-invocation", "namespaceId": "sidefx:capabilities", "title": "Governed model calls", "body": "Obtain a normalized model response under declared authority.", "promise": "Execution lineage and receipts accompany the result." },
+          { "capabilityId": "say-hello-world", "namespaceId": "sidefx:capabilities", "title": "A first execution", "body": "Run the canonical Hello World greeting without domain input.", "promise": "The exact greeting, with no external effects." }
+        ]
+      },
+      "bindings": {
+        "catalog": { "kind": "read", "reader": "catalog", "pointer": "/capabilities" }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "home-session",
+      "regionId": "main",
+      "order": 4,
+      "when": { "session": "signed-in" },
+      "component": { "kind": "section", "version": 1, "contractDigest": "b1b758c523e363f7f6fe4f5fa2c6add83e7344f4ce4a0246c33af9b42fef848c" },
+      "props": {
+        "id": "signed-panels",
+        "as": "div",
+        "variant": "signed-panels",
+        "label": "Your session",
+        "items": [
+          {
+            "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+            "props": { "id": "s-who", "as": "big", "binding": "session", "format": "session.identifier" },
+            "bindings": { "session": { "kind": "read", "reader": "session" } },
+            "actions": []
+          },
+          {
+            "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+            "props": { "id": "s-detail", "as": "sub", "binding": "session", "format": "session.detail" },
+            "bindings": { "session": { "kind": "read", "reader": "session" } },
+            "actions": []
+          },
+          {
+            "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+            "props": { "id": "r-head", "as": "big", "binding": "runs", "format": "runs.head" },
+            "bindings": { "runs": { "kind": "read", "reader": "session", "pointer": "/runs" } },
+            "actions": []
+          },
+          {
+            "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+            "props": { "id": "r-sub", "as": "sub", "binding": "runs", "format": "runs.sub" },
+            "bindings": { "runs": { "kind": "read", "reader": "session", "pointer": "/runs" } },
+            "actions": []
+          },
+          {
+            "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
+            "props": { "kind": "info", "text": "Runs are held by this host in memory; a restart clears the list." },
+            "bindings": {},
+            "actions": [
+              { "actionId": "sign-out", "kind": "session", "dispatchClass": "session-post", "input": { "intent": "sign-out" } }
+            ]
+          }
+        ]
+      },
+      "bindings": {
+        "session": { "kind": "read", "reader": "session" }
+      },
+      "actions": [
+        { "actionId": "sign-out", "kind": "session", "dispatchClass": "session-post", "input": { "intent": "sign-out" } }
+      ]
+    },
+    {
+      "sectionId": "home-runs",
+      "regionId": "main",
+      "order": 5,
+      "when": { "session": "signed-in" },
+      "component": { "kind": "list", "version": 1, "contractDigest": "410312d70a9853c2b045d23c42b6324426abe3dca7e7ce16fa267f9a08f5a763" },
+      "props": { "id": "runs", "binding": "runs", "limit": 5 },
+      "bindings": {
+        "runs": { "kind": "read", "reader": "session", "pointer": "/runs" }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "home-signed-out",
+      "regionId": "main",
+      "order": 6,
+      "when": { "session": "signed-out" },
+      "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
+      "props": {
+        "kind": "info",
+        "text": "Explore publicly. Sign in to start an observed run.",
+        "actionId": "open-sign-in-cta",
+        "actionLabel": "Sign in to observe"
+      },
+      "bindings": {},
+      "actions": [
+        { "actionId": "open-sign-in-cta", "kind": "navigate", "dispatchClass": "local", "to": "/circuit/login?return=%2Fcircuit%2Fhome" }
+      ]
+    },
+    {
+      "sectionId": "how",
+      "regionId": "main",
+      "order": 7,
+      "component": { "kind": "heading", "version": 1, "contractDigest": "26dc353fb78fd2f2e21fe1b2ddb70fe1ad28bb9b0f68f999cefa9d58a63d954c" },
+      "props": { "id": "how-title", "level": 2, "role": "section-title", "text": "Built from declared meaning" },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "home-how-lede",
+      "regionId": "main",
+      "order": 8,
+      "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+      "props": {
+        "as": "lede",
+        "text": "Contracts, operations and provider bindings live as rows in one authority database. The installed kernel interprets the graph selected for each capability, and receipts light the circuit as it executes."
+      },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "home-steps",
+      "regionId": "main",
+      "order": 9,
+      "component": { "kind": "card-list", "version": 1, "contractDigest": "5a68c842fd224c530eb0393ef9d2fab7f2840273813de124bf5fdf47613f54f2" },
+      "props": {
+        "items": [
+          { "title": "01 · Declare", "body": "Contracts, operations and provider bindings live as rows in one authority database.", "promise": "Declared meaning, governed by the estate." },
+          { "title": "02 · Execute", "body": "The installed SDA kernel interprets the graph selected for the capability.", "promise": "Execution follows admitted authority." },
+          { "title": "03 · Observe", "body": "Receipts light the circuit; replay preserves the captured scenario timing.", "promise": "A reading of the run, never a substitute for its receipts." }
+        ]
+      },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "home-figure",
+      "regionId": "main",
+      "order": 10,
+      "component": { "kind": "media.figure", "version": 1, "contractDigest": "cd303dcfd7d259823cbd4e837a4348f891590ab8a95109f6d15c5f50fad7b7fe" },
+      "props": {
+        "ids": { "figure": "how-circuit-figure", "label": "how-circuit-label", "caption": "how-circuit-caption", "link": "how-circuit-link" },
+        "figureLabel": "Declared circuit",
+        "capabilityId": "authenticate-ide-user",
+        "namespaceId": "sidefx:capabilities",
+        "page": "scenario-1"
+      },
+      "bindings": {
+        "figure": {
+          "kind": "read",
+          "reader": "scenario",
+          "input": { "capabilityId": "authenticate-ide-user", "namespaceId": "sidefx:capabilities", "page": "scenario-1" },
+          "pointer": "/slides/0"
+        }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "home-position-heading",
+      "regionId": "main",
+      "order": 11,
+      "component": { "kind": "heading", "version": 1, "contractDigest": "26dc353fb78fd2f2e21fe1b2ddb70fe1ad28bb9b0f68f999cefa9d58a63d954c" },
+      "props": { "id": "position-title", "level": 2, "role": "section-title", "text": "SFX position" },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "home-position",
+      "regionId": "main",
+      "order": 12,
+      "component": { "kind": "card-list", "version": 1, "contractDigest": "5a68c842fd224c530eb0393ef9d2fab7f2840273813de124bf5fdf47613f54f2" },
+      "props": {
+        "items": [
+          { "title": "Zero Implicit Authority", "body": "Intelligence may propose. Authority is explicit, evaluated, and resolved downstream before any effect.", "promise": "No effect without an admitted authority path." },
+          { "title": "Sovereignty at Scale", "body": "Declared meaning stays in your authority database; execution follows your admitted providers and policies.", "promise": "Your estate, your rules." },
+          { "title": "Semantic Flight Recording", "body": "Execution is captured as ordered testimony, so a run can be replayed from its receipts rather than reconstructed from logs.", "promise": "The record is the run's own account." },
+          { "title": "Evidence by Design", "body": "Effects arrive with their retained receipts and stated limits; a page view or a declaration alone is never presented as proof.", "promise": "Reads are not receipts." },
+          { "title": "Independent Evaluation", "body": "Evaluation is separate from operation, so a verdict does not depend on the operator's own account.", "promise": "The judge is not the party." },
+          { "title": "Enterprise / Government", "body": "Designed for governed environments where authority, retention, and review are requirements rather than afterthoughts.", "promise": "Built for governed environments." }
+        ]
+      },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "home-content-authority",
+      "regionId": "main",
+      "order": 13,
+      "component": { "kind": "card", "version": 1, "contractDigest": "c15eeb0a1d21dfe9e369834ee14ab8fbc908084716e1abd3fb7677c341030f93" },
+      "props": {
+        "item": {
+          "title": "Content authority",
+          "body": "Page copy is declaration data. This page is a reading, not an execution, and it produces no run, claim or trust state.",
+          "promise": "Statements carry their basis; page presence is not evidence.",
+          "meta": "SFX position"
+        }
+      },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "home-copy-basis",
+      "regionId": "main",
+      "order": 14,
+      "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
+      "props": {
+        "kind": "info",
+        "text": "SFX position · copy basis: the propositions above are content authority, not page-runtime semantics."
+      },
+      "bindings": {},
+      "actions": []
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 # Declarative UI circuits: implementation strategy
 
-Prepared 2026-10-07. Status: **draft, not started.** Revision 2.
+Prepared 2026-10-07. Status: **draft, not started.** Revision 3.
 **Revision 1 (2026-10-07): first strategy revision; consolidates `intent.md`, `research-brief.md`
 and the five lane analyses in [`analysis/`](analysis/) into one implementation-grade plan.**
 **Revision 2 (2026-10-07): applies every correction C1–C19 from the adversarial review
 ([`analysis/06-review.md`](analysis/06-review.md)); see the revision history at the end.**
+**Revision 3 (2026-10-07): applies the user review corrections C20–C27 and records the decisions
+(G1/G4/G6, gates G8/G9) from [`review.md`](review.md); see the revision history at the end.**
 
 **How this strategy relates.** [`intent.md`](intent.md) repositions the website around one argument
 — intelligence may propose, capabilities authorize, effects are evidenced — and proposes a
@@ -185,7 +187,7 @@ star becomes an SDA change request once Phase 1 proves the model (§7.5).
 | D1 | Page declarations: estate capabilities/scenarios, a new declared reader, or host config? | **Estate data through a declared reader.** Page/layout/section/component definitions are admitted by `sfx-embody` migration pairs as versioned, digest-addressed rows; one new reading capability `read-ui-page` (like `read-capability-details`) returns the composed `ui-page.v1` document; `circuit-host.json` gains `readers.page`. Host config stays trust/route data: `home.hero` and `GET /api/circuit/v1/home` remain because the Explorer uses them for default selection and the environment label (`explorer.js:332,338-340`); only `home.featured` retires to declaration authority. Full page-as-executed-capability is deferred to G2. | Matches the proven reader pattern (`circuit-host.json:17-21`; `declare-live-scenario-circuit.commit.sql:785`); satisfies meaning-in-rows (`AGENTS.md`); makes publication data-only; avoids inventing page-run evidence. Reconciliation of lane 3's estate mapping with lane 4's reader is both, layered. |
 | D2 | What runs where? | **Shell (deployed):** gateway/observer/API hosts, page runtime, adapter registry, validator, security/retrieval policy, host config, token CSS. **Estate (data):** page/layout/section/component definitions, copy, links, bindings, media references. Shell fetches only a fixed host-managed source registry (`catalog`, `scenario`, `details`, `provider-inspection`, `session`, `release`), each published with its route in the `ui-registry` manifest (§7.2). | The estate has no runtime (`sfx-embody/AGENTS.md:42-50`); the browser cannot be an estate provider yet; the shell is the browser analogue of ADR-0010's language kernels (`ADR-0010:21-31`). |
 | D3 | Component registry | **Option C:** declared semantic contracts (`ui-component.v1`: kind, roles, props schema, states) in the estate + one shipped adapter registry keyed by kind. Unknown kind or unsupported role refuses visibly (`UI_COMPONENT_NOT_SUPPORTED`); never a silent drop, never a fallback renderer. | Lane 3's recommendation (`analysis/03-ui-capability-providers.md:389-407`); mirrors `ui-embodiment-plan-v1.mjs:15-24` and ADR-0007 `SUPPORTED`/`ADAPTED`/`NOT_SUPPORTED`; keeps meaning in rows and implementations replaceable. |
-| D4 | Action and event taxonomy | **Twelve declared action kinds; three authority classes** (`local`, `read`, `session-post`). No new browser write path: the browser's only writes are `POST /api/circuit/v1/session[/logout]` and Observe/objective `POST /api/circuit/v1/runs`; the observer's `POST /events` and `/events/batch` are DA testimony ingestion, blocked publicly by the gateway 405 (`observe-server.mjs:463-466`; `gateway.mjs:162-164`; `accept.mjs:49`), not a browser route. Same-origin JSON + CSRF, `__Host-sfx-session`, idempotency unchanged. Events are declaration data over a fixed DOM event set; load events may only emit reads. | `run-api.mjs:23-24,62-68,50-52`; `identity-session.mjs:41-46`; `analysis/02-rendering-inventory.md:398-416`. |
+| D4 | Action and event taxonomy | **Twelve declared action kinds; three dispatch classes** (`local`, `read`, `session-post`). A dispatch class names the pre-existing browser seam an action may use; it is not authority — actual authority is resolved downstream by the capability system (C22). No new browser write path: the browser's only writes are `POST /api/circuit/v1/session[/logout]` and Observe/objective `POST /api/circuit/v1/runs`; the observer's `POST /events` and `/events/batch` are DA testimony ingestion, blocked publicly by the gateway 405 (`observe-server.mjs:463-466`; `gateway.mjs:162-164`; `accept.mjs:49`), not a browser route. Same-origin JSON + CSRF, `__Host-sfx-session`, idempotency unchanged. Events are declaration data over a fixed DOM event set; load events may only emit reads. | `run-api.mjs:23-24,62-68,50-52`; `identity-session.mjs:41-46`; `analysis/02-rendering-inventory.md:398-416`. |
 | D5 | Change classes and target rule | **Deploy (a) shell/runtime, (b) policy/registry/schema/route host. Data (c) declarations/composition, (d) content/media.** Data publishes through a new gate: schema + contract-version + component/action/source allowlist + digest + asset checks, previous revision retained, publish receipt, visible degraded fallback, pointer rollback. | Watched-path economics (§2.1); lane 4's target rule (`analysis/04-serving-routing-deploy.md:153-168`); failures stay visible (`live-store.mjs:211-215`). |
 | D6 | First shallow cut | **Home.** Keep `home.html` skeleton and its ids; `home.js` becomes a mount of the page runtime; main sections render from the declared page; header/footer/identity stay shell; signed-in copy is declared as state-scoped sections (§5.3, C9); circuit preview keeps its SVG digest check; post-conversion `home.featured` retires while `home.hero` stays host route data for the Explorer (C1). | Home is already fully read-driven with no write path and its structure is already host-declared (`circuit-host.json:6`; `home.js:83-96`); lane 2 nominates it (`analysis/02-rendering-inventory.md:420-445`). |
 | D7 | Token source and one-workspace vs nine-area IA | **One web token source is `site.css` custom properties** (deployed shell); rename the accent to `--observation` with `--cyan` kept as a deprecated alias; ban page-local `<style>` blocks in new and converted pages only — the Explorer's existing blocks are untouched in v1 and migrating them is a separate deploy with its own acceptance note (C11). **One renderer, many declared routes:** the nine-area IA (`intent.md:970-1044`) is declared pages served by the same shell under `/circuit/<slug>`; no second renderer, no new workspace; top-level vanity paths are gate G3; navigation becomes declared data. | Deck `design_system.py` is a design artifact, not runtime (`analysis/05-prior-art-design-surface.md:15-16,142-159`); D4's "no second renderer" is learned cost (`revamp.md:449-451`); gateway already proxies `/circuit/*` (`gateway.mjs:140-163`). |
@@ -202,8 +204,10 @@ adapters. It never names result sets, never synthesizes fields and never picks S
 
 ### 4.2 Component taxonomy
 
-Lane 2's taxonomy (`analysis/02-rendering-inventory.md:308-352`) is the source of truth. v1 ships
-the **content subset** that home needs and that Phase 1 reuses:
+Lane 2's taxonomy (`analysis/02-rendering-inventory.md:308-352`) is the source of truth. Phase 0
+admits **only the component kinds the home declaration consumes** (used-by-Phase-0 rule, C26);
+a kind with no declared use waits for the phase that uses it. The audited Phase 0 set and its
+uses:
 
 | Registry name | Purpose | Derived from |
 | --- | --- | --- |
@@ -216,12 +220,19 @@ the **content subset** that home needs and that Phase 1 reuses:
 | `card-list` | declared cards with optional catalog match | `home.js:66-81`; `circuit-host.json:6` |
 | `list` | items with href/meta/badges/current | `home.js:38-45`; `run-context.js:53-54` |
 | `media.figure` | svg/src/alt/caption/link/digest (digest-checked) | `site.js:38-62` |
-| `identity-session` | signed-in/out area | `home.js:10-21` |
 | `notice` | info/error/warning/empty state | `explorer.js:23`; `run-context.js:9` |
 
+Every kind above is consumed by the home body: `hero` (hero block), `section` (all sections),
+`text` (copy roles), `heading`, `stat` (estate counts), `card`/`card-list` (featured circuits),
+`list` (session runs and steps), `media.figure` (hero circuit preview), `notice` (failure and
+empty states). The identity area remains shell chrome (D6), so `identity-session` is **not** a
+Phase 0 kind; declared body sections render session values through `text`/`list` bindings to the
+`session` source and `when` scoping. It is admitted only when a declared body section uses it
+(C26).
+
 Phase 1 adds the kinds its content actually needs: `table`, `field-list`, `disclosure`, `badge`,
-`status-chip` (the data-bound Standards crosswalk, §10 Phase 1). `action-bar` and `tabs` wait
-until a page uses them. The Explorer's deep components (`circuit-scene`, `run-report`, `provider-profile`,
+`status-chip` (the data-bound Standards crosswalk, §10 Phase 1). `action-bar`, `tabs` and
+`identity-session` wait until a page uses them. The Explorer's deep components (`circuit-scene`, `run-report`, `provider-profile`,
 `objective-composer`, `timeline`) are **not declarable content components** in v1; they remain the
 Explorer runtime. Each adapter accepts an explicit `id` prop and must reproduce contractual state
 attributes (`aria-selected`, `aria-pressed`, `data-*`, `dataset.replayPosition`) when it renders a
@@ -248,9 +259,11 @@ migrated target (`circuit-runtime.js:3-5`; `circuit-viewer.js:160-170`).
 
 The twelve kinds from lane 2 (`analysis/02-rendering-inventory.md:398-416`) mapped onto the
 existing seams. Only `session` and `observe`/`objective` reach the server, and they use the routes
-that already exist.
+that already exist. `dispatchClass` names which pre-existing browser seam the action may dispatch
+through; it is not authority — actual authority is resolved downstream by the capability system
+(C22).
 
-| Kind | Authority class | Existing seam |
+| Kind | Dispatch class | Existing seam |
 | --- | --- | --- |
 | `navigate` | local | `syncUrl`/`history` (`explorer.js:36-42`); same-origin links |
 | `select` | local | `selectNode/selectRow/selectComponent`, `selectSlide/selectTarget` (`explorer.js:89-107`; `circuit-runtime.js:108-117`) |
@@ -292,11 +305,15 @@ method, a header or a credential.**
   `CIRCUIT_FILES` entries and acceptance pins like every other client module (C18;
   `observe-server.mjs:14-45`; `accept.mjs:47`). The page runtime reads `location.pathname` and
   requests `GET /api/circuit/v1/page?path=…`.
-- **Digest supply (C6).** First load, deep links, reloads and popstate arrive without a digest and
-  omit `expectedPageDigest`; the served `pageDigest` is bound for subsequent reads of that page
-  (refresh, source re-reads, popstate within the page). Declared navigation links may carry a
-  digest captured when the link was declared. `409 PAGE_SNAPSHOT_CHANGED` is reached whenever a
-  bound or declared digest no longer matches at the next read (e.g. after a publish).
+- **Digest supply (C6) and navigation (C27).** First load, deep links, reloads and popstate arrive
+  without a digest and omit `expectedPageDigest`; the served `pageDigest` is bound for subsequent
+  reads of that page (refresh, source re-reads, popstate within the page). Ordinary declared
+  navigation links resolve the **current published pointer** and carry no destination digest;
+  destination digest pinning is reserved for intentional snapshot links (historical evidence, a
+  publication receipt, a specific article revision, an audit/replay view). This preserves
+  independent page publication: publishing one page never forces a navigation republication.
+  `409 PAGE_SNAPSHOT_CHANGED` is reached when a bound digest or a snapshot link's pinned digest
+  no longer matches at the next read (e.g. after a publish).
 - `page.html` is shell chrome (header/footer/nav mount/identity mount) plus `#page-root`; it does
   not contain page copy. Declared navigation renders into the nav mount from a navigation
   declaration; links name their destination page (`analysis/05-prior-art-design-surface.md:418-420`).
@@ -312,27 +329,40 @@ method, a header or a credential.**
 | --- | --- | --- | --- |
 | (a) shell/runtime | gateway, observer, `page.js`, `page-runtime.js`, `ui-components.js`, `site.css` | composite image on watched paths | full staging acceptance + rollback (unchanged) |
 | (b) policy/registry/schema/route host | `circuit-host.json` readers/trust, validator, registry, gateway rules | composite image | full staging acceptance |
-| (c) declarations/composition | page/layout/section/component definitions, bindings, actions, events | estate publication: `publish_ui_page` invoked by SQL from the estate's governed publish path; no DAL, no service release (§7.1, C2) | **new data-only gate** (§9.2) |
+| (c) declarations/composition | page/layout/section/component definitions, bindings, actions, events | estate publication: the publisher/orchestrator `publish-ui-page` (governed workflow, C20) calls SQL mechanics `stage_ui_page`/`promote_ui_page`/`rollback_ui_page`; no DAL, no service release (§7.1) | **new data-only gate** (§9.2) |
 | (d) content/media | copy, links, digest references to allowlisted assets; new media files | copy/links: estate publication. New media: class (a) media route deploy (C5) | data gate for copy/links; class (a) for new media |
 
-The gate, in order (C2, C4, C8): (1) the publishing tool `publish_ui_page` fetches the deployed
-`ui-registry` manifest (`GET /api/circuit/v1/ui-registry` `[proposal]`, schema in §7.2);
-(2) it validates the candidate revision against the manifest — contract id/version, JSON schema,
-unknown component/action/source refusal, digest recompute, referenced asset allowlist and digests;
-(3) it appends the candidate revision **without moving the pointer** and verifies it through a
-candidate read (`revision=N`) with `verify-pages`; (4) it promotes by moving the pointer only on a
-pass, in one transaction, retaining the prior revision; (5) a failed post-promotion verify
-triggers an **automatic pointer rollback** by the same tool, mirroring the release discipline
-(`staging.yml:207-212`; `docs/automatic-staging-deployment.md:224-241`); (6) it records a publish
-receipt with both digests. Ownership: the estate publication owner runs `publish_ui_page` and
-owns its automatic rollback; the platform on-call owns registry/shell mismatches.
+The gate, in order (C4, C8, C20, C23): (1) the **publisher/orchestrator** `publish-ui-page`
+(a governed workflow/capability, not a database procedure) fetches the deployed `ui-registry`
+manifest (`GET /api/circuit/v1/ui-registry` `[proposal]`, schema in §7.2); (2) it validates the
+candidate revision against the manifest — contract id/version, JSON schema, unknown
+component/action/source refusal, digest recompute, referenced asset allowlist and digests;
+(3) it calls `stage_ui_page`, which validates persistence invariants and appends the candidate
+**without moving the pointer**; (4) it reads the candidate (`revision=N`) and runs `verify-pages`;
+(5) only on a pass it calls `promote_ui_page(candidateRevision, expectedCurrentRevision)`, a
+conditional pointer move that retains the prior revision; (6) it verifies again post-promotion
+and either records a publish receipt or calls
+`rollback_ui_page(fromRevision, toRevision, expectedCurrentRevision)` and records the refusal if
+the pointer moved under it. The SQL procedures own bounded durable mechanics only — persistence
+invariants, append, conditional pointer move, conditional rollback and publication facts — never
+registry fetch, HTTP rendering or `verify-pages`. Ownership: the estate publication owner runs
+`publish-ui-page` and its automatic rollback; the platform on-call owns registry/shell mismatches.
+
+**Pointer CAS law (C23).** The pointer is compare-and-swap, never blind overwrite. Publisher A
+holds current `10` and stages `11`; publisher B holds current `10` and stages `12`. A promotes
+`11`, B promotes `12`, A's post-check fails, and A's rollback refuses because
+`expectedCurrentRevision = 11` no longer holds — B's publication survives. The law:
+**"Evidence that an earlier state existed does not grant authority to overwrite the current
+state."** A rollback whose expected current no longer holds refuses and records the refusal; it
+never overwrites another publisher's promotion.
 
 **What still costs a deploy (C2).** One-time install: the declaration migration pair (installed
 through the SDA-checkout lifecycle, `sfx-embody/AGENTS.md:66-90`), plus the class (a)/(b) shell
 deploy that ships `readers.page`, the route host, the registry/manifest route and the adapters,
 with the full staging acceptance. Recurring: a new component kind, a new media route, a token
-change or any SDA change (G2). Per publish: one `publish_ui_page` call and one `verify-pages` run;
-no release, no migration pair, no `sfx-dal` regeneration and no service release on this path.
+change or any SDA change (G2). Per publish: one `publish-ui-page` run (stage → candidate verify →
+promote → post-verify) and its `verify-pages` invocations; no release, no migration pair, no
+`sfx-dal` regeneration and no service release on this path.
 
 ---
 
@@ -406,12 +436,12 @@ intent, never a CSS class list or framework name (`ui-authority-and-parity.md:39
   },
   "actions": [
     { "actionId": "open-explorer", "kind": "navigate", "to": "/circuit/explorer" }
-  ],
-  "events": [
-    { "on": "load", "actionId": "load-hero" }
   ]
 }
 ```
+
+The hero's figure is resolved by its declared `read` binding; no `load` event is needed, and a
+`load` event is declared only when it names an action that exists (C21).
 
 Binding kinds are a closed set: `literal` (value in declaration), `read` (named host reader +
 JSON pointer), `session`, `release`, `route`. A declaration naming a reader outside the host
@@ -446,7 +476,7 @@ an unknown condition refuses at validation.
 ### 5.5 Action descriptor
 
 ```json
-{ "actionId": "observe-subject", "kind": "observe", "authority": "session-post",
+{ "actionId": "observe-subject", "kind": "observe", "dispatchClass": "session-post",
   "input": {
     "subject": { "row": "capabilityId" },
     "namespace": "sidefx:capabilities",
@@ -454,9 +484,10 @@ an unknown condition refuses at validation.
   } }
 ```
 
-Bindings resolve against the scopes in §4.4 (C7). The declared `authority` must match the kind's
-fixed class in §4.4; a mismatch refuses at validation time, not at click time. A bound scope that
-is undeclared refuses at validation; one that cannot resolve at dispatch refuses visibly
+Bindings resolve against the scopes in §4.4 (C7). The declared `dispatchClass` must match the
+kind's fixed class in §4.4; a mismatch refuses at validation time, not at click time.
+`dispatchClass` describes the browser seam only and never grants authority (C22). A bound scope
+that is undeclared refuses at validation; one that cannot resolve at dispatch refuses visibly
 (`UI_ACTION_BINDING_UNRESOLVED`) and the action does not dispatch.
 
 ### 5.6 Event declaration
@@ -493,10 +524,12 @@ Rules:
 - `pageDigest` is computed over the canonical declaration (revision + section/component digests);
   it is the cache key and the publish rollback pointer.
 - First load omits `expectedPageDigest`; the served `pageDigest` is bound for subsequent reads of
-  the same page, and declared navigation links may carry one (§4.5, C6). A bound or declared
-  digest that no longer matches at the next read is `409 PAGE_SNAPSHOT_CHANGED`, mapped like the
-  existing `*_SNAPSHOT_CHANGED` refusals (`live-store.mjs:37,149`; `accept.mjs:97-98`). A
-  malformed digest value is `400` (`live-store.mjs:199`).
+  the same page. Ordinary navigation resolves the current published pointer; only intentional
+  snapshot links (historical evidence, a publication receipt, a specific article revision, an
+  audit/replay view) carry a destination digest (§4.5, C6, C27). A bound or pinned digest that
+  no longer matches at the next read is `409 PAGE_SNAPSHOT_CHANGED`, mapped like the existing
+  `*_SNAPSHOT_CHANGED` refusals (`live-store.mjs:37,149`; `accept.mjs:97-98`). A malformed digest
+  value is `400` (`live-store.mjs:199`).
 - A declaration that fails schema, contract-version or allowlist validation is
   `422 UI_DECLARATION_INVALID`, joining the existing 404/409/422 refusal vocabulary
   (`README.md:48-52`; C15).
@@ -536,8 +569,9 @@ The page read uses the existing read machinery: queue, timeout, size cap, LRU (2
 30 s TTL) and strong ETag/304 (`live-store.mjs:117-187,283-301`; `circuit-host.json:7-11`).
 Key the read by `(path, revision)`; the digest is the invalidation signal; `refresh=1` bypasses
 for operators; errors and degradations are `no-store`. Sources keep their own ETags; the shell
-serves one composed page from separately cached reads. Multi-instance invalidation is an open
-gate (G5).
+serves one composed page from separately cached reads. Multi-instance invalidation is its own
+later gate, **G8 (page cache publication consistency)**; it does not block Phase 0 on one
+effective serving instance (C24).
 
 ### 6.3 Read budget
 
@@ -578,11 +612,19 @@ One pair (preflight ending `ROLLBACK`, commit twin ending `COMMIT`, in-transacti
 - the `read-ui-page` capability, declared through `model.declare_capability_document` exactly like
   `read-live-scenario-circuit` (`declare-live-scenario-circuit.commit.sql:785`): one root terminal
   scenario, `ui-page-request.v1`/`ui-page.v1`, request `{ path, revision?, expectedPageDigest? }`;
-- publish procedures `[proposal]`: `publish_ui_page` (validate → append candidate → verify →
-  pointer move → automatic rollback on failure; digest-guarded; refuses unknown
-  contract/section/component shape) and `rollback_ui_page` (pointer move). **The pair installs the
-  procedures once**; each publish is a single `publish_ui_page` call from the estate's governed
-  publish path, not a migration-pair lifecycle event and not a server-side DAL call (C2).
+- SQL candidate mechanics `[proposal]`, each bounded and durable: `stage_ui_page` (validate
+  persistence invariants, append the candidate revision, record staging facts; never touches the
+  pointer), `promote_ui_page(candidateRevision, expectedCurrentRevision)` (conditional pointer
+  move and publication facts) and `rollback_ui_page(fromRevision, toRevision,
+  expectedCurrentRevision)` (conditional rollback; refuses when the expected current no longer
+  holds). The pair installs these procedures once; they do **not** own registry fetch, HTTP
+  rendering or `verify-pages` (C20, C23).
+- the **publisher/orchestrator** `[proposal]`: the governed workflow/capability `publish-ui-page`,
+  run by the estate publication owner. It fetches the deployed registry, validates the candidate,
+  calls `stage_ui_page`, reads the candidate, runs `verify-pages`, calls `promote_ui_page`, verifies
+  again and decides publication receipt versus `rollback_ui_page` (C20). It is not a database
+  procedure, not a browser route and not a `sfx-dal` surface; each publish is one workflow run, not
+  a migration-pair lifecycle event.
 
 The kernel-invoked reader and its admission follow `read-capability-details`; no `sfx-dal`
 registration, regeneration or service release is needed on this path (§7.4). The first content is
@@ -602,7 +644,6 @@ the home page declaration and its layout/component contracts.
     { "kind": "card-list", "version": 1 },
     { "kind": "list", "version": 1 },
     { "kind": "media.figure", "version": 1 },
-    { "kind": "identity-session", "version": 1 },
     { "kind": "notice", "version": 1 }
   ],
   "maximumSources": 8
@@ -616,6 +657,8 @@ the home page declaration and its layout/component contracts.
 
 `ui.components` is the deployed allowlist used by the validator and the manifest. `hero` is in it
 because the Phase 0 home example uses it (C3); a declaration may never use a kind not listed here.
+Every kind listed is consumed by the Phase 0 home declaration (used-by-Phase-0 rule, C26);
+`identity-session` is shell chrome, not a Phase 0 kind.
 
 **`ui-registry` manifest (`GET /api/circuit/v1/ui-registry`, `[proposal]`, C8).** The manifest is
 the machine-readable view of the deployed shell that the client validator and the publish gate
@@ -628,7 +671,7 @@ consume:
     "pageContractVersions": ["ui-page.v1","ui-page-definition.v1","ui-layout.v1","ui-component.v1"] },
   "components": [ { "kind": "hero", "version": 1, "contractDigest": "sha256:…",
     "roles": ["…"], "states": ["…"] } ],
-  "actions": [ { "kind": "observe", "authority": "session-post",
+  "actions": [ { "kind": "observe", "dispatchClass": "session-post",
     "inputs": ["subject","namespace","input"] } ],
   "sources": [
     { "sourceId": "catalog", "reader": "catalog", "route": "/api/circuit/v1/capabilities" },
@@ -666,13 +709,15 @@ page publication goes through the estate procedure, never through retrieval.
 ### 7.4 `sfx-dal`
 
 No change in v1. Page declarations touch no identity schema and add no generated repository; the
-reader is kernel-invoked like `read-capability-details`, and the publish tool is the estate
-procedure `publish_ui_page` invoked by SQL, so no `sfx-dal` registration, DAL regeneration or
-service release appears anywhere in the publish path (C2). A DAL change becomes necessary only if
-a runtime content-writer route is added to the identity host later (gate G4); that path must
-follow the sfx-dal migration and regeneration rules (`AGENTS.md`; `live-circuit-provider-details.md:219-241`),
-and if it were chosen it would add registration, regeneration and service-release costs to
-P0.1/P0.5 instead of the SQL procedure.
+reader is kernel-invoked like `read-capability-details`, the publisher `publish-ui-page` is a
+governed workflow using public platform reads and `verify-pages`, and the SQL procedures
+(`stage_ui_page`, `promote_ui_page`, `rollback_ui_page`) are bounded estate mechanics, so no
+`sfx-dal` registration, DAL regeneration or service release appears anywhere in the publish path
+(C2, C20). A DAL change becomes necessary only if a runtime content-writer route is added to the
+identity host later (gate G4); that path must follow the sfx-dal migration and regeneration rules
+(`AGENTS.md`; `live-circuit-provider-details.md:219-241`), and if it were chosen it would add
+registration, regeneration and service-release costs to P0.1/P0.5 instead of the workflow and SQL
+mechanics.
 
 ### 7.5 SDA decision gate
 
@@ -743,6 +788,14 @@ and must not present page presence as proof.
 - Unknown/undeclared data stays `NOT_DECLARED`/`EMPTY`/`UNRESOLVED` as distinct visible states,
   never a shared blank (`analysis/05-prior-art-design-surface.md:362-366`).
 
+### 8.5 Declarative rendering safety invariant (C25)
+
+Declarations never contain executable markup. Text roles render as text (`textContent`, never
+`innerHTML`); URLs are validated against an admitted scheme/origin profile; no adapter may
+evaluate declaration-provided script, HTML, CSS, event-handler text or arbitrary URL protocols
+(`javascript:` and arbitrary `data:` are refused). This is a verification and acceptance gate
+(WP0.7), not merely an implementation convention.
+
 ---
 
 ## 9. Acceptance and verification
@@ -761,9 +814,10 @@ never substitutes synthetic events or responses (`docs/automatic-staging-deploym
 | WP0.1 | `read-ui-page` returns the home declaration; serving digest equals publish digest; idempotent | `verify-pages.mjs` (local + `--staging`) | `docs/sfx-website-product-evolution/evidence/WP0-<date>.json` |
 | WP0.2 | Unknown component/action/source, contract-version and schema-invalid fixtures all render named refusals (`422 UI_DECLARATION_INVALID` for schema); no section silently dropped | `verify-pages.mjs --refusals` | same convention |
 | WP0.3 | `expectedPageDigest` mismatch is 409 `PAGE_SNAPSHOT_CHANGED`; degraded fallback names requested/served revisions | `verify-pages.mjs --digests` | same |
-| WP0.4 | A copy publish changes home's public and state-scoped copy without any watched-path push: publish receipt + served digest change + no release run; a failed verify triggers the tool's automatic pointer rollback (drill) | `publish_ui_page` + `verify-pages --staging` | publish receipt + WP0 receipt |
+| WP0.4 | A copy publish changes home's public and state-scoped copy without any watched-path push: publish receipt + served digest change + no release run; a failed verify triggers the publisher's automatic CAS rollback, and a rollback with a stale `expectedCurrentRevision` refuses (drill) | `publish-ui-page` + `verify-pages --staging` | publish receipt + WP0 receipt |
 | WP0.5 | Page read latency/cache measured: cold read, warm read, `refresh=1`; within declared budget | harness | WP0 receipt |
 | WP0.6 | Signed-in home still renders after conversion: the declared `when: signed-in` variant and the session run list render in a real browser session (C9) | browser gate extension | WP0 receipt |
+| WP0.7 | Rendering safety: markup in text roles renders as literal text; `javascript:`/arbitrary `data:` URLs refuse; no declaration-provided script, style or handler text executes (C25) | `verify-pages.mjs --safety` + browser gate | WP0 receipt |
 | WP1.x | Second page served from declarations; the data-bound crosswalk section resolves its declared reader; registry churn measured; navigation declared | `verify-pages` + `accept.mjs public` extension | WP1 receipts |
 
 `accept.mjs` public additions: declared page routes `200`, unknown page `404 PAGE_NOT_FOUND`,
@@ -775,11 +829,12 @@ and `ui-components.js` are added to the map and pinned; `home.js` keeps its pin
 
 - Shell/registry changes: existing release rollback restores the prior digest
   (`staging.yml:207-212`; `docs/automatic-staging-deployment.md:224-241`).
-- Data publishes: the publish tool verifies the candidate before promotion and performs an
-  **automatic pointer rollback** on a failed post-promotion verify (C4), mirroring the release
-  discipline (`staging.yml:207-212`); the previous revision is retained by construction; degraded
-  reads keep serving the last good page visibly. `rollback_ui_page` remains available for manual
-  rollback. Both are owned by the publisher of record (§4.6).
+- Data publishes: the publisher `publish-ui-page` verifies the candidate before promotion and
+  performs an **automatic CAS rollback** on a failed post-promotion verify (C4, C20), mirroring
+  the release discipline (`staging.yml:207-212`); the previous revision is retained by
+  construction; degraded reads keep serving the last good page visibly. `rollback_ui_page`
+  remains available for manual rollback under the same CAS law (C23). Both are owned by the
+  publisher of record (§4.6).
 
 ---
 
@@ -792,21 +847,24 @@ real second page without changing the contract, Phase 2 floods the IA.
 
 ### Phase 0 — thin slice (home)
 
-**Entry:** strategy accepted; gates G1, G4 (publication ownership and tool), G6 (component set,
-including `hero`) answered; reading of lane 2's home inventory frozen (C10).
+**Entry:** Revision 3 accepted; **G1 accepted**; **G4 accepted subject to the publisher/procedure
+split (C20) and the CAS pointer law (C23)**; **G6 accepted with used-by-Phase-0 enforcement
+(C26)**; reading of lane 2's home inventory frozen (C10).
 
 **Deliverables.**
 
 | ID | Work | Repo |
 | --- | --- | --- |
-| P0.1 | Migration pair: contracts, `sidefx_ui` schema, `read-ui-page` capability, home definition + layout + component contracts, publish/rollback procedures | sfx-embody |
-| P0.2 | Client runtime: `page-runtime.js`, `ui-components.js` (v1 registry), schema/registry validation, refusals | sfx-platform |
+| P0.1 | Migration pair: contracts, `sidefx_ui` schema, `read-ui-page` capability, home definition + layout + component contracts; SQL mechanics `stage_ui_page`/`promote_ui_page`/`rollback_ui_page`; the `publish-ui-page` publisher workflow (C20) | sfx-embody |
+| P0.2 | Client runtime: `page-runtime.js`, `ui-components.js` (v1 registry), schema/registry validation, refusals, rendering-safety enforcement | sfx-platform |
 | P0.3 | Serving: `readers.page`, `GET /api/circuit/v1/page`, `GET /api/circuit/v1/ui-registry`, generic `/circuit/<slug>` route host, fixture source | sfx-platform |
 | P0.4 | Home conversion: `home.js` mounts the page runtime; `home.html` skeleton/ids kept; `home.featured` retired to the declaration while `home.hero`/`GET /api/circuit/v1/home` stay host route data for the Explorer (C1); signed-in copy rendered from `when`-scoped sections; circuit-preview digest check preserved | sfx-platform |
-| P0.5 | Verification: `verify-pages.mjs`, `accept.mjs` public extension, latency/cache measurement, data-only publish drill with automatic rollback | sfx-platform + sfx-embody |
+| P0.5 | Verification: `verify-pages.mjs`, `accept.mjs` public extension, latency/cache measurement, publisher drill (`stage → candidate verify → promote → post-verify → CAS refusal/rollback`), rendering-safety fixtures (WP0.7) | sfx-platform + sfx-embody |
+| P0.6 | Home content authority: the home declaration visibly carries the settled propositions (Zero Implicit Authority, Sovereignty at Scale, Semantic Flight Recording, Evidence by Design, Independent Evaluation, Enterprise/Government) as content authority, not page-runtime semantics | sfx-embody + content owner |
 
-**Exit evidence:** WP0.1–WP0.6 receipts; full staging acceptance green; a live home copy change
-published as data with no release and an automatic-rollback drill; named refusals demonstrated.
+**Exit evidence:** WP0.1–WP0.7 receipts; full staging acceptance green; a live home copy change
+published as data with no release and an automatic-rollback/CAS-refusal drill; named refusals
+demonstrated; the home declaration carries the settled propositions.
 
 ### Phase 1 — second real page
 
@@ -839,12 +897,15 @@ change from Phase 0.
 
 ### Phase 2 — scale to the IA
 
-**Entry:** Phase 1 exit evidence; registry batch plan; media storage gate G5 answered.
+**Entry:** Phase 1 exit evidence; registry batch plan; media serving/storage gate G5 answered;
+public-claim provenance gate G9 scoped.
 
 **Deliverables:** waves by area (Why SFX, Platform, Solutions ×N, Standards, Ecosystem, Research,
 Media, Academy, Product) using the nine-area IA (`intent.md:970-1044`); declared navigation; the
-media serving route and digest-addressed media pipeline (gate G5); optional SDA request (G2) when
-the model is proven.
+media serving route and digest-addressed media pipeline (gate G5); the public-claim provenance
+model (statement, basis, sourceRefs, observedAt, effectiveAt, classification, status) at gate G9
+before the Standards/Research/current-development waves; optional SDA request (G2) when the model
+is proven.
 
 **Exit evidence:** every IA destination served; releases per content change measured at zero;
 component-kind churn bounded and batched; learning receipts per wave.
@@ -890,20 +951,24 @@ change is scored as a contract failure, not a content success.
 
 ### 11.3 Sequencing dependencies
 
-Estate migration pair before home conversion; registry manifest before the publish gate; generic
-route host before Phase 1; measurement before Phase 2; G2 only after Phase 1.
+Estate migration pair before home conversion; registry manifest before the publish gate; the
+`publish-ui-page` workflow and CAS mechanics before any data publish; generic route host before
+Phase 1; rendering-safety gate before declared content renders; measurement before Phase 2; G9
+before Phase 2 claim-bearing waves; G2 only after Phase 1.
 
 ### 11.4 Decision gates for the user
 
 | Gate | Decision | Recommendation | Owner |
 | --- | --- | --- | --- |
-| G1 | Accept the v1 declaration family + `read-ui-page` reader (D1) rather than full page-as-capability now | Accept v1; project to capabilities only with G2 | PO |
+| G1 | Accept the v1 declaration family + `read-ui-page` reader (D1) rather than full page-as-capability now | **ACCEPTED (Revision 3)** — declared page data → `read-ui-page` → trusted shell projection; full page-as-executed-capability stays with G2 | PO |
 | G2 | File the SDA change request: browser binding target, `ui-embodiment-plan.v1` provider, multi-child composition, page-view testimony | Do not file until Phase 1 exit; then file with the v1 schema as input | PO + SDA |
 | G3 | Route/IA: keep `/circuit/<slug>` or add a gateway prefix rule for top-level story paths | Keep `/circuit/` in v1; decide before production SEO | PO |
-| G4 | Content publication ownership and tool: estate publish procedure now vs runtime CMS later (blocked on per-user authority) | Estate-side publication with a named owner; CMS deferred | PO |
+| G4 | Content publication ownership and tool: estate workflow + SQL mechanics now vs runtime CMS later (blocked on per-user authority) | **ACCEPTED (Revision 3) subject to C20** (publisher `publish-ui-page` orchestrates; SQL procedures own bounded durable mechanics) and **C23** (CAS pointer law); CMS deferred | PO |
 | G5 | Media serving and storage: observer route + digest-addressed persistent volume vs object store vs SQL | v1 uses allowlisted assets only; build the media serving route and choose storage before new media (C5) | Team |
-| G6 | v1 component registry set and Phase 1/2 page conversion order | Home subset first, then the industry template; expand in batches | PO + UI |
+| G6 | v1 component registry set and Phase 1/2 page conversion order | **ACCEPTED (Revision 3) with used-by-Phase-0 enforcement** — the pruned set in §4.2/§7.2; a kind with no Phase 0 use waits; the industry template next | PO + UI |
 | G7 | Design-token reconciliation: `--observation` with `--cyan` alias; muted/dim/line values | Adopt live CSS as the web source of truth; alias deck names | Design owner |
+| G8 | Page cache publication consistency: what consistency promise does a page publication make across multiple serving instances? | Later gate; does not block Phase 0 on one effective serving instance (C24) | Team |
+| G9 | Public-claim provenance model (statement, basis, sourceRefs, observedAt, effectiveAt, classification, status) for Standards/Research/current-development content | Phase 2 gate; not a Phase 0 invention | PO |
 
 ---
 
@@ -949,16 +1014,17 @@ route host before Phase 1; measurement before Phase 2; G2 only after Phase 1.
 
 | Kind | v1 (Phase 0) | Phase 1 | Phase 2 / Explorer-only |
 | --- | --- | --- | --- |
-| `hero`, `section`, `text`, `heading`, `stat`, `card`, `card-list`, `list`, `media.figure`, `identity-session`, `notice` | ship | reuse | reuse |
+| `hero`, `section`, `text`, `heading`, `stat`, `card`, `card-list`, `list`, `media.figure`, `notice` | ship | reuse | reuse |
 | `table`, `field-list`, `disclosure`, `badge`, `status-chip` | — | ship (crosswalk) | reuse |
-| `action-bar`, `tabs`, `timeline`, `segmented` | — | — | ship only when a page uses them |
+| `identity-session`, `action-bar`, `tabs`, `timeline`, `segmented` | — | — | admitted only when a declared page uses it; `identity-session` is shell chrome today (C26) |
 | `circuit-scene`, `run-controls`, `run-report`, `provider-profile`, `objective-composer`, `json-editor`, `status-bar` | — | — | Explorer runtime only; not declarable content in v1 |
 
-### B.2 Action kinds and authority
+### B.2 Action kinds and dispatch classes
 
 Local: `navigate`, `select`, `playback`, `view`, `toggle`, `pane`, `copy`/`download`,
 `stage-change`. Read: `refresh`. Session POST: `session`, `observe`, `objective`. A declaration's
-`authority` must equal the kind's class; no kind adds a route, method, header or credential (§4.4).
+`dispatchClass` must equal the kind's fixed class; it names the browser seam, never authority
+(C22), and no kind adds a route, method, header or credential (§4.4).
 
 ---
 
@@ -1007,3 +1073,49 @@ Local: `navigate`, `select`, `playback`, `view`, `toggle`, `pane`, `copy`/`downl
   after the route host/registry ship (§4.3, §4.5, §6.4, §9.2).
 - **C19:** the declaration boundary is explicit — chrome and identity stay shell; nav, sections and
   page content are declared (§1.1).
+
+**Revision 3 (2026-10-07) — user review corrections C20–C27 and recorded decisions.** Relative to
+[`review.md`](review.md):
+
+- **C20 (blocker):** the publisher/orchestrator `publish-ui-page` (governed workflow/capability)
+  is separated from the SQL candidate mechanics
+  `stage_ui_page`/`promote_ui_page`/`rollback_ui_page`; the procedures own only persistence
+  invariants, append, conditional pointer move, conditional rollback and publication facts; every
+  "one SQL call owns verification" statement is replaced
+  (§4.6, §7.1, §7.4, P0.1/P0.5, §9.3, G4). This supersedes the Revision 2 C2 identity of
+  `publish_ui_page`.
+- **C21 (blocker):** the undeclared `load-hero` event is removed from the canonical home example;
+  the figure's declared `read` binding covers loading, and the example passes its own validator
+  (§5.3).
+- **C22:** the UI "authority classes" are renamed dispatch classes — `dispatchClass` with
+  `local`/`read`/`session-post` in the JSON examples; language equating browser dispatch with
+  authority is removed and actual authority stays downstream in the capability system (D4, §4.4,
+  §5.5, §7.2 manifest, B.2).
+- **C23:** the pointer CAS law is added with publisher A/B and the sentence "Evidence that an
+  earlier state existed does not grant authority to overwrite the current state";
+  `promote_ui_page(candidateRevision, expectedCurrentRevision)` and
+  `rollback_ui_page(fromRevision, toRevision, expectedCurrentRevision)` refuse when the expected
+  current no longer holds (§4.6, §7.1, §9.3, WP0.4).
+- **C24:** the cache/publication consistency question gets its own later gate **G8 (page cache
+  publication consistency)**; **G5 remains media serving/storage**; G8 does not block Phase 0 on
+  one effective serving instance (§6.2, §11.4).
+- **C25:** the declarative rendering safety invariant is added — no executable markup, text roles
+  render with `textContent`, URLs validate against an admitted scheme/origin profile, no adapter
+  evaluates declaration-provided script/HTML/CSS/handler text/protocols — and it is a verification
+  gate (WP0.7) (§8.5, §9.2).
+- **C26:** the used-by-Phase-0 rule is applied; `identity-session` is removed from the Phase 0
+  declarable set (it is shell chrome) and every admitted kind is re-audited against the home
+  declaration's actual body use (§4.2, §7.2, B.1).
+- **C27:** ordinary navigation resolves the current published pointer; destination digest pinning
+  is reserved for intentional snapshot links (historical evidence, publication receipt, specific
+  article revision, audit/replay view), preserving independent page publication (§4.5, §5.7).
+
+**Recorded decisions.** **G1 ACCEPTED** (declared page data → `read-ui-page` → trusted shell
+projection; no full page-as-executed-capability now). **G4 ACCEPTED** subject to the C20
+publisher/procedure split and the C23 CAS pointer law. **G6 ACCEPTED** with used-by-Phase-0
+enforcement (pruned set). **G8** (page cache publication consistency) and **G9** (public-claim
+provenance model: statement, basis, sourceRefs, observedAt, effectiveAt, classification, status)
+are recorded; G9 is a Phase 2 gate and does not block Phase 0. **Phase 0 content** must visibly
+carry the settled propositions (Zero Implicit Authority, Sovereignty at Scale, Semantic Flight
+Recording, Evidence by Design, Independent Evaluation, Enterprise/Government) as content
+authority, not page-runtime semantics (§10 Phase 0, P0.6).

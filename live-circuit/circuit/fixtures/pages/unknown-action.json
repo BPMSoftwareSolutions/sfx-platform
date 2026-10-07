@@ -1,0 +1,34 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/unknown-action",
+  "pageId": "ui-page-unknown-action",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "refusal": "UI_DECLARATION_INVALID",
+  "reason": "Section home-unknown-action declares the action kind launch-missiles, which the deployed ui-registry does not admit.",
+  "error": "UI_DECLARATION_INVALID",
+  "sections": [
+    {
+      "sectionId": "home-unknown-action",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
+      "props": { "kind": "info", "text": "This section names an action kind the shell has never admitted.", "actionId": "launch" },
+      "bindings": {},
+      "actions": [
+        { "actionId": "launch", "kind": "launch-missiles", "dispatchClass": "local", "to": "/circuit/explorer" }
+      ]
+    }
+  ]
+}

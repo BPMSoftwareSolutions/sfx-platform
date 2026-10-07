@@ -60,53 +60,7 @@
   </div>
 </header>
 
-<main>
-  <section class="hero art art-architecture" aria-labelledby="headline">
-    <div class="wrap hero-grid">
-      <div>
-        <p class="eyebrow" id="eyebrow">SFX Live Circuit Platform</p>
-        <h1 class="display" id="headline">Watch capabilities execute live.</h1>
-        <p class="lede" id="lede">Capabilities are declared as data. The SDA kernel executes their graphs. Follow the input, operations, provider calls and outcome as receipts arrive.</p>
-        <div class="actions" id="actions">
-          <a class="button primary" href="/circuit/explorer">Open the Live Circuit</a>
-          <a class="button secondary" id="sign-in-cta" href="/circuit/login?return=%2Fcircuit%2Fhome">Sign in to observe</a>
-        </div>
-        <p class="micro" id="micro">Explore publicly. Sign in to start an observed run.</p>
-      </div>
-      <article class="circuit-card" aria-label="Database circuit">
-        <header><p class="panel-label" id="circuit-label">Circuit</p><span class="source">DATABASE SCENE</span></header>
-        <div class="circuit-figure" id="circuit-figure"><div class="state">Reading the circuit from the database…</div></div>
-        <footer><span id="circuit-caption"></span><a id="circuit-link" href="/circuit/explorer">Open this circuit</a></footer>
-      </article>
-    </div>
-    <div class="wrap">
-      <div class="counts panel" id="counts" aria-label="Live estate counts">
-        <div class="count"><div class="value" id="c-total">–</div><div class="label">capabilities</div><div class="sub" id="c-split">Reading the catalog…</div></div>
-        <div class="count"><div class="value" id="c-scenarios">–</div><div class="label">scenarios</div><div class="sub">Declared across the estate</div></div>
-        <div class="count"><div class="value" id="c-multi">–</div><div class="label">multi-scenario capabilities</div><div class="sub">One circuit per scenario</div></div>
-        <div class="count"><div class="value" id="c-kernel">–</div><div class="label">installed kernel</div><div class="sub" id="c-release">Release not reported by this host</div></div>
-      </div>
-      <div class="signed-panels" id="signed-panels" hidden>
-        <div class="panel"><p class="panel-label">Your session</p><p class="big" id="s-who"></p><p class="sub" id="s-detail"></p></div>
-        <div class="panel"><p class="panel-label">Your observed runs</p><p class="big" id="r-head">No runs started in this session</p><p class="sub" id="r-sub">Your observed runs appear here after you start them in the Live Circuit.</p><ul class="runs" id="runs"></ul></div>
-      </div>
-      <p class="snapshot" id="snapshot"></p>
-    </div>
-  </section>
-
-  <section class="lower art art-flow" id="how" aria-labelledby="how-title">
-    <div class="wrap">
-      <h2 class="section-title" id="how-title">Built from declared meaning</h2>
-      <div class="steps">
-        <div class="step panel"><h3><span style="color:var(--amber)">01</span>Declare</h3><p>Contracts, operations and provider bindings live as rows in one authority database.</p></div>
-        <div class="step panel"><h3><span style="color:var(--blue)">02</span>Execute</h3><p>The installed SDA kernel interprets the graph selected for the capability.</p></div>
-        <div class="step panel"><h3><span style="color:var(--cyan)">03</span>Observe</h3><p>Receipts light the circuit. Replay preserves the captured scenario timing.</p></div>
-      </div>
-      <div class="cards-head"><h2 class="section-title">Capabilities to explore</h2></div>
-      <div class="cards" id="cards"></div>
-    </div>
-  </section>
-</main>
+<main id="page-root"></main>
 
 <footer class="site-footer">
   <div class="wrap">

@@ -1,0 +1,51 @@
+{
+  "tool": "publish-ui-page",
+  "at": "2026-10-07T19:54:24.421Z",
+  "base": "http://127.0.0.1:8788",
+  "candidateFile": "candidate-rev2.json",
+  "actor": "drill:local",
+  "steps": [
+    {
+      "step": "validate",
+      "pass": true,
+      "issue": null
+    },
+    {
+      "step": "stage",
+      "pass": true,
+      "pointerUntouched": true
+    },
+    {
+      "step": "candidate-verify",
+      "pass": true,
+      "status": "READ",
+      "servedDigest": "19383d339c1fef9ac253bbc223b0bea103c5f4c65b334ad9ca7bedfbf4bf88ce"
+    },
+    {
+      "step": "promote",
+      "pass": true,
+      "expectedCurrentRevision": 1
+    },
+    {
+      "step": "post-verify",
+      "pass": true,
+      "status": "READ",
+      "revision": 2
+    },
+    {
+      "step": "receipt",
+      "pass": true
+    }
+  ],
+  "validated": true,
+  "staged": true,
+  "candidateVerified": true,
+  "promoted": true,
+  "postVerified": true,
+  "rolledBack": false,
+  "refusal": null,
+  "ok": true,
+  "fromRevision": 1,
+  "candidateRevision": 2,
+  "digest": "19383d339c1fef9ac253bbc223b0bea103c5f4c65b334ad9ca7bedfbf4bf88ce"
+}

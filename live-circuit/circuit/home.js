@@ -1,11 +1,13 @@
-// Home page (design H2). Every value is read: host configuration
-// (/api/circuit/v1/home), session, the capability catalog, the gateway's health
-// response and the database scene. Missing values are shown as unavailable.
-import { $, json, home, session, release, circuitHref, circuitPreview, signOut, footerRelease } from './site.js';
+// Home page entry. The body is a declared page (ui-page.v1) read from
+// /api/circuit/v1/page; featured cards come from the declaration, not host
+// configuration. Shell chrome — the environment label, the identity area and
+// the footer release — stays with the shell. A read failure or refusal renders
+// a named notice and the chrome stays; the served pageDigest is bound for
+// subsequent re-reads (refresh, popstate), exactly like the generic page entry.
+import { $, json, home, session, release, signOut, footerRelease } from './site.js';
+import { createPageRuntime } from './page-runtime.js';
 
-const LANG = { csharp: 'C#', node: 'Node', python: 'Python' };
-const fmt = n => Number(n).toLocaleString('en-US');
-const time = iso => new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const PATH = '/circuit/home';
 
 function identityArea(state) {
   const node = $('identity');
@@ -20,78 +22,77 @@ function identityArea(state) {
   }
 }
 
-async function signedIn(state) {
-  $('eyebrow').textContent = 'Your Live Circuit workspace';
-  $('headline').textContent = state.identifier ? `Welcome back, ${state.identifier}.` : 'Welcome back.';
-  $('lede').textContent = 'Choose a capability and follow its execution. Observe is enabled for your session.';
-  $('sign-in-cta').remove();
-  $('micro').textContent = 'Runs you start carry your identity.';
-  $('counts').hidden = true; $('signed-panels').hidden = false;
-  $('s-who').textContent = state.identifier ?? `principal ${state.principalId.slice(0, 8)}`;
-  $('s-detail').textContent = `${state.realm ?? 'realm not reported'} / expires ${time(state.expiresAt)}`;
-  const r = await json('/api/circuit/v1/session/runs');
-  const runs = r.ok ? r.body.runs ?? [] : null;
-  if (runs === null) { $('r-head').textContent = 'Observed runs are unavailable'; $('r-sub').textContent = 'The session could not be read.'; return; }
-  if (!runs.length) return;
-  $('r-head').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'} in this session`;
-  $('r-sub').textContent = 'Held by this host in memory; a restart clears the list.';
-  $('runs').replaceChildren(...runs.slice(-5).reverse().map(run => {
-    const li = document.createElement('li');
-    const name = document.createElement('strong');
-    if (run.capabilityId) name.append(Object.assign(document.createElement('a'), { href: circuitHref(run.capabilityId, run.namespaceId ?? 'sidefx:capabilities'), textContent: run.capabilityId }));
-    else name.textContent = `run ${run.runId.slice(0, 8)}`;
-    li.append(name, Object.assign(document.createElement('span'), { textContent: `admitted ${time(run.admittedAt)}` }));
-    return li;
-  }));
+const root = $('page-root');
+let boundPath = null;
+let boundDigest = null;
+let serial = 0;
+
+function notice(code, detail, state) {
+  const node = document.createElement('p');
+  node.className = 'panel';
+  if (code) node.dataset.refusal = code;
+  if (state) node.dataset.state = state;
+  node.textContent = detail;
+  return node;
 }
 
-function counts(catalog, health) {
-  if (catalog) {
-    const caps = catalog.capabilities;
-    const domain = caps.filter(c => c.namespaceId === 'sidefx:capabilities').length;
-    $('c-total').textContent = fmt(caps.length);
-    $('c-split').textContent = `${domain} domain / ${caps.length - domain} platform`;
-    $('c-scenarios').textContent = fmt(caps.reduce((n, c) => n + (c.scenarioCount ?? 0), 0));
-    $('c-multi').textContent = fmt(caps.filter(c => (c.scenarioCount ?? 0) > 1).length);
-    $('snapshot').textContent = `Estate read ${new Date(catalog.readAt).toISOString().slice(0, 16).replace('T', ' ')} UTC / counts refresh from the database`;
+function navigate(url) {
+  const target = new URL(url, location.href);
+  if (target.origin === location.origin && target.pathname === location.pathname) {
+    history.pushState(null, '', url);
+    void load();
+    return;
+  }
+  location.assign(url);
+}
+
+async function load() {
+  const current = ++serial;
+  const query = new URLSearchParams({ path: PATH });
+  if (boundPath === PATH && boundDigest) query.set('expectedPageDigest', boundDigest);
+  let response;
+  try { response = await json(`/api/circuit/v1/page?${query}`); }
+  catch {
+    if (current !== serial) return;
+    boundPath = null; boundDigest = null;
+    root.replaceChildren(notice('PAGE_READ_FAILED', 'The page could not be read (PAGE_READ_FAILED).'));
+    return;
+  }
+  if (current !== serial) return;
+  if (!response.ok) {
+    boundPath = null; boundDigest = null;
+    const code = typeof response.body?.error === 'string' ? response.body.error : 'PAGE_READ_FAILED';
+    root.replaceChildren(notice(code, `The page could not be read (${code}).`));
+    return;
+  }
+  const pageDocument = response.body ?? {};
+  // Bind the served digest for subsequent reads when the revision is current;
+  // a degraded fallback stays unbound so a later read can recover the
+  // published revision.
+  if (pageDocument.pageDigest && pageDocument.status !== 'DEGRADED') {
+    boundPath = PATH;
+    boundDigest = String(pageDocument.pageDigest).replace(/^sha256:/, '');
   } else {
-    $('c-split').textContent = 'The catalog could not be read';
+    boundPath = null; boundDigest = null;
   }
-  if (health) {
-    $('c-kernel').textContent = LANG[health.kernelLanguage] ?? 'Installed';
-    $('c-release').textContent = `${health.release.split('-').pop()} / sha256 ${health.kernelDigest.split(':').pop().slice(0, 8)}`;
+  const runtime = await createPageRuntime({ root, document: pageDocument, navigate });
+  await runtime.render();
+  if (current !== serial) return;
+  if (pageDocument.status === 'DEGRADED') {
+    const degraded = pageDocument.degraded ?? {};
+    root.prepend(notice(null, `Showing revision ${degraded.servedRevision ?? pageDocument.revision ?? 'unknown'} because ${degraded.reason ?? 'the current revision could not be read'}.`, 'degraded'));
   }
 }
 
-function cards(config, catalog) {
-  const byId = new Map((catalog?.capabilities ?? []).map(c => [`${c.namespaceId}/${c.capabilityId}`, c]));
-  $('cards').replaceChildren(...(config.featured ?? []).map(item => {
-    const c = byId.get(`${item.namespaceId}/${item.capabilityId}`);
-    const card = document.createElement('article'); card.className = 'card panel' + (c || !catalog ? '' : ' missing');
-    card.innerHTML = '<h3></h3><p class="body"></p><p class="promise"></p><div class="meta"><span></span><a>Open circuit</a></div>';
-    card.querySelector('h3').textContent = item.title;
-    card.querySelector('.body').textContent = item.body;
-    card.querySelector('.promise').textContent = item.promise;
-    const n = c?.scenarioCount;
-    card.querySelector('.meta span').textContent = c ? `${n} scenario${n === 1 ? '' : 's'}` : catalog ? 'Not in the current estate' : item.capabilityId;
-    card.querySelector('.meta a').href = circuitHref(item.capabilityId, item.namespaceId, c?.declaredRootScenarioId);
-    card.querySelector('.meta a').setAttribute('aria-label', `Open the ${item.capabilityId} circuit`);
-    return card;
-  }));
-}
+window.addEventListener('popstate', () => { void load(); });
 
-const [config, state, catalog, health] = await Promise.all([
-  home().then(r => r.ok ? r.body : null), session().then(r => r.ok ? r.body : null),
-  json('/api/circuit/v1/capabilities').then(r => r.ok ? r.body : null), release()]);
+const [config, state, health] = await Promise.all([
+  home().then(r => r.ok ? r.body : null),
+  session().then(r => r.ok ? r.body : null),
+  release()
+]);
 
 if (config?.environment) { $('env').textContent = config.environment; $('env').hidden = false; }
 identityArea(state);
-counts(catalog, health);
 footerRelease($('release'), health);
-if (config) {
-  cards(config, catalog);
-  circuitPreview({ figure: $('circuit-figure'), caption: $('circuit-caption'), link: $('circuit-link'), label: $('circuit-label') }, config.hero);
-} else {
-  $('circuit-figure').querySelector('.state').textContent = 'Host configuration could not be read.';
-}
-if (state?.authenticated) await signedIn(state);
+await load();

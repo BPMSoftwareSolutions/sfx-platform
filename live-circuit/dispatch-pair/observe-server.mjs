@@ -28,6 +28,10 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/home.js', ['home.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer', ['explorer.html', 'text/html; charset=utf-8']],
   ['/circuit/explorer.js', ['explorer.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/page.html', ['page.html', 'text/html; charset=utf-8']],
+  ['/circuit/page.js', ['page.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/page-runtime.js', ['page-runtime.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/ui-components.js', ['ui-components.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-runtime.js', ['circuit-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer-model.mjs', ['explorer-model.mjs', 'text/javascript; charset=utf-8']],
   ['/circuit/pane-layout.js', ['pane-layout.js', 'text/javascript; charset=utf-8']],
@@ -43,6 +47,11 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/assets/sfx-logo-wordmark.png', ['assets/sfx-logo-wordmark.png', 'image/png']],
   ['/circuit/assets/sfx-emblem.png', ['assets/sfx-emblem.png', 'image/png']],
 ]);
+// Declared pages share one generic shell under /circuit/<slug>. Exact map
+// entries always win; these slugs stay reserved so a declaration can never
+// shadow login, the Explorer, a deck route or a client module.
+const reservedCircuitSlugs = new Set(['login', 'home', 'explorer', 'deck', 'decks', 'deck-slide',
+  'assets', 'page.html', 'page.js', 'page-runtime.js', 'ui-components.js']);
 // Home and sign-in page configuration is host data (circuit-host.json); the
 // environment label comes from the host's indexing setting or an explicit label.
 const hostPolicy = JSON.parse(await readFile(new URL('circuit-host.json', CIRCUIT_DIR), 'utf8'));
@@ -475,6 +484,13 @@ const handleRequest = async (req, res) => {
       const body = await readFile(new URL(file, CIRCUIT_DIR));
       res.writeHead(200, { 'content-type': type, 'cache-control': 'no-store' });
       res.end(body);
+      return;
+    }
+    // Declared pages resolve through the generic shell after every exact route.
+    if (req.method === 'GET' && /^\/circuit\/[a-z][a-z0-9-]*$/.test(url.pathname) &&
+        !reservedCircuitSlugs.has(url.pathname.slice('/circuit/'.length))) {
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
+      res.end(await readFile(new URL('page.html', CIRCUIT_DIR)));
       return;
     }
     sendJson(res, 404, { error: 'not_found' });

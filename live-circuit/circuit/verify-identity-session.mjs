@@ -69,10 +69,10 @@ check('sign-in and home pages, scripts, styles and artwork are served', async ()
     '/circuit/site.css', '/circuit/assets/optical-flow.webp', '/circuit/assets/optical-architecture-900.webp', '/circuit/assets/sfx-logo-wordmark.png'])
     assert.equal((await get(o, p)).status, 200, p);
 });
-check('home configuration is host data: hero, featured, sign-in circuit', async () => {
+check('home configuration is host route data: hero and sign-in circuit only', async () => {
   const h = await (await get(o, '/api/circuit/v1/home')).json();
   assert.equal(h.hero.capabilityId, 'authenticate-ide-user'); assert.equal(h.signInCircuit.capabilityId, 'authenticate-ide-user');
-  assert.ok(h.featured.length >= 1 && h.featured.every(f => f.capabilityId && f.title && f.namespaceId));
+  assert.equal((h.featured ?? []).length, 0, 'featured is declaration authority, not host data (C1)');
 });
 check('no cookie: not authenticated, Observe requires session', async () => {
   const s = await (await get(o, '/api/circuit/v1/session')).json();
