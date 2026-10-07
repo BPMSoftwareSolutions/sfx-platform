@@ -1,0 +1,51 @@
+{
+  "tool": "publish-ui-page",
+  "at": "2026-10-07T20:00:52.598Z",
+  "base": "http://127.0.0.1:8788",
+  "candidateFile": "candidate-rev4-clean.json",
+  "actor": "content-owner:first-publish",
+  "steps": [
+    {
+      "step": "validate",
+      "pass": true,
+      "issue": null
+    },
+    {
+      "step": "stage",
+      "pass": true,
+      "pointerUntouched": true
+    },
+    {
+      "step": "candidate-verify",
+      "pass": true,
+      "status": "READ",
+      "servedDigest": "b589288708f43051484b4375b340b5add0c54b430ea1751abeabee5f144d8cd8"
+    },
+    {
+      "step": "promote",
+      "pass": true,
+      "expectedCurrentRevision": 2
+    },
+    {
+      "step": "post-verify",
+      "pass": true,
+      "status": "READ",
+      "revision": 4
+    },
+    {
+      "step": "receipt",
+      "pass": true
+    }
+  ],
+  "validated": true,
+  "staged": true,
+  "candidateVerified": true,
+  "promoted": true,
+  "postVerified": true,
+  "rolledBack": false,
+  "refusal": null,
+  "ok": true,
+  "fromRevision": 2,
+  "candidateRevision": 4,
+  "digest": "b589288708f43051484b4375b340b5add0c54b430ea1751abeabee5f144d8cd8"
+}

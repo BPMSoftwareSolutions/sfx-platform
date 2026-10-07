@@ -1,0 +1,25 @@
+{
+  "tool": "publish-ui-page",
+  "at": "2026-10-07T20:00:44.740Z",
+  "base": "http://127.0.0.1:8788",
+  "candidateFile": "candidate-rev3-clean.json",
+  "actor": "content-owner:first-publish",
+  "steps": [
+    {
+      "step": "validate",
+      "pass": true,
+      "issue": null
+    }
+  ],
+  "validated": true,
+  "staged": false,
+  "candidateVerified": false,
+  "promoted": false,
+  "postVerified": false,
+  "rolledBack": false,
+  "refusal": "UI_PAGE_REVISION_EXISTS",
+  "ok": false,
+  "fromRevision": 2,
+  "candidateRevision": 3,
+  "digest": "eabd0886aec6d4843c20f62d445f39cfb46ff2081ded90fbac8046566cbf58ba"
+}
