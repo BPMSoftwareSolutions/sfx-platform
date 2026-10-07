@@ -8,9 +8,11 @@ export const CAPTURE_VIEWPORTS = Object.freeze([
 ]);
 
 const HOME_PATH = '/circuit/home';
+const SECOND_PAGE_PATH = '/circuit/healthcare-solutions';
 const UNSAFE_PATH = '/circuit/unsafe';
 const UNSAFE_FIXTURE = new URL('../../live-circuit/circuit/fixtures/pages/unsafe.json', import.meta.url);
 const PENDING_REASON = 'TEST_PRINCIPAL_CREDENTIALS_UNAVAILABLE';
+const CROSSWALK_STATES = new Set(['mapped', 'partial', 'planned', 'unmapped']);
 const MARKUP = '<script>window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1</script><img src=x onerror="window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1">';
 const JAVASCRIPT_TARGET = 'javascript:window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1';
 const DATA_TARGET = 'data:text/html,<script>window.__sfxSafetyRuns=1</script>';
@@ -37,12 +39,25 @@ function expectedSectionIds(declaration, state) {
   return ids;
 }
 
-async function readHome(page) {
-  return page.evaluate(async pathname => {
-    const response = await fetch(`/api/circuit/v1/page?path=${encodeURIComponent(pathname)}&refresh=1`, { redirect: 'error' });
+async function readDeclaredPage(page, pathname) {
+  return page.evaluate(async path => {
+    const response = await fetch(`/api/circuit/v1/page?path=${encodeURIComponent(path)}&refresh=1`, { redirect: 'error' });
     const body = response.status === 200 ? await response.json() : null;
     return { status: response.status, revision: body?.revision ?? null, pageDigest: body?.pageDigest ?? null, sections: body?.sections ?? [] };
-  }, HOME_PATH);
+  }, pathname);
+}
+
+async function readHome(page) {
+  return readDeclaredPage(page, HOME_PATH);
+}
+
+// The crosswalk section is declared by the served page; its source id comes
+// from that declaration, never from a hardcoded page or provider identity.
+function crosswalkBindingOf(declaration) {
+  const bindings = (Array.isArray(declaration?.sections) ? declaration.sections : []).flatMap(section =>
+    Object.values(section?.bindings ?? {}).filter(binding => binding?.reader === 'crosswalk' || binding?.source === 'crosswalk')
+      .map(binding => ({ sectionId: section.sectionId ?? null, crosswalkId: binding?.input?.crosswalkId ?? null })));
+  return bindings.find(binding => typeof binding.crosswalkId === 'string') ?? null;
 }
 
 async function renderedSections(page) {
@@ -103,6 +118,78 @@ async function captureState({ context, origin, outDir, state, check }) {
     await page.close();
   }
   check(`home-${state}-no-page-errors`, pageErrors.length === 0, pageErrors.join(' | '));
+  return { captures, read };
+}
+
+// The Phase-1 second declared page: same shell, declared sections, and the
+// data-bound crosswalk section whose declared states must reach the DOM.
+async function captureCrosswalkPage({ context, origin, outDir, check }) {
+  const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  const captures = [];
+  let read = { status: null, revision: null, pageDigest: null, sections: [] };
+  try {
+    for (const viewport of CAPTURE_VIEWPORTS) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(origin + SECOND_PAGE_PATH, { waitUntil: 'load' });
+      await page.waitForFunction(() => document.querySelector('#page-root .page-region > section[id]') !== null, null, { timeout: 90000 });
+      read = await readDeclaredPage(page, SECOND_PAGE_PATH);
+      const rendered = await renderedSections(page);
+      const renderedIds = new Set(rendered.map(section => section.id));
+      const expected = expectedSectionIds({ sections: read.sections }, 'signed-out');
+      const missing = expected.filter(id => !renderedIds.has(id));
+      check(`healthcare-solutions-${viewport.name}-sections`, read.status === 200 && missing.length === 0,
+        missing.length ? `missing ${missing.join(',')}` : `${rendered.length} sections`);
+
+      const crosswalk = crosswalkBindingOf({ sections: read.sections });
+      const declared = crosswalk?.crosswalkId
+        ? await page.evaluate(async crosswalkId => {
+            const response = await fetch(`/api/circuit/v1/crosswalk?crosswalkId=${encodeURIComponent(crosswalkId)}`, { redirect: 'error' });
+            const body = response.status === 200 ? await response.json() : null;
+            const states = [];
+            const walk = value => {
+              if (Array.isArray(value)) { for (const item of value) walk(item); return; }
+              if (value !== null && typeof value === 'object') {
+                if (typeof value.label === 'string' && typeof value.state === 'string') states.push(value.state);
+                for (const item of Object.values(value)) walk(item);
+              }
+            };
+            if (body) walk(body);
+            return { status: response.status, contractId: body?.contractId ?? null, states: [...new Set(states)] };
+          }, crosswalk.crosswalkId)
+        : { status: 0, contractId: null, states: [] };
+      const renderedStates = crosswalk?.sectionId
+        ? await page.evaluate(sectionId => {
+            const node = document.getElementById(sectionId);
+            return node ? [...new Set([...node.querySelectorAll('[data-state]')].map(item => item.getAttribute('data-state')))] : [];
+          }, crosswalk.sectionId)
+        : [];
+      const statesRendered = declared.states.length > 0 && declared.states.every(state => renderedStates.includes(state));
+      const vocabularyHeld = renderedStates.length > 0 && renderedStates.every(state => CROSSWALK_STATES.has(state));
+      check(`healthcare-solutions-crosswalk-${viewport.name}`,
+        Boolean(crosswalk) && declared.status === 200 && declared.contractId === 'standards-crosswalk.v1' && statesRendered && vocabularyHeld,
+        `section=${crosswalk?.sectionId ?? '(none)'} declaredStates=[${declared.states.join(',')}] renderedStates=[${renderedStates.join(',')}]`);
+
+      const file = path.join(outDir, `healthcare-solutions-${viewport.name}.png`);
+      await page.screenshot({ path: file, fullPage: true });
+      captures.push({
+        name: `healthcare-solutions-${viewport.name}`,
+        state: 'signed-out',
+        viewport: { name: viewport.name, width: viewport.width, height: viewport.height },
+        file: path.basename(file),
+        sha256: sha256File(file),
+        fullPage: true,
+        revision: read.revision,
+        pageDigest: read.pageDigest,
+        sections: rendered,
+        crosswalk: { sectionId: crosswalk?.sectionId ?? null, crosswalkId: crosswalk?.crosswalkId ?? null, declaredStates: declared.states, renderedStates }
+      });
+    }
+  } finally {
+    await page.close();
+  }
+  check('healthcare-solutions-no-page-errors', pageErrors.length === 0, pageErrors.join(' | '));
   return { captures, read };
 }
 
@@ -255,6 +342,7 @@ export async function captureDeclaredHome({ browser, origin, outDir, signedInCon
     pageDigest: null,
     captures: [],
     signedIn: null,
+    secondPage: null,
     domSafety: null,
     checks
   };
@@ -268,6 +356,10 @@ export async function captureDeclaredHome({ browser, origin, outDir, signedInCon
     receipt.revision = result.read.revision;
     receipt.pageDigest = result.read.pageDigest;
     check('home-signed-out-captured', result.captures.length === CAPTURE_VIEWPORTS.length, `${result.captures.length} captures`);
+    const second = await captureCrosswalkPage({ context: signedOutContext, origin, outDir, check });
+    receipt.captures.push(...second.captures);
+    receipt.secondPage = { path: SECOND_PAGE_PATH, revision: second.read.revision, pageDigest: second.read.pageDigest, captures: second.captures };
+    check('healthcare-solutions-captured', second.captures.length === CAPTURE_VIEWPORTS.length, `${second.captures.length} captures`);
   } finally {
     await signedOutContext.close();
   }

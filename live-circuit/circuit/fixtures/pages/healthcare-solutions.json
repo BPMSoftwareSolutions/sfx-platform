@@ -1,0 +1,103 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/healthcare-solutions",
+  "pageId": "ui-page-healthcare-solutions",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "copyBasis": "Phase 1 fixture for verify-pages --fixtures: the industry Solutions template with the data-bound Standards crosswalk. The estate publication owns the served document, so this fixture is shape-only.",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "e2591ca34ce894541132dccaca54fa77d8e98b84e7f8c8c8c93ff320fe9db58c",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sources": [
+    { "sourceId": "crosswalk", "reader": "crosswalk", "input": { "crosswalkId": "healthcare-solutions.v1" } }
+  ],
+  "sections": [
+    {
+      "sectionId": "healthcare-solutions-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Healthcare solutions", "level": 2 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "healthcare-solutions-crosswalk",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "table", "version": 1 },
+      "props": {
+        "columns": [
+          { "key": "standard", "label": "Standard" },
+          { "key": "capability", "label": "Declared capability" },
+          { "key": "state", "label": "Coverage state" }
+        ],
+        "caption": "SFX capability coverage of healthcare standards",
+        "empty": "No standards are declared for this crosswalk."
+      },
+      "bindings": {
+        "rows": {
+          "kind": "read",
+          "reader": "crosswalk",
+          "input": { "crosswalkId": "healthcare-solutions.v1" },
+          "pointer": "/standards"
+        }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "healthcare-solutions-crosswalk-basis",
+      "regionId": "main",
+      "order": 3,
+      "component": { "kind": "field-list", "version": 1 },
+      "props": { "label": "Crosswalk basis and limits" },
+      "bindings": {
+        "fields": {
+          "kind": "read",
+          "reader": "crosswalk",
+          "input": { "crosswalkId": "healthcare-solutions.v1" },
+          "pointer": "/basis"
+        }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "healthcare-solutions-crosswalk-disclosure",
+      "regionId": "main",
+      "order": 4,
+      "component": { "kind": "disclosure", "version": 1 },
+      "props": {
+        "summary": "Basis and limits",
+        "body": "Coverage states are declared labels over capability mechanisms. They are not compliance determinations and make no coverage or availability claim."
+      },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "healthcare-solutions-crosswalk-badge",
+      "regionId": "main",
+      "order": 5,
+      "component": { "kind": "badge", "version": 1 },
+      "props": { "label": "Preview", "tone": "info" },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "healthcare-solutions-crosswalk-status",
+      "regionId": "main",
+      "order": 6,
+      "component": { "kind": "status-chip", "version": 1 },
+      "props": { "label": "Crosswalk read", "state": "mapped" },
+      "bindings": {},
+      "actions": []
+    }
+  ],
+  "readingDefinitionSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}

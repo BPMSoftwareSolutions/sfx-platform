@@ -69,9 +69,10 @@ const repoRoot = path.resolve(here, '..', '..');
 const { UI_COMPONENT_ROLES, UI_COMPONENTS } = await import(pathToFileURL(path.join(here, 'ui-components.js')).href);
 
 // The shipped ui-component.v1 contracts as seeded by
-// sfx-embody/sql/migrations/declare-ui-page-reading.commit.sql:128-138: the
-// contract's own `roles` list and `props` keys. supportedRoles must equal their
-// union; the role table keeps the names split by how the adapter consumes them.
+// sfx-embody/sql/migrations/declare-ui-page-reading.commit.sql:128-138 and the
+// Phase-1 migration pair (five kinds, authored in parallel): the contract's own
+// `roles` list and `props` keys. supportedRoles must equal their union; the role
+// table keeps the names split by how the adapter consumes them.
 const CONTRACTS = {
   hero: { roles: ['eyebrow', 'headline', 'lede', 'figure', 'primaryActionId'], props: ['eyebrow', 'headline', 'lede', 'figure', 'primaryActionId'] },
   section: { roles: ['heading', 'body', 'actions'], props: ['heading', 'body', 'actions'] },
@@ -83,6 +84,11 @@ const CONTRACTS = {
   list: { roles: ['items', 'current'], props: ['items', 'current', 'empty'] },
   'media.figure': { roles: ['svg', 'src', 'alt', 'caption', 'link', 'digest'], props: ['src', 'svg', 'alt', 'caption', 'link', 'digest'] },
   notice: { roles: ['title', 'body', 'action', 'state'], props: ['tone', 'title', 'body', 'actionId', 'state'] },
+  table: { roles: ['columns', 'rows', 'caption', 'empty'], props: ['columns', 'rows', 'caption', 'empty'] },
+  'field-list': { roles: ['fields', 'label'], props: ['fields', 'label'] },
+  disclosure: { roles: ['summary', 'body'], props: ['summary', 'body'] },
+  badge: { roles: ['label'], props: ['label', 'tone'] },
+  'status-chip': { roles: ['label', 'state'], props: ['label', 'state'] },
 };
 
 const checks = [];
@@ -270,6 +276,60 @@ function probeSpec(kind, name) {
       return textProbe({ [name]: S }, {}, 'an unmatched action id renders as text');
     case 'notice\u0000title': case 'notice\u0000body':
       return textProbe({ [name]: S });
+    case 'table\u0000columns':
+      return textProbe({ columns: [{ key: 'subject', label: S }], rows: [{ subject: 'value' }] }, {}, 'the declared column label reaches the header');
+    case 'table\u0000rows': {
+      const state = `state-${S}`;
+      return {
+        entry: { sectionId: 'probe', props: { columns: [{ key: 'subject', label: 'Subject' }, { key: 'state', label: 'State' }],
+          rows: [{ subject: S, state: { label: `chip-${S}`, state } }] } },
+        verify: root => textOf(root).includes(S) && attrsOf(root).includes(`data-state=${state}`),
+        detail: 'the declared row cell reaches text and a {label,state} cell renders data-state',
+      };
+    }
+    case 'table\u0000caption':
+      return textProbe({ caption: S });
+    case 'table\u0000empty':
+      return textProbe({ rows: [], empty: S }, {}, 'an empty row set renders the declared empty text');
+    case 'field-list\u0000fields':
+      return {
+        entry: { sectionId: 'probe', props: { fields: [{ label: `label-${S}`, value: `value-${S}` }] } },
+        verify: root => textOf(root).includes(`label-${S}`) && textOf(root).includes(`value-${S}`),
+        detail: 'the declared field label and value reach the list',
+      };
+    case 'field-list\u0000label':
+      return textProbe({ label: S });
+    case 'disclosure\u0000summary':
+      return {
+        entry: { sectionId: 'probe', props: { summary: S, body: `body-${S}` } },
+        verify: root => tagsOf(root).includes('DETAILS') && tagsOf(root).includes('SUMMARY') && textOf(root).includes(S),
+        detail: 'the declared summary renders inside a details element',
+      };
+    case 'disclosure\u0000body':
+      return textProbe({ summary: 'probe summary', body: S });
+    case 'badge\u0000label':
+      return textProbe({ label: S });
+    case 'badge\u0000tone': {
+      const tone = `tone-${S}`;
+      return {
+        entry: { sectionId: 'probe', props: { label: S, tone } },
+        verify: root => {
+          const first = nodeList(root)[0];
+          return Boolean(first) && String(first.className).split(/\s+/).includes(tone) && textOf(root).includes(S);
+        },
+        detail: 'the declared tone selects the rendered class and the label reaches text',
+      };
+    }
+    case 'status-chip\u0000label':
+      return textProbe({ label: S, state: 'mapped' });
+    case 'status-chip\u0000state': {
+      const state = `state-${S}`;
+      return {
+        entry: { sectionId: 'probe', props: { label: S, state } },
+        verify: root => attrsOf(root).includes(`data-state=${state}`),
+        detail: 'the declared state reaches data-state',
+      };
+    }
     default:
       return null;
   }

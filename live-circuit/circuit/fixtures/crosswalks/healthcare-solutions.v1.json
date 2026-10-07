@@ -1,0 +1,49 @@
+{
+  "contractId": "standards-crosswalk.v1",
+  "status": "READ",
+  "crosswalkId": "healthcare-solutions.v1",
+  "title": "SFX capability coverage of healthcare standards",
+  "copyBasis": "Phase 1 fixture for verify-pages --fixtures. Coverage states are capability-level mappings, never compliance determinations; the estate publication owns the served document.",
+  "standards": [
+    {
+      "standard": "HIPAA Security Rule",
+      "reference": "45 CFR Part 164",
+      "capability": "execute-governed-model-invocation",
+      "state": { "label": "Mapped", "state": "mapped" },
+      "basis": "A declared capability invocation keeps execution lineage and receipts for evaluation.",
+      "limits": "Maps the capability mechanism only; it is not a compliance determination."
+    },
+    {
+      "standard": "HITRUST CSF",
+      "reference": "v11",
+      "capability": "authenticate-ide-user",
+      "state": { "label": "Partial", "state": "partial" },
+      "basis": "Principal, credential and session providers are separately declared.",
+      "limits": "Partial coverage of the control set; no certification claim."
+    },
+    {
+      "standard": "SOC 2 Type II",
+      "reference": "Trust Services Criteria",
+      "capability": "request-capability-from-objective-v3",
+      "state": { "label": "Planned", "state": "planned" },
+      "basis": "Objective admission is declared; the control mapping is not published yet.",
+      "limits": "Planned work; no evidence exists today."
+    },
+    {
+      "standard": "FDA SaMD",
+      "reference": "21 CFR Part 820",
+      "capability": "resolve-equity-market-price-evidence",
+      "state": { "label": "Unmapped", "state": "unmapped" },
+      "basis": "No declared capability claims this mapping.",
+      "limits": "Explicitly unmapped; absence is shown, never hidden."
+    }
+  ],
+  "basis": [
+    { "label": "Reader", "value": "standards-crosswalk.v1" },
+    { "label": "Source", "value": "dependency-free fixture" },
+    { "label": "Vocabulary", "value": "mapped | partial | planned | unmapped" }
+  ],
+  "limits": "This crosswalk states declared mapping intent over capability mechanisms. It is not a compliance, coverage or availability claim.",
+  "readingDefinitionSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}

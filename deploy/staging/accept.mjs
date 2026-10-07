@@ -44,10 +44,10 @@ try {
   } else if (mode === 'public') {
     const checks = [];
     for (const [route, method, expected] of [
-      ['/', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/circuit-runtime.js', 'GET', 200], ['/circuit/app.js', 'GET', 404], ['/circuit/session-status.js', 'GET', 404], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200], ['/circuit/pane-layout.js', 'GET', 200], ['/circuit/objective-run.js', 'GET', 200], ['/circuit/provider-profile.js', 'GET', 200],
+      ['/', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/healthcare-solutions', 'GET', 200], ['/circuit/circuit-runtime.js', 'GET', 200], ['/circuit/app.js', 'GET', 404], ['/circuit/session-status.js', 'GET', 404], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200], ['/circuit/pane-layout.js', 'GET', 200], ['/circuit/objective-run.js', 'GET', 200], ['/circuit/provider-profile.js', 'GET', 200],
       ['/circuit/page.html', 'GET', 200], ['/circuit/page.js', 'GET', 200], ['/circuit/page-runtime.js', 'GET', 200], ['/circuit/ui-components.js', 'GET', 200],
       ['/healthz','GET',200], ['/readyz','GET',200], ['/v1/runs/ready','GET',401], ['/internal/deployment','GET',401],
-      ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/procedure-extract/json','POST',401],
+      ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/api/circuit/v1/crosswalk','POST',405], ['/procedure-extract/json','POST',401],
       ['/robots.txt','GET',200], ['/favicon.ico','GET',200], ['/capabilities','GET',404], ['/about','GET',404], ['/sitemap.xml','GET',404]
     ]) {
       const response = await fetch(config.origin + route, {method, redirect:'error', signal:AbortSignal.timeout(90000)});
@@ -89,11 +89,26 @@ try {
     assert.equal(stalePage.status,409); assert.equal((await stalePage.json()).error,'PAGE_SNAPSHOT_CHANGED');
     const malformedPage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home') + '&expectedPageDigest=xyz',{redirect:'error',signal:AbortSignal.timeout(90000)});
     assert.equal(malformedPage.status,400); assert.equal((await malformedPage.json()).error,'INVALID_CIRCUIT_SELECTION');
+    // The second declared page (Phase 1) and its data-bound crosswalk section.
+    const secondPage = await json(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/healthcare-solutions'));
+    assert.equal(secondPage.contractId,'ui-page.v1'); assert.equal(secondPage.status,'READ'); assert(secondPage.pageDigest,'pageDigest required');
+    assert(secondPage.layout?.layoutId,'The second page must declare its layout');
+    const crosswalkBinding = (secondPage.sections ?? []).flatMap(section => Object.values(section.bindings ?? {}))
+      .find(binding => binding?.reader === 'crosswalk' || binding?.source === 'crosswalk');
+    const crosswalkId = crosswalkBinding?.input?.crosswalkId;
+    assert(crosswalkId,'The second page must bind the crosswalk reader with a crosswalkId');
+    const crosswalk = await json(config.origin + '/api/circuit/v1/crosswalk?' + new URLSearchParams({crosswalkId}));
+    assert.equal(crosswalk.contractId,'standards-crosswalk.v1');
+    const unknownCrosswalk = await fetch(config.origin + '/api/circuit/v1/crosswalk?' + new URLSearchParams({crosswalkId:'no-such-crosswalk.v1'}),{redirect:'error',signal:AbortSignal.timeout(90000)});
+    assert.equal(unknownCrosswalk.status,404);
     checks.push({route:'/api/circuit/v1/ui-registry',contractId:registry.contractId,components:registry.components.length},
       {route:'/api/circuit/v1/page',path:'/circuit/home',status:declaredPage.status,pageDigest:typeof declaredPage.pageDigest === 'string'},
       {route:'/api/circuit/v1/page',path:'/circuit/does-not-exist',status:404},
       {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'stale',status:409},
-      {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'malformed',status:400});
+      {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'malformed',status:400},
+      {route:'/api/circuit/v1/page',path:'/circuit/healthcare-solutions',status:secondPage.status,pageDigest:typeof secondPage.pageDigest === 'string'},
+      {route:'/api/circuit/v1/crosswalk',crosswalkId,status:200,contractId:crosswalk.contractId},
+      {route:'/api/circuit/v1/crosswalk',crosswalkId:'no-such-crosswalk.v1',status:404});
     const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
     const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);
     const inspections = [];

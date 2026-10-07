@@ -26,7 +26,8 @@ const UI_REGISTRY = {
     { kind: 'hero', version: 1 }, { kind: 'section', version: 1 }, { kind: 'text', version: 1 },
     { kind: 'heading', version: 1 }, { kind: 'stat', version: 1 }, { kind: 'card', version: 1 },
     { kind: 'card-list', version: 1 }, { kind: 'list', version: 1 }, { kind: 'media.figure', version: 1 },
-    { kind: 'notice', version: 1 }
+    { kind: 'notice', version: 1 }, { kind: 'table', version: 1 }, { kind: 'field-list', version: 1 },
+    { kind: 'disclosure', version: 1 }, { kind: 'badge', version: 1 }, { kind: 'status-chip', version: 1 }
   ],
   actions: [
     { kind: 'navigate', dispatchClass: 'local', inputs: [] },
@@ -48,7 +49,8 @@ const UI_REGISTRY = {
     { sourceId: 'details', reader: 'details', route: '/api/circuit/v1/capability-details' },
     { sourceId: 'provider-inspection', reader: 'provider-inspection', route: '/api/circuit/v1/provider-inspection' },
     { sourceId: 'session', reader: 'session', route: '/api/circuit/v1/session' },
-    { sourceId: 'release', reader: 'release', route: '/healthz' }
+    { sourceId: 'release', reader: 'release', route: '/healthz' },
+    { sourceId: 'crosswalk', reader: 'crosswalk', route: '/api/circuit/v1/crosswalk' }
   ],
   limits: { maximumSources: 8 }
 };

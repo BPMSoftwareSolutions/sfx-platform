@@ -26,33 +26,34 @@ function run(args) {
 
 try {
   // --- new-component scaffold mode -----------------------------------------
-  const badgeDir = path.join(scratch, 'badge');
-  const scaffold = run(['tools/live-circuit/new-component.mjs', 'badge',
-    '--roles', 'label,tone', '--props', 'status,id', '--out', badgeDir]);
+  // The scratch kind must not be shipped; `badge` is a real Phase-1 kind now.
+  const stubDir = path.join(scratch, 'badge-stub');
+  const scaffold = run(['tools/live-circuit/new-component.mjs', 'badge-stub',
+    '--roles', 'label,tone', '--props', 'status,id', '--out', stubDir]);
   record('component-scaffold-exit', scaffold.status === 0, `exit=${scaffold.status} ${scaffold.stderr.trim() || scaffold.stdout.trim().split('\n')[0]}`);
-  const badgeFiles = ['badge.contract.json', 'badge.adapter.mjs', 'badge.parity.json', 'badge.acceptance.md'];
-  for (const file of badgeFiles) record(`component-scaffold-file ${file}`, await exists(path.join(badgeDir, file)), '');
-  const contract = JSON.parse(await readFile(path.join(badgeDir, 'badge.contract.json'), 'utf8'));
-  record('component-contract-shape', contract.document === 'ui-component.v1' && contract.kind === 'badge'
+  const badgeFiles = ['badge-stub.contract.json', 'badge-stub.adapter.mjs', 'badge-stub.parity.json', 'badge-stub.acceptance.md'];
+  for (const file of badgeFiles) record(`component-scaffold-file ${file}`, await exists(path.join(stubDir, file)), '');
+  const contract = JSON.parse(await readFile(path.join(stubDir, 'badge-stub.contract.json'), 'utf8'));
+  record('component-contract-shape', contract.document === 'ui-component.v1' && contract.kind === 'badge-stub'
     && contract.version === 1 && contract.roles.join(',') === 'label,tone'
     && Object.keys(contract.props).join(',') === 'status,id', JSON.stringify(contract));
-  const stub = await import(pathToFileURL(path.join(badgeDir, 'badge.adapter.mjs')).href);
-  record('component-stub-supportedRoles', stub.UI_COMPONENT_ROLES?.badge?.version === 1
+  const stub = await import(pathToFileURL(path.join(stubDir, 'badge-stub.adapter.mjs')).href);
+  record('component-stub-supportedRoles', stub.UI_COMPONENT_ROLES?.['badge-stub']?.version === 1
     && stub.supportedRoles?.join(',') === 'label,tone,status,id', `supportedRoles=[${stub.supportedRoles?.join(',')}]`);
-  const parity = JSON.parse(await readFile(path.join(badgeDir, 'badge.parity.json'), 'utf8'));
-  record('component-parity-sentinels', parity.kind === 'badge' && parity.sentinels.label === 'sentinel-label'
+  const parity = JSON.parse(await readFile(path.join(stubDir, 'badge-stub.parity.json'), 'utf8'));
+  record('component-parity-sentinels', parity.kind === 'badge-stub' && parity.sentinels.label === 'sentinel-label'
     && parity.section.props.tone === 'sentinel-tone' && parity.section.bindings.status.value === 'sentinel-status', '');
 
-  // --- new-component --check mode (positive, negative, shipped ten) --------
-  const positive = run(['tools/live-circuit/new-component.mjs', '--check', path.join(badgeDir, 'badge.contract.json'),
-    '--ui-components', path.join(badgeDir, 'badge.adapter.mjs')]);
+  // --- new-component --check mode (positive, negative, shipped kinds) ------
+  const positive = run(['tools/live-circuit/new-component.mjs', '--check', path.join(stubDir, 'badge-stub.contract.json'),
+    '--ui-components', path.join(stubDir, 'badge-stub.adapter.mjs')]);
   record('component-check-positive', positive.status === 0 && /"failed": 0/.test(positive.stdout), `exit=${positive.status}`);
-  const tampered = JSON.parse(await readFile(path.join(badgeDir, 'badge.contract.json'), 'utf8'));
+  const tampered = JSON.parse(await readFile(path.join(stubDir, 'badge-stub.contract.json'), 'utf8'));
   tampered.roles.push('ghost');
-  const tamperedFile = path.join(badgeDir, 'badge.contract.tampered.json');
+  const tamperedFile = path.join(stubDir, 'badge-stub.contract.tampered.json');
   await writeFile(tamperedFile, JSON.stringify(tampered, null, 2), 'utf8');
   const negative = run(['tools/live-circuit/new-component.mjs', '--check', tamperedFile,
-    '--ui-components', path.join(badgeDir, 'badge.adapter.mjs')]);
+    '--ui-components', path.join(stubDir, 'badge-stub.adapter.mjs')]);
   record('component-check-negative', negative.status === 1 && /contract-role-parity/.test(negative.stdout), `exit=${negative.status}`);
   const shipped = run(['tools/live-circuit/new-component.mjs', '--check']);
   record('component-check-shipped-ten', shipped.status === 0 && /shipped-ten-role-parity/.test(shipped.stdout)

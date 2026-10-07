@@ -443,6 +443,92 @@ function renderNotice(container, entry, context) {
   container.append(node);
 }
 
+// A declared column is { key, label } or a plain string; the key addresses the
+// row object and the label is the visible header text.
+function tableColumns(value) {
+  return (Array.isArray(value) ? value : []).map(column => typeof column === 'string'
+    ? { key: column, label: column }
+    : { key: column?.key ?? column?.name ?? column?.id ?? '', label: column?.label ?? column?.key ?? column?.name ?? '' });
+}
+
+// A cell value is rendered as text; a { label, state } object is a declared
+// status chip and carries its state on data-state exactly as declared.
+function tableCell(value) {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value) && ('label' in value || 'state' in value)) {
+    const state = value.state;
+    return h('span', { class: 'status-chip', 'data-state': state === undefined || state === null || state === '' ? null : String(state),
+      text: displayValue(value.label ?? state) });
+  }
+  return displayValue(value);
+}
+
+function renderTable(container, entry, context) {
+  const props = entry?.props ?? {};
+  const columns = tableColumns(declared(context, entry, 'columns'));
+  const rowsValue = declared(context, entry, 'rows');
+  const rows = Array.isArray(rowsValue) ? rowsValue : Array.isArray(rowsValue?.rows) ? rowsValue.rows : [];
+  const caption = declared(context, entry, 'caption');
+  const table = h('table', { class: 'declared-table', id: props.id ?? entry?.sectionId });
+  if (caption !== undefined && caption !== null && caption !== '') table.append(h('caption', { text: displayValue(caption) }));
+  if (columns.length) {
+    const headRow = h('tr', {});
+    for (const column of columns) headRow.append(h('th', { scope: 'col', text: displayValue(column.label) }));
+    table.append(h('thead', {}, [headRow]));
+  }
+  const body = h('tbody', {});
+  for (const row of rows) {
+    const bodyRow = h('tr', {});
+    for (const column of columns) bodyRow.append(h('td', {}, [tableCell(row !== null && typeof row === 'object' ? row[column.key] : undefined)]));
+    body.append(bodyRow);
+  }
+  table.append(body);
+  container.append(table);
+  if (!rows.length) container.append(h('p', { class: 'note', text: declaredText(context, entry, 'empty') || 'No rows are declared.' }));
+}
+
+// Declared fields are an array of { label, value } or a flat object.
+function fieldEntries(value) {
+  if (Array.isArray(value)) return value.filter(field => field !== null && typeof field === 'object' && !Array.isArray(field))
+    .map(field => ({ label: field.label ?? field.name ?? field.key ?? '', value: field.value ?? field.text ?? field.body }));
+  if (value !== null && typeof value === 'object') return Object.entries(value).map(([label, item]) => ({ label, value: item }));
+  return [];
+}
+
+function renderFieldList(container, entry, context) {
+  const props = entry?.props ?? {};
+  const label = declared(context, entry, 'label');
+  if (label !== undefined && label !== null && label !== '') container.append(h('p', { class: 'panel-label', text: displayValue(label) }));
+  const list = h('dl', { class: 'field-list', id: props.id ?? entry?.sectionId });
+  for (const field of fieldEntries(declared(context, entry, 'fields'))) {
+    list.append(h('dt', { text: displayValue(field.label) }));
+    list.append(h('dd', { text: displayValue(field.value) }));
+  }
+  container.append(list);
+}
+
+function renderDisclosure(container, entry, context) {
+  const props = entry?.props ?? {};
+  const details = h('details', { class: 'disclosure', id: props.id ?? entry?.sectionId });
+  details.append(h('summary', { text: declaredText(context, entry, 'summary') }));
+  appendSectionBody(details, declared(context, entry, 'body'), context);
+  container.append(details);
+}
+
+function renderBadge(container, entry, context) {
+  const props = entry?.props ?? {};
+  const tone = declared(context, entry, 'tone');
+  const classes = ['badge', typeof tone === 'string' ? tone : ''].filter(Boolean).join(' ');
+  container.append(h('span', { class: classes, id: props.id ?? entry?.sectionId, text: declaredText(context, entry, 'label') }));
+}
+
+function renderStatusChip(container, entry, context) {
+  const props = entry?.props ?? {};
+  const state = declared(context, entry, 'state');
+  container.append(h('span', { class: 'status-chip', id: props.id ?? entry?.sectionId,
+    'data-state': state === undefined || state === null || state === '' ? null : String(state),
+    text: declaredText(context, entry, 'label') }));
+}
+
 // Nested declared entries render through the same registry, so a section can
 // group a list or copy without a second renderer.
 function renderEntry(container, entry, context) {
@@ -521,6 +607,36 @@ export const UI_COMPONENT_ROLES = {
     props: ['tone'],
     states: ['info', 'warning', 'error', 'empty'],
   },
+  table: {
+    version: 1,
+    roles: ['columns', 'rows', 'caption', 'empty'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  'field-list': {
+    version: 1,
+    roles: ['fields', 'label'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  disclosure: {
+    version: 1,
+    roles: ['summary', 'body'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  badge: {
+    version: 1,
+    roles: ['label'],
+    props: ['tone'],
+    states: ['ready'],
+  },
+  'status-chip': {
+    version: 1,
+    roles: ['label', 'state'],
+    props: [],
+    states: ['mapped', 'partial', 'planned', 'unmapped'],
+  },
 };
 
 // The admitted role set of a kind is the union of its table entries, in table
@@ -543,6 +659,11 @@ const UI_COMPONENT_RENDERERS = {
   list: renderList,
   'media.figure': renderMediaFigure,
   notice: renderNotice,
+  table: renderTable,
+  'field-list': renderFieldList,
+  disclosure: renderDisclosure,
+  badge: renderBadge,
+  'status-chip': renderStatusChip,
 };
 
 export const UI_COMPONENTS = Object.fromEntries(Object.keys(UI_COMPONENT_ROLES).map(kind => [kind, {

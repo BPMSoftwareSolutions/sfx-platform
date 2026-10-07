@@ -1,0 +1,79 @@
+{
+  "tool": "wp1-registry-churn",
+  "at": "2026-10-07T23:16:03.206Z",
+  "gate": "WP1.x registry churn measured",
+  "before": {
+    "components": 10,
+    "sources": 6,
+    "kinds": [
+      "hero",
+      "section",
+      "text",
+      "heading",
+      "stat",
+      "card",
+      "card-list",
+      "list",
+      "media.figure",
+      "notice"
+    ]
+  },
+  "after": {
+    "components": 15,
+    "sources": 7,
+    "kinds": [
+      "hero",
+      "section",
+      "text",
+      "heading",
+      "stat",
+      "card",
+      "card-list",
+      "list",
+      "media.figure",
+      "notice",
+      "table",
+      "field-list",
+      "disclosure",
+      "badge",
+      "status-chip"
+    ]
+  },
+  "delta": {
+    "components": 5,
+    "sources": 1,
+    "readerAdded": "crosswalk (read-standards-crosswalk)",
+    "pageAdded": "/circuit/healthcare-solutions (ui-page-healthcare-solutions)"
+  },
+  "surfacesPerKind": [
+    "ui-components.js role table + renderer + map",
+    "circuit-host.json ui.components",
+    "page-runtime.js UI_REGISTRY.components",
+    "live-store.mjs derived uiRegistry",
+    "verify-components.mjs CONTRACTS + probe"
+  ],
+  "surfacesPerReader": [
+    "circuit-host.json readers",
+    "live-store.mjs pageSources + readCrosswalk + dispatch + uiRegistry.sources",
+    "page-runtime.js UI_REGISTRY.sources",
+    "verify-pages.mjs expectedSources + route checks",
+    "accept.mjs pins"
+  ],
+  "checks": {
+    "componentsTool": {
+      "kinds": 15,
+      "probes": 61,
+      "passed": 107,
+      "failed": 0
+    },
+    "pagesTool": {
+      "passed": 11,
+      "failed": 0
+    },
+    "kindTooling": {
+      "passed": 25,
+      "failed": 0
+    }
+  },
+  "noSchemaChange": "ui-page.v1 / ui-page-request.v1 / ui-layout.v1 / ui-component.v1 document shapes unchanged; navigation is an added optional page-definition member"
+}

@@ -14,11 +14,12 @@
       "canonical": { "procedure": "analysis.read_provider_canonical_body", "identityResultSet": "provider_canonical_body" },
       "canonicalProviders": ["sda-authority-transformation-port.v1"] }
   },
-  "ui": { "components": [ { "kind": "hero", "version": 1 }, { "kind": "section", "version": 1 }, { "kind": "text", "version": 1 }, { "kind": "heading", "version": 1 }, { "kind": "stat", "version": 1 }, { "kind": "card", "version": 1 }, { "kind": "card-list", "version": 1 }, { "kind": "list", "version": 1 }, { "kind": "media.figure", "version": 1 }, { "kind": "notice", "version": 1 } ], "maximumSources": 8 },
+  "ui": { "components": [ { "kind": "hero", "version": 1 }, { "kind": "section", "version": 1 }, { "kind": "text", "version": 1 }, { "kind": "heading", "version": 1 }, { "kind": "stat", "version": 1 }, { "kind": "card", "version": 1 }, { "kind": "card-list", "version": 1 }, { "kind": "list", "version": 1 }, { "kind": "media.figure", "version": 1 }, { "kind": "notice", "version": 1 }, { "kind": "table", "version": 1 }, { "kind": "field-list", "version": 1 }, { "kind": "disclosure", "version": 1 }, { "kind": "badge", "version": 1 }, { "kind": "status-chip", "version": 1 } ], "maximumSources": 8 },
   "readers": {
     "catalog": { "operation": "list", "request": { "object": "capability", "verb": "list" } },
     "scenario": { "operation": "invoke", "request": { "object": "capability", "verb": "invoke", "subject": "read-live-scenario-circuit" }, "inputContractId": "live-scenario-circuit-request.v1", "outputContractId": "live-scenario-circuit.v1" },
     "details": { "operation": "invoke", "request": { "object": "capability", "verb": "invoke", "subject": "read-capability-details" }, "inputContractId": "capability-details-request.v1", "outputContractId": "capability-details.v1" },
-    "page": { "operation": "invoke", "request": { "object": "capability", "verb": "invoke", "subject": "read-ui-page" }, "inputContractId": "ui-page-request.v1", "outputContractId": "ui-page.v1" }
+    "page": { "operation": "invoke", "request": { "object": "capability", "verb": "invoke", "subject": "read-ui-page" }, "inputContractId": "ui-page-request.v1", "outputContractId": "ui-page.v1" },
+    "crosswalk": { "operation": "invoke", "request": { "object": "capability", "verb": "invoke", "subject": "read-standards-crosswalk" }, "inputContractId": "standards-crosswalk-request.v1", "outputContractId": "standards-crosswalk.v1" }
   }
 }

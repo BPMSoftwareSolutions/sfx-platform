@@ -1,0 +1,51 @@
+{
+  "tool": "publish-ui-page",
+  "at": "2026-10-07T23:15:17.429Z",
+  "base": "http://127.0.0.1:8790",
+  "candidateFile": "candidate-healthcare-rev2.json",
+  "actor": "content-owner:wp1",
+  "steps": [
+    {
+      "step": "validate",
+      "pass": true,
+      "issue": null
+    },
+    {
+      "step": "stage",
+      "pass": true,
+      "pointerUntouched": true
+    },
+    {
+      "step": "candidate-verify",
+      "pass": true,
+      "status": "READ",
+      "servedDigest": "75887d52255a2426cfae6681e4e05bada6a68fd946ed507e853f616e055ea67f"
+    },
+    {
+      "step": "promote",
+      "pass": true,
+      "expectedCurrentRevision": 1
+    },
+    {
+      "step": "post-verify",
+      "pass": true,
+      "status": "READ",
+      "revision": 2
+    },
+    {
+      "step": "receipt",
+      "pass": true
+    }
+  ],
+  "validated": true,
+  "staged": true,
+  "candidateVerified": true,
+  "promoted": true,
+  "postVerified": true,
+  "rolledBack": false,
+  "refusal": null,
+  "ok": true,
+  "fromRevision": 1,
+  "candidateRevision": 2,
+  "digest": "75887d52255a2426cfae6681e4e05bada6a68fd946ed507e853f616e055ea67f"
+}

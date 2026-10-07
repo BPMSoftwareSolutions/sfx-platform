@@ -239,7 +239,7 @@ const pageRefusals = { NOT_FOUND: ['PAGE_NOT_FOUND', 404], NOT_DECLARED: ['PAGE_
   SNAPSHOT_CHANGED: ['PAGE_SNAPSHOT_CHANGED', 409] };
 const pageActions = new Set(['navigate', 'select', 'session', 'observe', 'objective', 'playback', 'view',
   'toggle', 'pane', 'copy/download', 'stage-change', 'refresh']);
-const pageSources = new Set(['catalog', 'scenario', 'details', 'provider-inspection', 'session', 'release']);
+const pageSources = new Set(['catalog', 'scenario', 'details', 'provider-inspection', 'session', 'release', 'crosswalk']);
 function pageSourceNamed(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   if (typeof value.reader === 'string') return value.reader;
@@ -299,6 +299,47 @@ export async function readPage(selection, refresh = false) {
   if (payload.expectedPageDigest && String(data.pageDigest ?? '').replace(/^sha256:/, '') !== payload.expectedPageDigest)
     throw new CircuitReadError('PAGE_SNAPSHOT_CHANGED', 409);
   validatePage(data);
+  return { ...data, source: 'database' };
+}
+// The declared standards-crosswalk reading (standards-crosswalk.v1), the source
+// behind the Phase-1 data-bound page section. One GET-only reader beside the
+// page reader; a refusal is named and never served as an empty document.
+const crosswalkRefusals = { NOT_FOUND: ['CROSSWALK_NOT_FOUND', 404], NOT_DECLARED: ['CROSSWALK_NOT_FOUND', 404] };
+export async function readCrosswalk(selection, refresh = false) {
+  const payload = {};
+  for (const key of ['crosswalkId']) {
+    const value = selection[key];
+    if (value == null || value === '') continue;
+    if (typeof value !== 'string' || value.length > 400 || /[\u0000-\u001f]/.test(value))
+      throw new CircuitReadError('INVALID_CIRCUIT_SELECTION', 400);
+    payload[key] = value;
+  }
+  if (!payload.crosswalkId) throw new CircuitReadError('CROSSWALK_REQUIRED', 400);
+  const fixtureDirectory = process.env.SFX_PAGE_FIXTURE_DIR;
+  if (fixtureDirectory) {
+    if (/[\\/]/.test(payload.crosswalkId)) throw new CircuitReadError('CROSSWALK_NOT_FOUND', 404);
+    // The crosswalk fixture set is `crosswalks/<id>.json` beside the page
+    // fixture set, so verify-pages --fixtures stays dependency-free.
+    const pageDirectory = path.resolve(fixtureDirectory);
+    let text = null;
+    for (const candidate of [
+      path.join(pageDirectory, 'crosswalks', `${payload.crosswalkId}.json`),
+      path.join(path.dirname(pageDirectory), 'crosswalks', `${payload.crosswalkId}.json`),
+    ]) {
+      try { text = await readFile(candidate, 'utf8'); break; } catch { /* try the next fixture location */ }
+    }
+    if (text === null) throw new CircuitReadError('CROSSWALK_NOT_FOUND', 404);
+    const document = JSON.parse(text);
+    if (typeof document?.error === 'string') throw new CircuitReadError(document.error, document.error.includes('NOT_FOUND') ? 404 : 422);
+    if (document?.contractId !== 'standards-crosswalk.v1') throw new CircuitReadError('CIRCUIT_READER_CONTRACT_MISMATCH');
+    return { ...document, source: 'fixture' };
+  }
+  const { data } = await read('crosswalk', payload, refresh);
+  if (data.crosswalkId !== payload.crosswalkId) throw new CircuitReadError('CIRCUIT_SELECTION_MISMATCH');
+  if (crosswalkRefusals[data.status]) throw new CircuitReadError(...crosswalkRefusals[data.status]);
+  if (typeof data.status === 'string' && data.status.endsWith('_NOT_FOUND')) throw new CircuitReadError('CROSSWALK_NOT_FOUND', 404);
+  if (data.status !== 'READ') throw new CircuitReadError('CROSSWALK_READING_INVALID', 422);
+  if (data.contractId !== 'standards-crosswalk.v1') throw new CircuitReadError('CIRCUIT_READER_CONTRACT_MISMATCH');
   return { ...data, source: 'database' };
 }
 async function readProviderInspection(selection) {
@@ -392,11 +433,20 @@ const uiRegistry = { contractId: 'ui-registry.v1',
     { sourceId: 'details', reader: 'details', route: '/api/circuit/v1/capability-details' },
     { sourceId: 'provider-inspection', reader: 'provider-inspection', route: '/api/circuit/v1/provider-inspection' },
     { sourceId: 'session', reader: 'session', route: '/api/circuit/v1/session' },
-    { sourceId: 'release', reader: 'release', route: '/healthz' }
+    { sourceId: 'release', reader: 'release', route: '/healthz' },
+    { sourceId: 'crosswalk', reader: 'crosswalk', route: '/api/circuit/v1/crosswalk' }
   ],
   limits: { maximumSources: policy.ui?.maximumSources } };
 export async function serveCircuitApi(req, res, url) {
-  if (req.method !== 'GET' || !url.pathname.startsWith('/api/circuit/v1/')) return false;
+  if (!url.pathname.startsWith('/api/circuit/v1/')) return false;
+  if (req.method !== 'GET') {
+    // The public gateway refuses every circuit method except GET and the
+    // admitted POSTs (gateway.mjs:162-164); the host mirrors that law on its own
+    // routes, and the session and run APIs are dispatched before this function.
+    res.writeHead(405, { 'content-type': 'application/json; charset=utf-8', 'allow': 'GET', 'cache-control': 'no-store' });
+    res.end(JSON.stringify({ error: 'CIRCUIT_METHOD_NOT_ALLOWED' }));
+    return true;
+  }
   try {
     const refresh = url.searchParams.get('refresh') === '1';
     let data;
@@ -404,6 +454,7 @@ export async function serveCircuitApi(req, res, url) {
     else if (url.pathname === '/api/circuit/v1/scenario') data = await readScenario(Object.fromEntries(['capabilityId', 'namespaceId', 'scenarioId', 'detailId', 'detailPointer', 'expectedSnapshotDigest'].map(k => [k, url.searchParams.get(k)])), refresh);
     else if (url.pathname === '/api/circuit/v1/capability-details') data = await readCapabilityDetails(Object.fromEntries(['capabilityId', 'namespaceId'].map(k => [k, url.searchParams.get(k)])), refresh);
     else if (url.pathname === '/api/circuit/v1/page') data = await readPage(Object.fromEntries(['path', 'expectedPageDigest', 'revision'].map(k => [k, url.searchParams.get(k)])), refresh);
+    else if (url.pathname === '/api/circuit/v1/crosswalk') data = await readCrosswalk(Object.fromEntries(['crosswalkId'].map(k => [k, url.searchParams.get(k)])), refresh);
     else if (url.pathname === '/api/circuit/v1/ui-registry') data = uiRegistry;
     else if (url.pathname === '/api/circuit/v1/provider-inspection') data = await readProviderInspection(Object.fromEntries(['capabilityId', 'namespaceId', 'scenarioId', 'detailId', 'expectedSnapshotDigest'].map(k => [k, url.searchParams.get(k)])));
     else throw new CircuitReadError('CIRCUIT_RESOURCE_NOT_FOUND', 404);

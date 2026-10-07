@@ -16,8 +16,8 @@ const fixtureDirectory = path.join(here, 'fixtures', 'pages');
 const observerModule = path.join(repoRoot, 'live-circuit', 'dispatch-pair', 'observe-server.mjs');
 const fixturePort = 8897;
 const fixtureBase = `http://localhost:${fixturePort}`;
-const expectedComponents = ['hero', 'section', 'text', 'heading', 'stat', 'card', 'card-list', 'list', 'media.figure', 'notice'];
-const expectedSources = ['catalog', 'scenario', 'details', 'provider-inspection', 'session', 'release'];
+const expectedComponents = ['hero', 'section', 'text', 'heading', 'stat', 'card', 'card-list', 'list', 'media.figure', 'notice', 'table', 'field-list', 'disclosure', 'badge', 'status-chip'];
+const expectedSources = ['catalog', 'scenario', 'details', 'provider-inspection', 'session', 'release', 'crosswalk'];
 
 const args = process.argv.slice(2);
 const flags = new Set(args.filter(arg => arg.startsWith('--')));
@@ -101,6 +101,8 @@ if (fixtures) {
 
 let homeBody = null;
 let homeEtag = null;
+let secondPageBody = null;
+let registryCounts = null;
 
 await guard('home-read', async () => {
   const { response, body, etag } = await request(pagePath('home'));
@@ -130,9 +132,56 @@ await guard('ui-registry', async () => {
   const sources = new Set((body?.sources ?? []).map(source => source?.sourceId));
   const missingKinds = expectedComponents.filter(kind => !kinds.has(kind));
   const missingSources = expectedSources.filter(source => !sources.has(source));
+  registryCounts = { components: kinds.size, sources: sources.size };
   const pass = response.status === 200 && body?.contractId === 'ui-registry.v1'
     && missingKinds.length === 0 && missingSources.length === 0;
-  return { pass, detail: `status=${response.status} contractId=${body?.contractId} components=${kinds.size}/10 sources=${sources.size}/6${missingKinds.length ? ` missingKinds=${missingKinds.join(',')}` : ''}${missingSources.length ? ` missingSources=${missingSources.join(',')}` : ''}` };
+  return { pass, detail: `status=${response.status} contractId=${body?.contractId} components=${kinds.size}/${expectedComponents.length} sources=${sources.size}/${expectedSources.length}${missingKinds.length ? ` missingKinds=${missingKinds.join(',')}` : ''}${missingSources.length ? ` missingSources=${missingSources.join(',')}` : ''}` };
+});
+
+await guard('second-page-read', async () => {
+  const { response, body } = await request(pagePath('healthcare-solutions'));
+  secondPageBody = body;
+  const crosswalkSection = (body?.sections ?? []).find(section => section?.component?.kind === 'table');
+  const layoutId = body?.layout?.layoutId;
+  const pass = response.status === 200 && body?.contractId === 'ui-page.v1' && body?.status === 'READ'
+    && /^[a-f0-9]{64}$/.test(body?.pageDigest ?? '')
+    && typeof layoutId === 'string' && layoutId.length > 0
+    && Array.isArray(body?.layout?.regions) && body.layout.regions.length > 0
+    && Boolean(crosswalkSection);
+  return { pass, detail: `status=${response.status} contractId=${body?.contractId} page=${body?.status} layout=${layoutId ?? '(none)'} regions=${body?.layout?.regions?.length ?? 0} crosswalkSection=${crosswalkSection?.sectionId ?? '(none)'} sections=${body?.sections?.length ?? 0}` };
+});
+
+// The crosswalk section's declared reader id comes from the served page itself,
+// so the route check follows the published declaration instead of a hardcoded id.
+function declaredCrosswalkId(page) {
+  for (const section of Array.isArray(page?.sections) ? page.sections : []) {
+    const bindings = [...Object.values(section?.bindings ?? {}),
+      ...(Array.isArray(section?.actions) ? section.actions.flatMap(action => Object.values(action?.input ?? {})) : [])];
+    for (const binding of bindings) {
+      if ((binding?.reader === 'crosswalk' || binding?.source === 'crosswalk') && typeof binding?.input?.crosswalkId === 'string')
+        return binding.input.crosswalkId;
+    }
+  }
+  return null;
+}
+const crosswalkId = declaredCrosswalkId(secondPageBody);
+
+await guard('crosswalk-read', async () => {
+  if (!crosswalkId) return { pass: false, detail: 'the second page declares no crosswalk binding with a crosswalkId' };
+  const { response, body } = await request(`/api/circuit/v1/crosswalk?crosswalkId=${encodeURIComponent(crosswalkId)}`);
+  return { pass: response.status === 200 && body?.contractId === 'standards-crosswalk.v1', detail: `crosswalkId=${crosswalkId} status=${response.status} contractId=${body?.contractId}` };
+});
+
+await guard('crosswalk-method-405', async () => {
+  const response = await fetch(new URL('/api/circuit/v1/crosswalk', base), { method: 'POST', redirect: 'error' });
+  const status = response.status;
+  await response.body?.cancel();
+  return { pass: status === 405, detail: `POST /api/circuit/v1/crosswalk status=${status}` };
+});
+
+await guard('crosswalk-unknown-404', async () => {
+  const { response, body } = await request('/api/circuit/v1/crosswalk?crosswalkId=no-such-crosswalk.v1');
+  return { pass: response.status === 404 && typeof body?.error === 'string', detail: `status=${response.status} error=${body?.error}` };
 });
 
 if (fixtures) {
@@ -197,6 +246,7 @@ const summary = {
   base,
   mode: fixtures ? 'fixtures' : 'base',
   groups,
+  registry: registryCounts ?? { expectedComponents: expectedComponents.length, expectedSources: expectedSources.length },
   checkedAt: new Date().toISOString(),
   passed: checks.filter(check => check.pass).length,
   failed: checks.filter(check => !check.pass).length,
