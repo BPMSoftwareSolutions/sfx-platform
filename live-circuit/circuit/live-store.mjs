@@ -239,11 +239,13 @@ async function readProviderInspection(selection) {
   const identity = scene.navigation.items.find(item => item.id === selection.detailId);
   if (!providerId || !identity?.definitionDigest) throw new CircuitReadError('DECLARED_PROVIDER_REQUIRED', 422);
   await capacity();
+  const configured = policy.retrieval.provider;
+  const reader = configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured;
   try {
     const response = await fetch(`${endpoint.replace(/\/$/, '')}/json`, {
       method: 'POST', headers: { 'content-type': 'application/json',
         ...(process.env.SDA_API_TOKEN ? { authorization: `Bearer ${process.env.SDA_API_TOKEN}` } : {}) },
-      body: JSON.stringify({ procedure: policy.retrieval.provider.procedure,
+      body: JSON.stringify({ procedure: reader.procedure,
         parameters: { provider_id: providerId, estate_model_pk: Number(scene.identity.estateModelId) } }),
       signal: AbortSignal.timeout(policy.timeoutMilliseconds)
     });
@@ -257,10 +259,10 @@ async function readProviderInspection(selection) {
     const resultSets = JSON.parse(Buffer.concat(chunks).toString('utf8'));
     if (!Array.isArray(resultSets) || resultSets.some(set => !Array.isArray(set.columns) || !Array.isArray(set.rows)))
       throw new CircuitReadError('PROCEDURE_RESULT_CONTRACT_MISMATCH');
-    const declared = resultSets.find(set => set.name === policy.retrieval.provider.identityResultSet)?.rows;
+    const declared = resultSets.find(set => set.name === reader.identityResultSet)?.rows;
     if (declared?.length !== 1 || declared[0].provider_id !== providerId || declared[0].definition_digest !== identity.definitionDigest)
       throw new CircuitReadError('PROVIDER_DEFINITION_CHANGED', 409);
-    return { providerId, definitionDigest: identity.definitionDigest, snapshotDigest: scene.snapshotDigest,
+    return { providerId, definitionDigest: identity.definitionDigest, snapshotDigest: scene.snapshotDigest, reader: reader.procedure,
       readAt: new Date().toISOString(), resultSets };
   } finally { release(); }
 }

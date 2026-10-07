@@ -9,6 +9,8 @@
 // conclusion: requested-capability identity is not on the lane (B13), so the
 // strip says so until S2 publishes owner identity.
 
+import { el } from './circuit-viewer.js';
+
 export const OBJECTIVE_CAPABILITY = 'request-capability-from-objective-v3';
 export const OBJECTIVE_CONTRACT = 'agent-objective-request.v1';
 export const OBJECTIVE_NAMESPACE = 'sidefx:capabilities';
@@ -21,12 +23,6 @@ export function admissionBody(objective) {
   return { object: 'capability', operation: 'observe', subject: OBJECTIVE_CAPABILITY,
     namespace: OBJECTIVE_NAMESPACE, input: objectiveInput(objective) };
 }
-
-const el = (tag, attributes = {}) => {
-  const node = document.createElement(tag);
-  for (const [key, value] of Object.entries(attributes)) if (value != null) node.setAttribute(key, value);
-  return node;
-};
 
 // The spoken form of a summary: the returned text with machine payloads
 // removed. The on-screen text stays verbatim; tool results and JSON blocks are

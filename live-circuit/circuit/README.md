@@ -133,11 +133,20 @@ the returned provider ID and definition digest. Stale selections return 409;
 non-provider details return 422. Reads share the existing queue, timeout and
 response-size limits. Navigation cancels display of a superseded response.
 
+The provider drill-down renders the **provider involvement profile** from
+`analysis.read_provider_details` (identity, configuration, mechanics/ports,
+bindings, engagements, instructions, invocations, summary; the raw sets stay in
+a fold). `circuit-host.json` declares that reader with its identity set, and keeps
+`analysis.read_provider_canonical_body` as the declared fallback for the platform
+catalog providers named in `canonicalProviders` (a platform capability can be
+engaged by more than a thousand ports and exceed the read timeout). The response
+reports which reader ran.
+
 These are current database reads, not execution receipts. They do not affect
-live flow or replay. No edit or writer action is provided by this inspector;
-returned update-call text is evidence to review under the migration lifecycle.
-An unavailable retrieval service leaves the canonical provider detail visible
-and reports the retrieval error in its own panel.
+live flow or replay. The inspector remains read-only: instruction and engagement
+editors stage the exact change document for `model.install_provider_details_change`
+(with its `expectedDigest` guards) and copy or download it — nothing is applied in
+the browser, and no writer is added to `retrieval-policy.json`.
 
 Azure acceptance on 2026-10-02 verified Gemini Select and Gemini Summary with
 eight returned result sets each, exact definition digests, stale-selection 409

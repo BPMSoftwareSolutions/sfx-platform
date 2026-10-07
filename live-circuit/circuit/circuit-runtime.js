@@ -10,6 +10,7 @@ import { targetLink, relatedLinks, renderDetail, authorityTree } from './navigat
 import { buildTraversal, traversalState, LiveMotion } from './traversal.js';
 import { createObservePanel } from './observe-panel.js';
 import { createRunContext } from './run-context.js';
+import { renderProviderProfile } from './provider-profile.js';
 
 const $ = id => document.getElementById(id);
 const json = async (url, signal) => { const response = await fetch(url, { signal }); const body = await response.json(); if (!response.ok) throw new Error(body.error ?? `Read failed (${response.status})`); return body; };
@@ -93,8 +94,8 @@ export function createCircuitRuntime(shell) {
           const data = await json(`/api/circuit/v1/provider-inspection?${query}`, detailRequest.signal);
           if (serial !== detailSerial || deck !== state.deck) return;
           inspection.replaceChildren(el('h3', { text: 'Provider database inspection' }),
-            paragraph(`${data.resultSets.length} result sets · Database read ${data.readAt}`, 'muted'),
-            ...data.resultSets.map(set => authorityTree(set.rows, `${set.name} · ${set.rows.length} rows`)));
+            paragraph(`${data.resultSets.length} result sets · Database read ${data.readAt} · ${data.reader ?? 'declared reader'}`, 'muted'),
+            ...renderProviderProfile(data));
         } catch (error) {
           if (serial === detailSerial && error.name !== 'AbortError') inspection.replaceChildren(paragraph(`Provider data unavailable: ${error.message}.`, 'warning'));
         }

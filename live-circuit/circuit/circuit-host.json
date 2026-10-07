@@ -10,7 +10,9 @@
   "maximumQueuedReads": 32,
   "cache": { "maximumEntries": 24, "maximumBytes": 33554432, "ttlMilliseconds": 30000 },
   "retrieval": {
-    "provider": { "procedure": "analysis.read_provider_canonical_body", "identityResultSet": "provider_canonical_body" }
+    "provider": { "procedure": "analysis.read_provider_details", "identityResultSet": "provider_identity",
+      "canonical": { "procedure": "analysis.read_provider_canonical_body", "identityResultSet": "provider_canonical_body" },
+      "canonicalProviders": ["sda-authority-transformation-port.v1"] }
   },
   "readers": {
     "catalog": { "operation": "list", "request": { "object": "capability", "verb": "list" } },

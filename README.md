@@ -21,7 +21,8 @@ the Windows CLI checks — and rolls back on a failed gate.
 - **Home** — `/` serves the platform home page from the circuit host; `/circuit/home` is the same page.
 - **Explorer** — `/circuit/explorer`: declared navigation from the installed estate, the database
   circuit, live/replay run controls, the run report and Evidence context tabs, and Observe for a
-  signed-in principal.
+  signed-in principal; provider drill-downs show the complete involvement profile and stage
+  change documents for the provider writer.
 - **Objective row** — above the run bar: describe an objective by text or dictation (the prompt
   shell's mic icon and voice status) and press **Run** to execute
   `request-capability-from-objective-v3`; the circuit follows that run, the

@@ -61,28 +61,21 @@ The Explorer's **Provider database inspection** panel is the read surface:
    change needs no UI change.
 
 **Which procedure the panel calls is declared data** in
-`live-circuit/circuit/circuit-host.json`:
+`live-circuit/circuit/circuit-host.json`. The default is the details reader, with
+the canonical-body reader retained for the declared platform catalog providers
+whose engagement count can exceed the 30 s read timeout:
 
 ```json
 "retrieval": {
-  "provider": { "procedure": "analysis.read_provider_canonical_body", "identityResultSet": "provider_canonical_body" }
+  "provider": { "procedure": "analysis.read_provider_details", "identityResultSet": "provider_identity",
+    "canonical": { "procedure": "analysis.read_provider_canonical_body", "identityResultSet": "provider_canonical_body" },
+    "canonicalProviders": ["sda-authority-transformation-port.v1"] }
 }
 ```
 
-Both the canonical-body reader and the details reader are admitted by
-`deploy/sda-kernel/retrieval-policy.json`, which already lists:
-
-```json
-"analysis.read_provider_details"
-```
-
-To show the complete provider details in the panel, change the two values:
-
-```json
-"retrieval": {
-  "provider": { "procedure": "analysis.read_provider_details", "identityResultSet": "provider_identity" }
-}
-```
+Both readers are admitted by `deploy/sda-kernel/retrieval-policy.json`, which lists
+`analysis.read_provider_details` and `analysis.read_provider_canonical_body`. The
+inspection response reports which reader ran.
 
 The observer checks `identityResultSet`: exactly one row, with `provider_id`
 equal to the selected provider and `definition_digest` equal to the digest the
@@ -122,9 +115,11 @@ procedure-extract --procedure analysis.read_provider_details \
 
 ## 3. The write: `model.install_provider_details_change`
 
-The Explorer's inspection panel is **read-only by design**. It provides no edit
-or writer action, and the retrieval service executes only declared read
-procedures. A writer must never be added to `retrieval-policy.json`.
+The Explorer's inspection panel is **read-only by design**: the instruction and
+engagement editors stage the exact change document (with its `expectedDigest`
+guards) for review, copy or download, and apply nothing. The retrieval service
+executes only declared read procedures. A writer must never be added to
+`retrieval-policy.json`.
 
 Provider information is changed through the atomic writer, which composes the
 already-installed layer writers in one transaction:
