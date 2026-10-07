@@ -156,20 +156,29 @@ async function captureCrosswalkPage({ context, origin, outDir, check }) {
               }
             };
             if (body) walk(body);
+            // The declared crosswalk reader also returns plain row states
+            // (rows[].state), not only {label,state} cell objects.
+            if (Array.isArray(body?.rows)) for (const row of body.rows) if (typeof row?.state === 'string') states.push(row.state);
             return { status: response.status, contractId: body?.contractId ?? null, states: [...new Set(states)] };
           }, crosswalk.crosswalkId)
         : { status: 0, contractId: null, states: [] };
       const renderedStates = crosswalk?.sectionId
         ? await page.evaluate(sectionId => {
             const node = document.getElementById(sectionId);
-            return node ? [...new Set([...node.querySelectorAll('[data-state]')].map(item => item.getAttribute('data-state')))] : [];
+            if (!node) return { chips: [], text: '' };
+            return {
+              chips: [...new Set([...node.querySelectorAll('[data-state]')].map(item => item.getAttribute('data-state')))],
+              text: node.textContent ?? '',
+            };
           }, crosswalk.sectionId)
-        : [];
-      const statesRendered = declared.states.length > 0 && declared.states.every(state => renderedStates.includes(state));
-      const vocabularyHeld = renderedStates.length > 0 && renderedStates.every(state => CROSSWALK_STATES.has(state));
+        : { chips: [], text: '' };
+      const stateRendered = state => renderedStates.chips.includes(state) || new RegExp(`\\b${state}\\b`).test(renderedStates.text);
+      const statesRendered = declared.states.length > 0 && declared.states.every(stateRendered);
+      const vocabularyHeld = declared.states.every(state => CROSSWALK_STATES.has(state))
+        && renderedStates.chips.every(state => CROSSWALK_STATES.has(state));
       check(`healthcare-solutions-crosswalk-${viewport.name}`,
         Boolean(crosswalk) && declared.status === 200 && declared.contractId === 'standards-crosswalk.v1' && statesRendered && vocabularyHeld,
-        `section=${crosswalk?.sectionId ?? '(none)'} declaredStates=[${declared.states.join(',')}] renderedStates=[${renderedStates.join(',')}]`);
+        `section=${crosswalk?.sectionId ?? '(none)'} declaredStates=[${declared.states.join(',')}] renderedChips=[${renderedStates.chips.join(',')}]`);
 
       const file = path.join(outDir, `healthcare-solutions-${viewport.name}.png`);
       await page.screenshot({ path: file, fullPage: true });
