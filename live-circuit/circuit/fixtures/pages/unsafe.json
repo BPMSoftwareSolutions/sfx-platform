@@ -15,17 +15,16 @@
       { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
     ]
   },
-  "copyBasis": "Rendering-safety fixture (WP0.7). The text role must render script markup as literal text and the refused link scheme must never reach an href.",
+  "copyBasis": "Rendering-safety fixture (WP0.7). The text role must render script markup as literal text and the refused navigate target must never reach an href.",
   "sections": [
     {
       "sectionId": "unsafe-text",
       "regionId": "main",
       "order": 1,
-      "component": { "kind": "text", "version": 1, "contractDigest": "7990301f8992daa9fdce4f2a582719d4096484fd3b2b94e751be6672852630a5" },
+      "component": { "kind": "text", "version": 1, "contractDigest": "5d634b8cf213421bc4786f56e975fd54c269d7bd8ade56c026f2e60bb8743a83" },
       "props": {
-        "as": "paragraph",
-        "text": "<script>alert(1)</script>",
-        "link": { "href": "javascript:alert(1)", "label": "This destination must never become an href" }
+        "role": "paragraph",
+        "text": "<script>alert(1)</script>"
       },
       "bindings": {},
       "actions": []
@@ -34,10 +33,17 @@
       "sectionId": "unsafe-notice",
       "regionId": "main",
       "order": 2,
-      "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
-      "props": { "kind": "warning", "text": "Markup in text roles is data and renders as literal text." },
+      "component": { "kind": "notice", "version": 1, "contractDigest": "3215fa551aafe9baec67fdb4a027978c2348c42ebc72ffc4bd124f052734227f" },
+      "props": {
+        "tone": "warning",
+        "title": "Markup in text roles is data",
+        "body": "Markup in text roles renders as literal text. This destination must never become an href.",
+        "actionId": "open-unsafe"
+      },
       "bindings": {},
-      "actions": []
+      "actions": [
+        { "actionId": "open-unsafe", "kind": "navigate", "to": "javascript:alert(1)" }
+      ]
     }
   ]
 }

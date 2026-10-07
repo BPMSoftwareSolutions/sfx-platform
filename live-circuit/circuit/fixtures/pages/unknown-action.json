@@ -24,7 +24,7 @@
       "regionId": "main",
       "order": 1,
       "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
-      "props": { "kind": "info", "text": "This section names an action kind the shell has never admitted.", "actionId": "launch" },
+      "props": { "tone": "info", "title": "An action kind the shell has never admitted", "body": "This section names an action kind the shell has never admitted.", "actionId": "launch" },
       "bindings": {},
       "actions": [
         { "actionId": "launch", "kind": "launch-missiles", "dispatchClass": "local", "to": "/circuit/explorer" }

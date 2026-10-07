@@ -26,7 +26,7 @@
       "regionId": "main",
       "order": 1,
       "component": { "kind": "notice", "version": 1, "contractDigest": "71d089b9c386257dd545a96f6f492e6b78b14d0fe4f236a6f242f0d86d8c7451" },
-      "props": { "kind": "warning", "text": "This page is served from the prior valid revision while the requested revision is refused.", "refusal": "PAGE_SNAPSHOT_CHANGED" },
+      "props": { "tone": "warning", "title": "This page is served from a prior valid revision", "body": "This page is served from the prior valid revision while the requested revision is refused.", "state": "PAGE_SNAPSHOT_CHANGED" },
       "bindings": {},
       "actions": []
     }

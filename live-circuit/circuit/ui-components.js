@@ -7,10 +7,8 @@
 const SCENE_PENDING = 'Reading the circuit from the database…';
 const SCENE_EMPTY = 'The scene returned no circuit page.';
 const DIGEST_FAILURE = 'The circuit failed its digest check and is not shown.';
-const LANGUAGES = { csharp: 'C#', node: 'Node', python: 'Python' };
-const TEXT_ROLES = new Set(['eyebrow', 'display', 'lede', 'micro', 'section-title', 'snapshot', 'note', 'paragraph', 'answer']);
-const SUB_ROLES = new Set(['big', 'sub']);
-const SECTION_VARIANTS = new Set(['signed-panels']);
+const TEXT_ROLES = new Set(['eyebrow', 'display', 'lede', 'micro', 'section-title', 'paragraph', 'note']);
+const NOTICE_TONES = new Set(['info', 'warning', 'error', 'empty']);
 
 // The only DOM construction primitive. Attributes that would introduce
 // script or styling are dropped; text is always a text node.
@@ -33,6 +31,21 @@ function formatTime(value) {
   if (value === undefined || value === null || value === '') return 'not reported';
   const at = new Date(value);
   return Number.isNaN(at.getTime()) ? 'not reported' : at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function displayValue(value) {
+  if (value === undefined || value === null || value === '') return '–';
+  if (Array.isArray(value)) return value.length.toLocaleString('en-US');
+  if (typeof value === 'number') return value.toLocaleString('en-US');
+  if (typeof value === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+      const at = new Date(value);
+      if (!Number.isNaN(at.getTime())) return `${at.toISOString().slice(0, 16).replace('T', ' ')} UTC`;
+    }
+    return value;
+  }
+  if (typeof value === 'object') return String(value.release ?? value.identifier ?? '');
+  return String(value);
 }
 
 function safeHref(context, value) {
@@ -69,6 +82,21 @@ function bindingValue(context, entry, name) {
   }
 }
 
+// A component role resolves from its declared prop, else from its declared
+// binding; a missing value stays undefined so the adapter renders a state.
+function declared(context, entry, role) {
+  if (!entry) return undefined;
+  if (entry.props != null && Object.prototype.hasOwnProperty.call(entry.props, role)) return entry.props[role];
+  if (entry.bindings != null && Object.prototype.hasOwnProperty.call(entry.bindings, role)) return bindingValue(context, entry, role);
+  return undefined;
+}
+
+function declaredText(context, entry, role) {
+  const value = declared(context, entry, role);
+  if (value === undefined || value === null) return '';
+  return typeof value === 'string' ? value : String(value);
+}
+
 function actionFor(entry, actionId) {
   return (entry?.actions ?? []).find(action => action?.actionId === actionId) ?? null;
 }
@@ -86,10 +114,6 @@ function actionControl(context, entry, actionId, attrs, label) {
   return control;
 }
 
-function idsFor(entry, defaults) {
-  return { ...defaults, ...(entry?.props?.ids ?? {}) };
-}
-
 function circuitHref(capabilityId, namespaceId, scenarioId, page) {
   const query = new URLSearchParams({ capability: capabilityId ?? '', namespace: namespaceId ?? '' });
   if (scenarioId) query.set('scenario', scenarioId);
@@ -102,44 +126,48 @@ async function sha256(text) {
   return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-function previewSelection(entry, props) {
-  const input = entry?.bindings?.[props.binding ?? 'figure']?.input ?? {};
+function figureIds(entry) {
+  const base = entry?.sectionId ?? 'figure';
   return {
-    capabilityId: props.capabilityId ?? input.capabilityId ?? 'capability',
-    namespaceId: props.namespaceId ?? input.namespaceId ?? '',
-    page: props.page ?? input.page,
+    eyebrow: `${base}-eyebrow`, headline: `${base}-headline`, lede: `${base}-lede`, actions: `${base}-actions`,
+    figure: `${base}-figure`, label: `${base}-label`, caption: `${base}-caption`, link: `${base}-link`,
   };
 }
 
-function previewSlide(value, props) {
+function previewSelection(entry) {
+  const input = entry?.bindings?.figure?.input ?? {};
+  return { capabilityId: input.capabilityId ?? 'capability', namespaceId: input.namespaceId ?? '', page: input.page };
+}
+
+function previewSlide(value, page) {
   if (!value || typeof value !== 'object') return null;
-  if (Array.isArray(value.slides)) return { scene: value, slide: value.slides.find(item => item?.id === props.page) ?? value.slides[0] ?? null };
+  if (Array.isArray(value.slides)) return { scene: value, slide: value.slides.find(item => item?.id === page) ?? value.slides[0] ?? null };
   if (typeof value.svg === 'string') return { scene: null, slide: value };
   return null;
 }
 
-// site.js circuitPreview semantics: resolve the declared read binding, refuse
-// visibly on a digest mismatch, then show the database scene and link back to
-// the Explorer selection.
-function mountPreview(nodes, entry, context, props) {
-  if (nodes.label) nodes.label.textContent = props.label ?? 'Circuit';
+// site.js circuitPreview semantics: resolve the declared figure binding,
+// refuse visibly on a digest mismatch, then show the database scene and link
+// back to the Explorer selection.
+function mountPreview(nodes, entry, context) {
   const state = nodes.figure?.querySelector?.('.state') ?? null;
-  const raw = bindingValue(context, entry, props.binding ?? 'figure');
-  const found = previewSlide(raw, props);
+  const binding = entry?.bindings?.figure;
+  const raw = binding != null ? bindingValue(context, entry, 'figure') : undefined;
+  const found = previewSlide(raw, binding?.input?.page);
   if (!found) {
     if (raw !== undefined && raw !== null && state) state.textContent = SCENE_EMPTY;
     return;
   }
   const { scene, slide } = found;
+  const selection = previewSelection(entry);
   if (!slide?.svg) {
     if (state) state.textContent = SCENE_EMPTY;
-    setHref(nodes.link, context, circuitHref(previewSelection(entry, props).capabilityId, previewSelection(entry, props).namespaceId));
+    setHref(nodes.link, context, circuitHref(selection.capabilityId, selection.namespaceId));
     return;
   }
   const expected = typeof slide.svgDigest === 'string' ? slide.svgDigest : null;
   const verify = expected ? sha256(slide.svg).then(digest => { if (digest !== expected) throw new Error(DIGEST_FAILURE); }) : Promise.resolve();
   verify.then(() => {
-    const selection = previewSelection(entry, props);
     const image = document.createElement('img');
     image.alt = `${selection.capabilityId} scenario circuit, read from the database`;
     image.src = URL.createObjectURL(new Blob([slide.svg], { type: 'image/svg+xml' }));
@@ -151,19 +179,18 @@ function mountPreview(nodes, entry, context, props) {
     setHref(nodes.link, context, circuitHref(selection.capabilityId, selection.namespaceId, scene?.scenarioId, slide.id));
   }).catch(error => {
     if (state) state.textContent = error.message;
-    const selection = previewSelection(entry, props);
     if (nodes.caption) nodes.caption.textContent = selection.capabilityId;
     setHref(nodes.link, context, circuitHref(selection.capabilityId, selection.namespaceId));
   });
 }
 
-function figureNodes(context, ids, props) {
-  const label = h('p', { class: 'panel-label', id: ids.label, text: props.figureLabel ?? 'Circuit' });
+function figureNodes(context, ids) {
+  const label = h('p', { class: 'panel-label', id: ids.label, text: 'Circuit' });
   const figure = h('div', { class: 'circuit-figure', id: ids.figure }, [
-    h('div', { class: 'state', text: props.pendingText ?? SCENE_PENDING }),
+    h('div', { class: 'state', text: SCENE_PENDING }),
   ]);
   const caption = h('span', { id: ids.caption });
-  const link = linked(context, { id: ids.link, href: '/circuit/explorer' }, props.linkLabel ?? 'Open this circuit');
+  const link = linked(context, { id: ids.link, href: '/circuit/explorer' }, 'Open this circuit');
   const card = h('article', { class: 'circuit-card', 'aria-label': 'Database circuit' }, [
     h('header', {}, [label, h('span', { class: 'source', text: 'DATABASE SCENE' })]),
     figure,
@@ -173,82 +200,73 @@ function figureNodes(context, ids, props) {
 }
 
 function renderHero(container, entry, context) {
-  const props = entry?.props ?? {};
-  const ids = idsFor(entry, {
-    eyebrow: 'eyebrow', headline: 'headline', lede: 'lede', actions: 'actions',
-    signIn: 'sign-in-cta', micro: 'micro', figure: 'circuit-figure',
-    label: 'circuit-label', caption: 'circuit-caption', link: 'circuit-link',
-  });
+  const ids = figureIds(entry);
   const section = h('section', { class: 'hero art art-architecture', 'aria-labelledby': ids.headline });
   const grid = h('div', { class: 'wrap hero-grid' });
-  const copy = h('div', {}, [
-    h('p', { class: 'eyebrow', id: ids.eyebrow, text: props.eyebrow }),
-    h('h1', { class: 'display', id: ids.headline, text: props.headline }),
-    h('p', { class: 'lede', id: ids.lede, text: props.lede }),
-  ]);
-  const actions = h('div', { class: 'actions', id: ids.actions });
-  if (props.primaryActionId) actions.append(actionControl(context, entry, props.primaryActionId, { class: 'button primary' }, props.primaryLabel ?? 'Open the Live Circuit'));
-  if (props.secondaryActionId) actions.append(actionControl(context, entry, props.secondaryActionId, { class: 'button secondary', id: ids.signIn }, props.secondaryLabel ?? 'Sign in to observe'));
-  copy.append(actions);
-  if (props.micro) copy.append(h('p', { class: 'micro', id: ids.micro, text: props.micro }));
+  const copy = h('div', {});
+  const eyebrow = declared(context, entry, 'eyebrow');
+  if (eyebrow !== undefined && eyebrow !== null && eyebrow !== '') copy.append(h('p', { class: 'eyebrow', id: ids.eyebrow, text: displayValue(eyebrow) }));
+  copy.append(h('h1', { class: 'display', id: ids.headline, text: declaredText(context, entry, 'headline') }));
+  const lede = declared(context, entry, 'lede');
+  if (lede !== undefined && lede !== null && lede !== '') copy.append(h('p', { class: 'lede', id: ids.lede, text: displayValue(lede) }));
+  const primaryActionId = declared(context, entry, 'primaryActionId');
+  if (typeof primaryActionId === 'string' && primaryActionId) {
+    copy.append(h('div', { class: 'actions', id: ids.actions }, [
+      actionControl(context, entry, primaryActionId, { class: 'button primary' }, 'Open the Live Circuit'),
+    ]));
+  }
   grid.append(copy);
-  const nodes = figureNodes(context, ids, props);
+  const nodes = figureNodes(context, ids);
   grid.append(nodes.card);
   section.append(grid);
   container.append(section);
-  mountPreview(nodes, entry, context, props);
+  if (entry?.bindings?.figure != null) mountPreview(nodes, entry, context);
+}
+
+function appendSectionBody(container, body, context) {
+  if (body === undefined || body === null || body === '') return;
+  if (typeof body === 'string' || typeof body === 'number') { container.append(h('p', { class: 'note', text: String(body) })); return; }
+  if (!Array.isArray(body)) return;
+  for (const item of body) {
+    if (item?.component?.kind) renderEntry(container, item, context);
+    else if (typeof item === 'string') container.append(h('p', { class: 'note', text: item }));
+  }
 }
 
 function renderSection(container, entry, context) {
-  const props = entry?.props ?? {};
-  const tag = props.as === 'div' ? 'div' : props.as === 'article' ? 'article' : 'section';
-  const classes = [];
-  if (props.panel) classes.push('panel');
-  if (SECTION_VARIANTS.has(props.variant)) classes.push(props.variant);
-  const section = h(tag, { id: props.id, class: classes.join(' ') || null, 'aria-label': props.ariaLabel });
-  if (props.label) section.append(h('p', { class: 'panel-label', text: props.label }));
-  if (props.title) section.append(h('h2', { class: 'section-title', text: props.title }));
-  for (const item of props.items ?? []) {
-    if (item?.component?.kind) renderEntry(section, item, context);
-    else if (typeof item === 'string') section.append(h('p', { class: 'note', text: item }));
+  const section = h('section', { class: 'page-section' });
+  const wrap = h('div', { class: 'wrap' });
+  const heading = declared(context, entry, 'heading');
+  if (heading !== undefined && heading !== null && heading !== '') wrap.append(h('h2', { class: 'section-title', text: declaredText(context, entry, 'heading') }));
+  appendSectionBody(wrap, declared(context, entry, 'body'), context);
+  const actions = declared(context, entry, 'actions');
+  if (Array.isArray(actions) && actions.length) {
+    const bar = h('div', { class: 'actions' });
+    for (const ref of actions) {
+      const actionId = typeof ref === 'string' ? ref : ref?.actionId;
+      if (typeof actionId !== 'string' || !actionId || !actionFor(entry, actionId)) continue;
+      bar.append(actionControl(context, entry, actionId, { class: 'button secondary' }, typeof ref === 'object' && ref?.label ? String(ref.label) : 'Continue'));
+    }
+    if (bar.hasChildNodes()) wrap.append(bar);
   }
+  if (wrap.hasChildNodes()) section.append(wrap);
   container.append(section);
 }
 
-const TEXT_FORMATS = {
-  'session.identifier': value => value?.identifier ?? (value?.principalId ? `principal ${String(value.principalId).slice(0, 8)}` : 'Signed in'),
-  'session.detail': value => `${value?.realm ?? 'realm not reported'} / expires ${formatTime(value?.expiresAt)}`,
-  'catalog.snapshot': value => value?.readAt
-    ? `Estate read ${new Date(value.readAt).toISOString().slice(0, 16).replace('T', ' ')} UTC / counts refresh from the database`
-    : 'Counts refresh from the database',
-  'runs.head': value => {
-    const runs = Array.isArray(value) ? value : Array.isArray(value?.runs) ? value.runs : [];
-    return runs.length ? `${runs.length} run${runs.length === 1 ? '' : 's'} in this session` : 'No runs started in this session';
-  },
-  'runs.sub': value => (Array.isArray(value) || Array.isArray(value?.runs)
-    ? 'Held by this host in memory; a restart clears the list.'
-    : 'Your observed runs appear here after you start them in the Live Circuit.'),
-};
-
 function renderText(container, entry, context) {
   const props = entry?.props ?? {};
-  const value = props.binding ? bindingValue(context, entry, props.binding) : undefined;
-  const formatter = props.format ? TEXT_FORMATS[props.format] : null;
-  const message = formatter ? formatter(value)
-    : typeof value === 'string' || typeof value === 'number' ? String(value)
-      : props.text ?? '';
-  const role = props.as === 'paragraph' || !TEXT_ROLES.has(props.as) ? (SUB_ROLES.has(props.as) ? props.as : 'note') : props.as;
-  const node = h('p', { id: props.id, class: role, text: message });
-  if (props.link?.href) node.append(' ', linked(context, { href: props.link.href }, props.link.label ?? props.link.href));
-  container.append(node);
+  const role = typeof props.role === 'string' && TEXT_ROLES.has(props.role) ? props.role : 'note';
+  container.append(h('p', { id: props.id, class: role, text: declaredText(context, entry, 'text') }));
 }
 
 function renderHeading(container, entry, context) {
   const props = entry?.props ?? {};
   const level = Math.min(6, Math.max(1, Number(props.level) || 2));
-  const node = h(`h${level}`, { id: props.id, class: props.role === 'section-title' ? 'section-title' : null, text: props.text });
-  for (const chip of props.chips ?? []) node.append(' ', h('span', { class: 'chip', text: typeof chip === 'string' ? chip : chip?.text }));
-  for (const badge of props.badges ?? []) node.append(' ', h('span', { class: `badge ${badge?.kind ?? ''}`, text: badge?.text }));
+  const node = h(`h${level}`, { id: props.id, class: 'section-title', text: declaredText(context, entry, 'text') });
+  const chips = declared(context, entry, 'chips');
+  for (const chip of Array.isArray(chips) ? chips : []) node.append(' ', h('span', { class: 'chip', text: typeof chip === 'string' ? chip : chip?.text }));
+  const badges = declared(context, entry, 'badges');
+  for (const badge of Array.isArray(badges) ? badges : []) node.append(' ', h('span', { class: `badge ${badge?.kind ?? ''}`, text: typeof badge === 'string' ? badge : badge?.text }));
   container.append(node);
 }
 
@@ -257,132 +275,160 @@ function catalogCapabilities(value) {
   return Array.isArray(value?.capabilities) ? value.capabilities : null;
 }
 
-function metricResult(metric, value, item) {
-  switch (metric) {
-    case 'catalog.total': {
-      const capabilities = catalogCapabilities(value);
-      if (!capabilities) return { value: item.value ?? '–', sub: item.unavailable ?? 'The catalog could not be read' };
-      const domain = capabilities.filter(capability => capability?.namespaceId === 'sidefx:capabilities').length;
-      return { value: capabilities.length.toLocaleString('en-US'), sub: `${domain} domain / ${capabilities.length - domain} platform` };
-    }
-    case 'catalog.scenarios': {
-      const capabilities = catalogCapabilities(value);
-      if (!capabilities) return { value: item.value ?? '–', sub: item.sub };
-      const scenarios = capabilities.reduce((total, capability) => total + (Number(capability?.scenarioCount) || 0), 0);
-      return { value: scenarios.toLocaleString('en-US'), sub: item.sub };
-    }
-    case 'catalog.multi': {
-      const capabilities = catalogCapabilities(value);
-      if (!capabilities) return { value: item.value ?? '–', sub: item.sub };
-      return { value: capabilities.filter(capability => (Number(capability?.scenarioCount) || 0) > 1).length.toLocaleString('en-US'), sub: item.sub };
-    }
-    case 'kernel.language':
-      return { value: value ? LANGUAGES[value.kernelLanguage] ?? 'Installed' : item.value ?? '–', sub: item.sub };
-    case 'kernel.release':
-      return { value: value?.release ? `${String(value.release).split('-').pop()} / sha256 ${String(value.kernelDigest ?? '').split(':').pop().slice(0, 8)}` : item.sub, sub: item.sub };
-    default:
-      return { value: item.value ?? '–', sub: item.sub };
-  }
-}
-
 function renderStat(container, entry, context) {
   const props = entry?.props ?? {};
-  const panel = h('div', { class: 'counts panel', id: props.id ?? 'counts', 'aria-label': props.ariaLabel ?? 'Live estate counts' });
-  for (const item of props.items ?? []) {
-    const value = item.binding ? bindingValue(context, entry, item.binding) : undefined;
-    const primary = item.metric ? metricResult(item.metric, value, item) : { value: item.value, sub: item.sub };
-    const sub = item.subMetric ? metricResult(item.subMetric, value, item).value : primary.sub ?? item.sub;
-    const count = h('div', { class: 'count' }, [
-      h('div', { class: 'value', id: item.valueId, text: primary.value ?? '–' }),
-      h('div', { class: 'label', text: item.label }),
-    ]);
-    if (item.subId || sub) count.append(h('div', { class: 'sub', id: item.subId, text: sub ?? '' }));
-    panel.append(count);
-  }
+  const panel = h('div', { class: 'counts panel', id: props.id ?? entry?.sectionId, 'aria-label': 'Live estate count' });
+  const count = h('div', { class: 'count' }, [
+    h('div', { class: 'value', text: displayValue(declared(context, entry, 'value')) }),
+    h('div', { class: 'label', text: declaredText(context, entry, 'label') }),
+  ]);
+  const sub = declared(context, entry, 'sub');
+  if (sub !== undefined && sub !== null && sub !== '') count.append(h('div', { class: 'sub', text: displayValue(sub) }));
+  panel.append(count);
   container.append(panel);
+}
+
+function cardIdentity(item) {
+  if (typeof item?.capabilityId === 'string' && item.capabilityId) return { namespaceId: item.namespaceId ?? null, capabilityId: item.capabilityId };
+  if (typeof item?.meta === 'string' && item.meta.includes('/')) {
+    const [namespaceId, capabilityId] = item.meta.split('/');
+    if (namespaceId && capabilityId) return { namespaceId, capabilityId };
+  }
+  return null;
 }
 
 function catalogMatch(catalogValue, item) {
   const capabilities = catalogCapabilities(catalogValue);
-  if (!capabilities) return { known: false, match: null };
-  const match = capabilities.find(capability => capability?.capabilityId === item?.capabilityId
-    && (item?.namespaceId == null || capability?.namespaceId === item.namespaceId)) ?? null;
+  const identity = cardIdentity(item);
+  if (!capabilities || !identity) return { known: false, match: null };
+  const match = capabilities.find(capability => capability?.capabilityId === identity.capabilityId
+    && (identity.namespaceId == null || capability?.namespaceId === identity.namespaceId)) ?? null;
   return { known: true, match };
 }
 
-function cardNode(context, item, catalogValue) {
+function cardNode(context, entry, item) {
+  const catalogValue = declared(context, entry, 'catalog');
   const { known, match } = catalogMatch(catalogValue, item);
-  const card = h('article', { class: `card panel${known && !match ? ' missing' : ''}` });
-  card.append(
-    h('h3', { text: item.title }),
-    h('p', { class: 'body', text: item.body }),
-    h('p', { class: 'promise', text: item.promise }),
-  );
+  const missing = Boolean(known && !match);
+  const card = h('article', { class: `card panel${missing ? ' missing' : ''}`, id: item?.id });
+  card.append(h('h3', { text: item?.title ?? '' }));
+  if (item?.body) card.append(h('p', { class: 'body', text: item.body }));
+  if (item?.promise) card.append(h('p', { class: 'promise', text: item.promise }));
   const meta = h('div', { class: 'meta' });
-  const count = match?.scenarioCount;
-  const metaText = match ? `${count ?? 0} scenario${count === 1 ? '' : 's'}`
-    : known ? 'Not in the current estate'
-      : item.capabilityId ?? item.meta ?? '';
-  meta.append(h('span', { text: metaText }));
-  if (item.capabilityId) meta.append(linked(context, { href: circuitHref(item.capabilityId, item.namespaceId, match?.declaredRootScenarioId), 'aria-label': `Open the ${item.capabilityId} circuit` }, item.linkLabel ?? 'Open circuit'));
+  const metaText = missing ? item?.missing ?? 'Not in the current estate' : item?.meta ?? cardIdentity(item)?.capabilityId ?? '';
+  if (metaText !== '') meta.append(h('span', { text: metaText }));
+  if (typeof item?.link === 'string' && item.link) {
+    const action = actionFor(entry, item.link);
+    if (action) meta.append(actionControl(context, entry, item.link, { class: 'button secondary small' }, item.linkLabel ?? 'Open circuit'));
+    else {
+      const safe = safeHref(context, item.link);
+      if (safe) meta.append(h('a', { href: safe, text: item.linkLabel ?? 'Open circuit' }));
+    }
+  }
   card.append(meta);
   return card;
 }
 
 function renderCard(container, entry, context) {
-  const props = entry?.props ?? {};
-  const item = props.item ?? props;
-  const catalogValue = props.binding ? bindingValue(context, entry, props.binding) : undefined;
-  container.append(cardNode(context, item, catalogValue));
+  const item = {};
+  for (const role of ['title', 'body', 'promise', 'meta', 'link', 'missing']) item[role] = declared(context, entry, role);
+  container.append(cardNode(context, entry, item));
 }
 
 function renderCardList(container, entry, context) {
   const props = entry?.props ?? {};
-  const catalogValue = props.binding ? bindingValue(context, entry, props.binding) : undefined;
-  if (props.heading) container.append(h('div', { class: 'cards-head' }, [h('h2', { class: 'section-title', text: props.heading })]));
-  const cards = h('div', { class: 'cards', id: props.id });
-  for (const item of props.items ?? []) cards.append(cardNode(context, item, catalogValue));
+  const title = declared(context, entry, 'title');
+  if (title !== undefined && title !== null && title !== '') {
+    container.append(h('div', { class: 'cards-head' }, [h('h2', { class: 'section-title', text: declaredText(context, entry, 'title') })]));
+  }
+  const cards = h('div', { class: 'cards', id: props.id ?? entry?.sectionId });
+  const items = declared(context, entry, 'cards');
+  for (const item of Array.isArray(items) ? items : []) cards.append(cardNode(context, entry, item));
   container.append(cards);
 }
 
 function renderList(container, entry, context) {
   const props = entry?.props ?? {};
-  const value = props.binding ? bindingValue(context, entry, props.binding) : props.items;
-  const runs = Array.isArray(value) ? value : Array.isArray(value?.runs) ? value.runs : null;
-  const list = h('ul', { class: 'runs', id: props.id });
-  if (runs) {
-    const limit = Number(props.limit) > 0 ? Number(props.limit) : null;
-    const rows = limit ? runs.slice(-limit).reverse() : runs;
-    for (const run of rows) {
-      const name = h('strong');
-      if (run?.capabilityId) name.append(linked(context, { href: circuitHref(run.capabilityId, run.namespaceId ?? 'sidefx:capabilities') }, run.capabilityId));
-      else name.textContent = `run ${String(run?.runId ?? '').slice(0, 8)}`;
-      list.append(h('li', {}, [name, h('span', { text: `admitted ${formatTime(run?.admittedAt)}` })]));
-    }
+  const raw = declared(context, entry, 'items');
+  const items = Array.isArray(raw) ? raw : Array.isArray(raw?.runs) ? raw.runs : [];
+  const current = declared(context, entry, 'current');
+  if (current !== undefined && current !== null && current !== '') container.append(h('p', { class: 'panel-label', text: declaredText(context, entry, 'current') }));
+  const list = h('ul', { class: 'runs', id: props.id ?? entry?.sectionId });
+  for (const run of items) {
+    const name = h('strong');
+    if (run?.capabilityId) name.append(linked(context, { href: circuitHref(run.capabilityId, run.namespaceId ?? 'sidefx:capabilities') }, run.capabilityId));
+    else if (typeof run?.href === 'string' && run.href) name.append(linked(context, { href: run.href }, run.label ?? run.title ?? run.href));
+    else name.textContent = `run ${String(run?.runId ?? '').slice(0, 8)}`;
+    list.append(h('li', {}, [name, h('span', { text: run?.meta ?? `admitted ${formatTime(run?.admittedAt)}` })]));
   }
   container.append(list);
+  const empty = declared(context, entry, 'empty');
+  if (!items.length && empty !== undefined && empty !== null && empty !== '') container.append(h('p', { class: 'note', text: declaredText(context, entry, 'empty') }));
 }
 
 function renderMediaFigure(container, entry, context) {
   const props = entry?.props ?? {};
-  const ids = idsFor(entry, { figure: 'circuit-figure', label: 'circuit-label', caption: 'circuit-caption', link: 'circuit-link' });
-  const nodes = figureNodes(context, ids, props);
-  container.append(nodes.card);
-  mountPreview(nodes, entry, context, props);
+  const ids = figureIds(entry);
+  const alt = declared(context, entry, 'alt');
+  const caption = declared(context, entry, 'caption');
+  const link = declared(context, entry, 'link');
+  const digest = declared(context, entry, 'digest');
+  const svg = declared(context, entry, 'svg');
+  const src = declared(context, entry, 'src');
+  const figure = h('figure', { class: 'circuit-card', id: props.id, 'aria-label': 'Declared media figure' });
+  const media = h('div', { class: 'circuit-figure', id: ids.figure }, [h('div', { class: 'state', text: SCENE_PENDING })]);
+  const state = media.querySelector?.('.state') ?? null;
+  const captionNode = h('figcaption', { class: 'source', id: ids.caption, text: caption === undefined || caption === null ? '' : String(caption) });
+  figure.append(media, captionNode);
+  if (typeof link === 'string' && link) {
+    const action = actionFor(entry, link);
+    if (action) captionNode.append(' ', actionControl(context, entry, link, { class: 'button secondary small' }, 'Open'));
+    else {
+      const safe = safeHref(context, link);
+      if (safe) captionNode.append(' ', h('a', { href: safe, text: 'Open' }));
+    }
+  }
+  container.append(figure);
+  const image = document.createElement('img');
+  image.alt = alt === undefined || alt === null || alt === '' ? 'Declared media figure' : String(alt);
+  if (typeof src === 'string' && src) {
+    const safe = safeHref(context, src);
+    if (safe) { image.src = safe; media.replaceChildren(image); }
+    else if (state) state.textContent = 'The declared source is not an admitted URL.';
+    return;
+  }
+  if (typeof svg === 'string' && svg) {
+    const expected = typeof digest === 'string' ? digest.replace(/^sha256:/, '') : null;
+    const verify = expected ? sha256(svg).then(hash => { if (hash !== expected) throw new Error(DIGEST_FAILURE); }) : Promise.resolve();
+    verify.then(() => {
+      image.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+      media.replaceChildren(image);
+    }).catch(error => { if (state) state.textContent = error.message; });
+    return;
+  }
+  if (state) state.textContent = SCENE_EMPTY;
 }
 
 function renderNotice(container, entry, context) {
   const props = entry?.props ?? {};
-  const kind = ['info', 'error', 'warning', 'empty'].includes(props.kind) ? props.kind : 'info';
-  const refusal = props.refusal ?? props.code ?? null;
-  const node = h('p', {
-    class: `notice ${kind === 'info' ? 'note' : kind}`,
-    id: props.id,
-    role: kind === 'error' ? 'alert' : null,
-    'data-refusal': refusal,
-    text: props.text,
+  const tone = typeof props.tone === 'string' && NOTICE_TONES.has(props.tone) ? props.tone : 'info';
+  const state = declared(context, entry, 'state');
+  const node = h('div', {
+    class: `notice panel ${tone}`,
+    id: props.id ?? entry?.sectionId,
+    role: tone === 'error' ? 'alert' : null,
+    'data-state': state === undefined || state === null || state === '' ? null : String(state),
   });
-  if (props.actionId) node.append(' ', actionControl(context, entry, props.actionId, { class: 'button secondary small' }, props.actionLabel ?? 'Continue'));
+  const title = declaredText(context, entry, 'title');
+  if (title) node.append(h('strong', { class: 'notice-title', text: title }));
+  const body = declaredText(context, entry, 'body');
+  if (body) node.append(h('p', { class: 'notice-body', text: body }));
+  const actionId = declared(context, entry, 'actionId');
+  if (typeof actionId === 'string' && actionId) {
+    const action = actionFor(entry, actionId);
+    if (action) node.append(' ', actionControl(context, entry, actionId, { class: 'button secondary small' }, 'Continue'));
+    else node.append(' ', h('span', { text: actionId }));
+  }
   container.append(node);
 }
 
@@ -401,52 +447,52 @@ function renderEntry(container, entry, context) {
 export const UI_COMPONENTS = {
   hero: {
     version: 1,
-    supportedRoles: ['eyebrow', 'headline', 'lede', 'micro', 'primaryActionId', 'primaryLabel', 'secondaryActionId', 'secondaryLabel', 'figureLabel', 'linkLabel', 'pendingText', 'binding', 'figure', 'page', 'capabilityId', 'namespaceId', 'ids'],
+    supportedRoles: ['eyebrow', 'headline', 'lede', 'figure', 'primaryActionId'],
     render: renderHero,
   },
   section: {
     version: 1,
-    supportedRoles: ['id', 'as', 'panel', 'variant', 'label', 'title', 'ariaLabel', 'items', 'session'],
+    supportedRoles: ['heading', 'body', 'actions'],
     render: renderSection,
   },
   text: {
     version: 1,
-    supportedRoles: ['id', 'as', 'text', 'binding', 'format', 'link'],
+    supportedRoles: ['eyebrow', 'display', 'lede', 'micro', 'section-title', 'paragraph', 'note', 'role', 'text'],
     render: renderText,
   },
   heading: {
     version: 1,
-    supportedRoles: ['id', 'level', 'text', 'role', 'chips', 'badges'],
+    supportedRoles: ['level', 'chips', 'badges', 'text'],
     render: renderHeading,
   },
   stat: {
     version: 1,
-    supportedRoles: ['id', 'ariaLabel', 'items', 'catalog', 'release'],
+    supportedRoles: ['value', 'label', 'sub'],
     render: renderStat,
   },
   card: {
     version: 1,
-    supportedRoles: ['item', 'title', 'body', 'promise', 'meta', 'capabilityId', 'namespaceId', 'linkLabel', 'binding', 'catalog'],
+    supportedRoles: ['title', 'body', 'promise', 'meta', 'link', 'missing'],
     render: renderCard,
   },
   'card-list': {
     version: 1,
-    supportedRoles: ['id', 'heading', 'items', 'binding', 'catalog'],
+    supportedRoles: ['cards', 'catalog', 'title', 'catalogSourceId'],
     render: renderCardList,
   },
   list: {
     version: 1,
-    supportedRoles: ['id', 'items', 'binding', 'limit', 'runs'],
+    supportedRoles: ['items', 'current', 'empty'],
     render: renderList,
   },
   'media.figure': {
     version: 1,
-    supportedRoles: ['figureLabel', 'linkLabel', 'pendingText', 'binding', 'figure', 'page', 'capabilityId', 'namespaceId', 'ids'],
+    supportedRoles: ['svg', 'src', 'alt', 'caption', 'link', 'digest'],
     render: renderMediaFigure,
   },
   notice: {
     version: 1,
-    supportedRoles: ['id', 'kind', 'text', 'refusal', 'code', 'actionId', 'actionLabel'],
+    supportedRoles: ['title', 'body', 'action', 'state', 'tone', 'actionId'],
     render: renderNotice,
   },
 };
