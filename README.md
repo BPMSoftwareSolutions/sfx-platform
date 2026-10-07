@@ -25,8 +25,9 @@ the Windows CLI checks — and rolls back on a failed gate.
 - **Objective row** — above the run bar: describe an objective by text or dictation (the prompt
   shell's mic icon and voice status) and press **Run** to execute
   `request-capability-from-objective-v3`; the circuit follows that run, the
-  requested-capabilities strip sits under it with honest attribution, and Play speaks the returned
-  summary.
+  requested-capabilities strip sits under it with honest attribution, and Play speaks the
+  summary's spoken text (machine payloads are never read aloud; the on-screen text stays
+  verbatim).
 - **Circuit host** — observer feed, per-run SSE, run attribution, capability details and scenario
   readers, all served through the gateway.
 - **Identity** — sign-in, session validation, and durable run evidence (pinned identity host and

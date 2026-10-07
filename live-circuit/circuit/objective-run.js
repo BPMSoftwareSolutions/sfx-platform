@@ -28,35 +28,69 @@ const el = (tag, attributes = {}) => {
   return node;
 };
 
-// A player for one returned summary. Speech synthesis reads the text verbatim;
-// when the browser has no synthesis the summary stays on screen unchanged.
-export function summaryPlayer(text, label = 'Summary') {
+// The spoken form of a summary: the returned text with machine payloads
+// removed. The on-screen text stays verbatim; tool results and JSON blocks are
+// never read aloud.
+export function spokenSummary(text) {
+  let spoken = String(text ?? '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/\bTool result\s*:\s*[\s\S]*$/i, ' ');
+  for (let pass = 0; pass < 4; pass++) {
+    const next = spoken.replace(/\{[^{}]*\}/g, ' ').replace(/\[[^\[\]]*\]/g, ' ');
+    if (next === spoken) break;
+    spoken = next;
+  }
+  return spoken.replace(/\s+/g, ' ').trim();
+}
+
+// A player for one returned summary. Speech synthesis reads the summary's
+// spoken form verbatim; when the browser has no synthesis the summary stays on
+// screen unchanged. `auto` speaks the summary once when it arrives, without a
+// click; a summary is never auto-spoken twice across players (the strip and the
+// run report).
+let autoSpoken = null;
+export function summaryPlayer(text, label = 'Summary', { auto = false } = {}) {
   const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const spoken = spokenSummary(text);
   const wrap = el('div', { class: 'summary-player' });
   wrap.append(el('span', { class: 'summary-label', text: `${label} ready` }));
   const play = el('button', { type: 'button', class: 'button secondary small', 'data-summary-play': '', text: 'Play' });
   const rate = el('select', { class: 'summary-rate', 'aria-label': 'Speech rate' });
   for (const value of ['1', '1.25', '1.5']) rate.append(new Option(`${Number(value).toFixed(2)}\u00d7`, value, false, value === '1'));
-  wrap.append(play, rate);
+  const note = el('span', { class: 'summary-note' });
+  wrap.append(play, rate, note);
   if (!supported) {
     play.disabled = true; rate.disabled = true;
     wrap.dataset.state = 'unsupported';
-    wrap.append(el('span', { class: 'summary-note', text: 'Audio is unavailable in this browser; the summary stays on screen.' }));
+    note.textContent = 'Audio is unavailable in this browser; the summary stays on screen.';
     return wrap;
   }
-  let speaking = null;
-  const reset = () => { speaking = null; play.textContent = 'Play'; };
-  play.addEventListener('click', () => {
-    if (speaking) { window.speechSynthesis.cancel(); reset(); return; }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = Number(rate.value) || 1;
-    utterance.lang = document.documentElement.lang || navigator.language || 'en';
-    utterance.addEventListener('end', reset);
-    utterance.addEventListener('error', () => { reset(); wrap.dataset.state = 'error'; });
-    speaking = utterance;
-    window.speechSynthesis.speak(utterance);
-    play.textContent = 'Stop';
-  });
+  if (!spoken) {
+    play.disabled = true; rate.disabled = true;
+    wrap.dataset.state = 'machine';
+    note.textContent = 'The summary is machine output; there is no spoken text.';
+    return wrap;
+  }
+  let utterance = null;
+  const end = () => { utterance = null; play.textContent = 'Play'; };
+  function speak() {
+    window.speechSynthesis.cancel();
+    const utteranceText = new SpeechSynthesisUtterance(spoken);
+    utteranceText.rate = Number(rate.value) || 1;
+    utteranceText.lang = document.documentElement.lang || navigator.language || 'en';
+    const voices = window.speechSynthesis.getVoices?.() ?? [];
+    const voice = voices.find(v => v.localService && /^en/i.test(v.lang)) ?? voices.find(v => /^en/i.test(v.lang));
+    if (voice) utteranceText.voice = voice;
+    utteranceText.addEventListener('end', end);
+    utteranceText.addEventListener('error', () => {
+      end(); wrap.dataset.state = 'error';
+      note.textContent = 'Audio failed; the summary stays on screen. Press Play to retry.';
+    });
+    utterance = utteranceText; play.textContent = 'Stop';
+    window.speechSynthesis.speak(utteranceText);
+  }
+  play.addEventListener('click', () => { if (utterance) { window.speechSynthesis.cancel(); end(); return; } speak(); });
+  if (auto && autoSpoken !== spoken) { autoSpoken = spoken; speak(); }
   return wrap;
 }
 
@@ -74,10 +108,19 @@ export function createObjectiveRun(hooks) {
   const setVoice = (text, cls = '') => { formStatus.textContent = text; formStatus.className = `voice-status${cls ? ` ${cls}` : ''}`; };
   const setRun = (text, error = false) => { runStatus.textContent = text; runStatus.className = `objective-status${error ? ' error' : ''}`; };
 
-  // Dictation: the prompt shell's status copy; push-to-talk where hover exists,
-  // tap-to-toggle on touch; Escape cancels and restores the prior draft.
+  // Dictation: the prompt shell's status copy. Tap starts and a second tap
+  // stops; holding past 500 ms stops on release; Escape cancels and restores
+  // the prior draft. A browser without recognition keeps the mic disabled and
+  // the text field working.
   const Recognition = window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
-  const hover = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
+  const VOICE_ERRORS = {
+    'not-allowed': 'Microphone access is blocked for this site.',
+    'service-not-allowed': 'Dictation is unavailable in this browser.',
+    'audio-capture': 'No microphone was found.',
+    network: 'Dictation needs a network connection here.',
+    'no-speech': 'Nothing was heard; try again.',
+    'language-not-supported': 'This language is not supported for dictation.'
+  };
   let recognition = null, listening = false, cancelled = false, captured = false, failed = false, prefix = '';
   function buildRecognition() {
     const engine = new Recognition();
@@ -91,29 +134,46 @@ export function createObjectiveRun(hooks) {
       input.value = `${prefix}${prefix && transcript ? ' ' : ''}${transcript}`.trim();
       captured = true; updateButtons();
     };
-    engine.onerror = event => { failed = true;
-      setVoice(event.error === 'not-allowed' || event.error === 'service-not-allowed' ? 'Voice unavailable' : `Voice ${event.error}`, 'error'); };
+    engine.onerror = event => {
+      if (event.error === 'aborted') return;
+      failed = true;
+      setVoice(VOICE_ERRORS[event.error] ?? `Voice ${event.error}`, 'error');
+    };
     engine.onend = () => {
       listening = false; mic.classList.remove('listening'); mic.setAttribute('aria-pressed', 'false');
       if (cancelled) { input.value = prefix; captured = false; setVoice('Voice ready'); }
       else if (captured && input.value.trim()) setVoice('Voice captured. Review or Run.');
-      else if (failed) setVoice('Voice unavailable', 'error');
-      else setVoice('Voice ready');
+      else if (!failed) setVoice('Voice ready');
       updateButtons();
     };
     return engine;
   }
-  const start = () => { if (!Recognition || listening) return; recognition = recognition ?? buildRecognition(); try { recognition.start(); } catch { /* already running */ } };
+  const start = () => {
+    if (!Recognition || listening) return;
+    recognition = buildRecognition();
+    try { recognition.start(); }
+    catch { failed = true; setVoice('Dictation could not start.', 'error'); }
+  };
   const stop = () => { if (listening) try { recognition.stop(); } catch { /* already stopping */ } };
   const cancel = () => { if (!listening) return; cancelled = true; try { recognition.abort(); } catch { /* already stopping */ } };
   if (!Recognition) { mic.disabled = true; mic.title = 'Dictation is unavailable in this browser'; setVoice('Voice unavailable'); }
-  else if (hover) {
-    mic.addEventListener('pointerdown', event => { if (event.button === 0) start(); });
-    mic.addEventListener('pointerup', stop);
-    mic.addEventListener('pointercancel', stop);
-    mic.addEventListener('pointerleave', stop);
-  } else {
-    mic.addEventListener('click', () => listening ? stop() : start());
+  else {
+    // Tap starts listening and a second tap stops; press and hold also works:
+    // holding past 500 ms stops on release. Escape cancels.
+    let downAt = 0, startedHere = false;
+    mic.addEventListener('pointerdown', event => {
+      if (event.button !== 0) return;
+      downAt = performance.now();
+      startedHere = !listening;
+      if (startedHere) start();
+    });
+    mic.addEventListener('pointerup', () => { if (startedHere && listening && performance.now() - downAt >= 500) stop(); });
+    mic.addEventListener('click', () => {
+      if (startedHere) { startedHere = false; return; }
+      if (listening) stop(); else start();
+    });
+    mic.addEventListener('pointercancel', () => { if (startedHere && listening) stop(); });
+    mic.addEventListener('pointerleave', () => { if (startedHere && listening) stop(); });
   }
   window.addEventListener('keydown', event => { if (event.key === 'Escape' && listening) { event.preventDefault(); cancel(); } });
 
@@ -150,8 +210,7 @@ export function createObjectiveRun(hooks) {
     const state = hooks.runState?.() ?? {};
     const active = typeof state.id === 'string' && hooks.currentCapability?.() === OBJECTIVE_CAPABILITY;
     requested.hidden = !active;
-    summaryStrip.hidden = true;
-    if (!active) { boundSummary = null; lastStrip = ''; return; }
+    if (!active) { summaryStrip.hidden = true; boundSummary = null; lastStrip = ''; return; }
     const result = state.result ?? null;
     const runState = result?.state ?? (result ? 'ended' : 'running');
     const startedAt = Date.parse(result?.startedAt ?? '') || admittedAt;
@@ -169,10 +228,10 @@ export function createObjectiveRun(hooks) {
         el('span', { class: 'requested-chip', 'data-state': state.error ? 'failed' : 'not-observable', text: limitation }));
     }
     const summary = state.output && typeof state.output === 'object' ? state.output.summary : null;
-    if (typeof summary === 'string' && summary.trim()) {
-      summaryStrip.hidden = false;
-      if (boundSummary !== summary) { boundSummary = summary; summaryStrip.replaceChildren(summaryPlayer(summary)); }
-    } else boundSummary = null;
+    const ready = typeof summary === 'string' && summary.trim();
+    summaryStrip.hidden = !ready;
+    if (ready && boundSummary !== summary) { boundSummary = summary; summaryStrip.replaceChildren(summaryPlayer(summary, 'Summary', { auto: true })); }
+    if (!ready) boundSummary = null;
   }
   tick();
   const timer = window.setInterval(tick, 1000);

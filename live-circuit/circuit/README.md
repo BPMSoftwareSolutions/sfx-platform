@@ -73,7 +73,8 @@ gone; `/circuit` and `/circuit/` redirect here, keeping their query. The regions
   composer. Type or dictate an objective (the prompt shell's mic icon and voice status), press
   **Run**, and the Explorer switches to that capability and follows the run. The
   requested-capabilities strip sits under the circuit with honest attribution, and the summary
-  player speaks only the returned `summary` field. Text always works when dictation or audio is
+  player speaks the summary's spoken text: tool-result JSON and machine payloads are never read
+  aloud, while the on-screen text stays verbatim. Text always works when dictation or audio is
   unavailable.
 - **Circuit and run bar:** the selected scenario's database scene, drawn by
   `renderCircuitViewer`, with the circuit runtime mounted on it: live following of

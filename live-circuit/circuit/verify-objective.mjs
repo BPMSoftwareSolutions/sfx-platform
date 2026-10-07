@@ -5,7 +5,7 @@
 // client core must stay free of result-set names (specification rule 7).
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { admissionBody, objectiveInput, OBJECTIVE_CAPABILITY, OBJECTIVE_CONTRACT } from './objective-run.js';
+import { admissionBody, objectiveInput, spokenSummary, OBJECTIVE_CAPABILITY, OBJECTIVE_CONTRACT } from './objective-run.js';
 
 const here = new URL('./', import.meta.url);
 const html = await readFile(new URL('explorer.html', here), 'utf8');
@@ -32,6 +32,13 @@ assert.deepEqual(body, { object: 'capability', operation: 'observe', subject: OB
   input: { contractId: OBJECTIVE_CONTRACT, payload: { objective: "What is Broadcom's current market price?" } } });
 assert.equal(admissionBody('   ').input.payload.objective, '', 'A blank objective is trimmed, never invented');
 assert.equal(objectiveInput('  price  ').payload.objective, 'price');
+
+// The spoken summary drops machine payloads; the on-screen text stays verbatim.
+const machine = 'Nike (symbol: NKE) has an observed market price of $34.61 USD according to the Nasdaq Real Time Price data. Tool result: {"contractId":"equity-market-price-evidence.v1","payload":{"symbol":"NKE"}}';
+assert.equal(spokenSummary(machine), 'Nike (symbol: NKE) has an observed market price of $34.61 USD according to the Nasdaq Real Time Price data.');
+assert.equal(spokenSummary('Price is $34.61. {"a":[1,2]} Done.'), 'Price is $34.61. Done.');
+assert.equal(spokenSummary('```json\n{"a":1}\n```'), '');
+assert.equal(spokenSummary('{"only":"machine"}'), '');
 
 // Rule 7: the client names no result set; and the design's Ask wording never returns.
 assert(!/Ask/.test(html), 'The Explorer never labels the objective action Ask');
