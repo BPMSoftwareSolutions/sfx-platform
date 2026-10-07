@@ -29,11 +29,13 @@ class ObservedRuns extends RunSupervisor {
     const result = super.admit(request, idempotencyKey);
     if (result.replayed) return result;
     const { record } = result;
+    // Transport attribution belongs on every frame, outside kernel testimony.
+    const publishRun = event => publish({ ...event, runId: `sda-api:${record.runId}` });
     const receive = event => {
-      if (event.kind === 'run.started') publish({ kind: 'run-start', at: event.at, pid: record.pid, apiRunId: record.runId });
-      else if (event.kind === 'graph.captured') publish({ kind: 'observation', payload: record.graph });
-      else if (event.kind === 'run.exited') publish({ kind: 'run-end', at: event.at, exitCode: record.exitCode, apiRunId: record.runId });
-      else if (event.kind !== 'run.admitted') publish({ kind: 'observation', payload: event.payload });
+      if (event.kind === 'run.started') publishRun({ kind: 'run-start', at: event.at, pid: record.pid, apiRunId: record.runId });
+      else if (event.kind === 'graph.captured') publishRun({ kind: 'observation', payload: record.graph });
+      else if (event.kind === 'run.exited') publishRun({ kind: 'run-end', at: event.at, exitCode: record.exitCode, apiRunId: record.runId });
+      else if (event.kind !== 'run.admitted') publishRun({ kind: 'observation', payload: event.payload });
     };
     for (const event of record.buffer.after(0, { limit: config.maxEvents }).events) receive(event);
     const unsubscribe = record.buffer.subscribe(event => {

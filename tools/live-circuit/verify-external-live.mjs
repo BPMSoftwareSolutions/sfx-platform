@@ -23,24 +23,30 @@ try {
   await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability, namespace: scene.namespaceId, scenario: capability, page: 'scenario-1' }));
   await page.waitForSelector('.component-hit', { timeout: 90000 });
   await page.locator('#follow').check();
-  await page.evaluate(async () => {
-    window.externalSamples = []; window.externalRecords = []; window.externalOpen = false; window.externalGraph = null;
+  await page.evaluate(async graph => {
+    window.externalSamples = []; window.externalRecords = []; window.externalRuns = new Map(); window.externalRun = null;
     const source = window.externalSource = new EventSource('/events');
     source.onmessage = event => {
       const record = JSON.parse(event.data); window.externalRecords.push(record);
-      if (record.kind === 'run-start') { window.externalOpen = true; window.externalGraph = null; }
-      if (record.kind === 'run-end') window.externalOpen = false;
-      if (record.payload?.graphId) window.externalGraph = record.payload.graphId;
+      if (!record.runId) return;
+      if (record.kind === 'run-start') window.externalRuns.set(record.runId, { id: record.runId, open: true, graph: null });
+      const run = window.externalRuns.get(record.runId);
+      if (!run) return;
+      if (record.kind === 'run-end') run.open = false;
+      if (record.payload?.graphId) {
+        run.graph = record.payload.graphId;
+        if (run.graph === graph) window.externalRun = run;
+      }
     };
     const sample = () => {
-      window.externalSamples.push({ at: Date.now(), open: window.externalOpen, graph: window.externalGraph,
+      window.externalSamples.push({ at: Date.now(), runId: window.externalRun?.id, open: window.externalRun?.open, graph: window.externalRun?.graph,
         mode: document.querySelector('#mode').textContent, page: document.querySelector('#slide').value,
         current: [...document.querySelectorAll('.component-hit[data-current=true]')].map(n => ({ id: n.dataset.nodeId, kind: n.dataset.kind })) });
       window.externalFrame = requestAnimationFrame(sample);
     };
     window.externalFrame = requestAnimationFrame(sample);
     await new Promise((resolve, reject) => { source.onopen = resolve; source.onerror = () => reject(new Error('External SSE failed')); });
-  });
+  }, 'graph:' + capability);
   const child = spawn(command, args, { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
   child.stdout.pipe(process.stdout); child.stderr.pipe(process.stderr);
   const exitCode = await new Promise((resolve, reject) => { child.on('error', reject); child.on('close', resolve); });
@@ -52,27 +58,28 @@ try {
   if (exitCode === 0) {
     try {
       await page.waitForFunction(({graph, variant}) =>
-        window.externalRecords.some(r => r.kind === 'run-end') &&
-        window.externalSamples.some(s => s.graph === graph && s.current.some(n => n.kind === 'variant' && n.id.endsWith(':' + variant))),
+        window.externalRun?.open === false &&
+        window.externalSamples.some(s => s.runId === window.externalRun.id && s.graph === graph && s.current.some(n => n.kind === 'variant' && n.id.endsWith(':' + variant))),
         {graph:'graph:' + capability, variant}, {timeout:90000});
       terminalObserved = true;
     } catch {} // Preserve the captured receipts and frames before refusing.
   }
-  const { samples, records } = await page.evaluate(() => {
+  const { samples, records, runId } = await page.evaluate(() => {
     cancelAnimationFrame(window.externalFrame); window.externalSource.close();
-    return { samples: window.externalSamples, records: window.externalRecords };
+    return { samples: window.externalSamples, records: window.externalRecords, runId: window.externalRun?.id };
   });
   fs.writeFileSync(path.join(evidence, 'frames.json'), JSON.stringify(samples));
   fs.writeFileSync(path.join(evidence, 'capture.sse'), records.map(r => 'data: ' + JSON.stringify(r) + '\n\n').join(''));
   await page.screenshot({ path: path.join(evidence, 'external.png'), fullPage: true });
-  const live = samples.filter(s => s.open && s.graph === 'graph:' + capability);
+  const selected = samples.filter(s => s.runId === runId && s.graph === 'graph:' + capability);
+  const live = selected.filter(s => s.open);
   const providers = [...new Set(live.flatMap(s => s.current.filter(n => n.kind === 'provider').map(n => n.id)))];
   const declared = [...new Set(scene.nodes.filter(n => n.kind === 'provider').map(n => n.id))];
-  const outcomes = [...new Set(samples.flatMap(s => s.current.filter(n => n.kind === 'variant').map(n => n.id)))];
-  const receipt = { checkedAt: new Date().toISOString(), origin, capability, exitCode, errors,
+  const outcomes = [...new Set(selected.flatMap(s => s.current.filter(n => n.kind === 'variant').map(n => n.id)))];
+  const receipt = { checkedAt: new Date().toISOString(), origin, capability, runId, exitCode, errors,
     frames: samples.length, liveFrames: live.length, providers, declaredProviders: declared,
     pages: [...new Set(live.map(s => s.page))], outcomes, terminalObserved, commandCompletedAt,
-    outcomePaintedAt: samples.find(s => s.graph === 'graph:' + capability && s.current.some(n => n.kind === 'variant' && n.id.endsWith(':' + variant)))?.at ?? null,
+    outcomePaintedAt: selected.find(s => s.current.some(n => n.kind === 'variant' && n.id.endsWith(':' + variant)))?.at ?? null,
     replayUsed: samples.some(s => s.mode.includes('REPLAY')) };
   fs.writeFileSync(path.join(evidence, 'receipt.json'), JSON.stringify(receipt, null, 2));
   assert.equal(exitCode, 0); assert.equal(errors.length, 0); assert(!receipt.replayUsed);

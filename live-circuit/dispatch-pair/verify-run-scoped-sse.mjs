@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { observeRecord } from '../circuit/deck-trace.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const capturePath = process.argv[2] ?? path.join(here, 'observation-capture.v1.txt');
@@ -44,9 +45,11 @@ function parseCapture(text) {
 async function post(base, records) {
   // Replay the admitted frames as the capture wrote them: run boundaries keep
   // their payload, observations keep theirs.
-  const body = records.map((record) => record.kind === 'observation'
-    ? { kind: 'observation', payload: record.payload }
-    : { ...record.payload, kind: record.kind });
+  const body = records.map((record) => ({
+    ...(record.kind === 'observation' ? { kind: 'observation', payload: record.payload }
+      : { ...(record.payload ?? record), kind: record.kind }),
+    ...(record.runId ? { runId: record.runId } : {})
+  }));
   const response = await fetch(`${base}/events`, { method: 'POST', body: JSON.stringify(body) });
   assert(response.ok, `POST /events failed: ${response.status}`);
   return response.json();
@@ -226,8 +229,45 @@ try {
   assert((await latest.waitFor(4))[2].payload.phase === 'reader-run', 'run=current without graphId must stay the latest run');
   await latest.close();
 
+  // Two instances of the SAME graph, plus an unattributed native run, overlap.
+  // Identity must survive normalization, live delivery and scoped replay; neither
+  // graph identity, sequence windows nor a different run's end may attribute it.
+  const tagged = id => graphRun('graph:concurrent-subject', id).map(record => ({ ...record, runId: id }));
+  const a = tagged('sda-api:a'), b = tagged('sda-api:b'), native = graphRun('graph:native-reader', 'native');
+  const concurrentNext = openStream(base, '?run=next');
+  const concurrentLive = openStream(base, '');
+  await new Promise(resolve => setTimeout(resolve, 150));
+  await post(base, [a[0], a[1], native[0], b[0], b[1], native[1], a[2], b[2], b[3], native[2], native[3], a[3]]);
+  await concurrentLive.waitFor(12);
+  await concurrentNext.waitFor(4);
+  await new Promise(resolve => setTimeout(resolve, 150));
+  assert(concurrentNext.received.length === 4 && concurrentNext.received.every(r => r.runId === a[0].runId),
+    'run=next mixed concurrent executions');
+  assert(concurrentNext.received.at(-1).kind === 'run-end', 'Other run-end truncated the selected execution');
+  const collected = [];
+  for (const record of concurrentLive.received) observeRecord(collected, record);
+  assert(collected.length === 3 && collected.every(run => run.ended && !run.ambiguous), 'Viewer must separate attributed and legacy runs');
+  for (const id of ['sda-api:a', 'sda-api:b']) {
+    const run = collected.find(run => run.id === id);
+    assert(run.events.length === 3 && run.events.every(e => e.record.runId === id), 'Viewer mixed receipts between executions');
+  }
+  const concurrentReplay = openStream(base, '?run=current&graphId=graph:concurrent-subject');
+  await concurrentReplay.waitFor(4);
+  await new Promise(resolve => setTimeout(resolve, 150));
+  assert(concurrentReplay.received.length === 4 && concurrentReplay.received.every(r => r.runId === b[0].runId),
+    'Graph replay must select the latest invocation, excluding other runs');
+  const orphan = { kind: 'observation', runId: 'sda-api:missing', payload: a[1].payload };
+  assert(observeRecord(collected, orphan) === undefined, 'Missing run-start must not be attributed to another run');
+  observeRecord(collected, concurrentLive.received[0]);
+  assert(collected[0].ambiguous, 'Duplicate run identity must be held');
+  const untagged = [];
+  for (const record of [{ kind: 'run-start', observationKey: 'u1' }, { kind: 'run-start', observationKey: 'u2' },
+    { kind: 'run-end', payload: { exitCode: 0 } }]) observeRecord(untagged, record);
+  assert(untagged.every(run => run.ambiguous), 'Unattributed overlap must remain held');
+  await Promise.all([concurrentNext.close(), concurrentLive.close(), concurrentReplay.close()]);
+
   console.log(`RUN_SCOPED_SSE_OK capture=${capturePath} runs=${runStarts} admitted=${afterCapture} ` +
-    `currentRunStart=${currentSeqs[0]} nextRunStart=${nextRecords[0].seq} graphSelected=${byGraphRecords[0].seq}`);
+    `currentRunStart=${currentSeqs[0]} nextRunStart=${nextRecords[0].seq} graphSelected=${byGraphRecords[0].seq} concurrentRuns=3`);
   await stop();
   process.exit(0);
 } catch (error) {

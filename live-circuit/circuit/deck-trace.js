@@ -4,6 +4,25 @@ export function newRun(record) {
   return { id: record.runId ?? record.observationKey, startedAt: record.payload?.at ?? record.receivedAt, startRecord: record, graph: null,
     cells: new Map(), edges: new Map(), other: [], events: [], ended: false, ambiguous: false };
 }
+// Shared observers can carry concurrent invocations. Only a producer-supplied
+// envelope ID separates them; graph/cell identities and arrival order cannot.
+// Older, unattributed producers retain the fail-closed overlap behaviour.
+export function observeRecord(runs, record, at = Date.now()) {
+  const runId = record.runId;
+  if (record.kind === 'run-start') {
+    const existing = runId && runs.find(run => run.startRecord.runId === runId);
+    if (existing) { existing.ambiguous = true; return existing; }
+    const overlapping = runId ? [] : runs.filter(run => !run.startRecord.runId && !run.ended);
+    for (const run of overlapping) run.ambiguous = true;
+    const run = newRun(record); run.ambiguous = overlapping.length > 0;
+    runs.push(run);
+    return run;
+  }
+  const run = runId ? runs.find(run => run.startRecord.runId === runId)
+    : runs.findLast(run => !run.startRecord.runId);
+  if (run) applyRecord(run, record, at);
+  return run;
+}
 export function applyRecord(run, record, at = Date.now()) {
   // Launcher bookkeeping may arrive after run-end. It belongs outside the
   // invocation envelope and must not extend its recorded execution clock.

@@ -28,12 +28,12 @@ const events = selected.records.map((record, index) => ({ runId, cursor: index +
 events[0].at = selected.run.startedAt; events.at(-1).at = model.endedAt;
 const apiRun = { runId, state: 'completed', capability: { subject: deck.capabilityId }, startedAt: selected.run.startedAt, endedAt: model.endedAt, exitCode: selected.run.exitCode, partial: false };
 const output = { contractId: 'fixture-output.v1', payload: { summary: 'Transport fixture output' } };
-let streamFailure = 0, admissions = 0, authenticated = true;
+let streamFailure = 0, admissions = 0, authenticated = true, externalCapture = null;
 const sse = selected.records.map(r => 'data: ' + JSON.stringify(r) + '\n\n').join('');
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const json = (body, status = 200) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(body)); };
-  if (url.pathname === '/events') { res.writeHead(200, { 'content-type': 'text/event-stream' }); return res.end(url.searchParams.get('run') === 'current' ? sse : ': fixture observer\n\n'); }
+  if (url.pathname === '/events') { res.writeHead(200, { 'content-type': 'text/event-stream' }); return res.end(externalCapture ?? (url.searchParams.get('run') === 'current' ? sse : ': fixture observer\n\n')); }
   if (url.pathname === '/api/circuit/v1/scenario') return json(deck);
   if (url.pathname === '/api/circuit/v1/capability-details') return json({ error: 'Offline fixture: navigation not included' }, 503);
   if (url.pathname === '/api/circuit/v1/session') return json({ authenticated, observeRequiresSession: true, principalId: 'fixture-principal', identifier: 'Offline acceptance' });
@@ -152,6 +152,22 @@ try {
   await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes(' · completed'));
   assert(await page.locator('#observe-resume').isHidden());
   assert.equal(admissions, 0, 'Resume must read the same run, not create one');
+  // Replay retained testimony through the external-follow transport with an
+  // explicit fixture run ID and overlapping native-reader boundaries. This is
+  // an offline concurrency regression, not evidence of a new live execution.
+  const interleaved = selected.records.map(record => ({ ...record, runId: 'sda-api:fixture-selected' }));
+  interleaved.splice(Math.floor(interleaved.length / 3), 0,
+    { kind: 'run-start', payload: { pid: 9001 } },
+    { kind: 'observation', payload: { observationType: 'execution-graph-captured.v1', graphId: 'graph:fixture-native-reader', cells: [], edges: [] } });
+  interleaved.splice(Math.floor(interleaved.length * 2 / 3), 0, { kind: 'run-end', payload: { pid: 9001, exitCode: 0 } });
+  externalCapture = interleaved.map((record, i) => 'data: ' + JSON.stringify({ ...record, seq: i + 1, observationKey: `fixture-observer:concurrent:${i + 1}` }) + '\n\n').join('');
+  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId }));
+  await page.waitForFunction(() => document.querySelector('.run-outcome')?.textContent === 'ADMITTED');
+  await page.waitForFunction(() => [...document.querySelectorAll('.component-hit[data-current=true]')].some(node => node.dataset.nodeId.endsWith(':ADMITTED')));
+  assert(!(await page.locator('#mode').textContent()).includes('REPLAY'), 'External follow must remain live mode');
+  assert((await page.locator('#observer-status').textContent()).includes('2 run(s) seen'));
+  assert.equal(await page.locator('[data-step-node]').count(), model.operations.length);
+  if (process.argv[2]) await page.screenshot({ path: path.join(process.argv[2], 'concurrent-external.png'), fullPage: true });
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run'], errors, status: 'PASS' }));
+  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run', 'concurrent external follow keeps exact outcome'], errors, status: 'PASS' }));
 } finally { await browser.close(); server.closeAllConnections(); await new Promise(r => server.close(r)); }

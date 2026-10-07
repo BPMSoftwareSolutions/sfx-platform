@@ -54,7 +54,7 @@ const maxBodyBytes = 16 * 1024 * 1024;
 const ring = [];
 const clients = new Set();
 const runs = [];
-let sequence = 0;
+let sequence = 0, runIndex = 0;
 const observerInstance = randomBytes(12).toString('hex');
 
 function isRecord(value) {
@@ -76,16 +76,17 @@ function clip(value, limit = 96) {
 function normalizeEvent(input) {
   if (!isRecord(input)) return null;
   const kind = asText(input.kind);
+  const attribution = typeof input.runId === 'string' && input.runId.length ? { runId: input.runId } : {};
   if (kind === 'observation') {
-    return { kind, payload: isRecord(input.payload) ? input.payload : {} };
+    return { kind, ...attribution, payload: isRecord(input.payload) ? input.payload : {} };
   }
   if (kind === 'run-start' || kind === 'run-end') {
-    return { kind, payload: input };
+    return { kind, ...attribution, payload: input };
   }
   if (isRecord(input.payload)) {
-    return { kind: 'observation', payload: input.payload };
+    return { kind: 'observation', ...attribution, payload: input.payload };
   }
-  return { kind: kind ?? 'observation', payload: input };
+  return { kind: kind ?? 'observation', ...attribution, payload: input };
 }
 
 function glyphFor(payload) {
@@ -209,6 +210,7 @@ function admit(event) {
     observationKey: `sfx-observer:${observerInstance}:${sequence}`,
     receivedAt: receivedAt.toISOString(),
     kind: event.kind,
+    ...(event.runId ? { runId: event.runId } : {}),
     glyph: summary.glyph,
     cls: summary.cls,
     text: summary.text,
@@ -218,12 +220,14 @@ function admit(event) {
   if (ring.length > ringLimit) ring.splice(0, ring.length - ringLimit);
   while (runs.length > 0 && runs[0].endSeq !== null && ring.length > 0 && runs[0].endSeq < ring[0].seq) runs.shift();
   if (record.kind === 'run-start') {
-    runs.push({ index: runs.length + 1, startSeq: record.seq, endSeq: null });
-  } else if (record.kind === 'run-end' && runs.length > 0 && runs[runs.length - 1].endSeq === null) {
-    runs[runs.length - 1].endSeq = record.seq;
-  } else if (record.payload?.observationType === 'execution-graph-captured.v1' && runs.length > 0 && runs[runs.length - 1].endSeq === null) {
-    // A run is identified by the graph it captured; interleaved reader runs do not replace it.
-    runs[runs.length - 1].graphId ??= asText(record.payload.graphId);
+    runs.push({ index: ++runIndex, runId: record.runId, startSeq: record.seq, endSeq: null });
+  } else {
+    const run = record.runId ? runs.findLast(run => run.runId === record.runId)
+      : runs.findLast(run => !run.runId);
+    if (run && run.endSeq === null) {
+      if (record.kind === 'run-end') run.endSeq = record.seq;
+      else if (record.payload?.observationType === 'execution-graph-captured.v1') run.graphId ??= asText(record.payload.graphId);
+    }
   }
   console.log(`[${clockOf(receivedAt)}] ${record.observationKey} ${record.glyph} ${record.kind} ${record.text}`);
   const frame = `data: ${JSON.stringify(record)}\n\n`;
@@ -292,8 +296,9 @@ async function receive(req, res) {
   sendJson(res, 202, { accepted, sequence });
 }
 
-// Per-run scoping: a run spans its run-start through its run-end (an open run
-// stays open). `run=current` (or `last`) selects the most recent run, an
+// Per-run scoping: attributed runs match the producer's envelope ID. Legacy
+// streams keep their boundary window (unattributed overlap is held by viewers).
+// `run=current` (or `last`) selects the most recent run, an
 // ordinal selects the nth run, and `run=next` waits for the next run-start.
 // `run=current`/ordinal replay that run's ring records; a new SSE client with
 // no parameters is live-only and never receives an earlier run's events.
@@ -313,7 +318,7 @@ function createRunMatcher(selector, graphId = null) {
   let selected = null;
   const resolve = () => selector.kind === 'current'
     ? (graphId === null ? runs.at(-1) : runs.findLast(run => run.graphId === graphId)) ?? null
-    : runs[selector.value - 1] ?? null;
+    : runs.find(run => run.index === selector.value) ?? null;
   if (selector.kind !== 'next') selected = resolve();
   return (record) => {
     if (selected === null) {
@@ -323,7 +328,7 @@ function createRunMatcher(selector, graphId = null) {
     }
     if (record.seq < selected.startSeq) return false;
     if (selected.endSeq !== null && record.seq > selected.endSeq) return false;
-    return true;
+    return selected.runId ? record.runId === selected.runId : !record.runId;
   };
 }
 

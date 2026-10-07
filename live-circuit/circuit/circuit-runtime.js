@@ -4,7 +4,7 @@
 // (#viewer, #slide, #mode, #follow, #speed, #replay, #payload, #observe, …) are the
 // page contract the staging browser acceptance drives.
 import { el, renderCircuitViewer, boundaryGlyphs, surface } from './circuit-viewer.js';
-import { newRun, applyRecord, replayTimeline } from './deck-trace.js';
+import { newRun, applyRecord, observeRecord, replayTimeline } from './deck-trace.js';
 import { PlaybackClock } from './playback-clock.js';
 import { targetLink, relatedLinks, renderDetail, authorityTree } from './navigation.js';
 import { buildTraversal, traversalState, LiveMotion } from './traversal.js';
@@ -28,7 +28,7 @@ const maxZoom = slide => { const caps = slide?.blueprint?.endCaps; return caps ?
 // location(push) → writes the URL; component(id) → a circuit component was selected.
 export function createCircuitRuntime(shell) {
   const state = { deck: null, slideId: null, page: null, selectedNode: null, detailId: null, detailPointer: '', detailSlides: [], detailSlideId: null,
-    runs: [], current: null, openRuns: 0, lastSeq: 0, instance: null, connection: 'connecting', playback: null,
+    runs: [], lastSeq: 0, instance: null, connection: 'connecting', playback: null,
     apiOwned: false, apiRun: null, apiGap: false, apiId: null, apiResult: null, output: undefined, outputError: null,
     replayError: null, view: storedView(), zoom: 'fit', scale: null };
   let detailRequest, detailSerial = 0, replaySerial = 0, frame = 0, source;
@@ -335,7 +335,7 @@ export function createCircuitRuntime(shell) {
   function connect(replay = false) {
     source?.close();
     if (state.apiOwned) return;
-    if (replay) { state.runs = []; state.current = null; state.openRuns = 0; state.lastSeq = 0; }
+    if (replay) { state.runs = []; state.lastSeq = 0; }
     // Replay the latest run of this circuit's graph; interleaved reader runs are skipped.
     source = new EventSource(replay ? `/events?run=current&graphId=${encodeURIComponent(`graph:${capability()}`)}` : state.lastSeq ? `/events?since=${state.lastSeq}` : '/events');
     source.onopen = () => { state.connection = 'connected'; schedule(); };
@@ -344,20 +344,13 @@ export function createCircuitRuntime(shell) {
       try {
         const record = JSON.parse(message.data);
         const instance = record.observationKey?.split(':').slice(0, -1).join(':');
-        if (state.instance && state.instance !== instance) { state.runs = []; state.current = null; state.openRuns = 0; state.lastSeq = 0; stopReplay(); }
+        if (state.instance && state.instance !== instance) { state.runs = []; state.lastSeq = 0; stopReplay(); }
         state.instance = instance;
         if (record.seq <= state.lastSeq) return;
         state.lastSeq = record.seq;
-        if (record.kind === 'run-start') {
-          const overlap = state.openRuns > 0;
-          state.openRuns++;
-          if (overlap) for (const run of state.runs.filter(run => !run.ended)) run.ambiguous = true;
-          state.current = newRun(record); state.current.ambiguous = Boolean(overlap);
-          state.runs.push(state.current); if (state.runs.length > 20) state.runs.shift();
-        } else if (state.current) {
-          applyRecord(state.current, record);
-          if (record.kind === 'run-end') state.openRuns = Math.max(0, state.openRuns - 1);
-        } else state.connection = 'connected · incomplete retained run; waiting for run-start';
+        const observed = observeRecord(state.runs, record);
+        if (state.runs.length > 20) state.runs.shift();
+        if (!observed) state.connection = 'connected · incomplete retained run; waiting for run-start';
         schedule();
         if (replay && record.kind === 'run-end') { startReplay(latestRun()); connect(); }
       } catch (error) { state.connection = `invalid observation: ${error.message}`; schedule(); }
@@ -384,7 +377,7 @@ export function createCircuitRuntime(shell) {
     gap: () => { state.apiGap = true; if (state.apiRun) state.apiRun.ambiguous = true; schedule(); },
     release: () => {
       if (!state.apiOwned) return;
-      stopReplay(); state.apiOwned = false; state.apiRun = null; state.apiId = null; state.apiResult = null; state.output = undefined; state.outputError = null; state.runs = []; state.current = null; state.openRuns = 0; state.lastSeq = 0; state.instance = null; connect(); schedule();
+      stopReplay(); state.apiOwned = false; state.apiRun = null; state.apiId = null; state.apiResult = null; state.output = undefined; state.outputError = null; state.runs = []; state.lastSeq = 0; state.instance = null; connect(); schedule();
     }
   });
   $('slide').addEventListener('change', () => selectSlide($('slide').value));
