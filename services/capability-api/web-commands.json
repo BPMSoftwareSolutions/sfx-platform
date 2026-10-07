@@ -1,4 +1,0 @@
-{
-  "policyType": "sidefx-web-commands.v1",
-  "commands": [{ "object": "capability", "operation": "invoke" }]
-}

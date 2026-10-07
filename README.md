@@ -10,10 +10,10 @@ automatic: every watched push runs the release contract — composite build and 
 boundaries, real browser sign-in/Observe/replay, restart and vault proof, external CLI follow and
 the Windows CLI checks — and rolls back on a failed gate.
 
-> **Legacy website notice.** The `www.sidefx.io` Next.js website is retired. Staging serves one
-> composite image with no website; `/robots.txt` is the gateway's own, and the website's routes
-> answer 404. Its source remains in this repository only until the P5 removal. Website-era
-> documents are retained as historical records and are marked as such. See the
+> **Legacy website retired.** The `www.sidefx.io` Next.js website is retired and its code was
+> removed under P5 (2026-10-07). Staging serves one composite image with no website; the gateway
+> owns `/robots.txt`, and the website's routes answer 404. Website-era documents are retained as
+> historical records and are marked as such. See the
 > [revamp plan](docs/live-circuit-platform-revamp.md) for decisions D2–D3 and phases P0–P6.
 
 ## Current surface
@@ -41,7 +41,6 @@ the Windows CLI checks — and rolls back on a failed gate.
 | `tools/` | local Live Circuit stack and verification scripts |
 | `infra/` | Azure bindings and release authorization |
 | `docs/` | platform plans, runbooks and retained evidence |
-| `app/`, `components/`, `lib/`, `content/`, `contracts/`, `generated/`, `public/`, `scripts/`, `services/`, `tests/` | **Retired Next.js website** — pending [P5](docs/live-circuit-platform-revamp.md) removal |
 
 ## Running locally
 
@@ -88,4 +87,4 @@ Retained as historical records, each marked historical at the top:
 [`capability-execution.md`](docs/capability-execution.md),
 [`capability-readiness.md`](docs/capability-readiness.md),
 [`media-operations.md`](docs/media-operations.md). Their subjects are the retired Next.js website;
-code removal is tracked by [P5](docs/live-circuit-platform-revamp.md).
+its code was removed under [P5](docs/live-circuit-platform-revamp.md) on 2026-10-07.

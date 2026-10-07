@@ -335,8 +335,8 @@ A successful run could have replaced the complete host with a website-only image
 The variable was set to `false` at 21:11Z, and the `staging` job was removed from
 the workflow, which then only built and tested the website image until it was
 removed on 2026-10-07. Neither the website image nor that workflow is a Live
-Circuit release path. Both retire with Next.js under the
-[platform revamp](live-circuit-platform-revamp.md).
+Circuit release path. Both were retired with the website under the
+[platform revamp](live-circuit-platform-revamp.md) (P5, 2026-10-07).
 
 ### Packaging choices
 
@@ -460,7 +460,7 @@ admin password. Confirm the ARM binding still equals `DOCKER|$image` after check
 | Check | Required evidence |
 | --- | --- |
 | Startup | `/healthz` and `/readyz` return the intended release/kernel; ARM reports the exact image; all child services start without restart loops |
-| Public/read boundary | Clean browser loads website/circuit without Basic challenge; anonymous direct `/v1/*` is 401; external event POST is 405 |
+| Public/read boundary | Clean browser loads platform home/circuit without Basic challenge; anonymous direct `/v1/*` is 401; external event POST is 405 |
 | Database retrieval | Capability count paired with list, two different scenarios, provider drill-down, matching snapshot/definition digests; stale selection and disallowed procedures refused |
 | Real browser Observe | Fresh valid contract payload, one admitted run, graph and output captured; sequential input-to-operation-to-port/provider-to-exact-outcome flow while live |
 | External CLI | Open circuit before `sfx-api capability observe ... --json --trace`; verify external run selection and provider visits before return/process exit |
