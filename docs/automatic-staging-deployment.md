@@ -12,8 +12,9 @@ including their local documentation, trigger the release. No release label or
 operator command is needed for runtime changes under those paths.
 
 The target is `sidefx/staging` in `sidefx_group`. Production is never swapped or
-rebound. The website-only `container.yml` remains build/test only. Its old
-`AZURE_STAGING_ENABLED=false` switch stays false; the new workflow does not use it.
+rebound. The website-only `container.yml` was removed on 2026-10-07; it had been
+build/test only. Its `AZURE_STAGING_ENABLED=false` switch stays false; the new
+workflow does not use it.
 
 ## Accepted automatic release
 

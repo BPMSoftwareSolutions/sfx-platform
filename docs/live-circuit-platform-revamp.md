@@ -138,7 +138,7 @@ rollback target. The old Next.js website still answers `/`.
 | P2 One image without Next.js | **Accepted 2026-10-06** (`composite-e82d47d8a901-37403470208-1`) | §4 P2 |
 | P3 Explorer data path | **Steps 1–3 done 2026-10-06**: navigation installed, `read-capability-details` declared, served at `/api/circuit/v1/capability-details`. Uncached host reads take 3.9–5.0 s, over the 3-second bound (see §4 P3); cached reads are immediate. 11 capabilities fail their reading until the routing-law owner repairs it | §4 P3, §6 |
 | P4 Explorer workspace | **One workspace 2026-10-06**: Explorer with the live circuit runtime and Observe; `/circuit` redirects there. Summary cards, operation linking and specialized presentations remain | §4 P4 |
-| P5 Remove Next.js code | **Not started** (after P2) | §4 P5 |
+| P5 Remove Next.js code | **Started 2026-10-07**: `container.yml` retired; the Next.js code and packagers remain | §4 P5 |
 | P6 Deployment evolution | **Started.** Observe requires sign-in; per-user authority inside the API, durable run history and production promotion remain | §4 P6 |
 
 ## Historical sequence before automatic delivery
@@ -396,7 +396,9 @@ Delete the following from the repository:
 - `app/`, `components/`, `lib/`, `content/`, `contracts/`, `generated/`;
 - the publication and media scripts and the `public/media` pipeline;
 - `next.config.ts`, the Next/React/Tailwind dependencies, the root `Dockerfile`;
-- `container.yml` and the `sidefx-database` checkout.
+- `container.yml` and the `sidefx-database` checkout. **Done 2026-10-07**:
+  the workflow was removed (it had been failing on a SQL publication mismatch and
+  spent an Actions run per push); the checkout is gone with it.
 
 Archive `website-design-spec.md` and `architecture.md` as historical, and keep
 the decisions that still hold. Old routes answer 404, or redirect only where the

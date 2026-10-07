@@ -8,8 +8,10 @@ The composite image includes the Live Circuit, SDA Kernel API, retrieval,
 identity and persistent vault. Runtime changes on `main` trigger its build,
 deployment, real acceptance checks and automatic rollback on failed gates.
 
-The website-only deployment job was removed on 2026-10-05. `container.yml`
-only builds and tests; `AZURE_STAGING_ENABLED` remains false. Do not run the
+The website-only deployment job was removed on 2026-10-05, and its
+build-and-test workflow `.github/workflows/container.yml` was removed on
+2026-10-07 with the retiring Next.js website. `AZURE_STAGING_ENABLED` remains
+false. Do not run the
 legacy bootstrap or enable its old deployment instructions for this host.
 The remaining September procedure below is historical. Its runtime and health
 semantics describe the website image, not the composite gateway.
@@ -70,9 +72,10 @@ The actual OIDC subject includes numeric owner/repository IDs; its exact observe
 in `infra/azure.json`. A name-only subject failed authentication in the first run. Preserve the
 ID-qualified trust boundary; inspect the actual claim again if repository ownership changes.
 
-`.github/workflows/container.yml` still builds and tests on pull requests and
-the two selected branches. Its former OIDC staging job no longer exists.
-Build actions are pinned to commit digests. The build job has no Azure token permission.
+`.github/workflows/container.yml` built and tested on pull requests and the two
+selected branches until it was retired on 2026-10-07. Its former OIDC staging
+job no longer exists. Build actions are pinned to commit digests. The build job
+had no Azure token permission.
 
 The workflow runs the final image, checks representative pages and all their static references,
 redirect/404 behavior, server-rendered circuits and staging noindex. It removes a circuit artifact

@@ -325,7 +325,7 @@ There are two different paths today:
 
 | Path | What it produces | Use for Live Circuit |
 | --- | --- | --- |
-| Root Dockerfile and `.github/workflows/container.yml` | Website-only image | A base-image build; **not** a replacement for the complete live slot |
+| Root Dockerfile and `.github/workflows/container.yml` | Website-only image | A base-image build; **not** a replacement for the complete live slot. The workflow was removed 2026-10-07 |
 | `deploy/sda-kernel/` packagers plus ACR build | Composite image or overlay on an exact composite digest | Current Live Circuit release method |
 
 **The website-only deployment is disarmed (2026-10-05).** On audit, the
@@ -333,9 +333,10 @@ repository variable `AZURE_STAGING_ENABLED` was `true`, and `container.yml`
 patched this same slot after a successful non-PR build on its admitted branches.
 A successful run could have replaced the complete host with a website-only image.
 The variable was set to `false` at 21:11Z, and the `staging` job was removed from
-the workflow, which now only builds and tests the website image. Neither the
-website image nor that workflow is a Live Circuit release path. Both retire with
-Next.js under the [platform revamp](live-circuit-platform-revamp.md).
+the workflow, which then only built and tested the website image until it was
+removed on 2026-10-07. Neither the website image nor that workflow is a Live
+Circuit release path. Both retire with Next.js under the
+[platform revamp](live-circuit-platform-revamp.md).
 
 ### Packaging choices
 
