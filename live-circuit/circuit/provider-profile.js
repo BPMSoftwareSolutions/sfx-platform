@@ -103,6 +103,7 @@ export function renderProviderProfile(data) {
   ]);
   nodes.push(el('h3', { text: 'Provider involvement' }), header,
     el('p', { class: 'note', text: `${data.resultSets.length} result sets \u00b7 read ${data.readAt}. Current database read, not an execution receipt.` }));
+  if (data.readerFallback) nodes.push(el('p', { class: 'notice', text: `The details reader is unavailable (${data.readerFallback}); showing the canonical provider body. The structured profile fills in when the details reader is available on this database.` }));
 
   host.append(el('h4', { text: 'Identity' }), el('p', { class: 'notice', text: Object.entries(identity).map(([k, v]) => `${k}: ${show(v)}`).join('  \u00b7  ') || 'identity set empty' }));
   host.append(el('h4', { text: 'Configuration' }));

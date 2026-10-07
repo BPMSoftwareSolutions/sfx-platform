@@ -75,7 +75,11 @@ whose engagement count can exceed the 30 s read timeout:
 
 Both readers are admitted by `deploy/sda-kernel/retrieval-policy.json`, which lists
 `analysis.read_provider_details` and `analysis.read_provider_canonical_body`. The
-inspection response reports which reader ran.
+inspection response reports which reader ran. If the details reader fails — for
+example a database that has not received the details procedure yet, or an
+engagement count that exceeds the read timeout — the host retries the canonical
+reader and reports the choice and the reason (`readerFallback`); the profile then
+shows the canonical sets with the reason visible.
 
 The observer checks `identityResultSet`: exactly one row, with `provider_id`
 equal to the selected provider and `definition_digest` equal to the digest the

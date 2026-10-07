@@ -22,6 +22,7 @@ assert.equal(provider.canonical?.procedure, 'analysis.read_provider_canonical_bo
 assert.ok((provider.canonicalProviders ?? []).includes('sda-authority-transformation-port.v1'), 'Platform catalogs use the canonical fallback');
 assert.ok(policy.includes('"analysis.read_provider_details"') && policy.includes('"analysis.read_provider_canonical_body"'), 'Both readers are admitted by the retrieval policy');
 assert.match(store, /canonicalProviders/, 'The host selects the reader per provider');
+assert.match(store, /readerFallback/, 'A failed details read degrades to the canonical reader with the reason recorded');
 assert.match(store, /reader: reader\.procedure/, 'The response reports which reader ran');
 assert.match(runtime, /renderProviderProfile\(/, 'The drill-down renders the structured profile');
 assert.match(profile, /expectedDigest/, 'Staged documents carry the optimistic guard');

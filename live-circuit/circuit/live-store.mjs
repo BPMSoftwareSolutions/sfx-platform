@@ -240,8 +240,7 @@ async function readProviderInspection(selection) {
   if (!providerId || !identity?.definitionDigest) throw new CircuitReadError('DECLARED_PROVIDER_REQUIRED', 422);
   await capacity();
   const configured = policy.retrieval.provider;
-  const reader = configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured;
-  try {
+  async function readSets(reader) {
     const response = await fetch(`${endpoint.replace(/\/$/, '')}/json`, {
       method: 'POST', headers: { 'content-type': 'application/json',
         ...(process.env.SDA_API_TOKEN ? { authorization: `Bearer ${process.env.SDA_API_TOKEN}` } : {}) },
@@ -259,11 +258,26 @@ async function readProviderInspection(selection) {
     const resultSets = JSON.parse(Buffer.concat(chunks).toString('utf8'));
     if (!Array.isArray(resultSets) || resultSets.some(set => !Array.isArray(set.columns) || !Array.isArray(set.rows)))
       throw new CircuitReadError('PROCEDURE_RESULT_CONTRACT_MISMATCH');
+    return resultSets;
+  }
+  try {
+    // The declared platform catalogs skip the heavy details reader; any other
+    // provider degrades to the canonical reader when the details reader fails
+    // (for example a database that has not received the details procedure yet),
+    // and the response reports both the reader and the reason.
+    let reader = configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured, fallback = null, resultSets;
+    try { resultSets = await readSets(reader); }
+    catch (error) {
+      if (reader === configured.canonical || !configured.canonical) throw error;
+      fallback = error.code ?? error.name ?? 'READER_FAILED';
+      reader = configured.canonical;
+      resultSets = await readSets(reader);
+    }
     const declared = resultSets.find(set => set.name === reader.identityResultSet)?.rows;
     if (declared?.length !== 1 || declared[0].provider_id !== providerId || declared[0].definition_digest !== identity.definitionDigest)
       throw new CircuitReadError('PROVIDER_DEFINITION_CHANGED', 409);
     return { providerId, definitionDigest: identity.definitionDigest, snapshotDigest: scene.snapshotDigest, reader: reader.procedure,
-      readAt: new Date().toISOString(), resultSets };
+      ...(fallback ? { readerFallback: fallback } : {}), readAt: new Date().toISOString(), resultSets };
   } finally { release(); }
 }
 export async function serveCircuitApi(req, res, url) {

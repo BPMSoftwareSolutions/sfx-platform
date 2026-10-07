@@ -139,8 +139,10 @@ bindings, engagements, instructions, invocations, summary; the raw sets stay in
 a fold). `circuit-host.json` declares that reader with its identity set, and keeps
 `analysis.read_provider_canonical_body` as the declared fallback for the platform
 catalog providers named in `canonicalProviders` (a platform capability can be
-engaged by more than a thousand ports and exceed the read timeout). The response
-reports which reader ran.
+engaged by more than a thousand ports and exceed the read timeout). If the details
+reader fails for any other provider, the host retries the canonical reader and
+reports the reader and the reason (`readerFallback`); the profile shows the reason
+instead of an empty workspace.
 
 These are current database reads, not execution receipts. They do not affect
 live flow or replay. The inspector remains read-only: instruction and engagement
