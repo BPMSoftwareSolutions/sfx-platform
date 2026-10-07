@@ -27,8 +27,8 @@ the Windows CLI checks — and rolls back on a failed gate.
 - **Identity** — sign-in, session validation, and durable run evidence (pinned identity host and
   generated DAL) behind private service credentials.
 - **Staging** — `sidefx/staging` in `sidefx_group`. Latest accepted release: run
-  [37550222803](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37550222803),
-  source `adf66b9`, with the durable restart acceptance retained in
+  [37555602379](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37555602379),
+  source `65703db` (P5), with the durable restart acceptance retained in
   [E14](docs/run-evidence-plan/evidence/E14-staging-restart-acceptance.json).
 
 ## Repository layout
