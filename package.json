@@ -2,7 +2,7 @@
   "name": "sfx-platform",
   "version": "0.1.0",
   "private": true,
-  "description": "SideFX website — capability management and engineering platform (www.sidefx.io)",
+  "description": "SideFX Live Circuit Platform — Explorer, circuit host, and composite release tooling",
   "engines": {
     "node": ">=20"
   },

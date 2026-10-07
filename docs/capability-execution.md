@@ -1,5 +1,10 @@
 # Capability execution
 
+> **Historical — retired website (2026-10-07).** This surface belonged to the Next.js website that
+> the platform revamp retired (D2/P2 accepted 2026-10-06). Retained as a design record; current
+> execution evidence and UI live in the Live Circuit Platform — see the
+> [revamp plan](live-circuit-platform-revamp.md).
+
 A visitor opens a capability, composes an input, presses **Run**, and the capability executes —
 its authority read from SQL, its body rebuilt in memory, its result reported as the capability
 produced it. This is the surface the rest of the platform exists to make possible: the catalog

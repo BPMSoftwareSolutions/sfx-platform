@@ -1,5 +1,10 @@
 # Capability readiness: why capabilities are held, and how to clear them
 
+> **Historical — retired website (2026-10-07).** The census and repair paths below were written for
+> the Next.js website era. The underlying estate facts remain useful, but the surface they describe
+> was retired (D2/P2 accepted 2026-10-06). See the
+> [revamp plan](live-circuit-platform-revamp.md).
+
 Of the current generation's 219 capabilities, 94 prepare and execute; **125 are held**. This
 records what each hold actually means, where its fix lives, and how to rank the work from the
 database rather than by guesswork.

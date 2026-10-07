@@ -1,5 +1,9 @@
 # Media publication and recovery
 
+> **Historical — retired website (2026-10-07).** The website media pipeline this document describes
+> was retired with the Next.js website (D2/P2 accepted 2026-10-06). Retained as a design record;
+> see the [revamp plan](live-circuit-platform-revamp.md).
+
 The media worker lives in `C:/lab/sidefx-database/src/media/`. The Python compiler and Nano Banana transport live in `C:/lab/repos/content-creation-mission/scripts/`. The web container consumes immutable exported bytes and has no SQL credentials or Python runtime.
 
 ## Import and publication

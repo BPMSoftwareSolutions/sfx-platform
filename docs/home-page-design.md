@@ -37,8 +37,9 @@ The output folder remains outside Git. This record supplies its durable identity
 ## H1 baseline
 
 Status: **H1 drafted for review, 2026-10-05.** It is not implemented. The
-staging gateway still sends `/` to the Next.js website, which retires under
-[the revamp plan](live-circuit-platform-revamp.md) (decision D2, phase P2).
+staging gateway now serves the platform home page at `/`; the Next.js website
+is retired under [the revamp plan](live-circuit-platform-revamp.md)
+(decisions D2–D3, phases P2–P5).
 
 ## Package
 

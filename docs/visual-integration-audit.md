@@ -1,5 +1,9 @@
 # Visual integration audit
 
+> **Historical — retired website (2026-10-07).** This ledger belongs to the Next.js website that
+> the platform revamp retired (D2/P2 accepted 2026-10-06). Retained as a design record; see the
+> [revamp plan](live-circuit-platform-revamp.md).
+
 Updated 2026-09-08. The original audit below records the missing connection; implementation has now replaced that baseline. The complete image backfill remains open.
 
 ## Implemented connection

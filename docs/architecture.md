@@ -1,5 +1,10 @@
 # SideFX Platform Architecture
 
+> **Historical — retired website (2026-10-07).** This doctrine was codified for the Next.js
+> website that the platform revamp retired (D2/P2 accepted 2026-10-06). It is retained as a design
+> record, not current behavior; the platform's current shape is described in the
+> [revamp plan](live-circuit-platform-revamp.md).
+
 **Status:** Codified 2026-09-08 from `docs/website-design-spec.md` (Draft v6) and the observed implementation. The spec governs behavior; this document is the architecture doctrine the codebase is judged against. Where the implementation still trails the architecture, that gap is recorded here and in [`visual-integration-audit.md`](visual-integration-audit.md) — the architecture is the target, not a claim that everything below is already live.
 
 ---

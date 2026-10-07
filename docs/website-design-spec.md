@@ -1,5 +1,10 @@
 # SideFX Website — Design & Content Specification
 
+> **Historical — retired website (2026-10-07).** This specification describes the Next.js website
+> that the platform revamp retired (D2/P2 accepted 2026-10-06). It is retained as a design record,
+> not current behavior. The current product is the Live Circuit Platform; see the
+> [revamp plan](live-circuit-platform-revamp.md).
+
 **Product:** SideFX — Semantic Intent-Driven Engineering Effects; capability management and engineering platform
 **Domain:** https://www.sidefx.io
 **Owner:** BPM Intelligence (formerly BPM Software Solutions LLC), founded by Sidney Jones

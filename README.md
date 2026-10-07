@@ -1,295 +1,91 @@
 # sfx-platform
 
-The SideFX website — `www.sidefx.io`. Next.js App Router, TypeScript strict, Tailwind CSS v4.
+The SideFX **Live Circuit Platform**: the Explorer and its live circuit, the capability readers
+that feed it, and the composite image that serves and releases them.
 
-Built against [`docs/website-design-spec.md`](docs/website-design-spec.md). That spec governs; this
-README records how the implementation satisfies it and, just as importantly, where it does not yet.
-[`docs/architecture.md`](docs/architecture.md) codifies the architecture doctrine — pillars,
-boundaries, pipelines, contracts and honesty invariants — that the codebase is judged against.
-[`docs/visual-integration-audit.md`](docs/visual-integration-audit.md) is the ledger of open gates.
-[`docs/capability-execution.md`](docs/capability-execution.md) documents capability execution — the
-surface that runs a capability from the database, and the platform's centre of gravity.
-[`docs/observation-altitudes.md`](docs/observation-altitudes.md) establishes the nine observation
-altitudes, parent-context navigation and evidence mapping, separately from semantic/authoring
-altitude, runtime cell filters and observation overlays. It records requirements and open work.
+The platform serves `/` (home) and the workspace at `/circuit/explorer`; `/circuit` redirects
+there. Observe requires a signed-in principal, runs are attributed to that principal, and their
+evidence is captured durably through the identity host. Releases to the Azure staging slot are
+automatic: every watched push runs the release contract — composite build and deploy, public
+boundaries, real browser sign-in/Observe/replay, restart and vault proof, external CLI follow and
+the Windows CLI checks — and rolls back on a failed gate.
 
-## Running it
+> **Legacy website notice.** The `www.sidefx.io` Next.js website is retired. Staging serves one
+> composite image with no website; `/robots.txt` is the gateway's own, and the website's routes
+> answer 404. Its source remains in this repository only until the P5 removal. Website-era
+> documents are retained as historical records and are marked as such. See the
+> [revamp plan](docs/live-circuit-platform-revamp.md) for decisions D2–D3 and phases P0–P6.
 
-```bash
-npm ci
-npm run restore:media      # fetch public/media from SQL (see below)
-npm run validate:estate    # validate the committed, selected publication
-npm run dev                # http://localhost:3000
-```
+## Current surface
 
-### `public/media` is not in the repository
+- **Home** — `/` serves the platform home page from the circuit host; `/circuit/home` is the same page.
+- **Explorer** — `/circuit/explorer`: declared navigation from the installed estate, the database
+  circuit, live/replay run controls, the run report and Evidence context tabs, and Observe for a
+  signed-in principal.
+- **Circuit host** — observer feed, per-run SSE, run attribution, capability details and scenario
+  readers, all served through the gateway.
+- **Identity** — sign-in, session validation, and durable run evidence (pinned identity host and
+  generated DAL) behind private service credentials.
+- **Staging** — `sidefx/staging` in `sidefx_group`. Latest accepted release: run
+  [37550222803](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37550222803),
+  source `adf66b9`, with the durable restart acceptance retained in
+  [E14](docs/run-evidence-plan/evidence/E14-staging-restart-acceptance.json).
 
-The media publication — capability artwork, materials, editions and the 168 MB of compiled
-topology diagrams — is generated content that SQL retains in full and can rebuild byte for byte.
-It is therefore not committed. `npm run restore:media` writes it into `public/media` from the
-selected publication, and `npm run validate:media` checks every file against its SQL hash.
+## Repository layout
 
-It needs a database connection string in the environment (`SIDEFX_CONNECTION_STRING`, or
-`sidefx-connection-string`) and a checkout of
-[`sidefx-database`](https://github.com/BPMSoftwareSolutions/sidefx-database), which owns the media
-schema and the only SQL client. Point `SIDEFX_DATABASE_ROOT` at it if it is not a sibling
-directory. CI restores the same way before building the image.
-
-**If you already had this repository checked out**, pulling the commit that untracked these files
-will delete them from your working copy. Run `npm run restore:media` and the build works again.
-
-Other scripts:
-
-| Script | What it does |
+| Path | Holds |
 | --- | --- |
-| `npm run publish:estate` | Reads one pinned generation of the estate and writes `generated/` |
-| `npm run publish:contracts` | Publishes each capability's declared input contract schema for the input form |
-| `npm run restore:media` | Restores `public/media` from the selected SQL publication |
-| `npm run validate:media` | Verifies every restored media file against its SQL publication hash |
-| `npm run select:estate` | Validates estate/circuits and input contracts, then pins all four generated artifacts in a digest manifest |
-| `npm run validate:estate` | Checks the selected bytes, schema, identities, coverage and circuit integrity |
-| `npm run build` | Requires the selected valid publication, then builds standalone output; never reads the development database |
-| `npm run build:preview` | Development preview allowing missing source data; never used by the release workflow |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm run test` | Publication integrity, route/phase and circuit geometry checks |
-| `npm run check` | ESLint, typecheck and tests |
-| `npm run smoke -- <origin> --noindex` | Checks a running staging image through HTTP, including static assets, probes and circuit pages |
+| `live-circuit/` | Explorer, circuit host/observer, run API, browser session transport, evidence store |
+| `deploy/sda-kernel/` | gateway, composite packaging, host identity/retrieval policy, identity-login contract |
+| `deploy/staging/` | release, acceptance, finish and rollback tooling |
+| `tools/` | local Live Circuit stack and verification scripts |
+| `infra/` | Azure bindings and release authorization |
+| `docs/` | platform plans, runbooks and retained evidence |
+| `app/`, `components/`, `lib/`, `content/`, `contracts/`, `generated/`, `public/`, `scripts/`, `services/`, `tests/` | **Retired Next.js website** — pending [P5](docs/live-circuit-platform-revamp.md) removal |
 
-## Where the content comes from
+## Running locally
 
-The website never opens a database connection (§11.1). A publication service reads one pinned,
-consistent generation and writes immutable JSON that the site consumes:
+[`tools/live-circuit/start-local.mjs`](tools/live-circuit/README.md) starts an observer and Run API
+against a built [`scenario-driven-architecture`](https://github.com/BPMSoftwareSolutions/scenario-driven-architecture)
+API and an [`sfx-embody`](https://github.com/BPMSoftwareSolutions/sfx-embody) estate whose
+`sfx.config.json` selects an admitted installed kernel. It changes nothing else — no SDA source,
+estate configuration, database or Azure. Sign in through the staging HTTPS origin (or a configured
+local identity host) and view the circuit on localhost; the sign-in gate stays enabled.
 
-```
-C:\lab\sidefx-database\data\website-visuals\inventory-2026-09-08.json   (selected-model read)
-        │
-        │  scripts/publish-estate.mjs — allow-list, join validation, circuit compilation
-        ▼
-generated/estate-publication.json    validated by contracts/estate.ts on every read
-generated/circuit-projections.json   one boundary-lens circuit per scenario face
-        │
-        ▼
-lib/estate.ts  →  pages
-```
+The local stack requires a previously built SDA API and an admitted kernel. It deliberately has no
+embedded checkout paths and is not part of the staging image.
 
-Override the source with `--source <file>` or `SIDEFX_ESTATE_SOURCE`. With no source and no
-existing publication, the site renders its unavailable state and disables dependent actions rather
-than showing an empty catalog (§11.4).
+## Releasing
 
-After refreshing source content, run `npm run publish:estate`, `npm run publish:contracts`, then
-`npm run select:estate`. Review and commit the estate, circuit, visual and input-contract artifacts
-with their manifest in `generated/`. Selection
-records exact bytes; it is not evidence of editorial approval or upstream database verification.
-Production builds fail on absent, altered, mixed, empty or incomplete artifacts.
+[Automatic staging releases](docs/automatic-staging-deployment.md): only watched paths restart
+staging; `docs/`, this README and other unrelated changes do not.
 
-The current generation publishes **218 capabilities, 824 scenario faces, 191 mechanics, 74
-providers and 314 declared provider–mechanic relationships**, plus four preserved findings — see
-`/platform/capability-estate`.
+[`staging.yml`](.github/workflows/staging.yml) runs, in order: checks → composite build and deploy
+→ public boundaries → real browser sign-in/Observe/replay → confirmed restart with unchanged vault
+→ retained-run reopen → external CLI follow → Windows CLI checks → finish (accept or roll back).
+Receipts are retained in `artifacts/staging/` and [`docs/releases/`](docs/releases/).
 
-## Private capability Lab
+## Documentation
 
-The private [Hugging Face SideFX Lab](https://huggingface.co/spaces/BPMSoftwareSolutions/SideFX) runs Hello World, personal greeting, four retained provider examples and a live RapidAPI stock-price capability through the authenticated Azure service. [Deployment and evidence](docs/live-finance-deployment.md) records the verified revisions. `npm run dev:lab` remains the local development entry point.
+- [Revamp plan](docs/live-circuit-platform-revamp.md) — what the platform is, phases P0–P6 and the
+  decisions that retired the website
+- [Automatic staging deployment](docs/automatic-staging-deployment.md) — the release contract and
+  the current accepted release
+- [Staging deployment runbook](docs/live-circuit-staging-deployment.md)
+- [Browser session contract](docs/live-circuit-browser-session.md)
+- [Identity host and login](deploy/sda-kernel/identity-login.md)
+- [Windows CLI login client](docs/cli-login-client.md)
+- [Run evidence plan](docs/run-evidence-implementation-plan.md) and its
+  [reconnaissance and execution analysis](docs/run-evidence-plan/analysis/README.md)
+- [Explorer run-evidence design (E1)](docs/explorer-run-evidence-design.md)
+- [Flight recording](docs/sfx-flight-recording/intent.md) — intent, research and implementation plan
 
-## Executing a capability
+## Retired website documents
 
-Every published capability page offers **Run this capability**. The command goes to a capability
-API running beside the web process, which reads the capability's selected authority from SQL,
-plans its body in memory and executes it there. Preparation is optional and is not consumed by invocation.
-
-```
-browser  ->  server action  ->  services/capability-api  ->  sfx SDK  ->  selected SQL authority
-                                (holds the connection)                    -> body in memory
-                                                                          -> Scenario Kernel
-```
-
-The website itself still opens no database connection, spawns no runtime and holds no
-credential (§11.1). The API service is the boundary that does, exactly as the Python services
-sit beside the web process in §7 and §8.7.
-
-The service exposes **one** route, `POST /commands`, taking the same closed envelope the CLI
-uses — `{ object, operation, subject, namespace?, input }`. That is `sidefx-cli`'s Entity Neutrality Law
-observed literally: no capability, verb or vendor appears in a path or a branch, so adding a
-capability to the estate adds nothing to this repository.
-The committed web policy permits only `capability invoke`; preparation and other project
-commands are blocked before dispatch. The service defaults to loopback.
-
-```bash
-cd services/capability-api && npm install
-SIDEFX_PROJECT_DIR=../../../sfx-embody npm start        # needs the database connection string
-SIDEFX_INVOCATION_ENDPOINT=http://127.0.0.1:8787 npm run dev
-```
-
-### Composing the input
-
-The input is composed one of two ways, switched like the body modes of a request tool:
-
-- **form** — fields generated from the capability's own declared input contract. A value the
-  contract fixes (`const`) is shown as fixed rather than editable, enums become selects, arrays
-  get item builders, and nested objects nest. A shape the form cannot render faithfully is
-  edited as JSON rather than approximated by a control that would misrepresent it.
-- **raw** — the JSON document directly.
-
-Both are views of the same document, so switching carries the value across. Across the 215
-published schemas, 1,142 of 1,152 declared properties render as controls and 10 fall back to raw.
-
-The schemas come from `npm run publish:contracts`, which reads each capability's root-scenario
-input contract and the retained JSON Schema it references from one pinned generation into
-`generated/input-contracts.json` — 216 of 218 capabilities declare one. A capability with no
-declared contract gets raw input and no claimed shape.
-Run `npm run select:estate` after publication. Manifest v2 includes the input contracts;
-builds and page reads verify their hashes, schema references and selected estate generation.
-
-Where the estate workspace publishes example requests, `SIDEFX_CAPABILITY_EXAMPLES` seeds the
-form with one. Examples are matched by the `contractId` the example itself declares against the
-contract the capability declares — never by filename, which is not evidence of applicability.
-Examples are read while pages are prerendered, so the variable belongs to the build, unlike
-`SIDEFX_INVOCATION_ENDPOINT`, which is read per request.
-
-The form checks JSON syntax and preserves invalid drafts with an error, blocking Run and mode
-switching until corrected. Semantic admission belongs to the capability's contract.
-
-### What a run reports
-
-The page renders what the estate returned and nothing else:
-
-| State | Meaning |
-| --- | --- |
-| `terminated` | The capability executed and produced its outcome |
-| `rejected` | The capability's own contract refused the input, or its outcome; a real execution with its own kernel testimony |
-| `failed` | The event executed and threw |
-| `PORT_IMPLEMENTATION_NOT_RESOLVED` | The selected authority does not resolve an executable port implementation |
-| `NATIVE_TRANSITION_TRANSLATION_NOT_AVAILABLE` | The current native provider cannot lower the declared transition topology |
-| `CAPABILITY_NOT_FOUND` | The estate resolved no declared root for that capability |
-| `NOT_CONFIGURED` / `RATE_LIMITED` / `INVALID_JSON` | The site did not dispatch a request |
-| `UNKNOWN` | Execution could not be confirmed after a timeout, lost/unreadable response or unclassified error. Confirm whether it completed before retrying |
-
-A refusal is never filled in with another capability's result, and a rejected input is reported
-as rejected rather than corrected. Execution is an explicit user action: opening a capability,
-inspecting its circuit or playing its flow invokes nothing (§13.1).
-Failed executions retain their full kernel record even when returned inside an SDK error.
-The client defaults to a 630-second response deadline, beyond the API's 600-second command
-deadline; losing the response does not establish cancellation.
-
-### Direct invocation and qualification
-
-The current database provider resolves selected authority, plans the native body and invokes
-the Scenario Kernel on each call. Missing bindings and unsupported topology remain explicit
-holds. `sfx capability prepare` is a separate, optional retained proof; invocation neither
-requires nor consumes it. The older 94-prepared / 125-held census describes the preparation
-implementation at that time and is not current invocation coverage.
-
-The Hugging Face pilot qualification in `sfx-embody` exercises three selected roots through
-the installed CLI. It does not establish readiness for every catalog entry or remote deployment.
-
-A completed execution is not managed admission and not a conformance result; both remain
-separately unevaluated (§1.7).
-
-Coverage, the refusal vocabulary, the schema-driven form, operations and the open gaps —
-including the distinction between the loopback server and the authenticated deployed Lab service — are documented in
-[`docs/capability-execution.md`](docs/capability-execution.md).
-[`docs/capability-readiness.md`](docs/capability-readiness.md) records why the held capabilities are
-held, where each fix belongs, and how to rank the work from the database.
-
-### Contracts
-
-`contracts/estate.ts` defines `EstatePublication`, `CapabilityPage`, `EntityPage`
-(`MechanicPage` / `ProviderPage`), `CircuitProjection` and `EntityVisual` (§11.3). Availability
-dimensions are kept separate throughout, and an absent source value is published as `null` —
-meaning *unknown*, never *no*.
-
-## Layout
-
-```
-app/           routes; (marketing) pages, catalogs, /build, sitemap.ts, robots.ts
-components/    shell, ui primitives, circuit viewer, catalog, IDE composer, contact form
-contracts/     publication contracts (zod)
-lib/           estate reader, route registry, SEO, inquiries
-generated/     the published estate — rebuildable, not hand-edited
-scripts/       the publication service
-tests/         publication integrity, route/phase, circuit geometry
-```
-
-Python services live beside the web process, never inside it — estate analytics, semantic
-retrieval, media QA and authoring workers, codified in `docs/architecture.md` §7. The content
-lab's Python stack (polars, networkx, numpy, pydantic, Pillow, faster-whisper, mcp) is the
-proving ground for those services.
-
-`lib/routes.ts` is the single route and availability registry (§4). Navigation, footer, cards,
-CTAs and the sitemap all read from it, and a route marked `available: false` is never linked. A
-test enforces this.
-
-## Implemented
-
-- **All P1 marketing routes** with spec copy: home, `/platform` + five pillars,
-  `/platform/executable-meaning`, `/managed-capability-provider` (with `/mcp` → 308),
-  five `/solutions/*`, `/ecosystem`, `/about`, `/contact`, four `/docs/*`, two `/legal/*`.
-- **Estate catalogs and detail pages** for capabilities, mechanics and providers — 515 pages
-  prerendered from the publication, with search, filtering, and explicit empty, filtered-empty,
-  stale and unavailable states.
-- **Circuit viewer** (§12): deterministic geometry, typed route families, keyboard-selectable
-  nodes, text outline, node inspector, legend, opt-in illustrative flow that respects
-  `prefers-reduced-motion` and stops on tab hide or node inspection. The SVG *and* the outline are
-  server-rendered, so the circuit is readable without JavaScript.
-- **Boundary-view fidelity**: the current generation's blueprints carry nodes and no normalized
-  edges, so circuits render the source-backed Input → Event → Responsibility → Outcome boundary
-  with unresolved members shown as unresolved. Nothing is inferred to fill a gap.
-- **Capability execution** (§13.1): every capability page can run its capability through the
-  estate command surface, reporting the kernel's own disposition or the estate's own refusal.
-  See [Executing a capability](#executing-a-capability).
-- **Contact** with a server action: validation, rate limiting, honeypot, and preserved values plus
-  a focused error summary. Hosted submissions report unavailable until durable delivery exists;
-  development-only receipts support an idempotency key and temporary reference.
-- **Intent composer** at `/build`: typed and spoken input with equal functionality, retained
-  intent, and full handling of denied or unsupported microphone access.
-- **Accessibility**: skip link, semantic menus with expanded state and Escape/focus return,
-  visible focus, labelled regions, status carried by words as well as color. Every palette pair
-  in §6.2 passes WCAG AA contrast.
-- **SEO**: per-page unique titles/descriptions/canonicals, `Organization`/`WebSite` and
-  `DefinedTerm` structured data, `FAQPage` emitted only where visible Q&A renders, and a sitemap
-  built from the route registry plus the publication manifest.
-
-## Not implemented — open dependencies
-
-These are §10 release dependencies, not omissions of taste. Each is stated on the page that would
-otherwise imply it works:
-
-| Gap | Effect on the site |
-| --- | --- |
-| Gemini Pro authoring conveyor; auth and durable jobs | `/build` accepts and retains an intent but designs no circuit, and says so. No canned draft is shown. |
-| Capability export adapter; verified SDA release; own-architecture example | No download is offered anywhere. `/docs/ownership` documents the contract instead. |
-| Nano Banana production and the SQL media service (§11.5) | Every capability, mechanic and provider carries an open visual requirement; no placeholder stands in for a missing image. |
-| Target requirement/readiness records | No capability claims a target. Absence is shown as undeclared, not as "unsupported". |
-| Current invocation coverage across the estate | The earlier preparation census is historical; each published pilot needs current execution evidence against its exact authority. |
-| Capability command API authorization and deployment | The API is unauthenticated and runs only locally; no hosted environment configures it, so hosted builds report execution unavailable. |
-| Conformance and managed admission for executed capabilities | Results are reported as execution only; both remain separately unevaluated. |
-| Authenticated workspace | `/workspace/*` and `/sign-in` are registered as unavailable and are unlinked and noindex. |
-| Legal entity identity and approved copy | `/legal/*` describe implemented behavior and state plainly that they are not yet in force. |
-| Durable inquiry store and mail worker | Hosted builds reject submissions with values preserved. Development receipt is process-local only. Environment variables alone do not enable delivery. |
-| Analytics configuration | No provider is loaded. |
-| P2/P3 routes (`/training`, `/latest`, `/platform/knowledge`, `/pricing`) | Described as planned text where relevant; never linked. |
-
-Per §9: while an integration gate is open, P1 is reported as incomplete rather than the CTA being
-quietly replaced or a draft presented as live authoring.
-
-## Environment
-
-| Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SITE_ORIGIN` | Build-time canonical origin (default `https://www.sidefx.io`); shared across staging and production |
-| `SIDEFX_INDEXING` | Runtime slot setting; `disabled` applies noindex headers to every response and disallows all robots |
-| `SIDEFX_ESTATE_SOURCE` | Path to the estate inventory read by the publication service |
-| `SIDEFX_MAX_PUBLICATION_AGE_DAYS` | Age after which the site shows its stale-publication notice (default 30) |
-| `SIDEFX_INVOCATION_ENDPOINT` | Capability command service; without it the site reports execution unavailable |
-| `SIDEFX_INVOCATION_TIMEOUT_MS` | Bound on one invocation (default 30000) |
-| `SIDEFX_CAPABILITY_EXAMPLES` | Build-time directory of example requests, matched to capabilities by their declared `contractId` |
-| `SIDEFX_INQUIRY_RECIPIENT`, `SIDEFX_MAIL_API_KEY` | Reserved for the future delivery adapter; not sufficient to enable contact submission |
-
-## Azure container delivery
-
-The current target is the existing Azure App Service `sidefx` in East US 2, classic Docker mode,
-on `ASP-sidefxgroup-ad2e`. A dedicated `sidefx/sfx-platform` image repository uses the existing
-`bpmaiengineacr` registry. Configuration is in [`infra/azure.json`](infra/azure.json).
-
-See [`docs/azure-deployment.md`](docs/azure-deployment.md) for local image verification, the
-GitHub OIDC staging workflow, runtime settings, receipts and promotion/rollback prerequisites.
-P1 remains incomplete; staging infrastructure does not satisfy the outstanding product gates.
+Retained as historical records, each marked historical at the top:
+[`website-design-spec.md`](docs/website-design-spec.md), [`architecture.md`](docs/architecture.md),
+[`visual-integration-audit.md`](docs/visual-integration-audit.md),
+[`capability-execution.md`](docs/capability-execution.md),
+[`capability-readiness.md`](docs/capability-readiness.md),
+[`media-operations.md`](docs/media-operations.md). Their subjects are the retired Next.js website;
+code removal is tracked by [P5](docs/live-circuit-platform-revamp.md).
