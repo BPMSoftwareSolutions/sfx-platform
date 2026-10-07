@@ -7,6 +7,7 @@ import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { durableSnapshot } from './durable-snapshot.mjs';
+import { captureDeclaredHome } from './browser-captures.mjs';
 
 let input = ''; for await (const chunk of process.stdin) input += chunk;
 const fixture = JSON.parse(input); input = '';
@@ -93,6 +94,12 @@ try {
   secrets.push(session.value); cookie = `${session.name}=${session.value}`;
   assert(!(await page.evaluate(() => document.cookie)).includes(session.value));
   record('Real browser sign-in; __Host-, HttpOnly, Secure, Strict cookie; no script bearer');
+
+  stage('Capturing the declared home and proving DOM rendering safety');
+  const capturesDirectory = process.env.SFX_BROWSER_CAPTURES || path.join(path.dirname(evidence), 'browser-captures');
+  const captures = await captureDeclaredHome({ browser, origin, outDir: capturesDirectory, signedInContext: context, requireSignedIn: true });
+  fs.writeFileSync(path.join(evidence, 'browser-captures.json'), JSON.stringify(captures, null, 2));
+  record(`Declared home captured signed-out and signed-in at ${captures.viewports.length} viewports; declaration markup stays text and refused URLs never navigate`);
 
   const query = new URLSearchParams({ capabilityId: request.subject, namespaceId: request.namespace || 'sidefx:capabilities', scenarioId: request.subject });
   const sceneResponse = await fetch(origin + '/api/circuit/v1/scenario?' + query);
@@ -195,6 +202,9 @@ try {
   }
   const receipt = { checkedAt: new Date().toISOString(), origin, runId, sceneDigest: scene.snapshotDigest,
     checks, errors, sampleCount: samples.length, visited: [...new Set(samples.flatMap(s => s.current.map(n => n.id)))],
+    captures: { directory: capturesDirectory, revision: captures.revision, pageDigest: captures.pageDigest,
+      signedIn: captures.signedIn, files: captures.captures.filter(capture => capture.file).map(capture => capture.file),
+      domSafety: captures.checks.filter(check => check.name.startsWith('dom-safety')).map(check => ({ name: check.name, ok: check.ok })) },
     serverLogCheck: { performed: Boolean(logProcess), httpStatus:logStatus, actualHostOutput:logText.includes('STAGING_GATEWAY_READY'), sampledCharacters: logText.length, truncated: logTruncated, rawLogsRetained: false },
     basis: 'Real identity session and fresh capability execution through product browser UI; no response mocks or replay overrides' };
   fs.writeFileSync(path.join(evidence, 'browser-receipt.json'), JSON.stringify(receipt, null, 2));

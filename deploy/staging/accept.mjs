@@ -11,8 +11,8 @@ try {
     fs.mkdirSync(evidence, {recursive:true});
     const request = path.join(evidence, 'observe-request.json'); fs.writeFileSync(request, JSON.stringify(config.observe));
     await run(process.execPath, ['tools/live-circuit/verify-browser-session.mjs'], {
-      input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'), SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome, SFX_REQUIRE_DURABLE_RUNS: '1' }, timeout: 900000 });
-    console.log('Real browser sign-in, live Observe and sign-out passed.');
+      input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'), SFX_BROWSER_CAPTURES: path.join(evidence, 'browser-captures'), SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome, SFX_REQUIRE_DURABLE_RUNS: '1' }, timeout: 900000 });
+    console.log('Real browser sign-in, live Observe, declared-home captures, sign-out and safety proof passed.');
     await run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'prefix-process.json'});
     await run(process.execPath, ['tools/sfx-api/verify-circuit-replay.mjs', config.origin, path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse'), path.join(evidence, 'replay')], {publicDiagnostic:'replay-process.json'});
     console.log('Captured receipt prefixes and replay at 1x / 0.1x passed.');

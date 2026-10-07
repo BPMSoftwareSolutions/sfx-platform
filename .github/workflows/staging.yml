@@ -98,8 +98,16 @@ jobs:
         run: node deploy/staging/release.mjs deploy
       - name: Public reads and authorization boundaries
         run: node deploy/staging/accept.mjs public
-      - name: Real sign-in, live Observe, sign-out and captured replay
+      - name: Real sign-in, live Observe, declared-home captures, sign-out and captured replay
         run: node deploy/staging/accept.mjs browser
+      - name: Upload the declared-home browser captures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: staging-browser-captures
+          path: artifacts/staging/browser-captures/
+          retention-days: 30
+          if-no-files-found: error
       - name: Prove a new process and unchanged persistent vault
         run: node deploy/staging/release.mjs restart-check
       - name: Reopen the same retained run after the confirmed restart
