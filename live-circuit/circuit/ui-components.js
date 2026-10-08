@@ -126,6 +126,18 @@ async function sha256(text) {
   return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
+// An external-provider digest reference: a `sha256:` string or an object that
+// carries the digest. The shell records it as declared reference data; it never
+// fetches or proxies the provider's bytes.
+function digestReference(value) {
+  if (typeof value === 'string' && value) return value.replace(/^sha256:/, '');
+  if (value !== null && typeof value === 'object') {
+    const nested = value.digest ?? value.value ?? value.hex;
+    return typeof nested === 'string' && nested ? nested.replace(/^sha256:/, '') : null;
+  }
+  return null;
+}
+
 function figureIds(entry) {
   const base = entry?.sectionId ?? 'figure';
   return {
@@ -404,12 +416,16 @@ function renderMediaFigure(container, entry, context) {
   image.alt = alt === undefined || alt === null || alt === '' ? 'Declared media figure' : String(alt);
   if (typeof src === 'string' && src) {
     const safe = safeHref(context, src);
-    if (safe) { image.src = safe; media.replaceChildren(image); }
-    else if (state) state.textContent = 'The declared source is not an admitted URL.';
+    if (safe) {
+      const reference = digestReference(digest);
+      if (reference) image.setAttribute('data-digest', reference);
+      image.src = safe;
+      media.replaceChildren(image);
+    } else if (state) state.textContent = 'The declared source is not an admitted URL.';
     return;
   }
   if (typeof svg === 'string' && svg) {
-    const expected = typeof digest === 'string' ? digest.replace(/^sha256:/, '') : null;
+    const expected = digestReference(digest);
     const verify = expected ? sha256(svg).then(hash => { if (hash !== expected) throw new Error(DIGEST_FAILURE); }) : Promise.resolve();
     verify.then(() => {
       image.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
@@ -529,6 +545,218 @@ function renderStatusChip(container, entry, context) {
     text: declaredText(context, entry, 'label') }));
 }
 
+// A tab is a declared { id, label, badges?, panelId?, href? }. The declared
+// selection carries aria-selected; a tab links to an admitted href or its panel
+// and otherwise stays a labelled control.
+function tabNode(context, tab, selectedId) {
+  const id = tab?.id === undefined || tab?.id === null ? '' : String(tab.id);
+  const active = selectedId !== '' && id === selectedId;
+  const attrs = { class: active ? 'tab selected' : 'tab', role: 'tab',
+    'aria-selected': active ? 'true' : 'false', tabindex: active ? '0' : '-1' };
+  if (tab?.panelId !== undefined && tab?.panelId !== null && tab.panelId !== '') attrs['aria-controls'] = String(tab.panelId);
+  const label = String(tab?.label ?? tab?.text ?? id);
+  const declaredHref = typeof tab?.href === 'string' && tab.href ? tab.href : tab?.panelId ? `#${tab.panelId}` : null;
+  const safe = declaredHref ? safeHref(context, declaredHref) : null;
+  let node;
+  if (safe) node = h('a', { ...attrs, href: safe, text: label });
+  else if (declaredHref) node = h('span', { ...attrs, 'data-href-refused': 'true', text: label });
+  else node = h('button', { ...attrs, type: 'button', text: label });
+  for (const badge of Array.isArray(tab?.badges) ? tab.badges : []) {
+    if (badge === null || badge === undefined) continue;
+    node.append(' ', h('span', { class: `badge ${typeof badge === 'object' && badge?.kind ? badge.kind : ''}`.trim(),
+      text: typeof badge === 'string' ? badge : badge?.text }));
+  }
+  return node;
+}
+
+function renderTabs(container, entry, context) {
+  const props = entry?.props ?? {};
+  const tabsValue = declared(context, entry, 'tabs');
+  const tabs = Array.isArray(tabsValue) ? tabsValue : Array.isArray(tabsValue?.tabs) ? tabsValue.tabs : [];
+  const selected = declared(context, entry, 'selected');
+  const list = h('div', { class: 'tabs', id: props.id ?? entry?.sectionId, role: 'tablist' });
+  for (const tab of tabs) if (tab !== null && typeof tab === 'object') list.append(tabNode(context, tab, selected === undefined || selected === null ? '' : String(selected)));
+  container.append(list);
+}
+
+// A span is a declared { label, kind?, from?, to?, nodeId? }; duration,
+// playhead and seek stay declared data on the wrapper and the seek control.
+function timelineSpanNode(span) {
+  const meta = [span?.from, span?.to].filter(value => value !== undefined && value !== null && value !== '').join('–');
+  const node = h('li', { class: `timeline-span${span?.kind ? ` ${span.kind}` : ''}`,
+    'data-kind': span?.kind == null || span.kind === '' ? null : String(span.kind),
+    'data-from': span?.from == null || span.from === '' ? null : String(span.from),
+    'data-to': span?.to == null || span.to === '' ? null : String(span.to),
+    'data-node-id': span?.nodeId == null || span.nodeId === '' ? null : String(span.nodeId),
+    text: String(span?.label ?? '') });
+  if (meta) node.append(' ', h('span', { class: 'timeline-meta', text: meta }));
+  return node;
+}
+
+function renderTimeline(container, entry, context) {
+  const props = entry?.props ?? {};
+  const duration = declared(context, entry, 'duration');
+  const playhead = declared(context, entry, 'playhead');
+  const seek = declared(context, entry, 'seek');
+  const spans = declared(context, entry, 'spans');
+  const wrap = h('div', { class: 'timeline-wrap', id: props.id ?? entry?.sectionId });
+  if (duration !== undefined && duration !== null && duration !== '') {
+    wrap.append(h('p', { class: 'panel-label timeline-duration', text: `duration ${displayValue(duration)}` }));
+  }
+  const list = h('ol', { class: 'timeline' });
+  for (const span of Array.isArray(spans) ? spans : []) if (span !== null && typeof span === 'object') list.append(timelineSpanNode(span));
+  wrap.append(list);
+  const seekRecord = seek !== null && typeof seek === 'object' && !Array.isArray(seek) ? seek : null;
+  const range = h('input', { type: 'range', class: 'timeline-seek',
+    'data-duration': duration == null || duration === '' ? null : String(duration),
+    'data-playhead': playhead == null || playhead === '' ? null : String(playhead) });
+  const max = seekRecord?.max ?? duration;
+  if (seekRecord?.min !== undefined && seekRecord.min !== null && seekRecord.min !== '') range.setAttribute('min', String(seekRecord.min));
+  if (max !== undefined && max !== null && max !== '') range.setAttribute('max', String(max));
+  const value = seekRecord ? seekRecord.value : seek;
+  if (value !== undefined && value !== null && value !== '') range.setAttribute('value', String(value));
+  wrap.append(range);
+  container.append(wrap);
+}
+
+const FORM_FIELD_KINDS = new Set(['text', 'email', 'password', 'number', 'url', 'tel', 'search', 'date', 'textarea', 'select', 'checkbox']);
+
+// Declared fields are an array of { name, label, kind, required, value, hint,
+// options } or an object of the same keyed by name.
+function formFieldEntries(value) {
+  if (Array.isArray(value)) return value.filter(field => field !== null && typeof field === 'object' && !Array.isArray(field));
+  if (value !== null && typeof value === 'object') return Object.entries(value).map(([name, field]) => field !== null && typeof field === 'object' && !Array.isArray(field)
+    ? { name, ...field } : { name, label: name, value: field });
+  return [];
+}
+
+function formFieldValue(field, values) {
+  if (values !== null && typeof values === 'object' && !Array.isArray(values) && Object.prototype.hasOwnProperty.call(values, field.name)) return values[field.name];
+  return field.value ?? field.default;
+}
+
+function formFieldNode(field, values, prefix) {
+  const name = String(field.name ?? field.key ?? '');
+  const kind = FORM_FIELD_KINDS.has(field.kind) ? field.kind : 'text';
+  const id = String(field.id ?? `${prefix}-${name}`);
+  const value = formFieldValue(field, values);
+  const hint = field.hint ?? field.placeholder;
+  let control;
+  if (kind === 'textarea') {
+    control = h('textarea', { id, name, required: field.required ? '' : null, placeholder: hint, text: value == null ? '' : String(value) });
+  } else if (kind === 'select') {
+    control = h('select', { id, name, required: field.required ? '' : null });
+    for (const option of Array.isArray(field.options) ? field.options : []) {
+      const optionValue = typeof option === 'object' && option !== null ? option.value ?? option.id ?? '' : option;
+      const selected = optionValue !== undefined && optionValue !== null && value !== undefined && value !== null && String(optionValue) === String(value);
+      control.append(h('option', { value: optionValue === undefined || optionValue === null ? '' : String(optionValue), selected: selected ? '' : null,
+        text: typeof option === 'object' && option !== null ? String(option.label ?? option.text ?? optionValue ?? '') : String(option) }));
+    }
+  } else if (kind === 'checkbox') {
+    control = h('input', { type: 'checkbox', id, name, value: value === undefined || value === null ? 'true' : String(value), checked: value ? '' : null });
+  } else {
+    control = h('input', { type: kind, id, name, required: field.required ? '' : null,
+      value: value == null ? null : String(value), placeholder: hint });
+  }
+  const label = h('label', { class: 'form-field', for: id }, [
+    h('span', { class: 'form-field-label', text: String(field.label ?? name) }),
+    control,
+  ]);
+  if (hint !== undefined && hint !== null && hint !== '') label.append(h('span', { class: 'form-hint', text: String(hint) }));
+  return label;
+}
+
+// The submit role is the form control's label; the declared section event
+// (submit) resolves the action, so the adapter adds no dispatch path.
+function renderForm(container, entry, context) {
+  const props = entry?.props ?? {};
+  const fields = formFieldEntries(declared(context, entry, 'fields'));
+  const values = declared(context, entry, 'values');
+  const submit = declared(context, entry, 'submit');
+  const submitLabel = typeof submit === 'string' ? submit : submit !== null && typeof submit === 'object' ? submit.label ?? 'Submit' : 'Submit';
+  const form = h('form', { class: 'declared-form', id: props.id ?? entry?.sectionId });
+  for (const field of fields) form.append(formFieldNode(field, values, props.id ?? entry?.sectionId ?? 'form'));
+  form.append(h('button', { type: 'submit', class: 'button primary', text: String(submitLabel) }));
+  container.append(form);
+}
+
+// A gallery item is a declared external-provider media reference: the admitted
+// URL renders as the image source and the digest stays attached as a reference.
+function galleryItemNode(context, item) {
+  const safe = safeHref(context, item?.src ?? item?.url);
+  const node = h('figure', { class: 'gallery-entry' });
+  if (safe) {
+    const reference = digestReference(item?.digest);
+    node.append(h('img', { class: 'gallery-item', src: safe, alt: String(item?.alt ?? ''),
+      'data-digest': reference, 'data-provider': item?.provider == null || item.provider === '' ? null : String(item.provider) }));
+  } else {
+    node.append(h('p', { class: 'state', text: item?.src || item?.url ? 'The declared source is not an admitted URL.' : 'No source is declared.' }));
+  }
+  if (item?.caption !== undefined && item.caption !== null && item.caption !== '') node.append(h('figcaption', { text: String(item.caption) }));
+  if (typeof item?.href === 'string' && item.href) node.append(h('p', {}, [linked(context, { href: item.href }, item.linkLabel ?? 'Open')]));
+  return node;
+}
+
+function renderMediaGallery(container, entry, context) {
+  const props = entry?.props ?? {};
+  const itemsValue = declared(context, entry, 'items');
+  const items = Array.isArray(itemsValue) ? itemsValue : Array.isArray(itemsValue?.items) ? itemsValue.items : [];
+  const caption = declared(context, entry, 'caption');
+  const figure = h('figure', { class: 'media-gallery', id: props.id ?? entry?.sectionId });
+  const grid = h('div', { class: 'gallery-grid' });
+  for (const item of items) if (item !== null && typeof item === 'object') grid.append(galleryItemNode(context, item));
+  figure.append(grid);
+  if (caption !== undefined && caption !== null && caption !== '') figure.append(h('figcaption', { class: 'gallery-caption', text: String(caption) }));
+  if (!items.length) figure.append(h('p', { class: 'note', text: declaredText(context, entry, 'empty') || 'No media is declared.' }));
+  container.append(figure);
+}
+
+function renderCode(container, entry, context) {
+  const props = entry?.props ?? {};
+  const text = declaredText(context, entry, 'text');
+  const language = declared(context, entry, 'language');
+  const caption = declared(context, entry, 'caption');
+  const figure = h('figure', { class: 'declared-code', id: props.id ?? entry?.sectionId });
+  const pre = h('pre', { class: 'code-block', 'data-language': language == null || language === '' ? null : String(language) });
+  pre.append(h('code', { class: typeof language === 'string' && language ? `language-${language}` : null, text }));
+  figure.append(pre);
+  if (caption !== undefined && caption !== null && caption !== '') figure.append(h('figcaption', { text: displayValue(caption) }));
+  if (!text) figure.append(h('p', { class: 'note', text: 'No code is declared.' }));
+  container.append(figure);
+}
+
+function chartPoints(value) {
+  if (Array.isArray(value)) return value;
+  return Array.isArray(value?.series) ? value.series : [];
+}
+
+// A chart point is a declared { label, value, kind? }; maximum is the declared
+// scale when present, else the largest declared value.
+function renderChart(container, entry, context) {
+  const props = entry?.props ?? {};
+  const points = chartPoints(declared(context, entry, 'series'));
+  const maximum = declared(context, entry, 'maximum');
+  const caption = declared(context, entry, 'caption');
+  const numbers = points.map(point => Number(point?.value)).filter(value => Number.isFinite(value));
+  const declaredMax = Number(maximum);
+  const max = Number.isFinite(declaredMax) && declaredMax > 0 ? declaredMax : numbers.length ? Math.max(...numbers, 1) : 1;
+  const figure = h('figure', { class: 'declared-chart', id: props.id ?? entry?.sectionId, 'data-maximum': String(max) });
+  const list = h('ol', { class: 'chart-series' });
+  for (const point of points) {
+    if (point === null || typeof point !== 'object') continue;
+    const value = Number(point.value);
+    list.append(h('li', { class: 'chart-point', 'data-kind': point.kind == null || point.kind === '' ? null : String(point.kind) }, [
+      h('span', { class: 'chart-label', text: String(point.label ?? '') }),
+      h('meter', { class: 'chart-meter', min: 0, max, value: Number.isFinite(value) ? value : 0 }),
+      h('span', { class: 'chart-value', text: displayValue(point.value) }),
+    ]));
+  }
+  figure.append(list);
+  if (caption !== undefined && caption !== null && caption !== '') figure.append(h('figcaption', { text: String(caption) }));
+  if (!points.length) figure.append(h('p', { class: 'note', text: declaredText(context, entry, 'empty') || 'No chart series is declared.' }));
+  container.append(figure);
+}
+
 // Nested declared entries render through the same registry, so a section can
 // group a list or copy without a second renderer.
 function renderEntry(container, entry, context) {
@@ -637,6 +865,42 @@ export const UI_COMPONENT_ROLES = {
     props: [],
     states: ['mapped', 'partial', 'planned', 'unmapped'],
   },
+  tabs: {
+    version: 1,
+    roles: ['tabs', 'selected'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  timeline: {
+    version: 1,
+    roles: ['spans', 'duration', 'playhead', 'seek'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  form: {
+    version: 1,
+    roles: ['fields', 'values', 'submit'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  'media.gallery': {
+    version: 1,
+    roles: ['items', 'caption', 'empty'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  code: {
+    version: 1,
+    roles: ['text', 'language', 'caption'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
+  chart: {
+    version: 1,
+    roles: ['series', 'maximum', 'caption', 'empty'],
+    props: [],
+    states: ['ready', 'empty', 'error', 'not-supported'],
+  },
 };
 
 // The admitted role set of a kind is the union of its table entries, in table
@@ -664,6 +928,12 @@ const UI_COMPONENT_RENDERERS = {
   disclosure: renderDisclosure,
   badge: renderBadge,
   'status-chip': renderStatusChip,
+  tabs: renderTabs,
+  timeline: renderTimeline,
+  form: renderForm,
+  'media.gallery': renderMediaGallery,
+  code: renderCode,
+  chart: renderChart,
 };
 
 export const UI_COMPONENTS = Object.fromEntries(Object.keys(UI_COMPONENT_ROLES).map(kind => [kind, {

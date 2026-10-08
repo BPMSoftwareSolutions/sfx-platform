@@ -1,0 +1,48 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/specimen-chart",
+  "pageId": "ui-page-specimen-chart",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "6060606060606060606060606060606060606060606060606060606060606060",
+  "copyBasis": "U2 specimen fixture for verify-pages --fixtures: the chart kind declared from its ui-component.v1 contract roles (series, maximum, caption, empty). Bars render declared values against the declared maximum only.",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "specimen-chart-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Specimen: chart", "level": 2 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-chart",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "chart", "version": 1 },
+      "props": { "maximum": 25, "caption": "Declared kinds by agreement wave", "empty": "No series is declared." },
+      "bindings": {
+        "series": {
+          "kind": "literal",
+          "value": [
+            { "label": "Phase 0", "value": 10, "kind": "shipped" },
+            { "label": "Phase 1", "value": 5, "kind": "shipped" },
+            { "label": "U2 agreement", "value": 6, "kind": "proposed" }
+          ]
+        }
+      },
+      "actions": []
+    }
+  ],
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}

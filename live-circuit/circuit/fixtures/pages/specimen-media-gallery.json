@@ -1,0 +1,62 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/specimen-media-gallery",
+  "pageId": "ui-page-specimen-media-gallery",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "4040404040404040404040404040404040404040404040404040404040404040",
+  "copyBasis": "U2 specimen fixture for verify-pages --fixtures: the media.gallery kind declared from its ui-component.v1 contract roles (items, caption, empty). Media is referenced by external https URL, so no serving route is added; the example.test refs are placeholders.",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "specimen-media-gallery-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Specimen: media.gallery", "level": 2 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-media-gallery",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "media.gallery", "version": 1 },
+      "props": {
+        "caption": "External media references (no serving route)",
+        "empty": "No media is declared."
+      },
+      "bindings": {
+        "items": {
+          "kind": "literal",
+          "value": [
+            {
+              "src": "https://media.example.test/specimens/optical-flow.webp",
+              "alt": "Optical flow specimen",
+              "caption": "optical-flow.webp",
+              "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              "provider": "external"
+            },
+            {
+              "src": "https://media.example.test/specimens/optical-architecture.webp",
+              "alt": "Optical architecture specimen",
+              "caption": "optical-architecture.webp",
+              "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "provider": "external"
+            }
+          ]
+        }
+      },
+      "actions": []
+    }
+  ],
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}

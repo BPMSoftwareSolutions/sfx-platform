@@ -39,6 +39,9 @@ jobs:
       - run: node live-circuit/circuit/verify-objective.mjs
       - run: node live-circuit/circuit/verify-provider-profile.mjs
       - run: node live-circuit/circuit/verify-pages.mjs --fixtures
+      - run: node live-circuit/circuit/verify-components.mjs
+      - run: node live-circuit/circuit/verify-claims.mjs --fixtures
+      - run: node tools/live-circuit/verify-kind-tooling.mjs
       - run: node live-circuit/dispatch-pair/verify-run-scoped-sse.mjs
       - run: node deploy/sda-kernel/verify-observer-bridge.mjs
 

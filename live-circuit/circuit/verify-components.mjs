@@ -67,12 +67,17 @@ globalThis.document = { createElement: tagName => new ShimNode(tagName) };
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..', '..');
 const { UI_COMPONENT_ROLES, UI_COMPONENTS } = await import(pathToFileURL(path.join(here, 'ui-components.js')).href);
+// The real rendering-safety URL gate, so a probe that admits an external media
+// reference proves the shipped admission, not a harness substitute.
+const { safeUrl } = await import(pathToFileURL(path.join(here, 'page-runtime.js')).href);
 
 // The shipped ui-component.v1 contracts as seeded by
-// sfx-embody/sql/migrations/declare-ui-page-reading.commit.sql:128-138 and the
-// Phase-1 migration pair (five kinds, authored in parallel): the contract's own
-// `roles` list and `props` keys. supportedRoles must equal their union; the role
-// table keeps the names split by how the adapter consumes them.
+// sfx-embody/sql/migrations/declare-ui-page-reading.commit.sql:128-138, the
+// Phase-1 migration pair (five kinds, authored in parallel) and the U2
+// agreement wave (six kinds scaffolded by tools/live-circuit/new-component.mjs
+// under tools/live-circuit/generated/): the contract's own `roles` list and
+// `props` keys. supportedRoles must equal their union; the role table keeps the
+// names split by how the adapter consumes them.
 const CONTRACTS = {
   hero: { roles: ['eyebrow', 'headline', 'lede', 'figure', 'primaryActionId'], props: ['eyebrow', 'headline', 'lede', 'figure', 'primaryActionId'] },
   section: { roles: ['heading', 'body', 'actions'], props: ['heading', 'body', 'actions'] },
@@ -89,6 +94,12 @@ const CONTRACTS = {
   disclosure: { roles: ['summary', 'body'], props: ['summary', 'body'] },
   badge: { roles: ['label'], props: ['label', 'tone'] },
   'status-chip': { roles: ['label', 'state'], props: ['label', 'state'] },
+  tabs: { roles: ['tabs', 'selected'], props: ['tabs', 'selected'] },
+  timeline: { roles: ['spans', 'duration', 'playhead', 'seek'], props: ['spans', 'duration', 'playhead', 'seek'] },
+  form: { roles: ['fields', 'values', 'submit'], props: ['fields', 'values', 'submit'] },
+  'media.gallery': { roles: ['items', 'caption', 'empty'], props: ['items', 'caption', 'empty'] },
+  code: { roles: ['text', 'language', 'caption'], props: ['text', 'language', 'caption'] },
+  chart: { roles: ['series', 'maximum', 'caption', 'empty'], props: ['series', 'maximum', 'caption', 'empty'] },
 };
 
 const checks = [];
@@ -330,6 +341,110 @@ function probeSpec(kind, name) {
         detail: 'the declared state reaches data-state',
       };
     }
+    case 'tabs\u0000tabs':
+      return {
+        entry: { sectionId: 'probe', bindings: { tabs: { kind: 'literal', value: [{ id: 'probe-tab', label: S }] } } },
+        verify: root => nodeList(root).some(node => String(node.className).split(/\s+/).includes('tab')) && textOf(root).includes(S),
+        detail: 'the declared tab renders a role=tab control carrying the label',
+      };
+    case 'tabs\u0000selected':
+      return {
+        entry: { sectionId: 'probe', props: { selected: S },
+          bindings: { tabs: { kind: 'literal', value: [{ id: 'other', label: 'other' }, { id: S, label: S }] } } },
+        verify: root => nodeList(root).some(node => node.getAttribute('aria-selected') === 'true'
+          && String(node.className).split(/\s+/).includes('selected')) && textOf(root).includes(S),
+        detail: 'the declared selection marks the matching tab selected',
+      };
+    case 'timeline\u0000spans':
+      return {
+        entry: { sectionId: 'probe', bindings: { spans: { kind: 'literal',
+          value: [{ label: S, kind: `kind-${S}`, from: 1, to: 4, nodeId: `node-${S}` }] } } },
+        verify: root => textOf(root).includes(S) && attrsOf(root).includes(`data-kind=kind-${S}`)
+          && attrsOf(root).includes(`data-node-id=node-${S}`),
+        detail: 'the declared span renders its label, kind and node id',
+      };
+    case 'timeline\u0000duration':
+      return textProbe({ duration: S });
+    case 'timeline\u0000playhead':
+      return {
+        entry: { sectionId: 'probe', props: { duration: 10, playhead: S } },
+        verify: root => attrsOf(root).includes(`data-playhead=${S}`),
+        detail: 'the declared playhead reaches the seek control',
+      };
+    case 'timeline\u0000seek':
+      return {
+        entry: { sectionId: 'probe', props: { seek: { min: S, max: 10, value: 3 } } },
+        verify: root => attrsOf(root).includes(`min=${S}`) && attrsOf(root).includes('max=10'),
+        detail: 'the declared seek window reaches the range control',
+      };
+    case 'form\u0000fields':
+      return {
+        entry: { sectionId: 'probe', bindings: { fields: { kind: 'literal',
+          value: [{ name: `name-${S}`, label: `label-${S}`, kind: 'text', value: `value-${S}` }] } } },
+        verify: root => textOf(root).includes(`label-${S}`) && attrsOf(root).includes(`name=name-${S}`)
+          && attrsOf(root).includes(`value=value-${S}`),
+        detail: 'the declared field renders its label and control name/value',
+      };
+    case 'form\u0000values':
+      return {
+        entry: { sectionId: 'probe', props: { fields: [{ name: 'field', label: 'Field' }], values: { field: S } } },
+        verify: root => attrsOf(root).includes(`value=${S}`),
+        detail: 'the declared value reaches the field control',
+      };
+    case 'form\u0000submit':
+      return {
+        entry: { sectionId: 'probe', props: { fields: [], submit: S } },
+        verify: root => tagsOf(root).includes('BUTTON') && textOf(root).includes(S),
+        detail: 'the declared submit label reaches the form control',
+      };
+    case 'media.gallery\u0000items':
+      return {
+        entry: { sectionId: 'probe', bindings: { items: { kind: 'literal',
+          value: [{ src: `https://media.example.test/${S}.webp`, alt: S, caption: `caption-${S}`,
+            digest: '0'.repeat(64), provider: 'external' }] } } },
+        verify: root => nodeList(root).some(node => node.tagName === 'IMG'
+          && node.getAttribute('src') === `https://media.example.test/${S}.webp`
+          && node.getAttribute('data-provider') === 'external') && textOf(root).includes(`caption-${S}`),
+        detail: 'the declared external item renders an image ref and caption',
+      };
+    case 'media.gallery\u0000caption':
+      return textProbe({ items: [{ src: '/probe.webp', alt: 'probe' }], caption: S });
+    case 'media.gallery\u0000empty':
+      return textProbe({ items: [], empty: S });
+    case 'code\u0000text':
+      return {
+        entry: { sectionId: 'probe', bindings: { text: { kind: 'literal', value: S } }, props: { language: 'json' } },
+        verify: root => tagsOf(root).includes('PRE') && tagsOf(root).includes('CODE')
+          && textOf(root).includes(S) && attrsOf(root).includes('data-language=json'),
+        detail: 'the declared code reaches the pre block and its language attribute',
+      };
+    case 'code\u0000language':
+      return {
+        entry: { sectionId: 'probe', props: { text: 'probe', language: S } },
+        verify: root => attrsOf(root).includes(`data-language=${S}`)
+          && nodeList(root).some(node => node.tagName === 'CODE' && String(node.className).includes(`language-${S}`)),
+        detail: 'the declared language selects the code class and data attribute',
+      };
+    case 'code\u0000caption':
+      return textProbe({ text: 'probe', caption: S });
+    case 'chart\u0000series':
+      return {
+        entry: { sectionId: 'probe', bindings: { series: { kind: 'literal',
+          value: [{ label: `label-${S}`, value: 3, kind: `kind-${S}` }] } }, props: { maximum: 10 } },
+        verify: root => textOf(root).includes(`label-${S}`) && attrsOf(root).includes(`data-kind=kind-${S}`)
+          && attrsOf(root).includes('max=10') && attrsOf(root).includes('value=3'),
+        detail: 'the declared point renders its label, kind and scaled meter',
+      };
+    case 'chart\u0000maximum':
+      return {
+        entry: { sectionId: 'probe', props: { series: [{ label: 'probe', value: 2 }], maximum: 7001 } },
+        verify: root => attrsOf(root).includes('data-maximum=7001') && attrsOf(root).includes('max=7001'),
+        detail: 'the declared maximum scales the chart and its meter',
+      };
+    case 'chart\u0000caption':
+      return textProbe({ series: [{ label: 'probe', value: 1 }], caption: S });
+    case 'chart\u0000empty':
+      return textProbe({ series: [], empty: S });
     default:
       return null;
   }
@@ -342,6 +457,7 @@ async function runProbe(kind, name) {
     sources: {},
     resolve: binding => (binding && typeof binding === 'object' && 'value' in binding ? binding.value : binding),
     dispatch: () => {},
+    safeUrl,
   }, spec.context ?? {});
   try {
     await UI_COMPONENTS[kind]?.render(root, spec.entry, context);
@@ -371,6 +487,15 @@ for (const component of allowlist) {
     `circuit-host=${component.version} table=${table?.version} adapter=${UI_COMPONENTS[component.kind]?.version}`);
 }
 
+// The U2 agreement wave kinds must be shipped before a specimen declaration is
+// declarable content; a missing kind is a named failure, not a skipped probe.
+const REQUIRED_KINDS = ['tabs', 'timeline', 'form', 'media.gallery', 'code', 'chart'];
+for (const kind of REQUIRED_KINDS) {
+  const shipped = Object.prototype.hasOwnProperty.call(UI_COMPONENT_ROLES, kind);
+  record(`required-kind-${kind}`, shipped,
+    shipped ? 'shipped in the role table' : 'not merged into UI_COMPONENT_ROLES yet; the platform lane owns ui-components.js');
+}
+
 let probeCount = 0;
 for (const [kind, table] of Object.entries(UI_COMPONENT_ROLES)) {
   const adapter = UI_COMPONENTS[kind];
@@ -398,7 +523,7 @@ for (const [kind, table] of Object.entries(UI_COMPONENT_ROLES)) {
 const summary = {
   tool: 'verify-components.mjs',
   checkedAt: new Date().toISOString(),
-  contractSource: 'sfx-embody/sql/migrations/declare-ui-page-reading.commit.sql:128-138 (shipped ui-component.v1 contracts)',
+  contractSource: 'sfx-embody/sql/migrations/declare-ui-page-reading.commit.sql:128-138 (Phase 0/1 contracts) + tools/live-circuit/generated/<kind>/<kind>.contract.json (U2 agreement wave)',
   kinds: tableKinds.length,
   probes: probeCount,
   passed: checks.filter(check => check.pass).length,

@@ -12,6 +12,20 @@ const SECOND_PAGE_PATH = '/circuit/healthcare-solutions';
 const UNSAFE_PATH = '/circuit/unsafe';
 const UNSAFE_FIXTURE = new URL('../../live-circuit/circuit/fixtures/pages/unsafe.json', import.meta.url);
 const PENDING_REASON = 'TEST_PRINCIPAL_CREDENTIALS_UNAVAILABLE';
+// The U2 agreement-wave specimens: one page per new kind plus the page that
+// declares every kind at once. The gallery kind must use external media refs,
+// so the capture adds no media serving route (gate G5 stays unopened).
+const SPECIMEN_PAGES = Object.freeze([
+  { path: '/circuit/specimen-tabs', kind: 'tabs' },
+  { path: '/circuit/specimen-timeline', kind: 'timeline' },
+  { path: '/circuit/specimen-form', kind: 'form' },
+  { path: '/circuit/specimen-media-gallery', kind: 'media.gallery' },
+  { path: '/circuit/specimen-code', kind: 'code' },
+  { path: '/circuit/specimen-chart', kind: 'chart' },
+  { path: '/circuit/specimen-we-alls', kind: null }
+]);
+const SPECIMEN_KINDS = Object.freeze(SPECIMEN_PAGES.filter(page => page.kind).map(page => page.kind));
+export const SPECIMEN_PAGE_PATHS = Object.freeze(SPECIMEN_PAGES.map(page => page.path));
 const CROSSWALK_STATES = new Set(['mapped', 'partial', 'planned', 'unmapped']);
 const MARKUP = '<script>window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1</script><img src=x onerror="window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1">';
 const JAVASCRIPT_TARGET = 'javascript:window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1';
@@ -68,6 +82,27 @@ async function renderedSections(page) {
       component: node.dataset.component ?? null,
       region: node.dataset.region ?? null,
       rect: { x: Math.round(rect.x), y: Math.round(rect.y), width: Math.round(rect.width), height: Math.round(rect.height) }
+    };
+  }));
+}
+
+// Per-section posture of a specimen page: the named refusal codes and states
+// the shell rendered inside the section, whether any non-refusal content is
+// present, and every media reference the adapters admitted.
+async function renderedPosture(page) {
+  return page.evaluate(() => [...document.querySelectorAll('#page-root .page-region > section[id]')].map(node => {
+    const children = [...node.children];
+    return {
+      id: node.id,
+      component: node.dataset.component ?? null,
+      refusals: [...node.querySelectorAll('[data-refusal]')].map(item => item.getAttribute('data-refusal')),
+      states: [...node.querySelectorAll('[data-state]')].map(item => item.getAttribute('data-state')),
+      media: [...node.querySelectorAll('img')].map(item => ({
+        src: item.getAttribute('src') ?? null,
+        digest: item.getAttribute('data-digest') ?? null,
+        provider: item.getAttribute('data-provider') ?? null
+      })),
+      hasContent: children.some(child => !child.dataset?.refusal && !child.dataset?.state)
     };
   }));
 }
@@ -200,6 +235,108 @@ async function captureCrosswalkPage({ context, origin, outDir, check }) {
   }
   check('healthcare-solutions-no-page-errors', pageErrors.length === 0, pageErrors.join(' | '));
   return { captures, read };
+}
+
+// The U2 specimen pages, captured from the running host: every declared kind
+// section must either render content or keep a named UI_COMPONENT_NOT_SUPPORTED
+// refusal inside its own section (never a silent drop), and every gallery media
+// reference must be an external http(s) URL so no serving route is involved.
+// A specimen declaration the host does not serve (not published yet) is
+// recorded pending by name, exactly like an unavailable signed-in principal;
+// it is never substituted.
+async function captureSpecimens({ context, origin, outDir, check }) {
+  const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  const captures = [];
+  const pages = [];
+  try {
+    const home = CAPTURE_VIEWPORTS[0];
+    await page.setViewportSize({ width: home.width, height: home.height });
+    await page.goto(origin + HOME_PATH, { waitUntil: 'load' });
+    await page.waitForFunction(() => document.querySelector('#page-root .page-region > section[id]') !== null, null, { timeout: 90000 });
+    for (const specimen of SPECIMEN_PAGES) {
+      const slug = specimen.path.split('/').filter(Boolean).pop();
+      const expected = specimen.kind ? [specimen.kind] : SPECIMEN_KINDS;
+      const availability = await readDeclaredPage(page, specimen.path);
+      if (availability.status !== 200) {
+        pages.push({ path: specimen.path, kind: specimen.kind, pending: true, status: availability.status, revision: null, pageDigest: null, captures: [] });
+        check(`${slug}-published`, true, `status=${availability.status}; not served by this host, recorded pending`);
+        continue;
+      }
+      let read = availability;
+      for (const viewport of CAPTURE_VIEWPORTS) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.goto(origin + specimen.path, { waitUntil: 'load' });
+        await page.waitForFunction(() => document.querySelector('#page-root .page-region > section[id]') !== null, null, { timeout: 90000 });
+        read = await readDeclaredPage(page, specimen.path);
+        const rendered = await renderedSections(page);
+        const posture = await renderedPosture(page);
+        const renderedIds = new Set(rendered.map(section => section.id));
+        const declared = (read.sections ?? []).filter(section => expected.includes(section?.component?.kind));
+        const missing = declared.filter(section => !renderedIds.has(section.sectionId));
+        check(`${slug}-${viewport.name}-sections`, missing.length === 0,
+          missing.length ? `missing ${missing.map(section => section.sectionId).join(',')}` : `${rendered.length} sections`);
+        const sectionPostures = declared.map(section => {
+          const state = posture.find(item => item.id === section.sectionId) ?? null;
+          const refusals = state?.refusals ?? [];
+          return {
+            sectionId: section.sectionId,
+            kind: section.component.kind,
+            refused: refusals.includes('UI_COMPONENT_NOT_SUPPORTED'),
+            refusals,
+            states: state?.states ?? [],
+            hasContent: Boolean(state?.hasContent)
+          };
+        });
+        const silent = sectionPostures.filter(item => !item.refused && !item.hasContent);
+        const named = sectionPostures.filter(item => item.refused);
+        if (viewport.name === 'desktop') {
+          const ready = read.status === 200 && declared.length === expected.length && missing.length === 0;
+          check(`${slug}-posture`, ready && silent.length === 0,
+            !ready ? `page read status=${read.status} declared=${declared.length}/${expected.length}`
+              : silent.length ? `silent sections ${silent.map(item => item.sectionId).join(',')}`
+                : named.length ? `${named.length}/${sectionPostures.length} kinds refuse by name (shell deploy pending)` : `${sectionPostures.length} sections render content`);
+        }
+        const media = posture.flatMap(item => item.media).filter(item => item.src);
+        const external = media.filter(item => /^https:\/\//i.test(item.src));
+        if (expected.includes('media.gallery')) {
+          check(`${slug}-${viewport.name}-external-media`, media.length > 0 && media.length === external.length,
+            media.length ? `${external.length}/${media.length} refs external e.g. ${external[0]?.src ?? '(none)'}` : 'no media references were rendered');
+        }
+        const file = path.join(outDir, `${slug}-${viewport.name}.png`);
+        await page.screenshot({ path: file, fullPage: true });
+        captures.push({
+          name: `${slug}-${viewport.name}`,
+          state: 'signed-out',
+          page: specimen.path,
+          kind: specimen.kind,
+          viewport: { name: viewport.name, width: viewport.width, height: viewport.height },
+          file: path.basename(file),
+          sha256: sha256File(file),
+          fullPage: true,
+          revision: read.revision,
+          pageDigest: read.pageDigest,
+          sections: rendered,
+          posture: sectionPostures,
+          externalMedia: external.map(item => item.src)
+        });
+      }
+      pages.push({
+        path: specimen.path,
+        kind: specimen.kind,
+        pending: false,
+        revision: read.revision,
+        pageDigest: read.pageDigest,
+        captures: captures.filter(record => record.page === specimen.path).map(record => record.name)
+      });
+      check(`${slug}-published`, true, `revision=${read.revision} digest=${String(read.pageDigest ?? '').slice(0, 12)}…`);
+    }
+  } finally {
+    await page.close();
+  }
+  check('specimens-no-page-errors', pageErrors.length === 0, pageErrors.join(' | '));
+  return { paths: SPECIMEN_PAGE_PATHS, pages, captures };
 }
 
 function buildSafetyDeclaration(fixture) {
@@ -352,6 +489,7 @@ export async function captureDeclaredHome({ browser, origin, outDir, signedInCon
     captures: [],
     signedIn: null,
     secondPage: null,
+    specimens: null,
     domSafety: null,
     checks
   };
@@ -369,6 +507,12 @@ export async function captureDeclaredHome({ browser, origin, outDir, signedInCon
     receipt.captures.push(...second.captures);
     receipt.secondPage = { path: SECOND_PAGE_PATH, revision: second.read.revision, pageDigest: second.read.pageDigest, captures: second.captures };
     check('healthcare-solutions-captured', second.captures.length === CAPTURE_VIEWPORTS.length, `${second.captures.length} captures`);
+    receipt.specimens = await captureSpecimens({ context: signedOutContext, origin, outDir, check });
+    const publishedSpecimens = receipt.specimens.pages.filter(page => !page.pending);
+    check('specimens-captured', receipt.specimens.captures.length === publishedSpecimens.length * CAPTURE_VIEWPORTS.length,
+      publishedSpecimens.length
+        ? `${receipt.specimens.captures.length} captures over ${publishedSpecimens.length}/${SPECIMEN_PAGES.length} published specimen pages`
+        : `all ${SPECIMEN_PAGES.length} specimen pages recorded pending on this host`);
   } finally {
     await signedOutContext.close();
   }

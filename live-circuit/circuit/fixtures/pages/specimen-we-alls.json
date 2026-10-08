@@ -1,0 +1,134 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/specimen-we-alls",
+  "pageId": "ui-page-specimen-we-alls",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "7070707070707070707070707070707070707070707070707070707070707070",
+  "claimsPosture": "research",
+  "claims": [
+    { "claimId": "claim-provenance-reader-preview", "revision": 1, "digest": "sha256:771834a4e04f96b97e289b8b613bc9f5d7a5a209126a6364f8b09a01a16f40df" }
+  ],
+  "copyBasis": "U2 specimen-we-alls fixture for verify-pages --fixtures and the U2 capture/deck: one section per agreement-wave kind (tabs, timeline, form, media.gallery, code, chart) plus claim-bound copy on a research-posture page. Shape-only; the estate publication owns the served document.",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "specimen-we-alls-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Specimen: every agreement-wave kind", "level": 2 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-we-alls-tabs",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "tabs", "version": 1 },
+      "props": { "selected": "overview" },
+      "bindings": {
+        "tabs": { "kind": "literal", "value": [
+          { "id": "overview", "label": "Overview", "panelId": "specimen-we-alls-overview" },
+          { "id": "evidence", "label": "Evidence", "badges": [{ "text": "2", "kind": "info" }] }
+        ] }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-we-alls-timeline",
+      "regionId": "main",
+      "order": 3,
+      "component": { "kind": "timeline", "version": 1 },
+      "props": { "duration": 240, "playhead": 120, "seek": { "min": 0, "max": 240, "value": 120 } },
+      "bindings": {
+        "spans": { "kind": "literal", "value": [
+          { "label": "Observe admitted", "kind": "operation", "from": 0, "to": 120, "nodeId": "operation-01" },
+          { "label": "Scenario return", "kind": "outcome", "from": 120, "to": 240, "nodeId": "outcome-01" }
+        ] }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-we-alls-form",
+      "regionId": "main",
+      "order": 4,
+      "component": { "kind": "form", "version": 1 },
+      "props": { "values": { "capabilityId": "read-live-scenario-circuit" }, "submit": "Refresh the read" },
+      "bindings": {
+        "fields": { "kind": "literal", "value": [
+          { "name": "capabilityId", "label": "Capability", "kind": "text", "required": true, "value": "read-live-scenario-circuit", "hint": "Namespace-qualified id" }
+        ] }
+      },
+      "actions": [
+        { "actionId": "specimen-we-alls-refresh", "kind": "refresh", "dispatchClass": "read" }
+      ],
+      "events": [
+        { "on": "submit", "actionId": "specimen-we-alls-refresh" }
+      ]
+    },
+    {
+      "sectionId": "specimen-we-alls-media-gallery",
+      "regionId": "main",
+      "order": 5,
+      "component": { "kind": "media.gallery", "version": 1 },
+      "props": { "caption": "External media references (no serving route)", "empty": "No media is declared." },
+      "bindings": {
+        "items": { "kind": "literal", "value": [
+          { "src": "https://media.example.test/specimens/optical-flow.webp", "alt": "Optical flow specimen", "caption": "optical-flow.webp", "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000", "provider": "external" }
+        ] }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-we-alls-code",
+      "regionId": "main",
+      "order": 6,
+      "component": { "kind": "code", "version": 1 },
+      "props": { "language": "json", "caption": "A declared ui-page.v1 read shape" },
+      "bindings": {
+        "text": { "kind": "literal", "value": "{\n  \"contractId\": \"ui-page.v1\",\n  \"status\": \"READ\",\n  \"sections\": 8\n}" }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-we-alls-chart",
+      "regionId": "main",
+      "order": 7,
+      "component": { "kind": "chart", "version": 1 },
+      "props": { "maximum": 25, "caption": "Declared kinds by agreement wave", "empty": "No series is declared." },
+      "bindings": {
+        "series": { "kind": "literal", "value": [
+          { "label": "Phase 0", "value": 10, "kind": "shipped" },
+          { "label": "Phase 1", "value": 5, "kind": "shipped" },
+          { "label": "U2 agreement", "value": 6, "kind": "proposed" }
+        ] }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-we-alls-claims-copy",
+      "regionId": "main",
+      "order": 8,
+      "component": { "kind": "text", "version": 1 },
+      "props": {
+        "role": "note",
+        "text": "The provenance reader will return a page's pinned claim documents inside the served ui-page.v1 reading with classification and status rendered verbatim."
+      },
+      "bindings": {},
+      "actions": [],
+      "claims": [
+        { "claimId": "claim-provenance-reader-preview", "revision": 1, "props": ["text"] }
+      ]
+    }
+  ],
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}

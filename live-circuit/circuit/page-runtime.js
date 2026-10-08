@@ -27,7 +27,9 @@ const UI_REGISTRY = {
     { kind: 'heading', version: 1 }, { kind: 'stat', version: 1 }, { kind: 'card', version: 1 },
     { kind: 'card-list', version: 1 }, { kind: 'list', version: 1 }, { kind: 'media.figure', version: 1 },
     { kind: 'notice', version: 1 }, { kind: 'table', version: 1 }, { kind: 'field-list', version: 1 },
-    { kind: 'disclosure', version: 1 }, { kind: 'badge', version: 1 }, { kind: 'status-chip', version: 1 }
+    { kind: 'disclosure', version: 1 }, { kind: 'badge', version: 1 }, { kind: 'status-chip', version: 1 },
+    { kind: 'tabs', version: 1 }, { kind: 'timeline', version: 1 }, { kind: 'form', version: 1 },
+    { kind: 'media.gallery', version: 1 }, { kind: 'code', version: 1 }, { kind: 'chart', version: 1 }
   ],
   actions: [
     { kind: 'navigate', dispatchClass: 'local', inputs: [] },

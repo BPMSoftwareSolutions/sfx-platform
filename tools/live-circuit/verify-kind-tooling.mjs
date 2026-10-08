@@ -59,6 +59,19 @@ try {
   record('component-check-shipped-ten', shipped.status === 0 && /shipped-ten-role-parity/.test(shipped.stdout)
     && /shipped-ten-allowlist/.test(shipped.stdout), `exit=${shipped.status}`);
 
+  // --- U2 agreement-wave contracts against the shipped table ----------------
+  // Each generated contract must agree both directions with the merged role
+  // table and the shipped adapter's supportedRoles before a specimen fixture
+  // may declare it.
+  const agreementKinds = ['tabs', 'timeline', 'form', 'media.gallery', 'code', 'chart'];
+  for (const kind of agreementKinds) {
+    const contractPath = path.join(repoRoot, 'tools', 'live-circuit', 'generated', kind, `${kind}.contract.json`);
+    const result = run(['tools/live-circuit/new-component.mjs', '--check', path.relative(repoRoot, contractPath)]);
+    const failures = result.stdout.split(/\r?\n/).filter(line => line.startsWith('FAIL')).join('; ');
+    record(`agreement-contract-${kind}`, result.status === 0 && /"failed": 0/.test(result.stdout),
+      `exit=${result.status}${failures ? ` ${failures}` : ` ${kind} roles agree with the shipped table`}`);
+  }
+
   // --- new-reader scaffold, list and refusal modes -------------------------
   const readerDir = path.join(scratch, 'standards-crosswalk');
   const reader = run(['tools/live-circuit/new-reader.mjs', 'standards-crosswalk', '--fields', 'crosswalkId', '--out', readerDir]);

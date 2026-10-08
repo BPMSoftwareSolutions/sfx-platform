@@ -1,0 +1,52 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/specimen-form",
+  "pageId": "ui-page-specimen-form",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "3030303030303030303030303030303030303030303030303030303030303030",
+  "copyBasis": "U2 specimen fixture for verify-pages --fixtures: the form kind declared from its ui-component.v1 contract roles (fields, values, submit). The submit event emits only the admitted refresh action; no browser write path is added.",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "specimen-form-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Specimen: form", "level": 2 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-form",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "form", "version": 1 },
+      "props": { "values": { "capabilityId": "read-live-scenario-circuit" }, "submit": "Refresh the read" },
+      "bindings": {
+        "fields": {
+          "kind": "literal",
+          "value": [
+            { "name": "capabilityId", "label": "Capability", "kind": "text", "required": true, "value": "read-live-scenario-circuit", "hint": "Namespace-qualified id" },
+            { "name": "scenarioId", "label": "Scenario", "kind": "select", "options": [{ "value": "root", "label": "Root" }], "value": "root" }
+          ]
+        }
+      },
+      "actions": [
+        { "actionId": "specimen-form-refresh", "kind": "refresh", "dispatchClass": "read" }
+      ],
+      "events": [
+        { "on": "submit", "actionId": "specimen-form-refresh" }
+      ]
+    }
+  ],
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}

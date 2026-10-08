@@ -1,0 +1,44 @@
+{
+  "contractId": "ui-page.v1",
+  "status": "READ",
+  "path": "/circuit/specimen-code",
+  "pageId": "ui-page-specimen-code",
+  "namespaceId": "sidefx:ui",
+  "revision": 1,
+  "pageDigest": "5050505050505050505050505050505050505050505050505050505050505050",
+  "copyBasis": "U2 specimen fixture for verify-pages --fixtures: the code kind declared from its ui-component.v1 contract roles (text, language, caption). The code text renders through textContent.",
+  "layout": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "a1c7815015124444bad257a142f3b2ff4db0f6d53d2e56ba737ca00917da91fb",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "specimen-code-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Specimen: code", "level": 2 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "specimen-code",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "code", "version": 1 },
+      "props": { "language": "json", "caption": "A declared ui-page.v1 read shape" },
+      "bindings": {
+        "text": {
+          "kind": "literal",
+          "value": "{\n  \"contractId\": \"ui-page.v1\",\n  \"status\": \"READ\",\n  \"sections\": 6\n}"
+        }
+      },
+      "actions": []
+    }
+  ],
+  "readingDefinitionSha256": "9d0f8f9d0b6a4e0f9b0f9f4f6c2f4a7b8c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f",
+  "readAt": "2026-10-07T00:00:00.000Z"
+}
