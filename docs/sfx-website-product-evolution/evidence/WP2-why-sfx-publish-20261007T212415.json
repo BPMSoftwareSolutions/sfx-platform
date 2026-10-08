@@ -1,0 +1,64 @@
+{
+  "tool": "publish-ui-page",
+  "at": "2026-10-08T01:24:15.994Z",
+  "base": "http://127.0.0.1:8788",
+  "candidateFile": "page-definition-rev1.json",
+  "actor": "content-owner:why-sfx",
+  "steps": [
+    {
+      "step": "validate",
+      "pass": true,
+      "issue": null
+    },
+    {
+      "step": "claims-verify",
+      "pass": true,
+      "skipped": false,
+      "placements": 9,
+      "failures": []
+    },
+    {
+      "step": "stage",
+      "pass": true,
+      "pointerUntouched": true
+    },
+    {
+      "step": "candidate-verify",
+      "pass": false,
+      "status": "READ",
+      "servedDigest": "20aba8c0b1cfc9a6adb7dbb19f00ce91ddc44725fab8f4158833a29d566b7c40"
+    }
+  ],
+  "validated": true,
+  "claims": {
+    "required": true,
+    "claims": [
+      "claim-evidence-by-design@1",
+      "claim-intelligence-abundant-authority-scarce@1",
+      "claim-intelligence-proposes-capability-authorizes@1",
+      "claim-intent-to-authorized-effect-to-evidence@1",
+      "claim-semantic-flight-recording-in-development@1",
+      "claim-sovereignty-at-scale@1",
+      "claim-zero-implicit-authority@1"
+    ],
+    "placements": 9,
+    "rules": {
+      "path": "live-circuit\\circuit\\claim-rules.v1.json",
+      "contractId": "claim-rules.v1",
+      "rulesVersion": 1,
+      "digest": "sha256:b26d82938bbe6122292832a6b97c2f7377316be2b7ba10a9b2025f85b6ab56de"
+    },
+    "passed": 22,
+    "failed": 0
+  },
+  "staged": true,
+  "candidateVerified": false,
+  "promoted": false,
+  "postVerified": false,
+  "rolledBack": false,
+  "refusal": "UI_PAGE_CANDIDATE_UNVERIFIED",
+  "ok": false,
+  "fromRevision": null,
+  "candidateRevision": 1,
+  "digest": "44eff463a4f31f9d92de118ab9136ba4efb5debe61d9d9ad8676602b1759ecc9"
+}

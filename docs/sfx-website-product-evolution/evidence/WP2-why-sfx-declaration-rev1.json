@@ -1,0 +1,390 @@
+{
+  "document": "ui-page-definition.v1",
+  "pageId": "ui-page-why-sfx",
+  "namespaceId": "sidefx:ui",
+  "path": "/circuit/why-sfx",
+  "revision": 1,
+  "title": "Why SFX",
+  "layoutRef": {
+    "layoutId": "ui-layout-marketing.v1",
+    "digest": "e2591ca34ce894541132dccaca54fa77d8e98b84e7f8c8c8c93ff320fe9db58c"
+  },
+  "navigation": {
+    "items": [
+      {
+        "label": "Home",
+        "href": "/circuit/home"
+      },
+      {
+        "label": "Why SFX",
+        "href": "/circuit/why-sfx"
+      },
+      {
+        "label": "Healthcare Solutions",
+        "href": "/circuit/healthcare-solutions"
+      }
+    ]
+  },
+  "claims": [
+    {
+      "claimId": "claim-intelligence-abundant-authority-scarce",
+      "revision": 1,
+      "digest": "sha256:38b74d1389fbfc19b4d3924eebbcdf3fff5c3bf75728fc1fb057d406cacbab77"
+    },
+    {
+      "claimId": "claim-zero-implicit-authority",
+      "revision": 1,
+      "digest": "sha256:94165cd9281b1719373b1e49400a53e66c2aa8a71eb0ab0662a02bd3e7aa544c"
+    },
+    {
+      "claimId": "claim-intent-to-authorized-effect-to-evidence",
+      "revision": 1,
+      "digest": "sha256:11510d550a56eb968d67d9bda93c7ebc50ff01b107c9bd4d3defc7747dad5433"
+    },
+    {
+      "claimId": "claim-intelligence-proposes-capability-authorizes",
+      "revision": 1,
+      "digest": "sha256:644613117aff1868a09f2a2d0cf8be9e48d31b508b175b8d652347116a529ccd"
+    },
+    {
+      "claimId": "claim-sovereignty-at-scale",
+      "revision": 1,
+      "digest": "sha256:fa57c9b6785b0933ad0ee262b1bb894bab4ad82bad495d2904ca241f68c85ae8"
+    },
+    {
+      "claimId": "claim-semantic-flight-recording-in-development",
+      "revision": 1,
+      "digest": "sha256:ad6de4ce0662be6a554845634a6223aac13adb0aee997a408015ca8d60935a9b"
+    },
+    {
+      "claimId": "claim-evidence-by-design",
+      "revision": 1,
+      "digest": "sha256:0f4aa64f31fec7e4a0c44e3224bb8867eb16c8d687e03b83f17ecdc815f23139"
+    }
+  ],
+  "contentAuthority": {
+    "claimsPosture": "current-offer",
+    "basis": "Why SFX content: intelligence is becoming abundant and authority cannot be; SFX establishes zero implicit authority between intelligence and effect; capabilities authorize and effects are evidenced.",
+    "obligations": [
+      "Every assertive statement is bound to a ui-claim.v1 document with basis, source references and limits",
+      "No compliance, coverage or formal-verification claim",
+      "Semantic flight recording is labelled architecture in development"
+    ]
+  },
+  "sections": [
+    {
+      "sectionId": "why-hero",
+      "regionId": "main",
+      "order": 1,
+      "component": {
+        "kind": "hero",
+        "version": 1,
+        "contractDigest": "67d412b3fb40d238b11eddba26fef43c55461b853355ebb3b419a7fe232f600d"
+      },
+      "props": {
+        "eyebrow": "Why SFX",
+        "headline": "Intelligence is becoming abundant. Authority cannot be.",
+        "lede": "SFX governs the path from intent to capability to authorized effect to evidence.",
+        "primaryActionId": "why-flow"
+      },
+      "actions": [
+        {
+          "actionId": "why-flow",
+          "kind": "navigate",
+          "to": "#why-flow"
+        }
+      ],
+      "claims": [
+        {
+          "claimId": "claim-intelligence-abundant-authority-scarce",
+          "revision": 1,
+          "digest": "sha256:38b74d1389fbfc19b4d3924eebbcdf3fff5c3bf75728fc1fb057d406cacbab77",
+          "props": [
+            "headline"
+          ]
+        },
+        {
+          "claimId": "claim-intent-to-authorized-effect-to-evidence",
+          "revision": 1,
+          "digest": "sha256:11510d550a56eb968d67d9bda93c7ebc50ff01b107c9bd4d3defc7747dad5433",
+          "props": [
+            "lede"
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "why-defining",
+      "regionId": "main",
+      "order": 2,
+      "component": {
+        "kind": "text",
+        "version": 1,
+        "contractDigest": "5d634b8cf213421bc4786f56e975fd54c269d7bd8ade56c026f2e60bb8743a83"
+      },
+      "props": {
+        "role": "display",
+        "text": "SFX establishes zero implicit authority between intelligence and effect."
+      },
+      "claims": [
+        {
+          "claimId": "claim-zero-implicit-authority",
+          "revision": 1,
+          "digest": "sha256:94165cd9281b1719373b1e49400a53e66c2aa8a71eb0ab0662a02bd3e7aa544c",
+          "props": [
+            "text"
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "why-flow-heading",
+      "regionId": "main",
+      "order": 3,
+      "component": {
+        "kind": "heading",
+        "version": 1,
+        "contractDigest": "81befbf8d06c47b97c2870a8c391f2efca5e03bdb71ff9d83b99f1d80a6816ab"
+      },
+      "props": {
+        "text": "From intent to evidence",
+        "level": 2
+      }
+    },
+    {
+      "sectionId": "why-flow-diagram",
+      "regionId": "main",
+      "order": 4,
+      "component": {
+        "kind": "code",
+        "version": 1,
+        "contractDigest": "a92d5ee8ea5981712b52a65a7823606d3050939e4fed43e6d507b22f9ce24cc2"
+      },
+      "props": {
+        "text": "INTENT\n  v\nINTELLIGENCE proposes\n  v\nCAPABILITY AUTHORITY permits\n  v\nPROVIDER executes\n  v\nEFFECT\n  v\nEVIDENCE",
+        "language": "text",
+        "caption": "The declared path: intent, intelligence, capability authority, provider, effect, evidence."
+      }
+    },
+    {
+      "sectionId": "why-flow-statement",
+      "regionId": "main",
+      "order": 5,
+      "component": {
+        "kind": "text",
+        "version": 1,
+        "contractDigest": "5d634b8cf213421bc4786f56e975fd54c269d7bd8ade56c026f2e60bb8743a83"
+      },
+      "props": {
+        "role": "paragraph",
+        "text": "Intelligence may propose. Capabilities authorize. Effects are evidenced."
+      },
+      "claims": [
+        {
+          "claimId": "claim-intelligence-proposes-capability-authorizes",
+          "revision": 1,
+          "digest": "sha256:644613117aff1868a09f2a2d0cf8be9e48d31b508b175b8d652347116a529ccd",
+          "props": [
+            "text"
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "why-propositions-heading",
+      "regionId": "main",
+      "order": 6,
+      "component": {
+        "kind": "heading",
+        "version": 1,
+        "contractDigest": "81befbf8d06c47b97c2870a8c391f2efca5e03bdb71ff9d83b99f1d80a6816ab"
+      },
+      "props": {
+        "text": "The four propositions",
+        "level": 2
+      }
+    },
+    {
+      "sectionId": "why-propositions",
+      "regionId": "main",
+      "order": 7,
+      "component": {
+        "kind": "card-list",
+        "version": 1,
+        "contractDigest": "efa04ceaa25dc0e4406a578caf7175d7833e3085af8ef80b4ec632bbdf3410d3"
+      },
+      "props": {
+        "title": "Why SFX exists",
+        "cards": [
+          {
+            "id": "proposition-zero-implicit-authority",
+            "title": "Zero implicit authority",
+            "body": "SFX establishes zero implicit authority between intelligence and effect.",
+            "meta": "Proposition 1 of 4"
+          },
+          {
+            "id": "proposition-sovereignty-at-scale",
+            "title": "Sovereignty at scale",
+            "body": "Sovereignty at scale: a capability belongs to the enterprise and survives provider change.",
+            "meta": "Proposition 2 of 4"
+          },
+          {
+            "id": "proposition-semantic-flight-recording",
+            "title": "Semantic flight recording",
+            "body": "Preserve the causal neighborhood around consequential effects; the recorder is declared architecture in development.",
+            "meta": "Proposition 3 of 4 - architecture in development"
+          },
+          {
+            "id": "proposition-evidence-by-design",
+            "title": "Evidence by design",
+            "body": "Evidence by design: governed execution produces the evidence evaluation requires.",
+            "meta": "Proposition 4 of 4"
+          }
+        ]
+      },
+      "claims": [
+        {
+          "claimId": "claim-zero-implicit-authority",
+          "revision": 1,
+          "digest": "sha256:94165cd9281b1719373b1e49400a53e66c2aa8a71eb0ab0662a02bd3e7aa544c",
+          "props": [
+            "cards[0].body"
+          ]
+        },
+        {
+          "claimId": "claim-sovereignty-at-scale",
+          "revision": 1,
+          "digest": "sha256:fa57c9b6785b0933ad0ee262b1bb894bab4ad82bad495d2904ca241f68c85ae8",
+          "props": [
+            "cards[1].body"
+          ]
+        },
+        {
+          "claimId": "claim-semantic-flight-recording-in-development",
+          "revision": 1,
+          "digest": "sha256:ad6de4ce0662be6a554845634a6223aac13adb0aee997a408015ca8d60935a9b",
+          "props": [
+            "cards[2].body"
+          ]
+        },
+        {
+          "claimId": "claim-evidence-by-design",
+          "revision": 1,
+          "digest": "sha256:0f4aa64f31fec7e4a0c44e3224bb8867eb16c8d687e03b83f17ecdc815f23139",
+          "props": [
+            "cards[3].body"
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "why-lab-notice",
+      "regionId": "main",
+      "order": 8,
+      "component": {
+        "kind": "notice",
+        "version": 1,
+        "contractDigest": "3215fa551aafe9baec67fdb4a027978c2348c42ebc72ffc4bd124f052734227f"
+      },
+      "props": {
+        "tone": "info",
+        "title": "Lab: architecture in development",
+        "body": "Semantic flight recording: preserve the causal neighborhood around consequential effects; the recorder is declared architecture in development, not a shipping capability.",
+        "state": "info"
+      },
+      "claims": [
+        {
+          "claimId": "claim-semantic-flight-recording-in-development",
+          "revision": 1,
+          "digest": "sha256:ad6de4ce0662be6a554845634a6223aac13adb0aee997a408015ca8d60935a9b",
+          "props": [
+            "body"
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "why-claims-note",
+      "regionId": "main",
+      "order": 9,
+      "component": {
+        "kind": "section",
+        "version": 1,
+        "contractDigest": "41fb773d5d1f889cf6272d8b6e31ddff4b3955a606160f81a9465a1f320ccb0a"
+      },
+      "props": {
+        "heading": "Claims on this page",
+        "body": [
+          {
+            "component": {
+              "kind": "badge",
+              "version": 1,
+              "contractDigest": "61d5bf8f99e06c7256c779490fdfbebc579e615bc5c34233d217ce85e2cd1872"
+            },
+            "props": {
+              "label": "Declared claims",
+              "tone": "info"
+            }
+          },
+          {
+            "component": {
+              "kind": "badge",
+              "version": 1,
+              "contractDigest": "61d5bf8f99e06c7256c779490fdfbebc579e615bc5c34233d217ce85e2cd1872"
+            },
+            "props": {
+              "label": "Architecture in development",
+              "tone": "warning"
+            }
+          },
+          {
+            "component": {
+              "kind": "badge",
+              "version": 1,
+              "contractDigest": "61d5bf8f99e06c7256c779490fdfbebc579e615bc5c34233d217ce85e2cd1872"
+            },
+            "props": {
+              "label": "Not a compliance claim",
+              "tone": "warning"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "failure": {
+    "readFailed": "This page could not be read. The reading failed; no section is silently omitted.",
+    "unknownComponent": "This page declares a component the deployed shell does not support.",
+    "notices": [
+      {
+        "state": "read-failed",
+        "component": {
+          "kind": "notice",
+          "version": 1,
+          "contractDigest": "3215fa551aafe9baec67fdb4a027978c2348c42ebc72ffc4bd124f052734227f"
+        },
+        "props": {
+          "tone": "error",
+          "title": "This page could not be read",
+          "body": "The reading failed; no section is silently omitted.",
+          "state": "read-failed"
+        }
+      },
+      {
+        "state": "unknown-component",
+        "component": {
+          "kind": "notice",
+          "version": 1,
+          "contractDigest": "3215fa551aafe9baec67fdb4a027978c2348c42ebc72ffc4bd124f052734227f"
+        },
+        "props": {
+          "tone": "warning",
+          "title": "A declared component is not supported",
+          "body": "This page declares a component the deployed shell does not support. The affected section renders as a named notice, never dropped silently.",
+          "state": "unknown-component"
+        }
+      }
+    ]
+  },
+  "publishedAt": "2026-10-07T00:00:00.000Z"
+}

@@ -1,0 +1,79 @@
+{
+  "tool": "publish-ui-page",
+  "at": "2026-10-08T01:25:03.349Z",
+  "base": "http://127.0.0.1:8788",
+  "candidateFile": "page-definition-rev1.json",
+  "actor": "content-owner:why-sfx",
+  "steps": [
+    {
+      "step": "validate",
+      "pass": true,
+      "issue": null
+    },
+    {
+      "step": "claims-verify",
+      "pass": true,
+      "skipped": false,
+      "placements": 9,
+      "failures": []
+    },
+    {
+      "step": "stage",
+      "pass": true,
+      "pointerUntouched": true
+    },
+    {
+      "step": "candidate-verify",
+      "pass": true,
+      "status": "READ",
+      "servedDigest": "62d19ee38cd8f9775e3cd81396cfe2d11daf8c7d52288b13055d792cc2088524"
+    },
+    {
+      "step": "promote",
+      "pass": true,
+      "expectedCurrentRevision": null
+    },
+    {
+      "step": "post-verify",
+      "pass": true,
+      "status": "READ",
+      "revision": 1
+    },
+    {
+      "step": "receipt",
+      "pass": true
+    }
+  ],
+  "validated": true,
+  "claims": {
+    "required": true,
+    "claims": [
+      "claim-evidence-by-design@1",
+      "claim-intelligence-abundant-authority-scarce@1",
+      "claim-intelligence-proposes-capability-authorizes@1",
+      "claim-intent-to-authorized-effect-to-evidence@1",
+      "claim-semantic-flight-recording-in-development@1",
+      "claim-sovereignty-at-scale@1",
+      "claim-zero-implicit-authority@1"
+    ],
+    "placements": 9,
+    "rules": {
+      "path": "live-circuit\\circuit\\claim-rules.v1.json",
+      "contractId": "claim-rules.v1",
+      "rulesVersion": 1,
+      "digest": "sha256:b26d82938bbe6122292832a6b97c2f7377316be2b7ba10a9b2025f85b6ab56de"
+    },
+    "passed": 22,
+    "failed": 0
+  },
+  "staged": true,
+  "candidateVerified": true,
+  "promoted": true,
+  "postVerified": true,
+  "rolledBack": false,
+  "refusal": null,
+  "ok": true,
+  "fromRevision": null,
+  "candidateRevision": 1,
+  "digest": "62d19ee38cd8f9775e3cd81396cfe2d11daf8c7d52288b13055d792cc2088524"
+}
