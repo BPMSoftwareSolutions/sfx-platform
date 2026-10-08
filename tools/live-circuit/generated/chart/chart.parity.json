@@ -1,0 +1,30 @@
+{
+  "contractId": "ui-component-parity.v1",
+  "kind": "chart",
+  "version": 1,
+  "notes": [
+    "Every role is declared with a unique sentinel; the K1 consumption probe must see each sentinel reach the output, so no declared role silently drops.",
+    "roles are declared as props; add binding-path coverage if the adapter reads any role from bindings."
+  ],
+  "section": {
+    "sectionId": "chart-parity",
+    "regionId": "main",
+    "order": 1,
+    "component": {
+      "kind": "chart",
+      "version": 1
+    },
+    "props": {
+      "series": "sentinel-series",
+      "maximum": "sentinel-maximum",
+      "caption": "sentinel-caption",
+      "empty": "sentinel-empty"
+    }
+  },
+  "sentinels": {
+    "series": "sentinel-series",
+    "maximum": "sentinel-maximum",
+    "caption": "sentinel-caption",
+    "empty": "sentinel-empty"
+  }
+}

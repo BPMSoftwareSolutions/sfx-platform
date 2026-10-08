@@ -1,0 +1,16 @@
+{
+  "document": "ui-component.v1",
+  "kind": "tabs",
+  "version": 1,
+  "roles": [
+    "tabs",
+    "selected"
+  ],
+  "props": {},
+  "states": [
+    "ready",
+    "empty",
+    "error",
+    "not-supported"
+  ]
+}

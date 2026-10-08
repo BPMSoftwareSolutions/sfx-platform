@@ -1,0 +1,30 @@
+{
+  "contractId": "ui-component-parity.v1",
+  "kind": "timeline",
+  "version": 1,
+  "notes": [
+    "Every role is declared with a unique sentinel; the K1 consumption probe must see each sentinel reach the output, so no declared role silently drops.",
+    "roles are declared as props; add binding-path coverage if the adapter reads any role from bindings."
+  ],
+  "section": {
+    "sectionId": "timeline-parity",
+    "regionId": "main",
+    "order": 1,
+    "component": {
+      "kind": "timeline",
+      "version": 1
+    },
+    "props": {
+      "spans": "sentinel-spans",
+      "duration": "sentinel-duration",
+      "playhead": "sentinel-playhead",
+      "seek": "sentinel-seek"
+    }
+  },
+  "sentinels": {
+    "spans": "sentinel-spans",
+    "duration": "sentinel-duration",
+    "playhead": "sentinel-playhead",
+    "seek": "sentinel-seek"
+  }
+}

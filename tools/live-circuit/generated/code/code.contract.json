@@ -1,0 +1,17 @@
+{
+  "document": "ui-component.v1",
+  "kind": "code",
+  "version": 1,
+  "roles": [
+    "text",
+    "language",
+    "caption"
+  ],
+  "props": {},
+  "states": [
+    "ready",
+    "empty",
+    "error",
+    "not-supported"
+  ]
+}

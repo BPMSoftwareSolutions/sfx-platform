@@ -1,0 +1,17 @@
+{
+  "document": "ui-component.v1",
+  "kind": "form",
+  "version": 1,
+  "roles": [
+    "fields",
+    "values",
+    "submit"
+  ],
+  "props": {},
+  "states": [
+    "ready",
+    "empty",
+    "error",
+    "not-supported"
+  ]
+}

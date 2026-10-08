@@ -1,0 +1,17 @@
+{
+  "document": "ui-component.v1",
+  "kind": "media.gallery",
+  "version": 1,
+  "roles": [
+    "items",
+    "caption",
+    "empty"
+  ],
+  "props": {},
+  "states": [
+    "ready",
+    "empty",
+    "error",
+    "not-supported"
+  ]
+}

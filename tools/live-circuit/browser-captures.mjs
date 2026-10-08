@@ -200,20 +200,25 @@ async function captureCrosswalkPage({ context, origin, outDir, check }) {
       const renderedStates = crosswalk?.sectionId
         ? await page.evaluate(sectionId => {
             const node = document.getElementById(sectionId);
-            if (!node) return { chips: [], text: '' };
+            if (!node) return { chips: [], tokens: [] };
             return {
               chips: [...new Set([...node.querySelectorAll('[data-state]')].map(item => item.getAttribute('data-state')))],
-              text: node.textContent ?? '',
+              // A plain declared state (rows[].state) renders as an element's own
+              // text, for example a table cell. Tokenising each element keeps a
+              // state word from leaking into a neighbouring cell's text, and
+              // keeps "mapped" from matching inside "unmapped".
+              tokens: [...new Set([...node.querySelectorAll('*')]
+                .flatMap(item => (item.textContent ?? '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)))],
             };
           }, crosswalk.sectionId)
-        : { chips: [], text: '' };
-      const stateRendered = state => renderedStates.chips.includes(state) || new RegExp(`\\b${state}\\b`).test(renderedStates.text);
+        : { chips: [], tokens: [] };
+      const stateRendered = state => renderedStates.chips.includes(state) || renderedStates.tokens.includes(String(state).toLowerCase());
       const statesRendered = declared.states.length > 0 && declared.states.every(stateRendered);
       const vocabularyHeld = declared.states.every(state => CROSSWALK_STATES.has(state))
         && renderedStates.chips.every(state => CROSSWALK_STATES.has(state));
       check(`healthcare-solutions-crosswalk-${viewport.name}`,
         Boolean(crosswalk) && declared.status === 200 && declared.contractId === 'standards-crosswalk.v1' && statesRendered && vocabularyHeld,
-        `section=${crosswalk?.sectionId ?? '(none)'} declaredStates=[${declared.states.join(',')}] renderedChips=[${renderedStates.chips.join(',')}]`);
+        `section=${crosswalk?.sectionId ?? '(none)'} declaredStates=[${declared.states.join(',')}] renderedChips=[${renderedStates.chips.join(',')}] renderedTokens=[${renderedStates.tokens.filter(token => CROSSWALK_STATES.has(token)).join(',')}]`);
 
       const file = path.join(outDir, `healthcare-solutions-${viewport.name}.png`);
       await page.screenshot({ path: file, fullPage: true });

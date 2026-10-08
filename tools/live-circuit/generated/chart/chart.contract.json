@@ -1,0 +1,18 @@
+{
+  "document": "ui-component.v1",
+  "kind": "chart",
+  "version": 1,
+  "roles": [
+    "series",
+    "maximum",
+    "caption",
+    "empty"
+  ],
+  "props": {},
+  "states": [
+    "ready",
+    "empty",
+    "error",
+    "not-supported"
+  ]
+}

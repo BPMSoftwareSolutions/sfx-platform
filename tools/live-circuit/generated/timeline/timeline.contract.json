@@ -1,0 +1,18 @@
+{
+  "document": "ui-component.v1",
+  "kind": "timeline",
+  "version": 1,
+  "roles": [
+    "spans",
+    "duration",
+    "playhead",
+    "seek"
+  ],
+  "props": {},
+  "states": [
+    "ready",
+    "empty",
+    "error",
+    "not-supported"
+  ]
+}
