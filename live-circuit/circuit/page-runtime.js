@@ -484,7 +484,8 @@ export async function createPageRuntime({ root, document: declared, navigate }) 
   }
 
   function sourceNotice(record) {
-    return stateNotice('source-error', `The ${record.sourceId} source could not be read${record.status ? ` (HTTP ${record.status})` : ''}.`);
+    const code = typeof record.body?.error === 'string' && record.body.error ? ` ${record.body.error}` : '';
+    return stateNotice('source-error', `The ${record.sourceId} source could not be read${record.status ? ` (HTTP ${record.status})` : ''}.${code}`);
   }
 
   function eventScope(domEvent) {

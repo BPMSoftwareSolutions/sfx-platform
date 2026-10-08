@@ -373,23 +373,16 @@ async function readProviderInspection(selection) {
     return resultSets;
   }
   try {
-    // The declared platform catalogs skip the heavy details reader; any other
-    // provider degrades to the canonical reader when the details reader fails
-    // (for example a database that has not received the details procedure yet),
-    // and the response reports both the reader and the reason.
-    let reader = configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured, fallback = null, resultSets;
-    try { resultSets = await readSets(reader); }
-    catch (error) {
-      if (reader === configured.canonical || !configured.canonical) throw error;
-      fallback = error.code ?? error.name ?? 'READER_FAILED';
-      reader = configured.canonical;
-      resultSets = await readSets(reader);
-    }
+    // The declared platform catalogs select the canonical reader; every other
+    // provider reads through the details reader. There is no reader fallback:
+    // a failed read is a named CircuitReadError, never a canonical-only render.
+    const reader = configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured;
+    const resultSets = await readSets(reader);
     const declared = resultSets.find(set => set.name === reader.identityResultSet)?.rows;
     if (declared?.length !== 1 || declared[0].provider_id !== providerId || declared[0].definition_digest !== identity.definitionDigest)
       throw new CircuitReadError('PROVIDER_DEFINITION_CHANGED', 409);
     return { providerId, definitionDigest: identity.definitionDigest, snapshotDigest: scene.snapshotDigest, reader: reader.procedure,
-      ...(fallback ? { readerFallback: fallback } : {}), readAt: new Date().toISOString(), resultSets };
+      readAt: new Date().toISOString(), resultSets };
   } finally { release(); }
 }
 // The deployed shell registry the client validator and the publish gate consume.

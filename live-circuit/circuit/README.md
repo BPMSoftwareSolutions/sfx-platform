@@ -133,16 +133,18 @@ the returned provider ID and definition digest. Stale selections return 409;
 non-provider details return 422. Reads share the existing queue, timeout and
 response-size limits. Navigation cancels display of a superseded response.
 
-The provider drill-down renders the **provider involvement profile** from
-`analysis.read_provider_details` (identity, configuration, mechanics/ports,
-bindings, engagements, instructions, invocations, summary; the raw sets stay in
-a fold). `circuit-host.json` declares that reader with its identity set, and keeps
-`analysis.read_provider_canonical_body` as the declared fallback for the platform
-catalog providers named in `canonicalProviders` (a platform capability can be
-engaged by more than a thousand ports and exceed the read timeout). If the details
-reader fails for any other provider, the host retries the canonical reader and
-reports the reader and the reason (`readerFallback`); the profile shows the reason
-instead of an empty workspace.
+The provider drill-down is declared-only: the estate publishes the
+**provider involvement profile** as a `ui-view.v1` document at
+`/circuit/views/provider-profile` (migration `declare-provider-profile-view`),
+and the Explorer reads it through the page reader and projects it with the same
+runtime and adapters as a declared page. `circuit-host.json` declares
+`analysis.read_provider_details` with its identity set; the canonical reader is
+*selected* for the platform catalog providers named in `canonicalProviders` (a
+platform capability can be engaged by more than a thousand ports and exceed the
+read timeout), never used as a fallback. A provider whose details read fails, or
+a view that is absent or unreadable, renders a named visible state; the retired
+bespoke `provider-profile.js` renderer and the `readerFallback` degradation are
+gone.
 
 These are current database reads, not execution receipts. They do not affect
 live flow or replay. The inspector remains read-only: instruction and engagement

@@ -1,0 +1,90 @@
+{
+  "contractId": "ui-view.v1",
+  "status": "READ",
+  "viewId": "provider-profile",
+  "viewDigest": "5c1f4e2a7b8d9031645278ea0c3b6d9f2a4c8e1075d3b9f6a0c2e4d8b1f7a395",
+  "copyBasis": "Declared provider involvement profile for the generic view host (view-runtime.js): the regions the bespoke renderer in provider-profile.js draws, expressed with the deployed ui-component.v1 kinds and bound to the provider-inspection source. The URL selection (provider detail, capability, namespace, scenario, snapshot digest) is bound into the source by the host, so this declaration names no concrete provider. Fixture-grade pointer choices are illustrative: the estate publication owns the served document and its stable set addressing.",
+  "layout": {
+    "layoutId": "ui-layout-view.v1",
+    "digest": "3b7d9e1f5a2c8b4069d4e7f1a3c5b8d20e6f9a4c7b1d3e5f802468ac13579bdf",
+    "regions": [
+      { "regionId": "main", "order": 1, "placement": "body", "width": "wide" }
+    ]
+  },
+  "sources": [
+    { "sourceId": "provider-inspection", "reader": "provider-inspection" }
+  ],
+  "sections": [
+    {
+      "sectionId": "provider-profile-heading",
+      "regionId": "main",
+      "order": 1,
+      "component": { "kind": "heading", "version": 1 },
+      "props": { "text": "Provider involvement", "level": 3 },
+      "bindings": {},
+      "actions": []
+    },
+    {
+      "sectionId": "provider-profile-state",
+      "regionId": "main",
+      "order": 2,
+      "component": { "kind": "status-chip", "version": 1 },
+      "props": {},
+      "bindings": {
+        "label": { "kind": "read", "reader": "provider-inspection", "pointer": "/providerId" },
+        "state": { "kind": "literal", "value": "mapped" }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "provider-profile-identity",
+      "regionId": "main",
+      "order": 3,
+      "component": { "kind": "field-list", "version": 1 },
+      "props": { "label": "Identity" },
+      "bindings": {
+        "fields": { "kind": "read", "reader": "provider-inspection", "pointer": "/resultSets/0/rows/0" }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "provider-profile-sets",
+      "regionId": "main",
+      "order": 4,
+      "component": { "kind": "table", "version": 1 },
+      "props": { "caption": "Named result sets" },
+      "bindings": {
+        "columns": { "kind": "literal", "value": [{ "key": "name", "label": "Set" }, { "key": "rows", "label": "Rows" }] },
+        "rows": { "kind": "read", "reader": "provider-inspection", "pointer": "/resultSets" },
+        "empty": { "kind": "literal", "value": "No result sets were returned." }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "provider-profile-raw",
+      "regionId": "main",
+      "order": 5,
+      "component": { "kind": "disclosure", "version": 1 },
+      "props": { "summary": "Raw result sets (unchanged)" },
+      "bindings": {
+        "body": { "kind": "literal", "value": ["Raw result sets stay in the reader response; this view interprets nothing."] }
+      },
+      "actions": []
+    },
+    {
+      "sectionId": "provider-profile-caveat",
+      "regionId": "main",
+      "order": 6,
+      "component": { "kind": "notice", "version": 1 },
+      "props": {
+        "tone": "info",
+        "title": "A database read, not an execution receipt.",
+        "body": "Staging a change document applies nothing; the digest-guarded writers remain downstream."
+      },
+      "bindings": {},
+      "actions": []
+    }
+  ],
+  "readingDefinitionSha256": "b1f7a3955c1f4e2a7b8d9031645278ea0c3b6d9f2a4c8e1075d3b9f6a0c2e4d",
+  "readAt": "2026-10-08T00:00:00.000Z"
+}

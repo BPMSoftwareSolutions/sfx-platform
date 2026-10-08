@@ -26,6 +26,17 @@ const SPECIMEN_PAGES = Object.freeze([
 ]);
 const SPECIMEN_KINDS = Object.freeze(SPECIMEN_PAGES.filter(page => page.kind).map(page => page.kind));
 export const SPECIMEN_PAGE_PATHS = Object.freeze(SPECIMEN_PAGES.map(page => page.path));
+// The declared provider drill-down (view-runtime.js) subjects captured from the
+// running host: the two providers named by the P1 deck. Every declared section
+// must render from the estate-published view; a source failure is a named state.
+const PROVIDER_VIEW_PATH = '/circuit/views/provider-profile';
+const PROVIDER_SUBJECTS = Object.freeze([
+  { name: 'provider-view-google-gemini-select', capabilityId: 'request-capability-from-objective-v3',
+    namespaceId: 'sidefx:capabilities', providerId: 'google/gemini-select', detailId: 'provider:google/gemini-select' },
+  { name: 'provider-view-password-credential-provider', capabilityId: 'authenticate-ide-user',
+    namespaceId: 'sidefx:capabilities', providerId: 'password-credential-provider', detailId: 'provider:password-credential-provider' }
+]);
+const PROVIDER_VIEW_ROOT = '#declaration-detail [aria-label="Provider database inspection"]';
 const CROSSWALK_STATES = new Set(['mapped', 'partial', 'planned', 'unmapped']);
 const MARKUP = '<script>window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1</script><img src=x onerror="window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1">';
 const JAVASCRIPT_TARGET = 'javascript:window.__sfxSafetyRuns=(window.__sfxSafetyRuns||0)+1';
@@ -57,7 +68,9 @@ async function readDeclaredPage(page, pathname) {
   return page.evaluate(async path => {
     const response = await fetch(`/api/circuit/v1/page?path=${encodeURIComponent(path)}&refresh=1`, { redirect: 'error' });
     const body = response.status === 200 ? await response.json() : null;
-    return { status: response.status, revision: body?.revision ?? null, pageDigest: body?.pageDigest ?? null, sections: body?.sections ?? [] };
+    return { status: response.status, contractId: body?.contractId ?? null, viewId: body?.viewId ?? null,
+      viewContractId: body?.viewContractId ?? null, revision: body?.revision ?? null, pageDigest: body?.pageDigest ?? null,
+      sections: body?.sections ?? [], sources: body?.sources ?? [] };
   }, pathname);
 }
 
@@ -344,6 +357,93 @@ async function captureSpecimens({ context, origin, outDir, check }) {
   return { paths: SPECIMEN_PAGE_PATHS, pages, captures };
 }
 
+// The declared provider drill-down: the Explorer opens each provider, the
+// estate-published view reads through the page reader, and every declared
+// section must render from that view. ABSENT states must be explicit, no
+// generic canonical-only output may appear (the details reader is the only
+// reader; the response carries no readerFallback), and a source failure stays a
+// named state in the DOM.
+export async function captureProviderViews({ context, origin, outDir, check }) {
+  const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  const views = [];
+  const captures = [];
+  try {
+    // Refresh the observer's page cache to the published revision before the
+    // drill-down reads it, so the capture can never project a superseded view.
+    await page.goto(origin + HOME_PATH, { waitUntil: 'load' });
+    await readDeclaredPage(page, PROVIDER_VIEW_PATH);
+    for (const subject of PROVIDER_SUBJECTS) {
+      await page.setViewportSize({ width: CAPTURE_VIEWPORTS[0].width, height: CAPTURE_VIEWPORTS[0].height });
+      const query = new URLSearchParams({ capability: subject.capabilityId, namespace: subject.namespaceId, detail: subject.detailId });
+      await page.goto(`${origin}/circuit/explorer?${query}`, { waitUntil: 'load' });
+      await page.waitForFunction(root => document.querySelector(`${root} .page-region > section[id]`) !== null
+        || document.querySelector(`${root} [data-refusal]`) !== null, PROVIDER_VIEW_ROOT, { timeout: 120000 });
+      const declared = await readDeclaredPage(page, PROVIDER_VIEW_PATH);
+      // Every declared section must have run its adapter (content or a named
+      // state) before the capture reads the DOM; adapters render over awaits.
+      const declaredIds = declared.sections.map(section => section.sectionId);
+      const complete = await page.waitForFunction(ids => ids.every(id => {
+        const node = document.getElementById(id);
+        return node !== null && node.isConnected && node.childNodes.length > 0;
+      }), declaredIds, { timeout: 120000 }).then(() => true).catch(() => false);
+      check(`${subject.name}-render-complete`, complete, complete ? `${declaredIds.length} declared sections rendered` : 'declared sections did not finish rendering');
+      const rendered = await page.evaluate(root => [...document.querySelectorAll(`${root} .page-region > section[id]`)].map(node => {
+        const rect = node.getBoundingClientRect();
+        return { id: node.id, component: node.dataset.component ?? null, region: node.dataset.region ?? null,
+          refusals: [...node.querySelectorAll('[data-refusal]')].map(item => item.getAttribute('data-refusal')),
+          states: [...node.querySelectorAll('[data-state]')].map(item => item.getAttribute('data-state')),
+          text: node.textContent ?? '', rect: { x: Math.round(rect.x), y: Math.round(rect.y), width: Math.round(rect.width), height: Math.round(rect.height) } };
+      }), PROVIDER_VIEW_ROOT);
+      const declaredRefusals = await page.evaluate(root => [...document.querySelectorAll(`${root} [data-refusal]`)].map(item => item.getAttribute('data-refusal')), PROVIDER_VIEW_ROOT);
+      const installed = declared.status === 200 && declared.contractId === 'ui-page.v1' && declared.viewContractId === 'ui-view.v1';
+      check(`${subject.name}-view-published`, installed,
+        `status=${declared.status} contractId=${declared.contractId} viewId=${declared.viewId} viewContractId=${declared.viewContractId} sections=${declared.sections.length}`);
+      const renderedIds = new Set(rendered.map(section => section.id));
+      const missing = declared.sections.map(section => section.sectionId).filter(id => !renderedIds.has(id));
+      check(`${subject.name}-sections`, missing.length === 0 && rendered.length > 0,
+        missing.length ? `missing ${missing.join(',')}` : `${rendered.length}/${declared.sections.length} sections rendered`);
+      const refusals = rendered.flatMap(section => section.refusals);
+      check(`${subject.name}-no-refusals`, refusals.length === 0,
+        refusals.length || declaredRefusals.length ? `section=${refusals.join(',')} view=${declaredRefusals.join(',')}` : 'no section or view refusals');
+      const headline = rendered.find(section => section.id === 'profile-hero')?.text ?? '';
+      const identity = rendered.find(section => section.id === 'profile-identity-fields')?.text ?? '';
+      check(`${subject.name}-identity-bound`, headline.includes(subject.providerId) && identity.includes(subject.providerId),
+        `hero=${headline.includes(subject.providerId)} identity=${identity.includes(subject.providerId)} provider=${subject.providerId}`);
+      const absent = rendered.some(section => /ABSENT/.test(section.text));
+      const bindings = rendered.find(section => section.id === 'profile-bindings-card');
+      const declaredBindings = declared.sections.find(section => section.sectionId === 'profile-bindings-card')?.component?.kind;
+      check(`${subject.name}-absent-explicit`, absent,
+        `${absent ? 'an ABSENT marker renders' : 'no ABSENT marker rendered'} · declared=${declaredBindings ?? 'missing'} rendered=${bindings?.component ?? 'missing'} text=${(bindings?.text ?? '').replace(/\s+/g, ' ').slice(0, 120)}`);
+      const read = await page.evaluate(async ({ capabilityId, namespaceId, detailId }) => {
+        const scene = await (await fetch(`/api/circuit/v1/scenario?capabilityId=${encodeURIComponent(capabilityId)}&namespaceId=${encodeURIComponent(namespaceId)}`)).json();
+        const parameters = new URLSearchParams({ capabilityId, namespaceId, scenarioId: scene.scenarioId, detailId, detailPointer: '', expectedSnapshotDigest: scene.snapshotDigest });
+        const response = await fetch(`/api/circuit/v1/provider-inspection?${parameters}`);
+        const body = response.status === 200 ? await response.json() : null;
+        return { status: response.status, reader: body?.reader ?? null, providerId: body?.providerId ?? null,
+          sets: body?.resultSets?.length ?? 0, readerFallback: body !== null && Object.prototype.hasOwnProperty.call(body, 'readerFallback') };
+      }, subject);
+      check(`${subject.name}-details-reader`, read.status === 200 && read.reader === 'analysis.read_provider_details' && read.providerId === subject.providerId && !read.readerFallback,
+        `reader=${read.reader} provider=${read.providerId} sets=${read.sets} readerFallback=${read.readerFallback}`);
+      const file = path.join(outDir, `${subject.name}-desktop.png`);
+      await page.screenshot({ path: file, fullPage: true });
+      const record = { name: `${subject.name}-desktop`, subject: subject.name, providerId: subject.providerId, detailId: subject.detailId,
+        viewPath: PROVIDER_VIEW_PATH, viewId: declared.viewId, viewContractId: declared.viewContractId, pageDigest: declared.pageDigest,
+        file: path.basename(file), sha256: sha256File(file), state: 'signed-out',
+        viewport: { name: CAPTURE_VIEWPORTS[0].name, width: CAPTURE_VIEWPORTS[0].width, height: CAPTURE_VIEWPORTS[0].height },
+        declaredSections: declared.sections.length, sections: rendered.map(({ text, ...section }) => section), reader: read };
+      captures.push(record);
+      views.push(record);
+      check(`${subject.name}-captured`, true, `${rendered.length} sections · ${path.basename(file)}`);
+    }
+  } finally {
+    await page.close();
+  }
+  check('provider-views-no-page-errors', pageErrors.length === 0, pageErrors.join(' | '));
+  return { path: PROVIDER_VIEW_PATH, captures, views };
+}
+
 function buildSafetyDeclaration(fixture) {
   const declaration = JSON.parse(JSON.stringify(fixture));
   declaration.path = '/circuit/safety-probe';
@@ -495,6 +595,7 @@ export async function captureDeclaredHome({ browser, origin, outDir, signedInCon
     signedIn: null,
     secondPage: null,
     specimens: null,
+    providerViews: null,
     domSafety: null,
     checks
   };
@@ -518,6 +619,10 @@ export async function captureDeclaredHome({ browser, origin, outDir, signedInCon
       publishedSpecimens.length
         ? `${receipt.specimens.captures.length} captures over ${publishedSpecimens.length}/${SPECIMEN_PAGES.length} published specimen pages`
         : `all ${SPECIMEN_PAGES.length} specimen pages recorded pending on this host`);
+    receipt.providerViews = await captureProviderViews({ context: signedOutContext, origin, outDir, check });
+    receipt.captures.push(...receipt.providerViews.captures);
+    check('provider-views-captured', receipt.providerViews.captures.length === PROVIDER_SUBJECTS.length,
+      `${receipt.providerViews.captures.length}/${PROVIDER_SUBJECTS.length} declared provider views captured`);
   } finally {
     await signedOutContext.close();
   }

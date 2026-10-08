@@ -10,11 +10,14 @@ import { targetLink, relatedLinks, renderDetail, authorityTree } from './navigat
 import { buildTraversal, traversalState, LiveMotion } from './traversal.js';
 import { createObservePanel } from './observe-panel.js';
 import { createRunContext } from './run-context.js';
-import { renderProviderProfile } from './provider-profile.js';
+import { createViewRuntime, readView } from './view-runtime.js';
 
 const $ = id => document.getElementById(id);
 const json = async (url, signal) => { const response = await fetch(url, { signal }); const body = await response.json(); if (!response.ok) throw new Error(body.error ?? `Read failed (${response.status})`); return body; };
 const paragraph = (text, className = '') => el('p', { text, class: className });
+// A failed declared view is a named, visible state: the refusal code stays on
+// the node, and nothing renders in its place.
+const namedRefusal = (code, text) => { const node = paragraph(text, 'warning'); node.dataset.refusal = code; return node; };
 const details = (title, value) => el('details', {}, [el('summary', { text: title }), el('pre', { text: JSON.stringify(value, null, 2) })]);
 const glyphsOf = slide => [...(slide.blueprint?.glyphs ?? []), ...(slide.blueprint?.boundaryGlyphs ?? [])];
 // Linear is the default. A deliberately saved Paged preference still applies;
@@ -88,16 +91,31 @@ export function createCircuitRuntime(shell) {
       shell.location(false); render();
       renderDetail($('declaration-detail'), deck, response.detail, selectTarget);
       if (response.detail.kind === 'provider' && response.detail.status === 'DECLARED') {
-        const inspection = el('section', { 'aria-label': 'Provider database inspection' }, [paragraph('Loading provider data…', 'muted')]);
+        // The declared ui-view.v1 profile is the only provider drill-down host.
+        // A view that is absent, unreadable or invalid renders as a named,
+        // visible state; there is no bespoke fallback renderer.
+        const inspection = el('section', { 'aria-label': 'Provider database inspection' }, [paragraph('Loading the declared provider view…', 'muted')]);
         $('declaration-detail').append(inspection);
-        try {
-          const data = await json(`/api/circuit/v1/provider-inspection?${query}`, detailRequest.signal);
-          if (serial !== detailSerial || deck !== state.deck) return;
-          inspection.replaceChildren(el('h3', { text: 'Provider database inspection' }),
-            paragraph(`${data.resultSets.length} result sets · Database read ${data.readAt} · ${data.reader ?? 'declared reader'}`, 'muted'),
-            ...renderProviderProfile(data));
-        } catch (error) {
-          if (serial === detailSerial && error.name !== 'AbortError') inspection.replaceChildren(paragraph(`Provider data unavailable: ${error.message}.`, 'warning'));
+        const viewSelection = { capabilityId: deck.capabilityId, namespaceId: deck.namespaceId, scenarioId: deck.scenarioId,
+          detailId: id, expectedSnapshotDigest: deck.snapshotDigest };
+        let declared;
+        try { declared = await readView({ viewId: 'provider-profile', selection: viewSelection }); }
+        catch (error) { declared = { ok: false, status: 0, body: null, error: error?.message ?? String(error) }; }
+        if (serial !== detailSerial || deck !== state.deck) return;
+        if (declared.ok && declared.body?.status === 'READ' && Array.isArray(declared.body?.sections)) {
+          try {
+            const runtime = await createViewRuntime({ root: inspection, document: declared.body, selection: viewSelection });
+            await runtime.render();
+          }
+          catch (error) {
+            const code = 'PROVIDER_VIEW_RENDER_FAILED';
+            inspection.replaceChildren(namedRefusal(code, `The declared provider view could not render: ${error.message}.`));
+          }
+        } else {
+          const code = typeof declared.body?.error === 'string' && declared.body.error
+            ? declared.body.error
+            : declared.status ? `PROVIDER_VIEW_HTTP_${declared.status}` : 'PROVIDER_VIEW_UNREADABLE';
+          inspection.replaceChildren(namedRefusal(code, `The declared provider view is not published for this selection (${code}).`));
         }
       }
     } catch (error) {

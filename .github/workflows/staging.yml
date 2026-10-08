@@ -38,6 +38,7 @@ jobs:
       - run: node live-circuit/circuit/verify-run-api.mjs
       - run: node live-circuit/circuit/verify-objective.mjs
       - run: node live-circuit/circuit/verify-provider-profile.mjs
+      - run: node live-circuit/circuit/verify-view.mjs
       - run: node live-circuit/circuit/verify-pages.mjs --fixtures
       - run: node live-circuit/circuit/verify-components.mjs
       - run: node live-circuit/circuit/verify-claims.mjs --fixtures

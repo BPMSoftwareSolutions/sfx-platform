@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="same-origin">
+<title>Provider view · SFX Live Circuit Platform</title>
+<link rel="icon" href="/circuit/assets/sfx-emblem.png">
+<link rel="stylesheet" href="/circuit/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/circuit/home" aria-label="SFX Live Circuit Platform home"><img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX"><span class="divider"></span><span class="label">Live Circuit Platform</span></a>
+    <nav class="site-nav" aria-label="Site"></nav>
+    <div class="site-actions"><span class="env" id="env" hidden></span><span id="identity"></span></div>
+  </div>
+</header>
+
+<main id="view-root"></main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="/circuit/assets/sfx-logo-wordmark.png" alt="SFX">
+    <span class="credit">SideFX / a BPM Intelligence product</span>
+    <nav class="links" aria-label="Footer"><a href="/circuit/explorer">Live Circuit</a></nav>
+    <span class="release" id="release"></span>
+  </div>
+</footer>
+<script type="module">
+// The standalone declared-view host: /circuit/view?viewId=…&provider=…&capability=…
+// reads the ui-view.v1 declaration through the page reader and projects it with
+// the same runtime and adapters as a declared page. The Explorer drill-down
+// mounts the same view runtime inline.
+import { createViewRuntime, readView, viewSelection } from '/circuit/view-runtime.js';
+
+const root = document.getElementById('view-root');
+let serial = 0;
+function notice(code, detail) {
+  const node = document.createElement('p');
+  node.className = 'panel';
+  if (code) node.dataset.refusal = code;
+  node.textContent = detail;
+  return node;
+}
+async function load() {
+  const current = ++serial;
+  const selection = viewSelection();
+  const view = await readView({ viewId: selection.viewId, selection });
+  if (current !== serial) return;
+  if (!view.ok || view.body?.status !== 'READ' || !Array.isArray(view.body?.sections)) {
+    const code = typeof view.body?.error === 'string' ? view.body.error : 'VIEW_NOT_FOUND';
+    root.replaceChildren(notice(code, `The declared view ${selection.viewId} is not published (${code}).`));
+    return;
+  }
+  const runtime = await createViewRuntime({ root, document: view.body, selection });
+  await runtime.render();
+}
+window.addEventListener('popstate', () => { void load(); });
+await load();
+</script>
+</body>
+</html>

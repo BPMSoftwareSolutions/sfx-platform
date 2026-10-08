@@ -32,11 +32,13 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/page.js', ['page.js', 'text/javascript; charset=utf-8']],
   ['/circuit/page-runtime.js', ['page-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/ui-components.js', ['ui-components.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/view', ['view.html', 'text/html; charset=utf-8']],
+  ['/circuit/view.html', ['view.html', 'text/html; charset=utf-8']],
+  ['/circuit/view-runtime.js', ['view-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-runtime.js', ['circuit-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer-model.mjs', ['explorer-model.mjs', 'text/javascript; charset=utf-8']],
   ['/circuit/pane-layout.js', ['pane-layout.js', 'text/javascript; charset=utf-8']],
   ['/circuit/objective-run.js', ['objective-run.js', 'text/javascript; charset=utf-8']],
-  ['/circuit/provider-profile.js', ['provider-profile.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-canvas.css', ['circuit-canvas.css', 'text/css; charset=utf-8']],
   ['/circuit/site.js', ['site.js', 'text/javascript; charset=utf-8']],
   ['/circuit/site.css', ['site.css', 'text/css; charset=utf-8']],
@@ -51,7 +53,8 @@ const CIRCUIT_FILES = new Map([
 // entries always win; these slugs stay reserved so a declaration can never
 // shadow login, the Explorer, a deck route or a client module.
 const reservedCircuitSlugs = new Set(['login', 'home', 'explorer', 'deck', 'decks', 'deck-slide',
-  'assets', 'page.html', 'page.js', 'page-runtime.js', 'ui-components.js']);
+  'assets', 'page.html', 'page.js', 'page-runtime.js', 'ui-components.js',
+  'view', 'view.html', 'view-runtime.js']);
 // Home and sign-in page configuration is host data (circuit-host.json); the
 // environment label comes from the host's indexing setting or an explicit label.
 const hostPolicy = JSON.parse(await readFile(new URL('circuit-host.json', CIRCUIT_DIR), 'utf8'));
