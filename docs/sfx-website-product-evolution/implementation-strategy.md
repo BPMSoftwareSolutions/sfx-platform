@@ -1,12 +1,14 @@
 # Declarative UI circuits: implementation strategy
 
-Prepared 2026-10-07. Status: **draft, not started.** Revision 3.
+Prepared 2026-10-07. Status: **draft, not started.** Revision 4.
 **Revision 1 (2026-10-07): first strategy revision; consolidates `intent.md`, `research-brief.md`
 and the five lane analyses in [`analysis/`](analysis/) into one implementation-grade plan.**
 **Revision 2 (2026-10-07): applies every correction C1–C19 from the adversarial review
 ([`analysis/06-review.md`](analysis/06-review.md)); see the revision history at the end.**
 **Revision 3 (2026-10-07): applies the user review corrections C20–C27 and records the decisions
 (G1/G4/G6, gates G8/G9) from [`review.md`](review.md); see the revision history at the end.**
+**Revision 4 (2026-10-08): withdraws the G2 SDA change request as premature; its scope is derived
+from blueprint evidence, not prespecified. See §7.5, G2 and the revision history at the end.**
 
 **How this strategy relates.** [`intent.md`](intent.md) repositions the website around one argument
 — intelligence may propose, capabilities authorize, effects are evidenced — and proposes a
@@ -781,17 +783,16 @@ mechanics.
 
 ### 7.5 SDA decision gate
 
-The north star requires, as one request to `scenario-driven-architecture` (gate G2):
-
-1. a `browser-runtime` binding target (today: `node`, `python`, `csharp` only —
-   `bind-slot-provider.sql:10,30`);
-2. `ui-embodiment-plan.v1` admitted as a provider protocol (`ui-embodiment-plan-v1.mjs:26-146`);
-3. multi-child `invoke-scenario` composition semantics (page → layout → sections) with ordering,
-   partial failure and outcome composition rules;
-4. page-view testimony semantics if page views are ever to produce evidence (D8 says not in v1).
-
-Recommendation: do not file until Phase 1 exit evidence exists; file with the v1 declaration
-schema and page documents as the concrete input so the request is grounded.
+**Superseding note (Revision 4, 2026-10-08).** The G2 request is **not filed**. Its scope must be
+derived from blueprint evidence rather than prespecified, and the four prescriptive asks
+previously listed here — a `browser-runtime` binding target (today: `node`, `python`, `csharp`
+only — `bind-slot-provider.sql:10,30`), `ui-embodiment-plan.v1` admission
+(`ui-embodiment-plan-v1.mjs:26-146`), multi-child `invoke-scenario` composition (page → layout →
+sections) and page-view testimony — are **withdrawn as a package**. The default is no SDA change:
+the provider decoupling and the four-section landing blueprint rely only on existing
+estate-provider/read machinery (`ui-circuit-blueprint-strategy.md` §7). A kernel ask may only be
+derived later from a failing, captured design artifact (prove-then-request); no filing trigger is
+pending.
 
 ### 7.6 Providers home
 
@@ -1021,7 +1022,7 @@ before Phase 2 claim-bearing waves; G2 only after Phase 1.
 | Gate | Decision | Recommendation | Owner |
 | --- | --- | --- | --- |
 | G1 | Accept the v1 declaration family + `read-ui-page` reader (D1) rather than full page-as-capability now | **ACCEPTED (Revision 3)** — declared page data → `read-ui-page` → trusted shell projection; full page-as-executed-capability stays with G2 | PO |
-| G2 | File the SDA change request: browser binding target, `ui-embodiment-plan.v1` provider, multi-child composition, page-view testimony | Do not file until Phase 1 exit; then file with the v1 schema as input | PO + SDA |
+| G2 | File the SDA change request: browser binding target, `ui-embodiment-plan.v1` provider, multi-child composition, page-view testimony | **SUPERSEDED (Revision 4)** — request not filed; the four prescriptive asks are withdrawn as a package and its scope must be derived from blueprint evidence (prove then request; §7.5) | PO + SDA |
 | G3 | Route/IA: keep `/circuit/<slug>` or add a gateway prefix rule for top-level story paths | Keep `/circuit/` in v1; decide before production SEO | PO |
 | G4 | Content publication ownership and tool: estate workflow + SQL mechanics now vs runtime CMS later (blocked on per-user authority) | **ACCEPTED (Revision 3) subject to C20** (publisher `publish-ui-page` orchestrates; SQL procedures own bounded durable mechanics) and **C23** (CAS pointer law); CMS deferred | PO |
 | G5 | Media serving and storage: observer route + digest-addressed persistent volume vs object store vs SQL | v1 uses allowlisted assets only; build the media serving route and choose storage before new media (C5) | Team |
@@ -1179,3 +1180,15 @@ are recorded; G9 is a Phase 2 gate and does not block Phase 0. **Phase 0 content
 carry the settled propositions (Zero Implicit Authority, Sovereignty at Scale, Semantic Flight
 Recording, Evidence by Design, Independent Evaluation, Enterprise/Government) as content
 authority, not page-runtime semantics (§10 Phase 0, P0.6).
+
+**Revision 4 (2026-10-08) — the G2 SDA request is withdrawn as premature.**
+
+- The request is **not filed**; its scope must be derived from blueprint evidence, never
+  prespecified. The four prescriptive asks (browser binding target, `ui-embodiment-plan.v1`
+  provider, multi-child composition, page-view testimony) are **withdrawn as a package** (§7.5,
+  G2).
+- Why: the amendment replaces premature solutioning — including a past kernel-necessity claim
+  that evidence did not support — with the prove-then-request rule: a kernel ask may only be
+  derived later from a failing, captured design artifact. The provider decoupling and the
+  four-section landing blueprint rely only on existing estate-provider/read machinery
+  (`ui-circuit-blueprint-strategy.md` §7).

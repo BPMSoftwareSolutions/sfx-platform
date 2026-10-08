@@ -1,7 +1,7 @@
 # UI circuit blueprint strategy — the deterministic UI circuit design process
 
 Prepared 2026-10-08. Status: **strategy documented, not started.** Revision 1.
-Companion to [`implementation-strategy.md`](implementation-strategy.md) Revision 3; evidence base
+Companion to [`implementation-strategy.md`](implementation-strategy.md) Revision 4; evidence base
 [`analysis/12-ui-runtime-providers.md`](analysis/12-ui-runtime-providers.md) and
 [`analysis/13a-explorer-runtime.md`](analysis/13a-explorer-runtime.md), with code spot-checks from
 [`analysis/13b-shell-pages.md`](analysis/13b-shell-pages.md) and
@@ -219,16 +219,22 @@ progress is countable, not asserted.
    uncompared registry copies (`analysis/13b:339-369`) — each is a finding against this process,
    closed only by class (a)/(b) deploys, never by tolerating a second authority.
 
-## 7. Open gates and what can proceed before them
+## 7. Open gates: default no SDA change, ask only from evidence
 
-**G2 (browser binding)** is the SDA change request: a `browser-runtime` binding target (today
-`node`/`python`/`csharp` only), `ui-embodiment-plan.v1` admitted as a provider protocol,
-multi-child `invoke-scenario` composition (page → layout → sections), and page-view testimony if
-page views are ever evidence (`implementation-strategy.md:782-794,1024`;
-`analysis/12:107-120`). Do not file before Phase 1 exit evidence; file with the v1 declaration
-schema as the concrete input (`implementation-strategy.md:793-794`; `analysis/12:119-120`).
+**The default is no SDA change.** The provider decoupling (§4–§5) and the four-section landing
+blueprint (§2) rely only on existing estate-provider/read machinery — declared providers with
+`bindingState: UNBOUND` readiness, the `provider-inspection` reader and the existing read path
+(`analysis/03:121-126,155-164`; `implementation-strategy.md:737-742`). No kernel change is
+requested now.
 
-What can proceed before G2, through the existing circuit/read path:
+**Prove then request.** A kernel ask may only be derived later from a failing, captured design
+artifact: a blueprint attempt that the existing machinery refuses, evidenced by the capture, is
+the only admissible basis for a request. The earlier four-point ask — a `browser-runtime` binding
+target (today `node`/`python`/`csharp` only), `ui-embodiment-plan.v1` admission, multi-child
+`invoke-scenario` composition (page → layout → sections) and page-view testimony
+(`implementation-strategy.md:782-794,1024`; `analysis/12:107-120`) — is **withdrawn as premature**.
+
+What can proceed now, through the existing circuit/read path:
 
 - **Blueprint declaration and conformance:** page/layout/section definitions, contracts and
   instances are class (c) estate data served by the declared reader
@@ -244,9 +250,11 @@ What can proceed before G2, through the existing circuit/read path:
   evidence panels bind to existing readers today; the audited Expressibility verdict is the
   per-module checklist (`analysis/13a:379-401`).
 
-What waits for G2: browser-executed provider realisation (DOM renderers/adapters/action dispatch
-moving behind the provider boundary), multi-child composition, provider binding conformance, and
-token publication as data (`analysis/12:107-120,138-155`).
+**Derived later, if ever:** a kernel ask grounded in a captured failing blueprint artifact per the
+prove-then-request rule. On current evidence nothing else is requested — browser-executed provider
+realisation (DOM renderers/adapters/action dispatch moving behind the provider boundary),
+multi-child composition, provider binding conformance and token publication as data are not an
+open gate waiting to be filed (`analysis/12:107-120,138-155`).
 
 ## 8. Status
 
