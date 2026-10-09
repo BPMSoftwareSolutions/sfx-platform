@@ -66,5 +66,6 @@ export async function signOut() {
 }
 
 export function footerRelease(node, health) {
+  if (!node) return;
   node.textContent = health ? `${health.release}` : 'Release not reported by this host';
 }

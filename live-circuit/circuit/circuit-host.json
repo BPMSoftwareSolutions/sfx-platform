@@ -3,7 +3,7 @@
   "delivery": "database-memory",
   "api": { "defaultNamespace": "sidefx:capabilities", "timeoutMilliseconds": 630000, "maximumBodyBytes": 1048576 },
   "identity": { "observeRequiresSession": true, "circuit": { "capabilityId": "authenticate-ide-user", "namespaceId": "sidefx:capabilities", "page": "scenario-1", "label": "Sign-in circuit" }, "cookie": "__Host-sfx-session", "timeoutMilliseconds": 130000, "maximumBodyBytes": 4096, "maximumSessionLabels": 1000, "maximumAttributedRuns": 2000 },
-  "home": {"hero": {"capabilityId": "authenticate-ide-user", "namespaceId": "sidefx:capabilities", "page": "scenario-1", "label": "Sign-in circuit"}, "copyBasis": "Hero circuit and sign-in pointer remain host route data for the Explorer's no-query default selection and environment label (C1). The featured-capability list is declared authority: it lives in the home page declaration as a card-list bound to the catalog, not in this file."},
+  "home": {"hero": {"capabilityId": "ui-page-landing", "namespaceId": "sidefx:capabilities", "page": "scenario-1", "label": "Circuit Explorer landing"}, "copyBasis": "The landing circuit and sign-in pointer remain host route data for the Explorer's no-query default selection and environment label (C1). The featured-capability list is declared authority: it lives in the home page declaration as a card-list bound to the catalog, not in this file."},
   "timeoutMilliseconds": 30000,
   "maximumResponseBytes": 16777216,
   "maximumConcurrentReads": 2,

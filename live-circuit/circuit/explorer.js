@@ -2,12 +2,15 @@
 // the capability details document's declared navigation (explorer-model.mjs).
 // The circuit, its live and replay overlay, run controls, component drill-down
 // and Observe are the circuit runtime (circuit-runtime.js) mounted in this page.
-import { $, json, session, signOut, release } from './site.js';
+import { $, json, session, signOut, release, footerRelease } from './site.js';
 import { el } from './circuit-viewer.js';
 import { createCircuitRuntime } from './circuit-runtime.js';
 import { workspace, nodeStatus, nodeRows, sceneKey, selectionForScene, rowLabel } from './explorer-model.mjs';
 import { createPaneLayout } from './pane-layout.js';
 import { createObjectiveRun, admissionBody, OBJECTIVE_CAPABILITY } from './objective-run.js';
+import { createRegionRuntime, HEADER_REGION_ID, FOOTER_REGION_ID } from './region-runtime.js';
+import { headerSlots, leftSidebarSlots, middleSlots, rightSidebarSlots } from './explorer-shell.js';
+import { mountFooter } from './footer.js';
 
 const params = new URLSearchParams(location.search);
 const requestedFrom = p => ({ page: p.get('page'), detail: p.get('detail'), pointer: p.get('pointer') ?? '', detailPage: p.get('detailPage'), view: p.get('view'), run: p.get('run') });
@@ -23,14 +26,46 @@ const fields = entries => el('dl', { class: 'fields' }, entries.flatMap(([k, v])
 const notice = (text, kind = '') => el('div', { class: `notice ${kind}`, text });
 const action = (text, run) => { const link = el('a', { href: '#', text }); link.addEventListener('click', event => { event.preventDefault(); run(); }); return link; };
 
-const runtime = createCircuitRuntime({
+// The declared shell regions. Each region is mounted through the host's
+// ui.region.load before the runtime binds to the ids its slots carry: the
+// region supplies the structure and style, the shell supplies the behavior
+// nodes (headerSlots / leftSidebarSlots / middleSlots / rightSidebarSlots).
+// The shared footer mounts last. There is no fallback: a region that cannot be
+// read renders its named state in place of that region only.
+const leftRegion = await createRegionRuntime({ root: $('tree'), regionId: 'left-sidebar', slots: leftSidebarSlots() });
+const middleRegion = await createRegionRuntime({ root: $('region-middle'), regionId: 'middle', slots: middleSlots() });
+const rightRegion = await createRegionRuntime({ root: $('context'), regionId: 'right-sidebar', slots: rightSidebarSlots() });
+const headerRegion = await createRegionRuntime({ root: $('region-header'), regionId: HEADER_REGION_ID, slots: headerSlots() });
+// The context tabs toggle the declared slot hosts in place of the old
+// tabpanels; the run/runs/evidence groups stay with their tab.
+for (const [name, panel, hidden] of [['run-report', 'run', false], ['run-steps', 'run', false], ['observe-form', 'run', false],
+  ['runs-history', 'runs', true], ['component-evidence', 'evidence', true], ['selection-details', 'evidence', true], ['declared-authority', 'evidence', true]]) {
+  const host = rightRegion.slot?.(name);
+  if (!host) continue;
+  host.dataset.contextPanel = panel; host.hidden = hidden;
+}
+rightRegion.slot?.('run-report')?.setAttribute('id', 'context-run');
+rightRegion.slot?.('runs-history')?.setAttribute('id', 'context-runs');
+rightRegion.slot?.('component-evidence')?.setAttribute('id', 'context-evidence');
+const footerRegion = await mountFooter();
+
+const runtimeShell = {
   selection: () => ({ capabilityId: state.capability, namespaceId: state.namespace }),
   loadRoot: async () => { Object.assign(state, { scenario: '', row: null, component: null }); syncUrl(false); await readScene(false, {}); },
   scenario: id => changeScenario(id),
   location: push => syncUrl(push),
   component: id => selectComponent(id),
   authenticationRequired: () => identity().catch(() => {})
-});
+};
+// When the middle region rendered its named failure state there is no canvas to
+// drive: the runtime is a named no-op so the other declared regions keep
+// rendering and no path reaches a missing element.
+const runtime = $('circuit-frame') && $('slide') ? createCircuitRuntime(runtimeShell) : {
+  state: { deck: null, apiId: null, apiResult: null, output: undefined, outputError: null },
+  install: async () => {}, clear: () => {}, render: () => {}, selectSlide: () => {}, openDetail: () => {},
+  closeDetail: () => {}, focus: () => {}, hasComponent: () => false, slideOf: () => null, setView: () => {},
+  reset: () => {}, openRun: async () => {}, contextTab: () => {}, selection: () => ({})
+};
 const deck = () => runtime.state.deck;
 
 function syncUrl(push = false) {
@@ -111,17 +146,19 @@ function render() {
   renderHeader(); renderTree(); renderTabs(); renderSection(); renderContext(); renderStatus();
 }
 function renderHeader() {
+  const crumbs = $('crumbs'), title = $('title'), meta = $('meta'), bar = $('scenario-bar');
+  if (!crumbs || !title || !meta || !bar) return;
   const node = currentNode(), coordinate = node && state.ws.coordinates.find(c => c.id === (node.coordinate ?? node.node.split('.')[0]));
-  $('crumbs').textContent = ['Capabilities', coordinate?.label, node?.label].filter(Boolean).join(' › ');
-  $('title').textContent = state.capability || 'Capability Explorer';
+  crumbs.textContent = ['Capabilities', coordinate?.label, node?.label].filter(Boolean).join(' › ');
+  title.textContent = state.capability || 'Capability Explorer';
   document.title = `${state.capability ? state.capability + ' · ' : ''}Capability Explorer · SFX`;
   const d = state.document, lead = state.ws?.nodes.get(state.ws.aliases[0]?.target);
-  $('meta').replaceChildren(...[d?.namespaceId, d?.capabilityVersionPk != null && `version ${d.capabilityVersionPk}`,
+  meta.replaceChildren(...[d?.namespaceId, d?.capabilityVersionPk != null && `version ${d.capabilityVersionPk}`,
     lead?.value != null && `${lead.label}: ${words(lead.value).toUpperCase()}`,
     state.ws && `${state.ws.scenarios.length} scenario${state.ws.scenarios.length === 1 ? '' : 's'}`,
     state.ws?.policy && `navigation ${state.ws.policy.label} · ${words(state.ws.policy.state)}`].filter(Boolean).map(text => el('span', { text })));
-  for (const id of ['refresh', 'expand']) $(id).disabled = !state.capability;
-  const bar = $('scenario-bar'), scenarios = state.ws?.scenarios ?? [];
+  for (const id of ['refresh', 'expand']) { const button = $(id); if (button) button.disabled = !state.capability; }
+  const scenarios = state.ws?.scenarios ?? [];
   bar.hidden = scenarios.length < 2 && !(state.scenario && !scenario());
   if (!bar.hidden) {
     const current = scenario(), names = new Map((deck()?.scenarios ?? []).map(s => [s.id, s.name]));
@@ -148,8 +185,12 @@ function more(label, nodes) {
   box.open = nodes.some(n => n.node === currentNode()?.node);
   return box;
 }
+// Sections, groups and nodes are one interleaved tree (each coordinate heads
+// its own groups and nodes), so the whole tree renders into the node-navigation
+// host; the section/group/count/state/badge hosts stay as declared slots.
 function renderTree() {
   const host = $('tree-nodes');
+  if (!host) return;
   if (!state.capability) return host.replaceChildren(el('p', { class: 'note', text: 'Find a capability to explore its declared sections.' }));
   if (state.detailsError) return host.replaceChildren(el('div', { class: 'notice error' }, [el('strong', { text: 'Reading failed' }),
     el('p', { text: `The estate could not read this capability (${state.detailsError}). No sections are shown in its place.` })]));
@@ -166,8 +207,10 @@ function renderTree() {
   host.replaceChildren(...items);
 }
 function renderTabs() {
+  const host = $('tabs');
+  if (!host) return;
   const node = currentNode();
-  $('tabs').replaceChildren(...(state.ws?.aliases ?? []).map(a => {
+  host.replaceChildren(...(state.ws?.aliases ?? []).map(a => {
     const tab = el('button', { type: 'button', role: 'tab', class: 'tab', 'aria-selected': String(node?.alias === a.alias) }, [
       el('span', { text: a.label }),
       ...(a.refuse ? [el('span', { class: 'badge refuse', text: String(a.refuse) })] : []),
@@ -178,6 +221,7 @@ function renderTabs() {
 }
 function renderSection() {
   const host = $('section'), node = currentNode();
+  if (!host) return;
   if (!state.capability) return host.replaceChildren();
   if (state.detailsError) return host.replaceChildren(el('div', { class: 'notice error' }, [el('strong', { text: `Reading failed · ${state.detailsError}` }),
     el('p', { text: 'The capability details reading failed in the estate. The circuit above is read separately; Observe and replay remain available.' })]));
@@ -220,6 +264,7 @@ function rowsView(node, rows, columns) {
 }
 function renderContext() {
   const host = $('context-body'), node = currentNode();
+  if (!host) return;
   if (!node) return host.replaceChildren(el('p', { class: 'note', text: state.component ? '' : 'Select a section, a row or a circuit component.' }));
   const { rows } = state.document ? nodeRows(state.document, node, scenario()) : { rows: [] };
   const row = state.row != null ? rows[state.row] : null;
@@ -249,13 +294,15 @@ function renderStatus() {
   else if (state.capability) parts.push(el('span', { text: 'Reading capability details…' }));
   if (deck()) parts.push(el('span', { text: `Circuit: database scene ${deck().snapshotDigest?.slice(0, 12) ?? ''} · read ${deck().readAt ? new Date(deck().readAt).toLocaleTimeString() : 'time not reported'}` }));
   else if (state.sceneError) parts.push(el('span', { class: 'error', text: `Circuit: ${state.sceneError}` }));
-  $('status').replaceChildren(...(parts.length ? parts : [el('span', { text: 'Ready to read a capability.' })]));
+  const status = $('status');
+  if (status) status.replaceChildren(...(parts.length ? parts : [el('span', { text: 'Ready to read a capability.' })]));
 }
-function closeDrawers() { for (const id of ['tree', 'context']) $(id).classList.remove('open'); layout.sync(); }
+function closeDrawers() { for (const id of ['tree', 'context']) $(id)?.classList.remove('open'); layout.sync(); }
 
 // Identity, catalog and controls.
-async function identity() {
-  const s = (await session()).body, node = $('identity');
+async function identity(node) {
+  if (!node) return;
+  const s = (await session()).body;
   if (s?.authenticated) {
     const out = el('button', { type: 'button', class: 'button secondary small', text: 'Sign out' });
     out.addEventListener('click', async () => { out.disabled = true; await signOut(); location.reload(); });
@@ -266,7 +313,8 @@ async function identity() {
     node.replaceChildren(...parts);
   }
 }
-$('picker').addEventListener('submit', event => {
+const picker = $('picker');
+if (picker) picker.addEventListener('submit', event => {
   event.preventDefault();
   const id = $('capability').value.trim(), item = state.catalog.find(c => c.capabilityId === id);
   if (!id) return;
@@ -274,34 +322,34 @@ $('picker').addEventListener('submit', event => {
   Object.assign(state, { capability: id, namespace: item?.namespaceId ?? '', scenario: '', node: '', row: null, component: null });
   syncUrl(true); open();
 });
-$('scenario').addEventListener('change', event => changeScenario(event.target.value));
-$('refresh').addEventListener('click', () => open(true, runtime.selection()));
-$('expand').addEventListener('click', () => {
+$('scenario')?.addEventListener('change', event => changeScenario(event.target.value));
+$('refresh')?.addEventListener('click', () => open(true, runtime.selection()));
+$('expand')?.addEventListener('click', () => {
   const expanded = $('workspace').classList.toggle('expanded');
   $('expand').textContent = expanded ? 'Show workspace' : 'Expand circuit';
 });
 // Both sidebars drag-resize and collapse on desktop; the same buttons open the
 // narrow-window drawers. Widths and collapsed state persist per browser.
-const layout = createPaneLayout({
+const layout = $('resizer-tree') && $('resizer-context') && $('toggle-tree') && $('toggle-context') ? createPaneLayout({
   workspace: $('workspace'),
   panes: [
     { id: 'tree', variable: '--tree', side: 'left', handle: 'resizer-tree', aside: 'tree', toggle: 'toggle-tree', name: 'sections', minimum: 220, maximum: 640, defaultWidth: 300 },
     { id: 'context', variable: '--context', side: 'right', handle: 'resizer-context', aside: 'context', toggle: 'toggle-context', name: 'details', minimum: 300, maximum: 760, defaultWidth: 380 }
   ]
-});
+}) : { sync() {}, resize() {}, toggle() {} };
 // The universal capability's objective row, above the run bar. Run admits it,
 // then the Explorer switches to that circuit and follows the run.
 async function followObjectiveRun(runId) {
   if (state.capability !== OBJECTIVE_CAPABILITY) {
     Object.assign(state, { capability: OBJECTIVE_CAPABILITY, namespace: '', scenario: '', node: '', row: null, component: null });
-    $('capability').value = state.capability;
+    const input = $('capability'); if (input) input.value = state.capability;
     syncUrl(true);
     await open(false, { run: runId });
   } else {
     await runtime.openRun(runId);
   }
 }
-createObjectiveRun({
+if ($('objective-form')) createObjectiveRun({
   admit: objective => json('/api/circuit/v1/runs', { method: 'POST',
     headers: { 'idempotency-key': crypto.randomUUID() }, body: JSON.stringify(admissionBody(objective)) }),
   follow: followObjectiveRun,
@@ -313,7 +361,7 @@ window.addEventListener('popstate', () => {
   const p = new URLSearchParams(location.search), previous = { ...state }, requested = requestedFrom(p);
   Object.assign(state, { capability: p.get('capability') ?? '', namespace: p.get('namespace') ?? '', scenario: p.get('scenario') ?? '',
     node: p.get('node') ?? '', row: p.has('row') ? Number(p.get('row')) : null, component: null });
-  $('capability').value = state.capability;
+  const input = $('capability'); if (input) input.value = state.capability;
   if (state.capability !== previous.capability || state.namespace !== previous.namespace) { runtime.reset(); open(false, requested); return; }
   if (state.scenario !== previous.scenario) { render(); readScene(false, requested); return; }
   const circuit = runtime.selection();
@@ -329,14 +377,20 @@ window.addEventListener('popstate', () => {
   render();
 });
 
-const [catalog, host, health] = await Promise.all([json('/api/circuit/v1/capabilities'), json('/api/circuit/v1/home'), release(), identity()]);
+// The declared ui-region-header mount moved above the runtime, together with
+// the three Explorer regions; see explorer-shell.js for the shell slot content.
+
+const [catalog, host, health] = await Promise.all([json('/api/circuit/v1/capabilities'), json('/api/circuit/v1/home'), release(), identity($('identity'))]);
 state.health = health;
+footerRelease($('release'), health);
 if (catalog.ok) {
   state.catalog = catalog.body.capabilities ?? [];
-  $('capabilities').replaceChildren(...state.catalog.map(c => new Option(c.namespaceId, c.capabilityId)));
+  $('capabilities')?.replaceChildren(...state.catalog.map(c => new Option(c.namespaceId, c.capabilityId)));
 }
-if (host.ok && host.body?.environment) { $('env').textContent = host.body.environment; $('env').hidden = false; }
+const env = $('env');
+if (env && host.ok && host.body?.environment) { env.textContent = host.body.environment; env.hidden = false; }
 if (!state.capability && host.ok && host.body?.hero?.capabilityId)
   Object.assign(state, { capability: host.body.hero.capabilityId, namespace: host.body.hero.namespaceId ?? '' });
-$('capability').value = state.capability;
+const capabilityInput = $('capability');
+if (capabilityInput) capabilityInput.value = state.capability;
 open(false, requestedFrom(params));

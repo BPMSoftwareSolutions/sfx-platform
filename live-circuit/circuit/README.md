@@ -112,6 +112,44 @@ failed reading is shown as a failure, never as empty sections.
 `verify-explorer.mjs` checks a running host, including that the client names no
 result set.
 
+## Declared region mounts (four Explorer regions and the shared footer)
+
+The Explorer's header, left sidebar, middle and right sidebar are declared
+regions mounted in the shell; the hand-authored `.site-header`, `<aside>`,
+`<section id="main">` and context chrome are gone, and the page body carries
+only the region mounts. The shared footer (`#region-footer`) is mounted the same
+way on the Explorer, home, sign-in and every declared page; the hand-authored
+`.site-footer` is gone. Each mount loads a `ui-region-content.v1` candidate
+through its declared provider's `ui.region.load` contract:
+
+- `GET /api/circuit/v1/region?contractId=ui-region-request.v1&regionId=<id>`
+  with `header`, `left-sidebar`, `middle`, `right-sidebar` (provider package
+  `ui-explorer-region`) or `footer` (provider package `ui-shell-footer`). The
+  host maps each region to its declared package under the explicit local setting
+  `SFX_UI_PROVIDER_DIR` (providers root, each package in its own directory; a
+  flat package directory still resolves its own regions) and runs the
+  READ_ONLY operation; the browser never imports provider code. Without the
+  setting, or when no module declares `ui.region.load`, the route answers
+  `UI_REGION_PROVIDER_UNREADABLE`.
+- The runtime validates the candidate shape, re-checks every per-asset and
+  whole-candidate sha256 digest, refuses unsafe CSS/HTML/SVG constructs, and
+  fills the declared slots with the shell's own behavior (brand/nav/identity for
+  the header; search, level navigation, counts/states/badges for the left
+  sidebar; header, scenario bar, objective, run bar, canvas, timeline, evidence,
+  section and status bar for the middle; tabs, report, steps, observe, runs,
+  evidence, details and authority for the right sidebar; brand, credit, links
+  and release for the footer). The region supplies declared CSS/HTML/SVG content
+  only; the shell keeps the projector, validator, routing and safety seams.
+- There is no fallback: any refusal renders its named state
+  (`data-region-failure`) in place of that region, never the old chrome.
+
+`verify-region.mjs` proves the source, host, candidates, digests and refusals
+for all five regions (the provider checks run when the packages are present).
+The real-browser click-path capture is
+`tools/live-circuit/verify-regions-browser.mjs`, writing
+`artifacts/regions-local/` with per-region and per-page screenshots and
+blueprint-diff notes.
+
 ## Provider database inspection
 
 Open a declared provider through a circuit label or **Explore component**.

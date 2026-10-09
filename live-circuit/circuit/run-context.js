@@ -28,9 +28,13 @@ export function createRunContext(hooks) {
     for (const b of tabs) {
       const selected = b.dataset.contextTab === name;
       b.setAttribute('aria-selected', String(selected)); b.tabIndex = selected ? 0 : -1;
-      $(b.getAttribute('aria-controls')).hidden = !selected;
+      const panel = $(b.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !selected;
       if (selected && focus) b.focus();
     }
+    // The declared region declares one host per panel member; hosts that share a
+    // tab (run report, steps, observe; evidence details) toggle with it.
+    for (const host of document.querySelectorAll('[data-context-panel]')) host.hidden = host.dataset.contextPanel !== name;
     if (name === 'runs') loadRuns();
   }
   for (const b of tabs) {
@@ -55,7 +59,7 @@ export function createRunContext(hooks) {
       if (!rows.length) root.append(p('No attributed runs in this selection.'));
     } catch { if (serial === runsSerial) root.replaceChildren(p('Run history could not be read.', 'warning')); }
   }
-  $('runs-all').addEventListener('change', loadRuns); $('runs-refresh').addEventListener('click', loadRuns);
+  $('runs-all')?.addEventListener('change', loadRuns); $('runs-refresh')?.addEventListener('click', loadRuns);
 
   function report() {
     const root = $('run-report'); root.replaceChildren();

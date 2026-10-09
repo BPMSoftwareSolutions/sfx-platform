@@ -4,6 +4,7 @@ import http from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { listDecks, loadDeck, readSlide } from '../circuit/deck-store.mjs';
 import { serveCircuitApi } from '../circuit/live-store.mjs';
+import { serveRegionApi } from '../circuit/region-host.mjs';
 import { serveRunApi } from '../circuit/run-api.mjs';
 import { serveSessionApi } from '../circuit/identity-session.mjs';
 
@@ -32,9 +33,17 @@ const CIRCUIT_FILES = new Map([
   ['/circuit/page.js', ['page.js', 'text/javascript; charset=utf-8']],
   ['/circuit/page-runtime.js', ['page-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/ui-components.js', ['ui-components.js', 'text/javascript; charset=utf-8']],
-  ['/circuit/view', ['view.html', 'text/html; charset=utf-8']],
-  ['/circuit/view.html', ['view.html', 'text/html; charset=utf-8']],
+  // The declared-view host has no standalone page: views mount only in the
+  // Explorer drill-down, through view-runtime.js. `view` stays reserved so a
+  // declared page can never shadow that drill-down route space.
   ['/circuit/view-runtime.js', ['view-runtime.js', 'text/javascript; charset=utf-8']],
+  // The declared-region host projects provider-owned region content in the
+  // shell (Explorer header/left-sidebar/middle/right-sidebar and the shared
+  // footer); the providers themselves are loaded server-side from
+  // SFX_UI_PROVIDER_DIR and never reach the browser.
+  ['/circuit/region-runtime.js', ['region-runtime.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/explorer-shell.js', ['explorer-shell.js', 'text/javascript; charset=utf-8']],
+  ['/circuit/footer.js', ['footer.js', 'text/javascript; charset=utf-8']],
   ['/circuit/circuit-runtime.js', ['circuit-runtime.js', 'text/javascript; charset=utf-8']],
   ['/circuit/explorer-model.mjs', ['explorer-model.mjs', 'text/javascript; charset=utf-8']],
   ['/circuit/pane-layout.js', ['pane-layout.js', 'text/javascript; charset=utf-8']],
@@ -54,7 +63,7 @@ const CIRCUIT_FILES = new Map([
 // shadow login, the Explorer, a deck route or a client module.
 const reservedCircuitSlugs = new Set(['login', 'home', 'explorer', 'deck', 'decks', 'deck-slide',
   'assets', 'page.html', 'page.js', 'page-runtime.js', 'ui-components.js',
-  'view', 'view.html', 'view-runtime.js']);
+  'view', 'view.html', 'view-runtime.js', 'region-runtime.js', 'explorer-shell.js', 'footer.js']);
 // Home and sign-in page configuration is host data (circuit-host.json); the
 // environment label comes from the host's indexing setting or an explicit label.
 const hostPolicy = JSON.parse(await readFile(new URL('circuit-host.json', CIRCUIT_DIR), 'utf8'));
@@ -444,6 +453,7 @@ const handleRequest = async (req, res) => {
       return;
     }
     if (await serveRunApi(req, res, url)) return;
+    if (await serveRegionApi(req, res, url)) return;
     if (await serveCircuitApi(req, res, url)) return;
     if (req.method === 'GET' && url.pathname === '/circuit/decks') {
       sendJson(res, 200, { decks: await listDecks() });

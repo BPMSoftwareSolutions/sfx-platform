@@ -7,12 +7,12 @@
 // data, not a deploy; and it is projected by the same createPageRuntime
 // projector and the same 21 ui-component.v1 adapters as a declared page.
 //
-// The subject is chosen from the URL (the Explorer's capability/namespace/
-// scenario/detail selection and snapshot digest; viewId on the standalone host)
-// and is bound into the view's declared source inputs, so a declaration names no
-// concrete provider. The Explorer drill-down reads a view only through this host:
-// a view that is absent or unreadable is a named visible state, never a fallback
-// render.
+// The subject is chosen by the Explorer (the capability/namespace/scenario/
+// detail selection and snapshot digest) and is bound into the view's declared
+// source inputs, so a declaration names no concrete provider. The Explorer
+// drill-down reads a view only through this host: a view that is absent or
+// unreadable is a named visible state, never a fallback render. There is no
+// standalone view page; the drill-down is the only mount point.
 import { createPageRuntime, validatePage } from './page-runtime.js';
 import { json } from './site.js';
 
@@ -49,10 +49,10 @@ export function viewPath(viewId = DEFAULT_VIEW_ID) {
   return `${VIEW_PATH_PREFIX}${viewId}`;
 }
 
-// The URL selection becomes the declared sources' input. The viewId never does.
+// The selection becomes the declared sources' input. The viewId never does.
 // The host selection wins over the declaration's input: a declaration may carry
-// the captured read's identity as a default (a standalone /circuit/view open
-// uses it), but an Explorer selection must address the provider being opened.
+// the captured read's identity as a default, but an Explorer selection must
+// address the provider being opened.
 // Every read/source binding resolves to the same input as its declared source,
 // so the runtime issues one fetch per source, never a bare second request.
 export function bindViewSelection(declared, selection = viewSelection()) {

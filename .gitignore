@@ -5,3 +5,4 @@ tools/sfx-api/login-input/bin/
 tools/sfx-api/login-input/obj/
 .env
 .env.*
+outputs/

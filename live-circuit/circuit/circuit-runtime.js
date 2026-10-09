@@ -89,13 +89,17 @@ export function createCircuitRuntime(shell) {
       $('detail-page').replaceChildren(...state.detailSlides.map(s => new Option(s.title, s.id)));
       $('detail-page').value = state.detailSlideId ?? ''; $('detail-page').closest('label').hidden = !state.detailSlides.length; $('detail-pages').hidden = false;
       shell.location(false); render();
-      renderDetail($('declaration-detail'), deck, response.detail, selectTarget);
       if (response.detail.kind === 'provider' && response.detail.status === 'DECLARED') {
-        // The declared ui-view.v1 profile is the only provider drill-down host.
-        // A view that is absent, unreadable or invalid renders as a named,
-        // visible state; there is no bespoke fallback renderer.
+        // The declared ui-view.v1 profile is the only provider drill-down host
+        // and the primary pane content: opening a provider reveals its declared
+        // screens at once. The generic authority browser stays available,
+        // collapsed, below the view instead of replacing it.
         const inspection = el('section', { 'aria-label': 'Provider database inspection' }, [paragraph('Loading the declared provider view…', 'muted')]);
-        $('declaration-detail').append(inspection);
+        const authorityBody = el('div');
+        const authority = el('details', { class: 'declared-authority' }, [el('summary', { text: 'Declared authority (raw)' }), authorityBody]);
+        $('declaration-detail').replaceChildren(inspection, authority);
+        renderDetail(authorityBody, deck, response.detail, selectTarget);
+        context.tab('evidence');
         const viewSelection = { capabilityId: deck.capabilityId, namespaceId: deck.namespaceId, scenarioId: deck.scenarioId,
           detailId: id, expectedSnapshotDigest: deck.snapshotDigest };
         let declared;
@@ -117,11 +121,21 @@ export function createCircuitRuntime(shell) {
             : declared.status ? `PROVIDER_VIEW_HTTP_${declared.status}` : 'PROVIDER_VIEW_UNREADABLE';
           inspection.replaceChildren(namedRefusal(code, `The declared provider view is not published for this selection (${code}).`));
         }
+      } else {
+        renderDetail($('declaration-detail'), deck, response.detail, selectTarget);
       }
     } catch (error) {
       if (serial === detailSerial && error.name !== 'AbortError') $('declaration-detail').replaceChildren(
         paragraph(`Detail held: ${error.message}. Refresh the selected scenario if its authority changed.`, 'warning'));
     }
+  }
+  // Canvas selection. A provider glyph is the provider's door: clicking it
+  // opens the declared provider view (openDetail) rather than only selecting
+  // the component. Every other component keeps the inspector-first behaviour.
+  function selectComponent(id) {
+    state.selectedNode = id; render(); shell.component(id); context.tab('evidence');
+    const item = id && state.deck?.navigation?.items.find(candidate => candidate.id === id);
+    if (item?.kind === 'provider' && item.status === 'DECLARED' && state.detailId !== id) openDetail(id);
   }
   function selectTarget(target, push = true) {
     if (target.kind === 'detail') return openDetail(target.id, push, target.pointer ?? '');
@@ -297,7 +311,7 @@ export function createCircuitRuntime(shell) {
       replayWall: String(clock?.wallElapsed ?? ''), replayRate: String(clock?.rate ?? ''), replayPaused: String(clock?.paused ?? false) });
     const slide = shownSlide();
     if (slide) for (const root of layout(slide)) renderCircuitViewer(root, deck, slide, view, {
-      selectedNode: state.selectedNode, selectNode: id => { state.selectedNode = id; render(); shell.component(id); context.tab('evidence'); }, selectSlide, selectTarget,
+      selectedNode: state.selectedNode, selectNode: selectComponent, selectSlide, selectTarget,
       overlay: $('overlay').checked, run, mode: playback ? `Replay ${clock.rate}×` : 'Live', paused: clock?.paused, scenarioComplete: clock?.done, playbackId: playback?.id,
     });
     // Follow execution scrolls the linear band to the current position instead of switching pages.
@@ -399,27 +413,32 @@ export function createCircuitRuntime(shell) {
       stopReplay(); state.apiOwned = false; state.apiRun = null; state.apiId = null; state.apiResult = null; state.output = undefined; state.outputError = null; state.runs = []; state.lastSeq = 0; state.instance = null; connect(); schedule();
     }
   });
-  $('slide').addEventListener('change', () => selectSlide($('slide').value));
-  $('detail-page').addEventListener('change', () => { state.detailSlideId = $('detail-page').value; shell.location(true); render(); });
-  $('close-detail').addEventListener('click', () => { closeDetail(); shell.location(true); render(); });
-  $('overlay').addEventListener('change', render);
-  $('follow').addEventListener('change', () => { if ($('follow').checked) { closeDetail(); shell.location(true); } render(); });
-  $('replay').addEventListener('click', () => { const run = latestRun(); if (run?.ended) startReplay(run); else if (!run) connect(true); });
-  $('pause').addEventListener('click', () => { const clock = state.playback?.clock; if (!clock) return; if (clock.paused) clock.resume(); else clock.pause(); });
-  $('step').addEventListener('click', () => state.playback?.clock.next());
-  $('speed').addEventListener('change', () => state.playback?.clock.speed(Number($('speed').value)));
-  $('live').addEventListener('click', () => { stopReplay(); render(); });
-  $('view-paged').addEventListener('click', () => setView('paged'));
-  $('view-linear').addEventListener('click', () => setView('linear'));
-  $('zoom').addEventListener('change', () => zoomTo($('zoom').value === 'fit' ? 'fit' : Number($('zoom').value)));
-  $('zoom-in').addEventListener('click', () => zoomBy(1.25));
-  $('zoom-out').addEventListener('click', () => zoomBy(0.8));
-  $('circuit-frame').addEventListener('wheel', event => {
-    if (!event.ctrlKey || !shownSlide()?.blueprint?.endCaps) return;
-    event.preventDefault(); zoomBy(event.deltaY < 0 ? 1.15 : 1 / 1.15);
-  }, { passive: false });
-  new ResizeObserver(() => { if (shownSlide()?.blueprint?.endCaps) schedule(); }).observe($('circuit-frame'));
-  connect();
+  // The middle region owns these controls. When its declared mount is absent
+  // (a named region failure), the runtime still returns and callers guard; it
+  // registers no listeners and starts no stream against a missing canvas.
+  if ($('circuit-frame')) {
+    $('slide').addEventListener('change', () => selectSlide($('slide').value));
+    $('detail-page').addEventListener('change', () => { state.detailSlideId = $('detail-page').value; shell.location(true); render(); });
+    $('close-detail').addEventListener('click', () => { closeDetail(); shell.location(true); render(); });
+    $('overlay').addEventListener('change', render);
+    $('follow').addEventListener('change', () => { if ($('follow').checked) { closeDetail(); shell.location(true); } render(); });
+    $('replay').addEventListener('click', () => { const run = latestRun(); if (run?.ended) startReplay(run); else if (!run) connect(true); });
+    $('pause').addEventListener('click', () => { const clock = state.playback?.clock; if (!clock) return; if (clock.paused) clock.resume(); else clock.pause(); });
+    $('step').addEventListener('click', () => state.playback?.clock.next());
+    $('speed').addEventListener('change', () => state.playback?.clock.speed(Number($('speed').value)));
+    $('live').addEventListener('click', () => { stopReplay(); render(); });
+    $('view-paged').addEventListener('click', () => setView('paged'));
+    $('view-linear').addEventListener('click', () => setView('linear'));
+    $('zoom').addEventListener('change', () => zoomTo($('zoom').value === 'fit' ? 'fit' : Number($('zoom').value)));
+    $('zoom-in').addEventListener('click', () => zoomBy(1.25));
+    $('zoom-out').addEventListener('click', () => zoomBy(0.8));
+    $('circuit-frame').addEventListener('wheel', event => {
+      if (!event.ctrlKey || !shownSlide()?.blueprint?.endCaps) return;
+      event.preventDefault(); zoomBy(event.deltaY < 0 ? 1.15 : 1 / 1.15);
+    }, { passive: false });
+    new ResizeObserver(() => { if (shownSlide()?.blueprint?.endCaps) schedule(); }).observe($('circuit-frame'));
+    connect();
+  }
   return {
     state, install, clear, render, selectSlide, openDetail, closeDetail, focus, hasComponent, slideOf, setView,
     reset: () => observePanel.reset(), openRun: id => observePanel.open(id), contextTab: context.tab,

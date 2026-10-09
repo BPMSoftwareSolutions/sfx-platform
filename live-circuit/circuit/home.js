@@ -6,6 +6,7 @@
 // subsequent re-reads (refresh, popstate), exactly like the generic page entry.
 import { $, json, home, session, release, signOut, footerRelease } from './site.js';
 import { createPageRuntime } from './page-runtime.js';
+import { mountFooter } from './footer.js';
 
 const PATH = '/circuit/home';
 
@@ -89,7 +90,8 @@ window.addEventListener('popstate', () => { void load(); });
 const [config, state, health] = await Promise.all([
   home().then(r => r.ok ? r.body : null),
   session().then(r => r.ok ? r.body : null),
-  release()
+  release(),
+  mountFooter()
 ]);
 
 if (config?.environment) { $('env').textContent = config.environment; $('env').hidden = false; }

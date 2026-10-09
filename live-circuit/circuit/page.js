@@ -5,6 +5,7 @@
 // only when the served document declares one, and a refusal is a named notice.
 import { json } from './site.js';
 import { createPageRuntime, safeUrl } from './page-runtime.js';
+import { mountFooter } from './footer.js';
 
 const root = document.getElementById('page-root');
 const nav = document.getElementById('site-nav');
@@ -81,4 +82,5 @@ async function load() {
 }
 
 window.addEventListener('popstate', () => { void load(); });
+await mountFooter();
 await load();

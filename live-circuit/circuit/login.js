@@ -2,6 +2,7 @@
 // transport, which runs authenticate-ide-user through the identity host. The
 // session bearer never reaches this script; it lives in an HttpOnly cookie.
 import { $, home, release, circuitPreview, footerRelease } from './site.js';
+import { mountFooter } from './footer.js';
 const session = '/api/circuit/v1/session';
 const messages = {
   AUTHENTICATION_REJECTED: 'The identifier or password was not accepted.',
@@ -23,7 +24,7 @@ const signedOut = {
 // Only same-origin circuit paths are accepted as a return target.
 const target = (() => {
   const value = new URLSearchParams(location.search).get('return');
-  return value && value.startsWith('/circuit') && !value.startsWith('//') && !value.includes('\\') ? value : '/circuit/explorer';
+  return value && value.startsWith('/circuit') && !value.startsWith('//') && !value.includes('\\') ? value : '/circuit/explorer?capability=ui-page-landing&namespace=sidefx%3Acapabilities';
 })();
 
 function status(text, kind = '') { $('status').textContent = text; $('status').className = kind; }
@@ -106,4 +107,5 @@ home().then(r => {
   if (circuit) circuitPreview({ figure: $('circuit-figure'), caption: $('circuit-caption'), link: $('circuit-link'), label: $('circuit-label') }, circuit);
   else $('circuit-figure').querySelector('.state').textContent = 'Host configuration could not be read.';
 });
+await mountFooter();
 release().then(health => footerRelease($('release'), health));
