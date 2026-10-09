@@ -55,7 +55,7 @@ const runtimeShell = {
   scenario: id => changeScenario(id),
   location: push => syncUrl(push),
   component: id => selectComponent(id),
-  authenticationRequired: () => identity().catch(() => {})
+  authenticationRequired: () => identity($('identity')).catch(() => {})
 };
 // When the middle region rendered its named failure state there is no canvas to
 // drive: the runtime is a named no-op so the other declared regions keep

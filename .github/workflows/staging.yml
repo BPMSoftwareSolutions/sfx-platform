@@ -80,14 +80,16 @@ jobs:
         run: |
           npm ci --prefix deploy/staging/test-tools
           deploy/staging/test-tools/node_modules/.bin/playwright install --with-deps chromium
-      - name: Check missing-run and retry controls before deployment
-        run: node live-circuit/circuit/verify-run-evidence-browser.mjs artifacts/staging/missing-run
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: BPMSoftwareSolutions/sfx-providers
           ref: a33b4428ab74d5910f6ea69947bdda5122a7d33f
           path: .release-sources/sfx-providers
           sparse-checkout: providers
+      - name: Check missing-run and retry controls before deployment
+        env:
+          SFX_UI_PROVIDER_DIR: ${{ github.workspace }}/.release-sources/sfx-providers/providers
+        run: node live-circuit/circuit/verify-run-evidence-browser.mjs artifacts/staging/missing-run
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: BPMSoftwareSolutions/sfx-dal

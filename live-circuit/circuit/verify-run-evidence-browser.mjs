@@ -1,5 +1,7 @@
 // Offline browser acceptance. Scene and testimony are retained real evidence;
 // session/list/API envelopes are explicit transport fixtures, not live proof.
+// Declared shell regions come from the release's pinned provider checkout via
+// SFX_UI_PROVIDER_DIR, using the same host route as the served Explorer.
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { once } from 'node:events';
@@ -8,8 +10,14 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { newRun, applyRecord } from './deck-trace.js';
 import { evidenceModel, componentEvidence } from './run-evidence.mjs';
+import { readRegion, serveRegionApi, REGION_PROVIDERS } from './region-host.mjs';
 
 const dir = path.dirname(fileURLToPath(import.meta.url)), root = path.resolve(dir, '../..');
+assert(process.env.SFX_UI_PROVIDER_DIR, 'SFX_UI_PROVIDER_DIR_REQUIRED: use the release-pinned UI providers');
+for (const regionId of REGION_PROVIDERS.keys()) {
+  const reading = await readRegion({ regionId });
+  assert.equal(reading.disposition, 'AUTHORED', `${regionId}: ${JSON.stringify(reading.findings)}`);
+}
 const deck = JSON.parse(await fs.readFile(process.env.SFX_BROWSER_EVIDENCE_SCENE ?? path.join(root, 'docs/replay-timing-fidelity/scene.json'), 'utf8'));
 const capture = await fs.readFile(path.join(root, 'docs/replay-timing-fidelity/capture.sse'), 'utf8');
 const groups = []; let group;
@@ -32,6 +40,7 @@ let streamFailure = 0, admissions = 0, authenticated = true, externalCapture = n
 const sse = selected.records.map(r => 'data: ' + JSON.stringify(r) + '\n\n').join('');
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  if (await serveRegionApi(req, res, url)) return;
   const json = (body, status = 200) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(body)); };
   if (url.pathname === '/events') { res.writeHead(200, { 'content-type': 'text/event-stream' }); return res.end(externalCapture ?? (url.searchParams.get('run') === 'current' ? sse : ': fixture observer\n\n')); }
   if (url.pathname === '/api/circuit/v1/scenario') return json(deck);
@@ -64,10 +73,19 @@ server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
 const { chromium } = await import(pathToFileURL(process.env.SFX_BROWSER_TEST_MODULE).href);
 const browser = await chromium.launch({ executablePath: process.env.SFX_BROWSER_EXECUTABLE, headless: true });
+let page; const errors = [];
 try {
-  const page = await browser.newPage({ viewport: { width: 1680, height: 1100 } }), errors = [];
+  page = await browser.newPage({ viewport: { width: 1680, height: 1100 } });
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
+  const mounts = ['region-header', 'tree', 'region-middle', 'context', 'region-footer'];
+  await page.waitForFunction(ids => ids.every(id => {
+    const node = document.getElementById(id);
+    return node?.dataset.regionSource === 'declared' || node?.dataset.regionFailure !== undefined;
+  }), mounts);
+  assert.deepEqual(await page.locator('[data-region-failure]').evaluateAll(nodes => nodes.map(node => ({
+    region: node.dataset.region, failure: node.dataset.regionFailure, detail: node.textContent
+  }))), [], 'All declared shell regions must mount before run acceptance');
   await page.waitForFunction(() => document.querySelector('#run-report')?.textContent.includes('Transport fixture output'));
   if (deck.slides.some(s => s.blueprint?.role === 'scenario-linear')) {
     assert.equal(await page.locator('#view-linear').getAttribute('aria-pressed'), 'true', 'Linear is the default');
@@ -169,5 +187,14 @@ try {
   assert.equal(await page.locator('[data-step-node]').count(), model.operations.length);
   if (process.argv[2]) await page.screenshot({ path: path.join(process.argv[2], 'concurrent-external.png'), fullPage: true });
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log(JSON.stringify({ basis: 'Offline browser, retained scene and receipts, fixture API/session', gates: ['report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run', 'concurrent external follow keeps exact outcome'], errors, status: 'PASS' }));
+  console.log(JSON.stringify({ basis: 'Offline browser, pinned declared region providers, retained scene and receipts, fixture API/session', gates: ['declared shell regions', 'report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run', 'concurrent external follow keeps exact outcome'], errors, status: 'PASS' }));
+} catch (error) {
+  if (process.argv[2] && page) {
+    await fs.mkdir(process.argv[2], { recursive: true });
+    await page.screenshot({ path: path.join(process.argv[2], 'failure.png'), fullPage: true });
+    await fs.writeFile(path.join(process.argv[2], 'failure.json'), JSON.stringify({
+      error: error.message, pageErrors: errors, body: await page.locator('body').innerText()
+    }, null, 2) + '\n');
+  }
+  throw error;
 } finally { await browser.close(); server.closeAllConnections(); await new Promise(r => server.close(r)); }
