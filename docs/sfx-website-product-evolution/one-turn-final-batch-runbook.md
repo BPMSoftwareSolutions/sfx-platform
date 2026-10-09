@@ -498,3 +498,19 @@ is owned by two lanes, or the working tree contains files outside §1's ownershi
 push if any §3.5 command fails. After the push, the only recovery is §3.10 rollback plus a new
 forward commit; do not cancel an active release to accelerate a newer push
 (`docs/automatic-staging-deployment.md:236-241`).
+
+---
+
+## 5. Beyond this batch
+
+**Beyond this batch.** The provider-deployment-boundary items **P1–P4** are not in this batch and
+are left pending by design: the batch lands the declared regions with the provider packages baked
+into the composite image (Lane C), while the originating plan
+([`sidefx-circuit-driven-ui-strategy.md`](../sidefx-circuit-driven-ui-strategy.md) L54–L79, L97,
+L103, L130) leaves the versioned provider API, admitted version selection, browser-loading
+security mechanics and independent provider versioning for afterwards — specified in
+[`analysis/15-provider-deployment-boundary.md`](analysis/15-provider-deployment-boundary.md) and
+inventoried at §9 of
+[`analysis/14-remaining-work-inventory.md`](analysis/14-remaining-work-inventory.md). This batch's
+scope (§1 lanes, §3 steps, §4 stop conditions) and its owed receipts are unchanged; nothing in §3
+acquires a P-item.

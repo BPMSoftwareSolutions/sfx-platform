@@ -32,6 +32,7 @@ A09/A11/A12/A13a/A13b/A13c = [`analysis/09-iteration-loop-tooling.md`](09-iterat
 [`analysis/13a-explorer-runtime.md`](13a-explorer-runtime.md),
 [`analysis/13b-shell-pages.md`](13b-shell-pages.md),
 [`analysis/13c-serving-and-readers.md`](13c-serving-and-readers.md);
+A15 = [`analysis/15-provider-deployment-boundary.md`](15-provider-deployment-boundary.md);
 REV = [`review.md`](../review.md).
 
 **Status legend.** *done* = landed and evidenced in-repo; *uncommitted* = present in the working
@@ -259,3 +260,29 @@ the sequencing table is stale relative to the withdrawal (see B8).
 **F7 (resolved 2026-10-09).** `outputs/**` is ignored by `.gitignore` (added in `5eee1df`), so the
 region-wave commits exclude it; the deck remains a local-only check input, and the checks that read
 it must tolerate its absence in CI (F3/R7).
+
+---
+
+## 9. Provider deployment boundary (post-batch)
+
+Added 2026-10-08; this is the post-batch companion to §3. The workstream and its P1–P4
+specification are [`analysis/15-provider-deployment-boundary.md`](15-provider-deployment-boundary.md)
+(A15), whose originating plan is
+[`sidefx-circuit-driven-ui-strategy.md`](../../sidefx-circuit-driven-ui-strategy.md) (SP) L54–L79
+with L9, L97 (L09), L103, L107 and L130. A15 is design only — every statement there is
+`[proposal]`, and its status for all four items is **not started**. P1–P4 are **not part of the
+one-turn final batch**: §3's R1–R9 and the runbook's lanes, push, deploy and receipts owe nothing
+here, and no P-item may be folded into that batch. The batch ships provider content read
+server-side from packages baked into the composite image (`SFX_UI_PROVIDER_DIR`; R1, R9, F4);
+P1–P4 close the boundary SP requires afterwards. IS §11.4 gate relations are noted per row; no new
+gate is proposed, and G2 stays withdrawn (W9).
+
+| ID | Item | Status | Source | Change surface | Acceptance evidence owed | Turn / gate |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1 | Versioned provider API — read-only host route `GET /ui-providers/{providerId}/manifest` projecting identity, version/binding state, manifest digest, operation contracts, entrypoint ids and per-asset `sha256` digests; unknown or digest-inconsistent providers refuse by named code (candidates `UI_PROVIDER_UNKNOWN` / `UI_PROVIDER_MANIFEST_INVALID`); the SP L67 asset route stays out of minimum scope | not started | A15 §1; SP:9, 64-70, 118 | shell: route + refusal map, no provider-specific branch; provider: manifest projection from existing `descriptor`/`contentManifest` exports; estate: declared data reflected; CI: digest-parity check + pin updates | receipt with all six manifest field groups for `ui-explorer-region`; digests recomputed independently and equal; unknown-provider 404 named; tampered manifest refused; repeat reads byte-stable | One turn (shell + CI); no §11.4 gate |
+| P2 | Admission and version selection, host-unchanged — a slot resolves through its admitted binding to `providerId` + selected version/generation digest, per slot, never global latest; rollback reselects the prior generation; an incompatible provider refuses and the prior selection stays in force, no silent fallback | not started | A15 §2; SP:9, 97 (L09), 107, 128; A14 B1 | estate: migration pair declaring identities, contracts, ports, bindings and generations (B1); shell: read the admitted selection/manifest; CI: two-version fixture, shell-digest comparison, conformance gate | the four-step L09 test (v1 digest baseline; v2 admitted with identical shell digests and conformance passing; v3 named contract refusal with v2 still selected; v1 rollback with no shell delta); pair preflight/commit + in-transaction proof; selection/capture receipts | Estate half externally gated (`sfx-embody` lifecycle, E3); G2 not an open gate (W9) |
+| P3 | Browser loading security mechanics and trust boundary — only if browser loading is admitted: fail-closed strict CSP, digest-verified asset fetch with named refusal, isolation with no ambient session/kernel/credential/network authority, content-addressed immutable assets pinned to the admitted generation; provider bytes and unverified manifest fields stay untrusted | not started; every element unproven (SP L130) | A15 §3; SP:62, 70, 128, 130 | shell: CSP/headers, integrity verification, isolation boundary, pin enforcement; provider: content surviving the allowlists, no executable authority; estate: admitted contracts selecting the mechanic; CI: negative security fixtures and a browser gate (F3) | named refusals for a tampered asset digest, a version/generation mismatch, a CSP-forbidden construct, an undeclared entrypoint and an attempted authority fetch; proof served assets carry no credential; browser-gate receipt under an admitted binding | One turn once a browser mechanic is admitted; no `browser-runtime` binding admitted (A12 §5, W9) |
+| P4 | Package boundaries, independent versioning and release independence — one package per independently versioned provider concern; package semver and admitted generation digest move together; a provider release changes only that package, a contract change is a declaration revision and admission, and each package stays testable with plain `node` without platform or estate | not started | A15 §4; SP:9, 56, 103, 118, 130; A14 B3 | provider: package layout, checks, release refs; shell: pins/packaging only, no code; estate: versions/digests as declaration data; CI: per-package checks, composite digest inventory, version-swap drill | release-independence test: vX and vX+1 pass their own checks and host conformance; version swap with empty host diff; incompatible contract version refused by name; per-version check output and composite inventory digests | Externally paced by provider deploys (B3: 1 of 6 packages done) |
+
+**Batch separation.** P1–P4 have no commit, deploy or receipt in the one-turn batch; the runbook's
+§5 "Beyond this batch" note points here, and §3's R1–R9 scope/status stand as written.
