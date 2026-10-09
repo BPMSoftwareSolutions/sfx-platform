@@ -92,8 +92,11 @@ async function deploy() {
   // admitted components (kernel, API, retrieval, delivery config, vault bootstrap).
   // Identity comes from the pinned publish; host and circuit come from this commit.
   const sourcesFile = path.join(root, 'deploy/staging/identity-sources.json');
+  // The declared UI region packages come from the same pinned provider checkout.
+  const providersCheckout = path.join(root, '.release-sources/sfx-providers/providers');
+  assert(fs.existsSync(path.join(providersCheckout, 'ui-shell-footer', 'ui-shell-footer.mjs')), 'Pinned provider checkout required for the region packages');
   await run(process.execPath, ['deploy/sda-kernel/prepare-composite.mjs', path.join(evidence, 'previous-release.json'), context, id, previousImage,
-    path.join(root, 'artifacts/identity-publish'), sourcesFile]);
+    path.join(root, 'artifacts/identity-publish'), sourcesFile, providersCheckout]);
   const next = JSON.parse(fs.readFileSync(path.join(context, 'runtime/release.json')));
   composite(next); websiteRetired(next); identityUpdate(previous, next, JSON.parse(fs.readFileSync(sourcesFile)));
   write('release.json', next);

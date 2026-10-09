@@ -36,7 +36,7 @@ try {
   const host = ['host/api.mjs', 'host/gateway.mjs', 'host/identity-policy.json', 'host/initialize.sh', 'host/retrieval-policy.json'];
   assert.deepEqual(actual.filter(name => name.startsWith('host/')), host);
   for (const [name, value] of Object.entries(next.circuit.files)) {
-    assert(host.includes(name) || name.startsWith('estate/demo/'), 'Only host files and the circuit are placed: ' + name);
+    assert(host.includes(name) || name.startsWith('estate/demo/') || name.startsWith('estate/ui-providers/'), 'Only host files, the circuit and UI providers are placed: ' + name);
     assert.equal(sha(path.join(runtime, name)), value);
   }
   for (const name of host) assert(!fs.readFileSync(path.join(runtime, name), 'utf8').includes('\r'), 'LF host file required: ' + name);
@@ -59,19 +59,31 @@ try {
   for (const name of ['sfx-identity-host', 'sfx-identity-host.dll', 'SFX.Identity.DAL.dll']) fs.writeFileSync(path.join(published, name), 'packaging fixture ' + name);
   const sources = { providers: '1'.repeat(40), dal: '2'.repeat(40) }, sourcesFile = path.join(root, 'sources.json');
   fs.writeFileSync(sourcesFile, JSON.stringify(sources));
+  const uiProviders = path.join(root, 'ui-providers');
+  for (const name of ['ui-explorer-region', 'ui-shell-footer']) {
+    fs.mkdirSync(path.join(uiProviders, name, 'assets'), { recursive: true });
+    fs.writeFileSync(path.join(uiProviders, name, `${name}.mjs`), `export const descriptor = { operations: [{ operationId: 'ui.region.load' }] };\n`);
+    fs.writeFileSync(path.join(uiProviders, name, 'assets', 'region.css'), 'packaging fixture ' + name);
+  }
   const identityOut = path.join(root, 'identity-candidate');
-  const update = spawnSync(process.execPath, [packager, previousFile, identityOut, 'fixture-identity', components, published, sourcesFile], { encoding: 'utf8' });
+  const update = spawnSync(process.execPath, [packager, previousFile, identityOut, 'fixture-identity', components, published, sourcesFile, uiProviders], { encoding: 'utf8' });
   assert.equal(update.status, 0, update.stderr);
   const updated = JSON.parse(fs.readFileSync(path.join(identityOut, 'runtime/release.json')));
   assert.deepEqual(updated.identity.sources, sources); assert.deepEqual(updated.retrieval, previous.retrieval);
   assert.equal(updated.kernelDigest, previous.kernelDigest);
   assert.equal(updated.identity.executable, sha(path.join(published, 'sfx-identity-host.dll')));
   assert.equal(updated.identity.dal, sha(path.join(published, 'SFX.Identity.DAL.dll')));
+  for (const name of ['ui-explorer-region/ui-explorer-region.mjs', 'ui-shell-footer/ui-shell-footer.mjs', 'ui-shell-footer/assets/region.css'])
+    assert.equal(updated.circuit.files['estate/ui-providers/' + name], sha(path.join(uiProviders, name)), 'UI provider file must be inventoried: ' + name);
+  const refused = (out, ...extra) => spawnSync(process.execPath, [packager, previousFile, path.join(root, out), 'fixture-' + out, components, published, sourcesFile, ...extra], { encoding: 'utf8' });
+  assert.match(refused('no-providers').stderr, /UI_PROVIDERS_REQUIRED/);
+  fs.rmSync(path.join(uiProviders, 'ui-shell-footer', 'assets'), { recursive: true });
+  assert.match(refused('no-footer-assets', uiProviders).stderr, /UI_PROVIDER_PACKAGE_INCOMPLETE: ui-shell-footer/);
   fs.writeFileSync(sourcesFile, JSON.stringify({ ...sources, dal: 'main' }));
-  assert.notEqual(spawnSync(process.execPath, [packager, previousFile, path.join(root, 'unpinned'), 'fixture-unpinned', components, published, sourcesFile]).status, 0);
+  assert.notEqual(spawnSync(process.execPath, [packager, previousFile, path.join(root, 'unpinned'), 'fixture-unpinned', components, published, sourcesFile, uiProviders]).status, 0);
   console.log(JSON.stringify({ scope: 'stand-in composite packaging conformance', files: actual.length, base: next.composite.base,
-    preserved: ['kernel', 'api', 'retrieval', 'identity', 'installed delivery', 'vault bootstrap'], website: false,
-    rejected: ['existing destination', 'mutable components image', 'same release id', 'incomplete components release'], manifestComplete: true }));
+    preserved: ['kernel', 'api', 'retrieval', 'identity', 'installed delivery', 'vault bootstrap'], website: false, uiProviders: ['ui-explorer-region', 'ui-shell-footer'],
+    rejected: ['existing destination', 'mutable components image', 'same release id', 'incomplete components release', 'missing UI providers', 'incomplete UI provider package'], manifestComplete: true }));
 } finally {
   // Only the mkdtemp-owned directory, never the input estate or a supplied path.
   fs.rmSync(root, { recursive: true, force: true });

@@ -3,7 +3,7 @@
 // combined with. The installed kernel, SDA API, retrieval and identity hosts and
 // the vault bootstrap are copied from that exact image by Dockerfile.composite.
 // An optional identity publish replaces only identity, with pinned source inputs.
-// node prepare-composite.mjs <previous-release.json> <fresh-destination> <release-id> <components-image@sha256>
+// node prepare-composite.mjs <previous-release.json> <fresh-destination> <release-id> <components-image@sha256> [<published-identity> <identity-sources.json> <ui-providers>]
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,10 +11,12 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { copyLiveCircuit } from './live-circuit.mjs';
 
-const [previousFile, destination, id, componentsImage, publishedIdentity, identitySourcesFile, extra] = process.argv.slice(2);
+const [previousFile, destination, id, componentsImage, publishedIdentity, identitySourcesFile, uiProviders, extra] = process.argv.slice(2);
 if (!previousFile || !destination || !id || !componentsImage || extra !== undefined)
   throw new Error('Expected previous-release.json fresh-destination release-id exact-components-image');
 if (Boolean(publishedIdentity) !== Boolean(identitySourcesFile)) throw new Error('IDENTITY_PUBLISH_AND_SOURCES_REQUIRED');
+if (!publishedIdentity && uiProviders) throw new Error('UI_PROVIDERS_REQUIRE_IDENTITY_PUBLISH');
+if (publishedIdentity && !uiProviders) throw new Error('UI_PROVIDERS_REQUIRED');
 if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(id)) throw new Error('INVALID_RELEASE_ID');
 if (!/^[^\s@]+@sha256:[a-f0-9]{64}$/.test(componentsImage)) throw new Error('EXACT_COMPONENTS_IMAGE_REQUIRED');
 if (fs.existsSync(destination)) throw new Error('FRESH_RELEASE_DIRECTORY_REQUIRED');
@@ -42,6 +44,16 @@ if (publishedIdentity) {
   for (const name of ['sfx-identity-host', 'sfx-identity-host.dll', 'SFX.Identity.DAL.dll'])
     if (!fs.statSync(path.join(publishedIdentity, name)).isFile()) throw new Error('PUBLISHED_LINUX_IDENTITY_REQUIRED');
   fs.cpSync(publishedIdentity, path.join(runtime, 'identity'), { recursive: true });
+  // The declared UI region packages travel with the composite release and are
+  // loaded server-side by the observer through SFX_UI_PROVIDER_DIR; the browser
+  // never imports provider code (ui-explorer-region-blueprint.md §4.4).
+  for (const name of ['ui-explorer-region', 'ui-shell-footer']) {
+    const source = path.join(path.resolve(uiProviders), name);
+    const moduleFile = path.join(source, `${name}.mjs`);
+    if (!fs.existsSync(moduleFile) || !fs.existsSync(path.join(source, 'assets'))) throw new Error('UI_PROVIDER_PACKAGE_INCOMPLETE: ' + name);
+    if (!fs.readFileSync(moduleFile, 'utf8').includes("'ui.region.load'")) throw new Error('UI_PROVIDER_OPERATION_REQUIRED: ' + name);
+    fs.cpSync(source, path.join(runtime, 'estate', 'ui-providers', name), { recursive: true });
+  }
 }
 
 const sha = file => 'sha256:' + createHash('sha256').update(fs.readFileSync(file)).digest('hex');

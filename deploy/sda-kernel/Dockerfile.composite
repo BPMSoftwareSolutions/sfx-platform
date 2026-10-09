@@ -43,7 +43,7 @@ if (r.composite?.website !== false || fs.existsSync('/app')) throw Error('WEBSIT
  && cp /tmp/components-final/* /opt/sfx/.components/ \
  && rm -rf /tmp/runtime /tmp/components-source /tmp/components-copied /tmp/components-final /tmp/component-fingerprint.sh \
  && chown -R node:node /opt/sfx
-ENV NODE_ENV=production HOME=/home/sjones XDG_DATA_HOME=/home/sjones/.local/share PORT=3000
+ENV NODE_ENV=production HOME=/home/sjones XDG_DATA_HOME=/home/sjones/.local/share PORT=3000 SFX_UI_PROVIDER_DIR=/opt/sfx/estate/ui-providers
 WORKDIR /opt/sfx
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:3000/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
