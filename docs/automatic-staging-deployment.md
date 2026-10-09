@@ -120,8 +120,9 @@ observer served `/circuit/home`, `/circuit/login`, its assets and the home API.
    provider/owning-step/call/exact-outcome visibility, principal attribution,
    sign-out and revocation. Scan console, testimony, output and a bounded Azure
    log sample for the tested secrets.
-7. Verify every receipt prefix. Replay that capture at 1x and 0.1x and verify
-   provider intervals and the captured scenario clock. Live acceptance never
+7. Verify every receipt prefix and every declared replay rate with a
+   deterministic scheduler over that capture. Play it once at 1x in the browser
+   to verify provider rendering and bounded completion. Live acceptance never
    substitutes synthetic events or API responses.
 8. Require the browser's run to reach complete SQL capture; retain event, graph
    and output digests. Restart again; require a different gateway `bootId` with
@@ -159,6 +160,20 @@ assertion), `browser/progress.json` (last phase), and `browser/run.json` (actual
 execution, when available) in the `staging-release` artifact. The parent command
 withholds raw child output because authentication material can be present;
 `COMMAND_FAILED: node (1)` alone does not identify which assertion failed.
+
+Replay has its own workflow step. `verify-timing.mjs` checks every declared rate
+(including 0.1x), each receipt timestamp, pause/resume, stepping, speed changes
+and delayed-scheduler catch-up using a deterministic scheduler over the unchanged
+real capture. `replay-timing.json` labels these as virtual-clock measurements.
+The browser then plays the capture once at 1x, requiring provider painting and
+bounded completion. It records wall-clock deviation without making 50 ms of
+shared-runner scheduling jitter a deployment failure. This removes the full
+0.1x playback wait from every release.
+
+For an explicit wall-clock qualification, run
+`node tools/sfx-api/verify-circuit-replay.mjs <origin> <scene.json> <capture.sse> <output-directory> --full-wall-clock`.
+That diagnostic retains both full-duration rates and the original 50 ms
+tolerance. It consumes retained evidence and makes no new capability invocation.
 
 Replay verification selects the completed capability run from the capture
 (which also contains real sign-in/sign-out runs), retaining its original receipt

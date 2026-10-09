@@ -35,6 +35,8 @@ jobs:
       - run: node --test deploy/staging/policy.test.mjs
       - run: node deploy/sda-kernel/verify-composite-package.mjs
       - run: node live-circuit/circuit/verify-identity-session.mjs
+      - name: Deterministic replay clocks on retained execution evidence
+        run: node live-circuit/circuit/verify-timing.mjs docs/replay-timing-fidelity/scene.json docs/replay-timing-fidelity/capture.sse
       - run: node live-circuit/circuit/verify-run-api.mjs
       - run: node live-circuit/circuit/verify-objective.mjs
       - run: node live-circuit/circuit/verify-provider-profile.mjs
@@ -105,8 +107,10 @@ jobs:
         run: node deploy/staging/release.mjs deploy
       - name: Public reads and authorization boundaries
         run: node deploy/staging/accept.mjs public
-      - name: Real sign-in, live Observe, declared-home captures, sign-out and captured replay
+      - name: Real sign-in, live Observe, declared-home captures and sign-out
         run: node deploy/staging/accept.mjs browser
+      - name: Captured replay clocks and 1x browser rendering
+        run: node deploy/staging/accept.mjs replay
       - name: Upload the declared-home browser captures
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

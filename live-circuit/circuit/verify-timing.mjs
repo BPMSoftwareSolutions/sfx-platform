@@ -122,7 +122,7 @@ for (const patch of [{completedAt:null,observedAt:null},{completedAt:run.started
   const damaged=structuredClone(run);const event=damaged.events.find(e=>e.record.payload?.testimonyType==='cell-execution-testimony.v1');
   Object.assign(event.record.payload,patch);assert.throws(()=>replayTimeline(deck,damaged));
 }
-console.log(JSON.stringify({capture,runId:run.id,recordedDurationMs:timeline.duration,window:timeline.window,
+console.log(JSON.stringify({capture,runId:run.id,clockBasis:'deterministic scheduler over unchanged captured execution timestamps; clock measurements are virtual milliseconds',recordedDurationMs:timeline.duration,window:timeline.window,
   scenarioRecords:scenarioRecords.length,outsideRecords:timeline.outsideRecords.length,recordsRetained:run.events.length,
   timestampedFrames:timeline.frames.length,operationIntervals:intervals.map(i=>({nodeId:i.nodeId,startMs:i.from,endMs:i.to})),
   sequentialOverlapCount:overlaps,sequenceChecks,clockChecks:measurements,pauseResume:true,step:true,speedChange:true,

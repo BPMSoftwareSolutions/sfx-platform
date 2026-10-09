@@ -18,9 +18,12 @@ try {
       throw error;
     }
     console.log('Real browser sign-in, live Observe, declared-home captures, sign-out and safety proof passed.');
+  } else if (mode === 'replay') {
     await run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'prefix-process.json'});
+    const timing = await run(process.execPath, ['live-circuit/circuit/verify-timing.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'replay-timing-process.json'});
+    write('replay-timing.json', JSON.parse(timing));
     await run(process.execPath, ['tools/sfx-api/verify-circuit-replay.mjs', config.origin, path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse'), path.join(evidence, 'replay')], {publicDiagnostic:'replay-process.json'});
-    console.log('Captured receipt prefixes and replay at 1x / 0.1x passed.');
+    console.log('Captured receipt prefixes, deterministic replay clocks at every declared rate, and 1x browser playback passed.');
   } else if (mode === 'durable') {
     const fixture = await privateFixture();
     await run(process.execPath, ['tools/live-circuit/verify-durable-restart.mjs'], {
