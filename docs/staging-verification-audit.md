@@ -296,6 +296,49 @@ allows two concurrent reads with a 30 s retrieval timeout, and each inspection
 takes about 20 s alone. Only static reads run in parallel; reader-backed reads
 remain sequential.
 
+## First live qualification, 2026-10-09
+
+Commit `3f275e602c7a8086be170c60d881ed594c8a3a16` exercised the new workflows
+in CI. [Checks run 37930681609](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37930681609)
+passed all four parallel jobs using Node 24.20.0, the pinned Playwright browser
+and .NET 8.0.408. The fifteen offline gates took 4.592 seconds at concurrency
+four; candidate replay passed both prompt and delayed delivery. The longest
+checks job, Windows client build and local tests, took 94 seconds.
+
+The successful checks run automatically triggered
+[release 37930867627](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37930867627).
+The release checked out that exact commit, downloaded the qualifying identity
+artifact, verified its inventory and digests, and accepted
+`composite-3f275e602c7a-37930867627-1` at 12:44:38 UTC. The accepted image digest
+is `sha256:9b35d4ed053b8dd251594e8f6a719e01265c10e35718d264c1b3fb32d5944097`.
+
+| Required gate | Observed seconds | Result |
+| --- | ---: | --- |
+| Build, bind and verify deployment | 231.5 | Passed |
+| Deployed contract smoke | 64.6 | Passed |
+| Real browser sign-in, Observe, capture and sign-out | 57.4 | Passed |
+| Receipt prefixes and deterministic replay clocks | 4.3 | Passed |
+| Process restart and vault preservation | 27.7 | Passed |
+| Retained run readback after restart | 13.8 | Passed |
+| API CLI execution and external follow | 30.7 | Passed |
+| Windows live login and credential custody | 25.6 | Passed |
+
+The acceptance receipt is `accepted.json` in the run's `staging-final` artifact;
+the supporting receipts and captures are in `staging-release` and
+`staging-windows-cli`. There were no omitted gates or log samples. Run
+`9072c15c-6095-4210-aa6f-b320dffcf7ca` returned `RETURNED`; all 2,409 captured
+events, graph and output survived restart with matching digests and zero new
+admissions. Acceptance took about 12 minutes 25 seconds from the checks run's
+creation, including runner setup and handoffs. Presentation capture starts
+after acceptance and is outside that measurement.
+
+This closes the first-run uncertainty about the cross-workflow trigger,
+artifact handoff, pinned CI toolchain and successful Azure release path. It does
+not qualify the open items above or prove an absence of flakes. The receipt
+explicitly records the objective execution as non-deterministic because it
+still depends on Gemini, live market data and estate declarations. This run did
+not exercise rollback or the refusal of an out-of-order release.
+
 ## Source references
 
 - [Workflow and current concurrency scope](../.github/workflows/staging.yml)
