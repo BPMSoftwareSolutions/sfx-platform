@@ -34,7 +34,9 @@ hashTree(inputDirectory);
 const version = digest.digest('hex'), destination = path.join(root, version);
 fs.mkdirSync(destination, { recursive: true }); fs.mkdirSync(bin, { recursive: true });
 for (const file of files) fs.copyFileSync(path.join(source, file), path.join(destination, file));
-fs.cpSync(inputDirectory, path.join(destination, 'login-input'), { recursive: true });
+const installedInput = path.join(destination, 'login-input');
+if (!fs.existsSync(installedInput) || fs.realpathSync(installedInput) !== inputDirectory)
+  fs.cpSync(inputDirectory, installedInput, { recursive: true });
 const localArgument = fs.realpathSync(values['local-launcher']);
 const previousPath = path.join(root, 'login-install.json');
 const previous = fs.existsSync(previousPath) ? JSON.parse(fs.readFileSync(previousPath, 'utf8')) : null;
@@ -43,13 +45,16 @@ if (fs.readFileSync(localArgument, 'utf8').includes('SFX_AUTH_WRAPPER')) {
   if (!previous?.localLauncher || !fs.existsSync(previous.localLauncher)) throw new Error('Previous local delegate unavailable.');
   local = previous.localLauncher;
 }
-const replacedLauncher = path.join(bin, windows ? 'sfx.ps1' : 'sfx');
-if (fs.existsSync(replacedLauncher) && fs.realpathSync(replacedLauncher) === local) {
-  const localBytes = fs.readFileSync(local);
-  const localHash = createHash('sha256').update(localBytes).digest('hex');
-  const preserved = path.join(root, `local-${localHash}${windows ? '.ps1' : ''}`);
-  fs.writeFileSync(preserved, localBytes, { mode: 0o700 }); local = preserved;
-}
+// Always install the delegate by content, including an explicitly supplied
+// launcher update. Never leave dispatch pointing into a checkout/build folder.
+// Reinstalling through the auth wrapper retains its current installed delegate.
+const localBytes = fs.readFileSync(local);
+const localHash = createHash('sha256').update(localBytes).digest('hex');
+const preserved = path.join(root, `local-${localHash}${windows ? '.ps1' : ''}`);
+if (fs.existsSync(preserved)) {
+  if (!fs.readFileSync(preserved).equals(localBytes)) throw new Error('LOCAL_LAUNCHER_DIGEST_MISMATCH');
+} else fs.writeFileSync(preserved, localBytes, { mode: 0o700, flag: 'wx' });
+local = preserved;
 const config = path.join(root, 'config.json');
 // A human-client installation never asks for or changes a machine credential.
 const profile = fs.existsSync(config) ? JSON.parse(fs.readFileSync(config, 'utf8').replace(/^\uFEFF/, '')) : {};
@@ -71,5 +76,5 @@ if (windows) {
   fs.writeFileSync(path.join(bin, 'sfx'), `#!/bin/sh\n# SFX_AUTH_WRAPPER\ncase "$1" in\n login|whoami|logout) [ -n "\${SFX_API_CONFIG:-}" ] || export SFX_API_CONFIG=${sh(userConfig)}; exec ${sh(process.execPath)} ${sh(entry)} "$@" ;;\n *) exec ${sh(local)} "$@" ;;\nesac\n`, { mode: 0o755 });
   fs.writeFileSync(path.join(bin, 'sfx-api'), `#!/bin/sh\n# SFX_AUTH_WRAPPER\n[ -n "\${SFX_API_CONFIG:-}" ] || export SFX_API_CONFIG=${sh(config)}\nexec ${sh(process.execPath)} ${sh(entry)} "$@"\n`, { mode: 0o755 });
 }
-fs.writeFileSync(previousPath, JSON.stringify({ version, destination, localLauncher: local, bin, endpoint, installedAt: new Date().toISOString() }, null, 2) + '\n');
+fs.writeFileSync(previousPath, JSON.stringify({ version, destination, localLauncher: local, localLauncherDigest: `sha256:${localHash}`, bin, endpoint, installedAt: new Date().toISOString() }, null, 2) + '\n');
 console.log(`Installed sfx login/whoami/logout and sfx-api in ${bin}; local commands delegate to ${local}.`);

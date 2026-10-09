@@ -107,14 +107,21 @@ dotnet publish tools/sfx-api/login-input/LoginInput.csproj -r win-x64 --self-con
 ./tools/sfx-api/install-login.ps1 -Endpoint https://localhost:8793 -InputDirectory artifacts/cli-login/input
 ```
 
-The Windows installer finds the existing `sfx.ps1`, preserves it byte-for-byte
-when replacing its entry point, and installs both `sfx` and `sfx-api` launchers.
+The Windows installer finds the existing `sfx.ps1`, copies its delegate into a
+digest-addressed installation, and installs both `sfx` and `sfx-api` launchers.
 It resolves path aliases so an nvm junction cannot make the delegate point back
 to its replacement. `login-install.json` records the version, destination,
-delegate and bin directory. It neither requests an administrator token nor
+delegate, delegate SHA-256 and bin directory. It neither requests an administrator token nor
 replaces the existing machine credential. Node 20 or later runs the client.
 Published input binaries include their .NET runtime. Commands run away from both
 checkouts. No runtime is added to `sfx-embody`.
+
+To adopt an updated canonical SDA launcher, pass its file explicitly with
+`-LocalLauncher` and the existing command directory with `-BinDirectory`.
+The source is an installation input: dispatch points to the copied,
+digest-addressed launcher rather than to that source path. The old installed
+copy is preserved. Reinstalling with the existing authentication wrapper keeps
+its current delegate; running `sfx login` alone does not update the launcher.
 
 On a Mac, build for its architecture and place the wrapper directory on PATH:
 
