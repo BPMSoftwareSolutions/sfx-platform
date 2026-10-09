@@ -19,6 +19,26 @@ exists.
 
 ---
 
+## Rollout sequence — providers first
+
+The rollout this specification serves is explicit and ordered (SP L54–L79, L9, L103, L118). Every
+statement below remains a `[proposal]`.
+
+- **Stage A — providers.** Every UI circuit provider (`header`, `left-sidebar`, `middle`,
+  `right-sidebar`, `footer`, drill-down) is completed, packaged, versioned and tested entirely in
+  `sfx-providers` (SP L103: independently packaged and tested; no provider-specific implementation
+  retained in `sfx-platform`), then hosted and consumable through the provider API — P1 (§1) —
+  independently of `sfx-platform` (SP L9, L64–L70, L118).
+- **Stage B — thin consumer.** Only after Stage A is consumable, `sfx-platform` becomes the thin
+  consumer (loader + mounts) in one batch (SP L60, L79, L128: generic provider loading and
+  composition; no provider-specific UI business behavior). The uncommitted platform region mounts
+  are reference-only, not this rollout (A14 §9; runbook §1).
+
+Stage A precedes Stage B: no Stage B mount work starts while a provider named in Stage A is
+incomplete or not yet consumable through P1.
+
+---
+
 ## 0. Baseline: the loader as it exists today
 
 These are observable facts, cited so the proposals in §1–§4 can be read as deltas.

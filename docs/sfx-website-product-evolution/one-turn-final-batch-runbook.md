@@ -6,6 +6,17 @@ the work order that lands the declarative-UI region batch in one turn: the four 
 and the shared shell footer mounted from declared providers, the verification wiring, and the
 provider packaging that makes the batch servable on staging.
 
+**Rollout order corrected 2026-10-09 — providers first.** The ordered rollout is Stage A — every
+UI circuit provider (`header`, `left-sidebar`, `middle`, `right-sidebar`, `footer`, drill-down)
+completed, packaged, versioned and tested entirely in `sfx-providers`, then hosted and consumable
+through the provider API (P1) independently of `sfx-platform`; then Stage B — only after Stage A
+is consumable, `sfx-platform` becomes the thin consumer (loader + mounts) in one batch (SP L9,
+L54–L79, L103, L118;
+[`analysis/15-provider-deployment-boundary.md`](analysis/15-provider-deployment-boundary.md);
+[`analysis/14-remaining-work-inventory.md`](analysis/14-remaining-work-inventory.md) §9). The
+executed lanes below are the reference batch; the uncommitted platform region mounts are
+reference-only, not the rollout.
+
 Authority chain for the batch:
 [`sidefx-circuit-driven-ui-strategy.md`](../sidefx-circuit-driven-ui-strategy.md) is the
 originating plan (L9 thin `sfx-platform` / providers-owned; L22/L39/L128 four post-login Explorer
@@ -79,6 +90,11 @@ the working tree is clean apart from the two untracked planning docs. Verified i
    2026-10-09T00:36:09Z.
 5. §3.5 was not re-run in full in this pass; every file it names exists, and the §3.4 and
    packaging gates were re-run and pass.
+6. The rollout order is corrected to providers-first (2026-10-09; §1, §5;
+   `analysis/15-provider-deployment-boundary.md`;
+   `analysis/14-remaining-work-inventory.md` §9): lanes B and A start in `sfx-platform` and are
+   Stage B, dependent on Stage A; the uncommitted platform region mounts are reference-only, not
+   the rollout.
 
 **Done vs outstanding.**
 
@@ -98,17 +114,28 @@ the working tree is clean apart from the two untracked planning docs. Verified i
 
 ---
 
-## 1. Lanes — disjoint file ownership
+## 1. Lanes — disjoint file ownership (reference batch; B and A are Stage B)
+
+The corrected rollout order is providers-first. **Stage A** — every UI circuit provider
+(`header`, `left-sidebar`, `middle`, `right-sidebar`, `footer`, drill-down) completed, packaged,
+versioned and tested entirely in `sfx-providers`, then hosted and consumable through the provider
+API (P1) independently of `sfx-platform`. **Stage B** — only after Stage A is consumable,
+`sfx-platform` becomes the thin consumer (loader + mounts) in one batch (SP L9, L54–L79, L103,
+L118; `analysis/15-provider-deployment-boundary.md`;
+`analysis/14-remaining-work-inventory.md` §9). Lanes B and A below start in `sfx-platform`: under
+the corrected order they are Stage B and cannot lead. The uncommitted platform region mounts are
+reference-only, not the rollout.
 
 One lane per file; an executor that finds a lane file modified outside its lane stops and reports
-(`ui-circuit-blueprint-strategy.md:181-193`, one package per deploy, no big-bang). Lane order is
-C → B → A because Lane B pins Lane C's commit.
+(`ui-circuit-blueprint-strategy.md:181-193`, one package per deploy, no big-bang). The lane order
+C → B → A is the reference batch's execution order (Lane B pins Lane C's commit), not the rollout
+order.
 
-| Lane | Owns (only these files) | Deliverable | Plan authority |
-| --- | --- | --- | --- |
-| **C — provider/asset alignment** | `sfx-providers/providers/ui-shell-footer/**`, `sfx-providers/tests/ui-shell-footer.test.mjs`; `sfx-platform/deploy/staging/identity-sources.json`, `deploy/staging/release.mjs`, `deploy/sda-kernel/prepare-composite.mjs`, `deploy/sda-kernel/Dockerfile.composite`, `deploy/sda-kernel/verify-composite-package.mjs` | The five declared region packages reach the deployed observer; asset digests match the shell slots | `ui-explorer-region-blueprint.md` §3.3, §4.4, §6; `landing-blueprint.md` §5.4; `implementation-strategy.md` §4.6 |
-| **B — verification wiring** | `.github/workflows/staging.yml`, `deploy/staging/accept.mjs`, `live-circuit/circuit/verify-region.mjs`, `verify-identity-session.mjs`, `verify-objective.mjs`, `verify-view.mjs`, `tools/live-circuit/verify-regions-browser.mjs`, `verify-region-header-browser.mjs` | Checks run `verify-region.mjs`; public acceptance pins the region route; CI checks out Lane C's provider commit | `implementation-strategy.md` §9.1–9.2; `analysis/09` §1.3–1.4, T4; `ui-circuit-blueprint-strategy.md` §6.3 |
-| **A — left/right region mounts** | `live-circuit/circuit/explorer.html`, `explorer.js`, `explorer-shell.js`, `region-runtime.js`, `region-host.mjs`, `footer.js`, `home.html`, `home.js`, `login.html`, `login.js`, `page.html`, `page.js`, `site.js`, `circuit-runtime.js`, `run-context.js`, `view-runtime.js`, `view.html` (delete), `circuit-host.json`, `README.md`, `.gitignore`; `live-circuit/dispatch-pair/observe-server.mjs` | Explorer mounts all four regions; home/login/declared pages mount the shared footer; named failures replace chrome | `ui-explorer-region-blueprint.md` §1, §2.2, §2.4, §5.2; `landing-blueprint.md` §2.4; `implementation-strategy.md` §1.1, §4.5 |
+| Lane | Stage | Owns (only these files) | Deliverable | Plan authority |
+| --- | --- | --- | --- | --- |
+| **C — provider/asset alignment** | A — provider package; B — pins | `sfx-providers/providers/ui-shell-footer/**`, `sfx-providers/tests/ui-shell-footer.test.mjs`; `sfx-platform/deploy/staging/identity-sources.json`, `deploy/staging/release.mjs`, `deploy/sda-kernel/prepare-composite.mjs`, `deploy/sda-kernel/Dockerfile.composite`, `deploy/sda-kernel/verify-composite-package.mjs` | The five declared region packages reach the deployed observer; asset digests match the shell slots | `ui-explorer-region-blueprint.md` §3.3, §4.4, §6; `landing-blueprint.md` §5.4; `implementation-strategy.md` §4.6 |
+| **B — verification wiring** | B — after Stage A | `.github/workflows/staging.yml`, `deploy/staging/accept.mjs`, `live-circuit/circuit/verify-region.mjs`, `verify-identity-session.mjs`, `verify-objective.mjs`, `verify-view.mjs`, `tools/live-circuit/verify-regions-browser.mjs`, `verify-region-header-browser.mjs` | Checks run `verify-region.mjs`; public acceptance pins the region route; CI checks out Lane C's provider commit | `implementation-strategy.md` §9.1–9.2; `analysis/09` §1.3–1.4, T4; `ui-circuit-blueprint-strategy.md` §6.3 |
+| **A — left/right region mounts** | B — after Stage A | `live-circuit/circuit/explorer.html`, `explorer.js`, `explorer-shell.js`, `region-runtime.js`, `region-host.mjs`, `footer.js`, `home.html`, `home.js`, `login.html`, `login.js`, `page.html`, `page.js`, `site.js`, `circuit-runtime.js`, `run-context.js`, `view-runtime.js`, `view.html` (delete), `circuit-host.json`, `README.md`, `.gitignore`; `live-circuit/dispatch-pair/observe-server.mjs` | Explorer mounts all four regions; home/login/declared pages mount the shared footer; named failures replace chrome | `ui-explorer-region-blueprint.md` §1, §2.2, §2.4, §5.2; `landing-blueprint.md` §2.4; `implementation-strategy.md` §1.1, §4.5 |
 
 Out of scope for the batch (leave uncommitted or committed separately; they are outside the
 watched paths and do not affect the deploy): `docs/canonical-scenario-blueprint.md`,
@@ -501,16 +528,20 @@ forward commit; do not cancel an active release to accelerate a newer push
 
 ---
 
-## 5. Beyond this batch
+## 5. Beyond this batch — providers first
 
-**Beyond this batch.** The provider-deployment-boundary items **P1–P4** are not in this batch and
-are left pending by design: the batch lands the declared regions with the provider packages baked
-into the composite image (Lane C), while the originating plan
-([`sidefx-circuit-driven-ui-strategy.md`](../sidefx-circuit-driven-ui-strategy.md) L54–L79, L97,
-L103, L130) leaves the versioned provider API, admitted version selection, browser-loading
-security mechanics and independent provider versioning for afterwards — specified in
+**Beyond this batch.** The corrected rollout is providers-first. The provider-deployment-boundary
+items **P1–P4** lead as **Stage A** — every UI circuit provider (`header`, `left-sidebar`,
+`middle`, `right-sidebar`, `footer`, drill-down) completed, packaged, versioned and tested
+entirely in `sfx-providers`, then hosted and consumable through the provider API (P1)
+independently of `sfx-platform`. Only after Stage A is consumable does `sfx-platform` become the
+thin consumer (loader + mounts) in one batch as **Stage B**; the executed platform lanes and the
+uncommitted platform region mounts are reference-only, not the rollout. This ordering follows the
+originating plan
+([`sidefx-circuit-driven-ui-strategy.md`](../sidefx-circuit-driven-ui-strategy.md) L54–L79, L9,
+L103, L118, L130), specified in
 [`analysis/15-provider-deployment-boundary.md`](analysis/15-provider-deployment-boundary.md) and
 inventoried at §9 of
 [`analysis/14-remaining-work-inventory.md`](analysis/14-remaining-work-inventory.md). This batch's
-scope (§1 lanes, §3 steps, §4 stop conditions) and its owed receipts are unchanged; nothing in §3
-acquires a P-item.
+scope (§1 lanes, §3 steps, §4 stop conditions) and its owed receipts stand as the reference
+batch; nothing in §3 acquires a P-item.
