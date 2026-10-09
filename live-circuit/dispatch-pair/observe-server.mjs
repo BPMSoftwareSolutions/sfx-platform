@@ -389,6 +389,10 @@ function openStream(req, res, url) {
       res.write(`data: ${JSON.stringify(record)}\n\n`);
     }
   }
+  // Subscription boundary: every record this stream replays has been written and
+  // live delivery starts next. EventSource ignores comments; tests use it as an
+  // explicit barrier instead of a quiet-period wait.
+  res.write(': replay-complete\n\n');
   const client = { res, matcher };
   clients.add(client);
   req.on('close', () => clients.delete(client));

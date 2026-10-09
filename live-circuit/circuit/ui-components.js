@@ -161,6 +161,7 @@ function previewSlide(value, page) {
 // site.js circuitPreview semantics: resolve the declared figure binding,
 // refuse visibly on a digest mismatch, then show the database scene and link
 // back to the Explorer selection.
+// Resolves once a digest-verified figure is placed or its refusal is shown.
 function mountPreview(nodes, entry, context) {
   const state = nodes.figure?.querySelector?.('.state') ?? null;
   const binding = entry?.bindings?.figure;
@@ -179,7 +180,7 @@ function mountPreview(nodes, entry, context) {
   }
   const expected = typeof slide.svgDigest === 'string' ? slide.svgDigest : null;
   const verify = expected ? sha256(slide.svg).then(digest => { if (digest !== expected) throw new Error(DIGEST_FAILURE); }) : Promise.resolve();
-  verify.then(() => {
+  return verify.then(() => {
     const image = document.createElement('img');
     image.alt = `${selection.capabilityId} scenario circuit, read from the database`;
     image.src = URL.createObjectURL(new Blob([slide.svg], { type: 'image/svg+xml' }));
@@ -232,7 +233,7 @@ function renderHero(container, entry, context) {
   grid.append(nodes.card);
   section.append(grid);
   container.append(section);
-  if (entry?.bindings?.figure != null) mountPreview(nodes, entry, context);
+  if (entry?.bindings?.figure != null) return mountPreview(nodes, entry, context);
 }
 
 function appendSectionBody(container, body, context) {
@@ -427,11 +428,11 @@ function renderMediaFigure(container, entry, context) {
   if (typeof svg === 'string' && svg) {
     const expected = digestReference(digest);
     const verify = expected ? sha256(svg).then(hash => { if (hash !== expected) throw new Error(DIGEST_FAILURE); }) : Promise.resolve();
-    verify.then(() => {
+    // Resolves once the digest-verified figure is placed or its refusal is shown.
+    return verify.then(() => {
       image.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
       media.replaceChildren(image);
     }).catch(error => { if (state) state.textContent = error.message; });
-    return;
   }
   if (state) state.textContent = SCENE_EMPTY;
 }

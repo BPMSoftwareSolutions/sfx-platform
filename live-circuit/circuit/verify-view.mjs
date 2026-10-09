@@ -5,7 +5,8 @@
 // ui-view.v1 host end to end: the view document reads through the deployed page
 // reader, the selection binds into its declared sources (host selection wins),
 // the page validator admits it, and view-runtime.js is served to the Explorer
-// drill-down. Reads only; the fixture observer never touches ports 8788/8799.
+// drill-down. Reads only; the fixture observer runs on a spare port with an
+// isolated environment (fixture-observer.mjs).
 //
 // Click path: the Explorer's provider glyph click must open the declared view
 // (circuit-runtime.js selectComponent -> openDetail), reveal the Evidence pane,
@@ -17,17 +18,15 @@
 // view is a named visible state, never a fallback render.
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { startFixtureObserver } from './fixture-observer.mjs';
 import { VIEW_CONTRACT, DEFAULT_VIEW_ID, bindViewSelection, viewPath, viewSelection, validateView, readView, createViewRuntime } from './view-runtime.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..', '..');
 const fixtureDirectory = path.join(here, 'fixtures', 'pages');
-const observerModule = path.join(repoRoot, 'live-circuit', 'dispatch-pair', 'observe-server.mjs');
-const fixturePort = 8896;
-const fixtureBase = `http://localhost:${fixturePort}`;
+let fixtureBase = null;
 
 const checks = [];
 function record(name, pass, detail) {
@@ -84,22 +83,11 @@ await guard('view-selection-url', async () => {
 });
 await guard('view-path', async () => ({ pass: viewPath() === '/circuit/views/' + DEFAULT_VIEW_ID, detail: viewPath() }));
 
-let child = null;
-function stopObserver() {
-  const running = child; child = null;
-  if (running && running.exitCode === null) running.kill();
-}
+let observer = null;
+function stopObserver() { observer?.stop(); observer = null; }
 async function startObserver() {
-  const env = { ...process.env, OBSERVER_PORT: String(fixturePort), SFX_PAGE_FIXTURE_DIR: fixtureDirectory };
-  child = spawn(process.execPath, [observerModule], { env, cwd: repoRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-  child.stdout.resume(); child.stderr.resume(); child.on('error', () => {});
-  const deadline = Date.now() + 20000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`observe-server exited early with code ${child.exitCode}`);
-    try { const response = await fetch(`${fixtureBase}/health`, { signal: AbortSignal.timeout(2000) }); if (response.ok) return; } catch { /* not ready */ }
-    await new Promise(resolve => setTimeout(resolve, 250));
-  }
-  throw new Error('observe-server did not report /health within 20s');
+  observer = await startFixtureObserver({ SFX_PAGE_FIXTURE_DIR: fixtureDirectory });
+  fixtureBase = observer.base;
 }
 
 let viewDocument = null;

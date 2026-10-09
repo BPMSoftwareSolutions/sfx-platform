@@ -2,13 +2,14 @@
 // Declared-region host checks (shell lane: the four Explorer regions and the
 // shared shell footer):
 //   node live-circuit/circuit/verify-region.mjs
-// Source checks always run. When the sfx-providers checkout is present (an
-// explicit SFX_UI_PROVIDER_DIR or a sibling checkout), a fixture observer loads
-// the real ui-explorer-region and ui-shell-footer providers through
-// ui.region.load and the candidates, contracts, digests and refusals are
-// proven end to end. The region runtime module's Node-safe validator/digest
-// functions run against those candidates. Reads only; the fixture observer
-// never touches ports 8788/8799.
+// SFX_UI_PROVIDER_DIR must name the release-pinned sfx-providers `providers`
+// directory. A fixture observer loads the real ui-explorer-region and
+// ui-shell-footer providers through ui.region.load and the candidates,
+// contracts, digests and refusals are proven end to end; the region runtime
+// module's Node-safe validator/digest functions run against those candidates.
+// A missing provider directory is a configuration error, never reduced
+// coverage reported as success. Reads only; fixture observers run on spare
+// ports with an isolated environment (fixture-observer.mjs).
 //
 // No fallback: the Explorer's hand-authored region chrome and every page's
 // .site-footer are gone; a region that cannot be read or projected renders its
@@ -16,22 +17,29 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REGION_OPERATION, REGION_REQUEST_CONTRACT, REGION_CONTENT_CONTRACT, HEADER_REGION_ID, FOOTER_REGION_ID,
   validateRegionContent, verifyRegionDigests, readingFailure } from './region-runtime.js';
+import { startFixtureObserver } from './fixture-observer.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..', '..');
-const observerModule = path.join(repoRoot, 'live-circuit', 'dispatch-pair', 'observe-server.mjs');
-const deckFile = path.join(repoRoot, 'outputs', 'capability-estate', 'landing-circuit', 'circuit-blueprint.json');
-const fixturePort = 8895;
-const fixtureBase = `http://localhost:${fixturePort}`;
+// The landing blueprint deck is an untracked estate output. Its comparison runs
+// only when explicitly requested, so the same command covers the same checks on
+// every machine; a requested deck that is missing is a configuration error.
+const deckFile = process.env.SFX_REGION_BLUEPRINT_DECK ? path.resolve(process.env.SFX_REGION_BLUEPRINT_DECK) : null;
+if (deckFile && !existsSync(deckFile)) {
+  console.error('REGION_BLUEPRINT_DECK_MISSING: ' + deckFile);
+  process.exit(2);
+}
+let fixtureBase = null;
 const explorerRegions = ['header', 'left-sidebar', 'middle', 'right-sidebar'];
-const configuredProvider = process.env.SFX_UI_PROVIDER_DIR ? path.resolve(process.env.SFX_UI_PROVIDER_DIR) : null;
-const siblingProviders = path.resolve(repoRoot, '..', 'sfx-providers', 'providers');
-const providerDirectory = configuredProvider ?? (existsSync(siblingProviders) ? siblingProviders : null);
+const providerDirectory = process.env.SFX_UI_PROVIDER_DIR ? path.resolve(process.env.SFX_UI_PROVIDER_DIR) : null;
+if (!providerDirectory || !existsSync(path.join(providerDirectory, 'ui-shell-footer'))) {
+  console.error('REGION_PROVIDER_FIXTURE_REQUIRED: set SFX_UI_PROVIDER_DIR to the release-pinned sfx-providers/providers directory');
+  process.exit(2);
+}
 
 const checks = [];
 const limitations = [];
@@ -106,22 +114,11 @@ record('footer-slots', footerSource.includes('FOOTER_REGION_ID') && footerSource
   && footerSource.includes('createRegionRuntime('),
   'the footer mount fills the four declared slots with shell behavior only');
 
-let child = null;
-function stopObserver() {
-  const running = child; child = null;
-  if (running && running.exitCode === null) running.kill();
-}
+let observer = null;
+function stopObserver() { observer?.stop(); observer = null; }
 async function startObserver(providerPath) {
-  const env = { ...process.env, OBSERVER_PORT: String(fixturePort), SFX_UI_PROVIDER_DIR: providerPath };
-  child = spawn(process.execPath, [observerModule], { env, cwd: repoRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-  child.stdout.resume(); child.stderr.resume(); child.on('error', () => {});
-  const deadline = Date.now() + 20000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`observe-server exited early with code ${child.exitCode}`);
-    try { const response = await fetch(`${fixtureBase}/health`, { signal: AbortSignal.timeout(2000) }); if (response.ok) return; } catch { /* not ready */ }
-    await new Promise(resolve => setTimeout(resolve, 250));
-  }
-  throw new Error('observe-server did not report /health within 20s');
+  observer = await startFixtureObserver({ SFX_UI_PROVIDER_DIR: providerPath });
+  fixtureBase = observer.base;
 }
 const regionPath = regionId => `${fixtureBase}/api/circuit/v1/region?${new URLSearchParams({ contractId: REGION_REQUEST_CONTRACT, regionId })}`;
 
@@ -154,7 +151,7 @@ try {
   stopObserver();
 }
 
-if (providerDirectory) {
+{
   const candidates = new Map();
   try {
     await startObserver(providerDirectory);
@@ -210,7 +207,7 @@ if (providerDirectory) {
         detail: `unknown=${unknown.status}/${unknownBody?.findings?.[0]?.code} missing=${invalid.status}/${invalidBody?.findings?.[0]?.code}` };
     });
 
-    if (existsSync(deckFile)) {
+    if (deckFile) {
       await guard('region-blueprint-deck', async () => {
         const deck = JSON.parse(await readFile(deckFile, 'utf8'));
         const rows = [];
@@ -230,16 +227,13 @@ if (providerDirectory) {
       });
       limitations.push('The shared footer is a shell-chrome revision outside the landing deck\'s four region resolves; the browser capture records its blueprint-diff note.');
     } else {
-      limitations.push('The blueprint deck (outputs/capability-estate/landing-circuit/circuit-blueprint.json) is not present in this checkout; the browser capture bundle records the deck diff.');
+      limitations.push('Blueprint deck comparison not requested (set SFX_REGION_BLUEPRINT_DECK, e.g. outputs/capability-estate/landing-circuit/circuit-blueprint.json); the browser capture bundle records the deck diff.');
     }
   } catch (error) {
     record('region-fixture-observer', false, `could not start over the provider packages · ${error?.message ?? error}`);
   } finally {
     stopObserver();
   }
-} else {
-  record('region-provider-package', true, 'recorded unavailable · set SFX_UI_PROVIDER_DIR or keep a sibling sfx-providers checkout to run the provider checks');
-  limitations.push('The provider invocation checks need the sfx-providers packages (SFX_UI_PROVIDER_DIR or a sibling checkout); the local browser capture bundle is the real-browser proof.');
 }
 
 const summary = {

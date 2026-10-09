@@ -11,6 +11,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { newRun, applyRecord } from './deck-trace.js';
 import { evidenceModel, componentEvidence } from './run-evidence.mjs';
 import { readRegion, serveRegionApi, REGION_PROVIDERS, REGION_ROUTE } from './region-host.mjs';
+import { admissionBody } from './objective-run.js';
+import { viewPath } from './view-runtime.js';
 
 const dir = path.dirname(fileURLToPath(import.meta.url)), root = path.resolve(dir, '../..');
 assert(process.env.SFX_UI_PROVIDER_DIR, 'SFX_UI_PROVIDER_DIR_REQUIRED: use the release-pinned UI providers');
@@ -46,7 +48,13 @@ const server = http.createServer(async (req, res) => {
   if (await serveRegionApi(req, res, url)) return;
   const json = (body, status = 200) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(body)); };
   if (url.pathname === '/events') { res.writeHead(200, { 'content-type': 'text/event-stream' }); return res.end(externalCapture ?? (url.searchParams.get('run') === 'current' ? sse : ': fixture observer\n\n')); }
-  if (url.pathname === '/api/circuit/v1/scenario') return json(deck);
+  if (url.pathname === '/api/circuit/v1/scenario') {
+    // A provider drill-down reads its declared detail, then the declared view,
+    // which this fixture has not published (the real host's PAGE_NOT_FOUND).
+    const detailId = url.searchParams.get('detailId');
+    return json(detailId ? { ...deck, detailSlides: [], detail: { id: detailId, kind: 'provider', status: 'DECLARED', body: { providerId: detailId.slice('provider:'.length) } } } : deck);
+  }
+  if (url.pathname === '/api/circuit/v1/page') return json({ error: 'PAGE_NOT_FOUND' }, 404);
   if (url.pathname === '/api/circuit/v1/capability-details') return json({ error: 'Offline fixture: navigation not included' }, 503);
   if (url.pathname === '/api/circuit/v1/session') return json({ authenticated, observeRequiresSession: true, principalId: 'fixture-principal', identifier: 'Offline acceptance' });
   if (url.pathname === '/api/circuit/v1/session/runs') return json({ principalId: 'fixture-principal', runs: listed });
@@ -195,8 +203,34 @@ try {
   assert((await page.locator('#observer-status').textContent()).includes('2 run(s) seen'));
   assert.equal(await page.locator('[data-step-node]').count(), model.operations.length);
   if (process.argv[2]) await page.screenshot({ path: path.join(process.argv[2], 'concurrent-external.png'), fullPage: true });
+  // A declared provider glyph opens the declared provider view through the page
+  // reader; an unpublished view is a named visible refusal, never a fallback.
+  const glyph = page.locator('.component-hit[data-kind="provider"]').filter({ visible: true }).first();
+  const providerId = await glyph.getAttribute('data-node-id');
+  assert(deck.navigation.items.some(item => item.id === providerId && item.status === 'DECLARED'), 'A visible declared provider glyph is required');
+  const viewRead = page.waitForRequest(r => new URL(r.url()).pathname === '/api/circuit/v1/page' && new URL(r.url()).searchParams.get('path') === viewPath('provider-profile'));
+  // Click where the provider is drawn, as a user does: whichever drawn control is
+  // on top there (the glyph, or the Linear view's navigation link) must open it.
+  const box = await glyph.boundingBox();
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await viewRead;
+  await page.locator('#declaration-detail [data-refusal="PAGE_NOT_FOUND"]').waitFor();
+  // The objective composer, by behavior: its declared controls are present, the
+  // action is Run (never Ask), and a typed objective is admitted verbatim as the
+  // universal capability request. The fixture refuses it unauthenticated.
+  for (const id of ['objective-form', 'objective-input', 'objective-voice-status', 'objective-mic', 'objective-run', 'objective-run-status', 'summary-strip', 'requested-capabilities'])
+    assert.equal(await page.locator('#' + id).count(), 1, 'Objective composer control ' + id);
+  assert(await page.locator('#objective-mic svg').count() > 0, 'The objective mic is an SVG icon');
+  assert.equal(await page.locator('#objective-form').getByRole('button', { name: 'Run', exact: true }).count(), 1, 'The objective action is Run');
+  assert.equal(await page.getByRole('button', { name: /^Ask$/ }).count(), 0, 'The Explorer never labels the objective action Ask');
+  const objective = "  What is Broadcom's current market price?  ";
+  await page.route('**/api/circuit/v1/runs', route => route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ disposition: 'SIGN_IN_REQUIRED' }) }));
+  const objectiveRequest = page.waitForRequest(r => new URL(r.url()).pathname === '/api/circuit/v1/runs' && r.method() === 'POST');
+  await page.locator('#objective-input').fill(objective);
+  await page.locator('#objective-run').click();
+  assert.deepEqual((await objectiveRequest).postDataJSON(), admissionBody(objective), 'Objective admission is the universal capability request');
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log(JSON.stringify({ basis: 'Offline browser, pinned declared region providers, retained scene and receipts, fixture API/session', gates: ['declared shell regions', 'report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run', 'concurrent external follow keeps exact outcome'], errors, status: 'PASS' }));
+  console.log(JSON.stringify({ basis: 'Offline browser, pinned declared region providers, retained scene and receipts, fixture API/session', gates: ['declared shell regions', 'provider drill-down reads the declared view', 'objective composer admission', 'report', 'history set equality', 'evidence containment', 'seek', 'mobile context', '401 offers sign-in and returns to the same run', '404 releases controls without resubmission', '503 resumes original run', 'concurrent external follow keeps exact outcome'], errors, status: 'PASS' }));
 } catch (error) {
   if (process.argv[2] && page) {
     await fs.mkdir(process.argv[2], { recursive: true });

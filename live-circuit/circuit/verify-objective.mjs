@@ -1,31 +1,16 @@
-// Objective component checks. Reads only; needs no running host.
+// Objective component checks. Needs no running host; starts a fixture observer.
 //   node verify-objective.mjs
-// The universal capability's composer must be the prompt shell's pattern:
-// prompt-shell mic icon, voice status, Run, and the universal subject. The
-// client core must stay free of result-set names (specification rule 7).
+// The admission and summary behavior of objective-run.js, the circuit host
+// serving it, and specification rule 7 (the client core names no result set).
+// The composer's rendered controls, its Run action and the exact admission it
+// sends are proven in a real browser by verify-run-evidence-browser.mjs; this
+// script does not match source spelling, icon geometry or copy.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { admissionBody, objectiveInput, spokenSummary, OBJECTIVE_CAPABILITY, OBJECTIVE_CONTRACT } from './objective-run.js';
+import { startFixtureObserver } from './fixture-observer.mjs';
 
 const here = new URL('./', import.meta.url);
-const html = await readFile(new URL('explorer.html', here), 'utf8');
-const explorer = await readFile(new URL('explorer.js', here), 'utf8');
-const shell = await readFile(new URL('explorer-shell.js', here), 'utf8');
-const module_ = await readFile(new URL('objective-run.js', here), 'utf8');
-const server = await readFile(new URL('../dispatch-pair/observe-server.mjs', here), 'utf8');
-const client = [html, explorer, shell, module_].join('\n');
-
-// The declared middle region carries the composer; the shell builds its
-// behavior nodes into the declared slots, so the ids live in the shell module.
-for (const id of ['objective-form', 'objective-input', 'objective-voice-status', 'objective-mic', 'objective-run', 'objective-run-status', 'summary-strip', 'requested-capabilities'])
-  assert.match(shell, new RegExp(`'${id}'`), `The shell slot content declares ${id}`);
-assert.match(shell, /M18\.585 13\.412/, 'The objective mic is the prompt-shell icon');
-assert.match(shell, /createElementNS\('http:\/\/www\.w3\.org\/2000\/svg', 'svg'\)/, 'The objective mic is an SVG icon');
-assert.match(shell, /id: 'objective-run'[\s\S]{0,220}text: 'Run'/, 'The objective action is Run');
-assert.match(shell, /Voice ready/, 'The idle voice status is the shell copy');
-assert.match(explorer, /createObjectiveRun\(/, 'The objective component is mounted in the Explorer');
-assert.match(module_, /Review or Run\./, 'The captured voice status is the shell copy');
-assert.ok(server.includes("['/circuit/objective-run.js'"), 'The circuit host serves objective-run.js');
 
 // The admission body is the universal capability with the declared objective
 // contract; the objective is trimmed and submitted verbatim, never guessed.
@@ -44,7 +29,16 @@ assert.equal(spokenSummary('Price is $34.61. {"a":[1,2]} Done.'), 'Price is $34.
 assert.equal(spokenSummary('```json\n{"a":1}\n```'), '');
 assert.equal(spokenSummary('{"only":"machine"}'), '');
 
-// Rule 7: the client names no result set; and the design's Ask wording never returns.
-assert(!/Ask/.test(html), 'The Explorer never labels the objective action Ask');
+// The circuit host serves the module the Explorer imports, byte for byte.
+const observer = await startFixtureObserver();
+try {
+  const response = await fetch(`${observer.base}/circuit/objective-run.js`);
+  assert.equal(response.status, 200, 'The circuit host serves objective-run.js');
+  assert.equal(await response.text(), await readFile(new URL('objective-run.js', here), 'utf8'), 'The served module is the checked-out module');
+} finally { observer.stop(); }
+
+// Rule 7: the client core names no result set.
+const client = (await Promise.all(['explorer.html', 'explorer.js', 'explorer-shell.js', 'objective-run.js']
+  .map(name => readFile(new URL(name, here), 'utf8')))).join('\n');
 assert(!client.includes("'capability_navigation'") && !client.includes('"capability_navigation"'), 'The client names no result set');
 console.log(JSON.stringify({ checked: 'objective component', capability: OBJECTIVE_CAPABILITY, contract: OBJECTIVE_CONTRACT, served: true }));

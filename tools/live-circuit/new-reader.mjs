@@ -237,8 +237,9 @@ function registryPatch(spec) {
 
 function acceptPins(spec) {
   return `# Generated acceptance pins for reader "${spec.reader}".
-# Merge into deploy/staging/accept.mjs public mode (route list :47-48):
-['${spec.route}', 'GET', 200],
+# Merge into the deploy/staging/accept.mjs smoke. A reader route is reader-backed:
+# add it to the sequential reader lane (readerLane), not the parallel static lane.
+route('${spec.route}', 'GET', 200),
 # The registry group (verify-pages.mjs:127-136) asserts every sourceId; add
 # '${spec.sourceId}' to expectedSources when this source feeds a declared page.
 # Reader checks stay hand-owned: contractId equality, refusal statuses and the

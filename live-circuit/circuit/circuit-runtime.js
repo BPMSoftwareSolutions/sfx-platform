@@ -35,7 +35,7 @@ export function createCircuitRuntime(shell) {
     runs: [], lastSeq: 0, instance: null, connection: 'connecting', playback: null,
     apiOwned: false, apiRun: null, apiGap: false, apiId: null, apiResult: null, output: undefined, outputError: null,
     replayError: null, view: storedView(), zoom: 'fit', scale: null };
-  let detailRequest, detailSerial = 0, replaySerial = 0, frame = 0, source;
+  let detailRequest, detailSerial = 0, replaySerial = 0, frame = 0, source, reconnect = 0;
   let liveTraversal = { key: null, model: null };
   const liveMotion = new LiveMotion();
   const capability = () => shell.selection().capabilityId;
@@ -365,15 +365,18 @@ export function createCircuitRuntime(shell) {
       node.open = expanded.has(node.querySelector('summary').textContent.replace(/\(\d+\)/g, ''));
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(() => { frame = 0; render(); }); }
+  function disconnect() { clearTimeout(reconnect); reconnect = 0; source?.close(); source = null; }
   function connect(replay = false) {
-    source?.close();
+    disconnect();
     if (state.apiOwned) return;
     if (replay) { state.runs = []; state.lastSeq = 0; }
     // Replay the latest run of this circuit's graph; interleaved reader runs are skipped.
-    source = new EventSource(replay ? `/events?run=current&graphId=${encodeURIComponent(`graph:${capability()}`)}` : state.lastSeq ? `/events?since=${state.lastSeq}` : '/events');
-    source.onopen = () => { state.connection = 'connected'; schedule(); };
-    source.onmessage = message => {
-      if (state.apiOwned) return;
+    // Each stream acts only while it is current: a superseded stream's end or an
+    // earlier stream's pending reconnect must never close the stream replacing it.
+    const stream = source = new EventSource(replay ? `/events?run=current&graphId=${encodeURIComponent(`graph:${capability()}`)}` : state.lastSeq ? `/events?since=${state.lastSeq}` : '/events');
+    stream.onopen = () => { if (source !== stream) return; state.connection = 'connected'; schedule(); };
+    stream.onmessage = message => {
+      if (source !== stream || state.apiOwned) return;
       try {
         const record = JSON.parse(message.data);
         const instance = record.observationKey?.split(':').slice(0, -1).join(':');
@@ -388,7 +391,10 @@ export function createCircuitRuntime(shell) {
         if (replay && record.kind === 'run-end') { startReplay(latestRun()); connect(); }
       } catch (error) { state.connection = `invalid observation: ${error.message}`; schedule(); }
     };
-    source.onerror = () => { if (state.apiOwned) return; state.connection = 'reconnecting'; schedule(); source.close(); setTimeout(() => connect(), 1500); };
+    stream.onerror = () => {
+      if (source !== stream || state.apiOwned) return;
+      state.connection = 'reconnecting'; schedule(); disconnect(); reconnect = setTimeout(() => connect(), 1500);
+    };
   }
   const observePanel = createObservePanel({
     selection: shell.selection,
@@ -397,7 +403,7 @@ export function createCircuitRuntime(shell) {
       await shell.loadRoot();
       if (!state.deck) throw new Error('The live scenario could not be loaded.');
     },
-    admitted: id => { source?.close(); stopReplay(); Object.assign(state, { apiOwned: true, apiRun: null, apiGap: false, apiId: id, apiResult: null, output: undefined, outputError: null }); state.connection = `API run ${id}`; context.tab('run'); shell.location(false); schedule(); },
+    admitted: id => { disconnect(); stopReplay(); Object.assign(state, { apiOwned: true, apiRun: null, apiGap: false, apiId: id, apiResult: null, output: undefined, outputError: null }); state.connection = `API run ${id}`; context.tab('run'); shell.location(false); schedule(); },
     completed: (result, output, error) => { state.apiResult = result; state.output = output; state.outputError = error; schedule(); },
     failed: message => { state.outputError = message; schedule(); },
     authenticationRequired: () => shell.authenticationRequired?.(),

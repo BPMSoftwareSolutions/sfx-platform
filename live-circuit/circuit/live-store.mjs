@@ -342,6 +342,11 @@ export async function readCrosswalk(selection, refresh = false) {
   if (data.contractId !== 'standards-crosswalk.v1') throw new CircuitReadError('CIRCUIT_READER_CONTRACT_MISMATCH');
   return { ...data, source: 'database' };
 }
+// The declared platform catalogs select the canonical reader; every other
+// provider reads through the details reader.
+export function providerReader(configured, providerId) {
+  return configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured;
+}
 async function readProviderInspection(selection) {
   const endpoint = process.env.PROCEDURE_EXTRACT_ENDPOINT;
   if (!endpoint) throw new CircuitReadError('PROCEDURE_RETRIEVAL_NOT_CONFIGURED', 503);
@@ -373,10 +378,9 @@ async function readProviderInspection(selection) {
     return resultSets;
   }
   try {
-    // The declared platform catalogs select the canonical reader; every other
-    // provider reads through the details reader. There is no reader fallback:
-    // a failed read is a named CircuitReadError, never a canonical-only render.
-    const reader = configured.canonical && (configured.canonicalProviders ?? []).includes(providerId) ? configured.canonical : configured;
+    // There is no reader fallback: a failed read is a named CircuitReadError,
+    // never a canonical-only render.
+    const reader = providerReader(configured, providerId);
     const resultSets = await readSets(reader);
     const declared = resultSets.find(set => set.name === reader.identityResultSet)?.rows;
     if (declared?.length !== 1 || declared[0].provider_id !== providerId || declared[0].definition_digest !== identity.definitionDigest)

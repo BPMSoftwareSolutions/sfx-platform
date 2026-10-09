@@ -460,8 +460,8 @@ async function runProbe(kind, name) {
     safeUrl,
   }, spec.context ?? {});
   try {
+    // Renders that verify a digest return their completion; nothing is timed.
     await UI_COMPONENTS[kind]?.render(root, spec.entry, context);
-    await new Promise(resolve => setTimeout(resolve, 20));
   } catch (error) {
     return { pass: false, detail: `render threw ${error?.message ?? error}` };
   }

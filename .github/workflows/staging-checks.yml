@@ -1,0 +1,178 @@
+name: Live Circuit checks
+
+# Offline qualification for every watched change. Nothing here touches Azure or
+# waits for the staging lock, and the jobs run in parallel. A successful run on
+# main starts the release transaction in staging.yml, which releases exactly the
+# commit qualified here and the identity publish built here.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'live-circuit/**'
+      - 'deploy/sda-kernel/**'
+      - 'deploy/staging/**'
+      - 'tools/live-circuit/**'
+      - 'tools/sfx-api/**'
+      - 'infra/azure.json'
+      - 'infra/authorize-staging-release.ps1'
+      - '.github/workflows/staging-checks.yml'
+      - '.github/workflows/staging.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push supersedes unfinished checks of an older one; its release then
+# carries both changes. Releases themselves are never cancelled (staging.yml).
+concurrency:
+  group: live-circuit-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    name: Offline contract gates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - id: pins
+        name: Read pinned provider and DAL commits
+        run: node -e "const s=require('./deploy/staging/identity-sources.json');console.log('providers='+s.providers);console.log('dal='+s.dal)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-providers
+          ref: ${{ steps.pins.outputs.providers }}
+          path: .release-sources/sfx-providers
+          sparse-checkout: providers
+      - name: Offline gates in isolated parallel workers
+        env:
+          SFX_UI_PROVIDER_DIR: ${{ github.workspace }}/.release-sources/sfx-providers/providers
+        run: node deploy/staging/offline-checks.mjs --concurrency=4
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: offline-checks
+          path: artifacts/checks/
+          retention-days: 30
+          if-no-files-found: ignore
+
+  candidate-browser:
+    name: Candidate browser qualification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SFX_BROWSER_TEST_MODULE: ${{ github.workspace }}/deploy/staging/test-tools/node_modules/playwright/index.mjs
+      SFX_UI_PROVIDER_DIR: ${{ github.workspace }}/.release-sources/sfx-providers/providers
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - id: pins
+        name: Read pinned provider commit
+        run: node -e "console.log('providers='+require('./deploy/staging/identity-sources.json').providers)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-providers
+          ref: ${{ steps.pins.outputs.providers }}
+          path: .release-sources/sfx-providers
+          sparse-checkout: providers
+      - name: Install pinned acceptance browser
+        run: |
+          npm ci --prefix deploy/staging/test-tools
+          deploy/staging/test-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run history, retry, drill-down and objective controls
+        run: node live-circuit/circuit/verify-run-evidence-browser.mjs artifacts/candidate/run-evidence
+      - name: Replay pinned retained evidence with prompt and delayed delivery
+        run: node tools/live-circuit/verify-replay-candidate.mjs artifacts/candidate/replay
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: candidate-browser
+          path: artifacts/candidate/
+          retention-days: 30
+          if-no-files-found: ignore
+
+  windows-client:
+    name: Windows client build and local tests
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - id: pins
+        name: Read pinned input provider commit
+        shell: pwsh
+        run: node -e "console.log('input='+require('./deploy/staging/client-sources.json').cliInputProvider)" >> $env:GITHUB_OUTPUT
+      # Input provider test build only; it is never shipped in the release image.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-providers
+          ref: ${{ steps.pins.outputs.input }}
+          path: .acceptance-providers
+          sparse-checkout: |
+            providers/cli-login-input-provider
+            providers/cli-login/Contracts.cs
+            providers/cli-login/IIdentityDal.cs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: '8.0.408'
+      - name: Build the hidden input helper and run the client tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          npm ci --prefix deploy/staging/test-tools
+          if ($LASTEXITCODE) { throw 'Acceptance tooling installation failed' }
+          $providerProject = Join-Path $PWD '.acceptance-providers/providers/cli-login-input-provider/CliLoginInputProvider.csproj'
+          dotnet publish tools/sfx-api/login-input/LoginInput.csproj -c Release -r win-x64 --self-contained true -p:LoginInputProviderProject="$providerProject" -o (Join-Path $env:RUNNER_TEMP 'sfx-cli/input')
+          if ($LASTEXITCODE) { throw 'Input provider publish failed' }
+          node --test tools/sfx-api/auth.test.mjs tools/sfx-api/install-login.test.mjs
+          if ($LASTEXITCODE) { throw 'Client tests failed' }
+
+  identity:
+    name: Pinned identity transport
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - id: pins
+        name: Read pinned provider and DAL commits
+        run: node -e "const s=require('./deploy/staging/identity-sources.json');console.log('providers='+s.providers);console.log('dal='+s.dal)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-providers
+          ref: ${{ steps.pins.outputs.providers }}
+          path: .release-sources/sfx-providers
+          sparse-checkout: providers
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-dal
+          ref: ${{ steps.pins.outputs.dal }}
+          path: .release-sources/sfx-dal
+          sparse-checkout: identity
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: '8.0.408'
+      - name: Publish the pinned identity evidence transport with its manifest
+        run: |
+          node deploy/staging/build-identity.mjs
+          tar -czf artifacts/identity-publish.tar.gz -C artifacts identity-publish identity-publish.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: identity-publish
+          path: |
+            artifacts/identity-publish.tar.gz
+            artifacts/staging/identity-build.json
+          retention-days: 14
+          if-no-files-found: error

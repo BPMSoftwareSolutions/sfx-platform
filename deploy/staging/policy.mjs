@@ -44,3 +44,12 @@ export function websiteRetired(release) {
   assert.equal(release.composite?.website, false, 'The Next.js website must not be part of the release');
   assert(/^node:[^\s@]+@sha256:[a-f0-9]{64}$/.test(release.composite?.base ?? ''), 'Pinned Node base required');
 }
+// The live Windows client gate runs when a release can change the installed CLI,
+// its login input, or the identity contract it authenticates against. Other
+// releases record that gate as out of scope rather than implying it ran.
+const CLIENT_SCOPE = [/^tools\/sfx-api\/(?!verify-circuit-replay\.mjs$)/, /^deploy\/staging\/(identity-sources\.json|client-sources\.json|test-tools\/)/,
+  /^deploy\/sda-kernel\/(gateway\.mjs|identity-policy\.json|initialize\.sh)$/, /^live-circuit\/circuit\/identity-session\.mjs$/,
+  /^\.github\/workflows\/staging\.yml$/];
+export function clientScope(files) {
+  return files.filter(file => CLIENT_SCOPE.some(pattern => pattern.test(file)));
+}

@@ -2,33 +2,48 @@
 //   node verify-provider-profile.mjs
 // The provider drill-down is declared-only: the estate-published view is read
 // through the page reader, the host binds its own selection, and a view that
-// cannot be read is a named visible state. The bespoke provider-profile.js
-// renderer and every reader fallback are gone; a read-only check, no host
-// required.
+// cannot be read is a named visible state. Checks reader selection, retrieval
+// admission and selection binding by behavior, and the served route table
+// through a fixture observer. The click path (provider glyph -> declared view
+// read -> named refusal) runs in a real browser in verify-run-evidence-browser.mjs.
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
+import { providerReader } from './live-store.mjs';
+import { bindViewSelection } from './view-runtime.js';
+import { startFixtureObserver } from './fixture-observer.mjs';
 
 const here = new URL('./', import.meta.url);
 const host = JSON.parse(await readFile(new URL('circuit-host.json', here), 'utf8'));
-const policy = await readFile(new URL('../../deploy/sda-kernel/retrieval-policy.json', here), 'utf8');
-const store = await readFile(new URL('live-store.mjs', here), 'utf8');
-const runtime = await readFile(new URL('circuit-runtime.js', here), 'utf8');
-const viewRuntime = await readFile(new URL('view-runtime.js', here), 'utf8');
-const server = await readFile(new URL('../dispatch-pair/observe-server.mjs', here), 'utf8');
+const policy = JSON.parse(await readFile(new URL('../../deploy/sda-kernel/retrieval-policy.json', here), 'utf8'));
 
 const provider = host.retrieval.provider;
 assert.equal(provider.procedure, 'analysis.read_provider_details', 'The details reader is the default');
 assert.equal(provider.identityResultSet, 'provider_identity', 'The identity set pairs with the details reader');
+for (const canonical of provider.canonicalProviders ?? [])
+  assert.equal(providerReader(provider, canonical).procedure, 'analysis.read_provider_canonical_body', `${canonical} selects the canonical reader`);
 assert.ok((provider.canonicalProviders ?? []).includes('sda-authority-transformation-port.v1'), 'Canonical platform catalogs select the canonical reader');
-assert.ok(policy.includes('"analysis.read_provider_details"') && policy.includes('"analysis.read_provider_canonical_body"'), 'Both readers are admitted by the retrieval policy');
-assert.match(store, /canonicalProviders/, 'The host selects the canonical reader for canonical platform catalogs');
-assert.ok(!store.includes('readerFallback'), 'No reader fallback is retained: a failed details read is a named refusal');
-assert.match(runtime, /readView\(/, 'The drill-down reads the declared view');
-assert.match(runtime, /createViewRuntime\(/, 'The drill-down projects the declared view');
-assert.ok(!runtime.includes('renderProviderProfile') && !runtime.includes('provider-profile.js'), 'The bespoke profile renderer is not wired anywhere');
-assert.ok(!server.includes("['/circuit/provider-profile.js'"), 'The circuit host does not serve provider-profile.js');
-assert.match(viewRuntime, /input: \{ \.\.\.\(isRecord\(source\.input\)/, 'The host selection wins over the declaration defaults');
+assert.equal(providerReader(provider, 'google/gemini-select').procedure, 'analysis.read_provider_details', 'Other providers select the details reader');
+assert.equal(providerReader({ ...provider, canonical: undefined }, 'sda-authority-transformation-port.v1').procedure,
+  'analysis.read_provider_details', 'Without a declared canonical reader every provider reads details');
+for (const reader of [provider, provider.canonical])
+  assert.ok(policy.allowedProcedures.includes(reader.procedure), `${reader.procedure} is admitted by the retrieval policy`);
+
+// The host selection wins over a declared default; an empty selection keeps it.
+const declaredView = { sources: [{ sourceId: 'profile', reader: 'provider-inspection', input: { detailId: 'declared-default', extra: 'kept' } }] };
+const bound = bindViewSelection(declaredView, { detailId: 'provider:selected' }).sources[0].input;
+assert.equal(bound.detailId, 'provider:selected', 'The host selection wins over the declaration defaults');
+assert.equal(bound.extra, 'kept', 'Declared inputs the selection does not name are preserved');
+assert.equal(bindViewSelection(declaredView, { detailId: '' }).sources[0].input.detailId, 'declared-default', 'An empty selection keeps the declared default');
+
+// The bespoke renderer is gone from the checkout and from the served routes.
 await assert.rejects(access(new URL('provider-profile.js', here)), 'provider-profile.js is deleted');
+const observer = await startFixtureObserver();
+try {
+  const [retired, runtime] = await Promise.all([fetch(`${observer.base}/circuit/provider-profile.js`), fetch(`${observer.base}/circuit/view-runtime.js`)]);
+  await Promise.all([retired.body?.cancel(), runtime.body?.cancel()]);
+  assert.equal(retired.status, 404, 'The circuit host does not serve provider-profile.js');
+  assert.equal(runtime.status, 200, 'The circuit host serves view-runtime.js');
+} finally { observer.stop(); }
 
 console.log(JSON.stringify({ checked: 'declared provider view', reader: provider.procedure,
-  canonical: provider.canonicalProviders, bespokeRenderer: 'absent', readerFallback: 'absent', appliedByClient: false }));
+  canonical: provider.canonicalProviders, bespokeRenderer: 'absent', appliedByClient: false }));

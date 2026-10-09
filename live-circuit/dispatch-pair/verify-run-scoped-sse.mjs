@@ -7,6 +7,9 @@
 //     run-start..run-end window so per-run attribution is exact.
 // The script starts observe-server.mjs on a spare port, replays the capture
 // through POST /events, and exercises each endpoint with an SSE reader.
+// Ordering is explicit: the server is ready when /health answers, and a stream
+// is subscribed (with any requested replay fully written) when its
+// `: replay-complete` comment arrives. No assertion depends on a quiet period.
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -59,8 +62,8 @@ function openStream(base, query) {
   const controller = new AbortController();
   const received = [];
   const waiters = [];
-  let streamError = null;
-  const ready = (async () => {
+  let streamError = null, subscribed = false;
+  const done = (async () => {
     const response = await fetch(`${base}/events${query}`, { signal: controller.signal });
     assert(response.ok, `GET /events${query} failed: ${response.status}`);
     const reader = response.body.getReader();
@@ -75,8 +78,9 @@ function openStream(base, query) {
         const frame = buffer.slice(0, index);
         buffer = buffer.slice(index + 2);
         for (const line of frame.split('\n')) {
-          if (!line.startsWith('data: ')) continue;
-          received.push(JSON.parse(line.slice(6)));
+          if (line === ': replay-complete') subscribed = true;
+          else if (line.startsWith('data: ')) received.push(JSON.parse(line.slice(6)));
+          else continue;
           for (const waiter of waiters.splice(0)) waiter();
         }
       }
@@ -84,26 +88,39 @@ function openStream(base, query) {
   })().catch((error) => {
     if (error.name !== 'AbortError') streamError = error;
   });
+  // The deadline bounds a broken server; it is never an ordering assumption.
+  async function until(condition, describe, timeoutMs = 5000) {
+    const deadline = Date.now() + timeoutMs;
+    while (!condition()) {
+      if (streamError !== null) throw streamError;
+      if (Date.now() > deadline) {
+        throw new Error(`stream ${query} ${describe}; received ${received.length} records: ` +
+          received.map((record) => `${record.kind}:${record.seq}`).join(','));
+      }
+      await new Promise((resolve) => {
+        const timer = setTimeout(resolve, 50);
+        waiters.push(() => { clearTimeout(timer); resolve(); });
+      });
+    }
+  }
   return {
     received,
+    // Resolves once the stream is registered and its replay (if any) is complete.
+    async subscribed() {
+      await until(() => subscribed, 'never reported replay-complete');
+      return received.slice();
+    },
     async waitFor(count, timeoutMs = 5000) {
-      const deadline = Date.now() + timeoutMs;
-      while (received.length < count) {
-        if (streamError !== null) throw streamError;
-        if (Date.now() > deadline) {
-          throw new Error(`stream ${query} received ${received.length}/${count} records: ` +
-            received.map((record) => `${record.kind}:${record.seq}`).join(','));
-        }
-        await new Promise((resolve) => {
-          const timer = setTimeout(resolve, 50);
-          waiters.push(() => { clearTimeout(timer); resolve(); });
-        });
-      }
+      await until(() => received.length >= count, `expected ${count} records`, timeoutMs);
       return received.slice(0, count);
+    },
+    async waitUntil(predicate, describe, timeoutMs = 5000) {
+      await until(() => received.some(predicate), describe, timeoutMs);
+      return received.slice();
     },
     close() {
       controller.abort();
-      return ready;
+      return done;
     },
   };
 }
@@ -125,8 +142,18 @@ const stop = async () => {
 process.on('exit', () => { if (!stopping) server.kill('SIGTERM'); });
 process.on('SIGINT', () => { void stop().then(() => process.exit(130)); });
 
+async function serverReady(timeoutMs = 20000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (server.exitCode !== null) throw new Error(`observe-server exited early with code ${server.exitCode}`);
+    try { if ((await fetch(`${base}/health`, { signal: AbortSignal.timeout(2000) })).ok) return; } catch { /* not listening yet */ }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`observe-server did not answer /health within ${timeoutMs} ms`);
+}
+
 try {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await serverReady();
   const capture = parseCapture(fs.readFileSync(capturePath, 'utf8'));
   const runStarts = capture.filter((record) => record.kind === 'run-start').length;
   const runEnds = capture.filter((record) => record.kind === 'run-end').length;
@@ -139,8 +166,7 @@ try {
   // A bare SSE client is live-only: it receives no replay, and when the next
   // run is posted it sees only that run.
   const bare = openStream(base, '');
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  assert(bare.received.length === 0, `bare /events replayed ${bare.received.length} ring records`);
+  assert((await bare.subscribed()).length === 0, `bare /events replayed ${bare.received.length} ring records`);
   const thirdRun = [
     { kind: 'run-start', at: new Date().toISOString(), processId: 1, nativeProcessId: 11 },
     { kind: 'observation', payload: { observationType: 'delivery-phase', phase: 'run-3', status: 'completed' } },
@@ -160,8 +186,7 @@ try {
 
   // `since` replays exactly the records after the named sequence.
   const sinceStream = openStream(base, `?since=${afterThirdRun}`);
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  assert(sinceStream.received.length === 0, `since=${afterThirdRun} replayed older records`);
+  assert((await sinceStream.subscribed()).length === 0, `since=${afterThirdRun} replayed older records`);
   const fourthRecord = { kind: 'observation', payload: { observationType: 'delivery-phase', phase: 'after-since', status: 'completed' } };
   const fourth = await post(base, [fourthRecord]);
   await sinceStream.waitFor(1);
@@ -170,33 +195,31 @@ try {
 
   // Per-run filtering: run 1 and run 2 replay only their own windows.
   const runOne = openStream(base, '?run=1');
-  const runOneRecords = await runOne.waitFor(3);
+  const runOneRecords = await runOne.subscribed();
+  assert(runOneRecords.length === 3, `run=1 replayed ${runOneRecords.length} records, expected its 3-record window`);
   assert(runOneRecords.every((record) => typeof record.observationKey === 'string'),
     'replayed observer records lost their observation keys');
   assert(runOneRecords[0].kind === 'run-start' && runOneRecords[2].kind === 'run-end', 'run=1 window is not run-start..run-end');
   assert(runOneRecords[1].payload.testimonyType === 'cell-execution-testimony.v1', 'run=1 event does not belong to the captured run');
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  assert(runOne.received.length === 3, `run=1 leaked ${runOne.received.length - 3} records from another run`);
   await runOne.close();
 
   const runTwo = openStream(base, '?run=2');
-  const runTwoRecords = await runTwo.waitFor(3);
+  const runTwoRecords = await runTwo.subscribed();
+  assert(runTwoRecords.length === 3, `run=2 replayed ${runTwoRecords.length} records, expected its 3-record window`);
   assert(runTwoRecords[1].payload.observationType === 'provider-exchange-shape.v1', 'run=2 event does not belong to the captured run');
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  assert(runTwo.received.length === 3, `run=2 leaked ${runTwo.received.length - 3} records from another run`);
   await runTwo.close();
 
   // `run=current` selects the most recent run, and `run=next` waits for the
   // next run-start and then scopes to it.
   const current = openStream(base, '?run=current');
-  const currentRecords = await current.waitFor(3);
+  const currentRecords = await current.subscribed();
+  assert(currentRecords.length === 3, `run=current replayed ${currentRecords.length} records`);
   assert(currentRecords[0].payload.phase === 'run-3' || currentRecords[0].kind === 'run-start', 'run=current did not select the third run');
   const currentSeqs = currentRecords.map((record) => record.seq);
   await current.close();
 
   const next = openStream(base, '?run=next');
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  assert(next.received.length === 0, 'run=next replayed an existing run');
+  assert((await next.subscribed()).length === 0, 'run=next replayed an existing run');
   const fifthRun = [
     { kind: 'run-start', at: new Date().toISOString(), processId: 2, nativeProcessId: 22 },
     { kind: 'observation', payload: { observationType: 'delivery-phase', phase: 'run-5', status: 'completed' } },
@@ -220,13 +243,12 @@ try {
   await post(base, graphRun('graph:transport-subject', 'subject-run'));
   await post(base, graphRun('graph:transport-reader', 'reader-run'));
   const byGraph = openStream(base, `?run=current&graphId=${encodeURIComponent('graph:transport-subject')}`);
-  const byGraphRecords = await byGraph.waitFor(4);
+  const byGraphRecords = await byGraph.subscribed();
+  assert(byGraphRecords.length === 4, `graphId replayed ${byGraphRecords.length} records, expected its 4-record run`);
   assert(byGraphRecords[2].payload.phase === 'subject-run', 'graphId did not select the latest run of that graph');
-  await new Promise((resolve) => setTimeout(resolve, 150));
-  assert(byGraph.received.length === 4, `graphId leaked ${byGraph.received.length - 4} records from another run`);
   await byGraph.close();
   const latest = openStream(base, '?run=current');
-  assert((await latest.waitFor(4))[2].payload.phase === 'reader-run', 'run=current without graphId must stay the latest run');
+  assert((await latest.subscribed())[2].payload.phase === 'reader-run', 'run=current without graphId must stay the latest run');
   await latest.close();
 
   // Two instances of the SAME graph, plus an unattributed native run, overlap.
@@ -236,11 +258,13 @@ try {
   const a = tagged('sda-api:a'), b = tagged('sda-api:b'), native = graphRun('graph:native-reader', 'native');
   const concurrentNext = openStream(base, '?run=next');
   const concurrentLive = openStream(base, '');
-  await new Promise(resolve => setTimeout(resolve, 150));
-  await post(base, [a[0], a[1], native[0], b[0], b[1], native[1], a[2], b[2], b[3], native[2], native[3], a[3]]);
+  await Promise.all([concurrentNext.subscribed(), concurrentLive.subscribed()]);
+  // a's run-end closes the batch: on one ordered stream nothing from this batch
+  // can still be in flight once it has arrived.
+  const batch = [a[0], a[1], native[0], b[0], b[1], native[1], a[2], b[2], b[3], native[2], native[3], a[3]];
+  await post(base, batch);
   await concurrentLive.waitFor(12);
-  await concurrentNext.waitFor(4);
-  await new Promise(resolve => setTimeout(resolve, 150));
+  await concurrentNext.waitUntil(r => r.kind === 'run-end' && r.runId === a[0].runId, 'never received the selected run-end');
   assert(concurrentNext.received.length === 4 && concurrentNext.received.every(r => r.runId === a[0].runId),
     'run=next mixed concurrent executions');
   assert(concurrentNext.received.at(-1).kind === 'run-end', 'Other run-end truncated the selected execution');
@@ -252,8 +276,7 @@ try {
     assert(run.events.length === 3 && run.events.every(e => e.record.runId === id), 'Viewer mixed receipts between executions');
   }
   const concurrentReplay = openStream(base, '?run=current&graphId=graph:concurrent-subject');
-  await concurrentReplay.waitFor(4);
-  await new Promise(resolve => setTimeout(resolve, 150));
+  await concurrentReplay.subscribed();
   assert(concurrentReplay.received.length === 4 && concurrentReplay.received.every(r => r.runId === b[0].runId),
     'Graph replay must select the latest invocation, excluding other runs');
   const orphan = { kind: 'observation', runId: 'sda-api:missing', payload: a[1].payload };

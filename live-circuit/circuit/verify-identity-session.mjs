@@ -10,6 +10,7 @@ import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { isolatedEnvironment } from './fixture-observer.mjs';
 
 const server = fileURLToPath(new URL('../dispatch-pair/observe-server.mjs', import.meta.url));
 const IDENTIFIER = 'pilot-fixture', PASSWORD = 'canary-password-7f3a91', MACHINE = 'machine-token-fixture-0001';
@@ -45,7 +46,7 @@ const api = http.createServer(async (req, res) => {
 
 async function start(env) {
   const port = await spare();
-  const child = spawn(process.execPath, [server], { env: { ...process.env, OBSERVER_PORT: String(port), ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, [server], { env: isolatedEnvironment({ OBSERVER_PORT: String(port), ...env }), stdio: ['ignore', 'pipe', 'pipe'] });
   let output = ''; child.stdout.on('data', d => { output += d; }); child.stderr.on('data', d => { output += d; });
   for (let i = 0; i < 60; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch {} await new Promise(r => setTimeout(r, 100)); }
   return { origin: `http://127.0.0.1:${port}`, host: `127.0.0.1:${port}`, child, output: () => output };

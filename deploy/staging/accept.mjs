@@ -1,40 +1,199 @@
 // Credentials are acquired privately with the workflow's OIDC identity.
+// Each mode is one gate in the release ledger (gates/<mode>.json):
+//   smoke         deployment contract reads (bounded concurrency, pinned scene snapshot)
+//   browser       real sign-in, live Observe, durable capture before restart, sign-out
+//   evidence      receipt prefixes and deterministic replay clocks on that fresh capture
+//   durable       same owner reopens the same retained run after the confirmed restart
+//   external      API CLI invocation followed live by an anonymous browser
+//   cli           installed Windows CLI login, DPAPI, whoami and revocation
+//   presentation  post-acceptance declared-home captures (qualification, not a release gate)
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { config, root, evidence, run, write, token, privateFixture, logAccess, json } from './common.mjs';
+import { config, evidence, run, write, token, privateFixture, logAccess, json, gate, pool, classified } from './common.mjs';
 const mode = process.argv[2];
-try {
-  if (mode === 'browser') {
+const READ_CONCURRENCY = 6;
+const fetchPublic = (route, init = {}) => fetch(config.origin + route, { redirect: 'error', signal: AbortSignal.timeout(90000), ...init });
+// A child gate retains <directory>/failed.json with its stage and, when known,
+// its classification; carry that classification into this gate's record.
+function childFailure(error, failedFile) {
+  try { const failed = JSON.parse(fs.readFileSync(failedFile, 'utf8')); return Object.assign(error, { classification: failed.classification ?? error.classification }); }
+  catch { return error; }
+}
+
+async function smoke() {
+  const records = [];
+  const read = (name, work) => async () => {
+    const startedAt = Date.now();
+    try { const detail = await work(); records.push({ name, ok: true, milliseconds: Date.now() - startedAt, ...detail }); }
+    catch (error) { records.push({ name, ok: false, milliseconds: Date.now() - startedAt, error: error.message,
+      classification: error.classification ?? (error.code === 'ERR_ASSERTION' ? 'product' : 'unclassified') }); }
+  };
+  const route = (path, method, status, content) => read(`${method} ${path}`, async () => {
+    const response = await fetchPublic(path, { method });
+    assert.equal(response.status, status, path); assert(!response.headers.get('www-authenticate')?.includes('Basic'), 'No Basic challenge: ' + path);
+    if (content) await content(await response.text()); else await response.body?.cancel();
+    return { status: response.status };
+  });
+  const expectedVariant = `variant:${config.observe.subject}:${config.expectedOutcome}`;
+  let scene, secondPage;
+  const inspections = [];
+  // Two lanes, both anonymous and execution-free. Static reads (routes, region
+  // packages, registry) run with bounded concurrency. Reader-backed reads share
+  // the host's two read slots and 30 s retrieval timeout: overlapped provider
+  // inspections were observed to fail with CIRCUIT_READER_UNAVAILABLE, so that
+  // lane stays sequential. The lanes run alongside each other.
+  const staticLane = pool([
+    route('/', 'GET', 200, text => assert(text.includes('<title>SFX Live Circuit Platform</title>'), 'The platform home page must be served at /')),
+    route('/robots.txt', 'GET', 200, text => assert.equal(text, 'User-agent: *\nDisallow: /\n', 'Staging must disallow indexing')),
+    ...['/circuit/home', '/circuit/healthcare-solutions', '/circuit/login', '/circuit/explorer', '/circuit/circuit-runtime.js', '/circuit/explorer-model.mjs',
+      '/circuit/pane-layout.js', '/circuit/objective-run.js', '/circuit/page.html', '/circuit/page.js', '/circuit/page-runtime.js', '/circuit/ui-components.js',
+      '/circuit/view-runtime.js', '/circuit/region-runtime.js', '/circuit/explorer-shell.js', '/circuit/footer.js', '/healthz', '/readyz', '/favicon.ico']
+      .map(path => route(path, 'GET', 200)),
+    // Retired website and circuit assets stay retired.
+    ...['/circuit/app.js', '/circuit/session-status.js', '/circuit/provider-profile.js', '/circuit/view', '/circuit/view.html', '/capabilities', '/about', '/sitemap.xml']
+      .map(path => route(path, 'GET', 404)),
+    // Protected operations stay protected on the deployed gateway.
+    route('/v1/runs/ready', 'GET', 401), route('/internal/deployment', 'GET', 401), route('/procedure-extract/json', 'POST', 401),
+    route('/events', 'POST', 405), route('/api/circuit/v1/scenario', 'POST', 405), route('/api/circuit/v1/crosswalk', 'POST', 405),
+    // The former Live Circuit page is the Explorer: old links redirect with their selection intact.
+    ...['/circuit', '/circuit/'].map(path => read(`redirect ${path}`, async () => {
+      const query = '?capability=' + encodeURIComponent(config.observe.subject) + '&page=scenario-1';
+      const moved = await fetchPublic(path + query, { redirect: 'manual' }); await moved.body?.cancel();
+      assert.equal(moved.status, 302, path); assert.equal(moved.headers.get('location'), '/circuit/explorer' + query, path + ' keeps its selection');
+      return { status: 302, location: moved.headers.get('location') };
+    })),
+    // The pinned region provider packages are installed in this image.
+    ...['header', 'left-sidebar', 'middle', 'right-sidebar', 'footer'].map(regionId => read(`region ${regionId}`, async () => {
+      const region = await json(config.origin + '/api/circuit/v1/region?' + new URLSearchParams({ contractId: 'ui-region-request.v1', regionId }));
+      assert.equal(region.disposition, 'AUTHORED', regionId); assert.equal(region.shapeConforms, true, regionId); assert(region.candidate, regionId);
+      return { disposition: region.disposition, provider: region.candidate.regionProviderId };
+    })),
+    read('ui registry', async () => {
+      const registry = await json(config.origin + '/api/circuit/v1/ui-registry'); assert.equal(registry.contractId, 'ui-registry.v1');
+      return { components: registry.components.length };
+    }),
+  ], READ_CONCURRENCY, work => work());
+  async function readerLane() {
+    for (const work of [
+      read('capability catalog', async () => {
+        const catalog = await json(config.origin + '/api/circuit/v1/capabilities'); assert(catalog.capabilities?.length > 0, 'Catalog must list capabilities');
+        return { capabilities: catalog.capabilities.length };
+      }),
+      read('capability details', async () => {
+        const details = await json(config.origin + '/api/circuit/v1/capability-details?' + new URLSearchParams({ capabilityId: config.observe.subject, namespaceId: config.observe.namespace }));
+        assert.equal(details.contractId, 'capability-details.v1'); assert.equal(details.status, 'READ'); assert.equal(details.capabilityId, config.observe.subject);
+        const navigation = details.sets?.capability_navigation; assert(Array.isArray(navigation) && navigation.length, 'Navigation rows required');
+        assert.equal(navigation.find(r => r.row_kind === 'POLICY')?.state, 'RESOLVED'); assert(!navigation.some(r => r.row_kind === 'COVERAGE'), 'No coverage violations');
+        const unknown = await fetchPublic('/api/circuit/v1/capability-details?capabilityId=no-such-capability-for-details');
+        assert.equal(unknown.status, 404); assert.equal((await unknown.json()).error, 'CAPABILITY_NOT_FOUND');
+        return { sets: Object.keys(details.sets).length, navigationRows: navigation.length, readingDefinitionSha256: details.readingDefinitionSha256 };
+      }),
+      read('declared home page', async () => {
+        const page = await json(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home'));
+        assert.equal(page.contractId, 'ui-page.v1'); assert.equal(page.status, 'READ'); assert(page.pageDigest, 'pageDigest required');
+        return { pageDigest: page.pageDigest };
+      }),
+      read('declared second page', async () => {
+        secondPage = await json(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/healthcare-solutions'));
+        assert.equal(secondPage.contractId, 'ui-page.v1'); assert.equal(secondPage.status, 'READ'); assert(secondPage.pageDigest, 'pageDigest required');
+        assert(secondPage.layout?.layoutId, 'The second page must declare its layout');
+        return { pageDigest: secondPage.pageDigest };
+      }),
+      read('acceptance scenario', async () => {
+        scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({ capabilityId: config.observe.subject, namespaceId: config.observe.namespace, scenarioId: config.observe.subject }));
+        if (!scene.nodes.some(node => node.kind === 'variant' && node.id === expectedVariant))
+          throw classified('changed-input', 'ACCEPTANCE_FIXTURE_OUTCOME_UNDECLARED', `${config.observe.subject} no longer declares ${config.expectedOutcome}; reconcile deploy/staging/config.json with the capability contract before live Observe`);
+        return { snapshotDigest: scene.snapshotDigest, expectedOutcome: config.expectedOutcome };
+      }),
+    ]) await work();
+    if (secondPage) await read('declared crosswalk', async () => {
+      const binding = (secondPage.sections ?? []).flatMap(section => Object.values(section.bindings ?? {})).find(b => b?.reader === 'crosswalk' || b?.source === 'crosswalk');
+      const crosswalkId = binding?.input?.crosswalkId; assert(crosswalkId, 'The second page must bind the crosswalk reader with a crosswalkId');
+      assert.equal((await json(config.origin + '/api/circuit/v1/crosswalk?' + new URLSearchParams({ crosswalkId }))).contractId, 'standards-crosswalk.v1');
+      return { crosswalkId };
+    })();
+    if (scene) for (const provider of scene.navigation.items.filter(item => item.kind === 'provider')) await read(`provider ${provider.id}`, async () => {
+      const query = new URLSearchParams({ capabilityId: scene.capabilityId, namespaceId: scene.namespaceId, scenarioId: scene.scenarioId, detailId: provider.id, expectedSnapshotDigest: scene.snapshotDigest });
+      const detail = await json(config.origin + '/api/circuit/v1/scenario?' + query);
+      assert.equal(detail.detail.id, provider.id);
+      if (detail.snapshotDigest !== scene.snapshotDigest) throw classified('changed-input', 'DECLARATION_SNAPSHOT_CHANGED', 'The estate changed during the smoke reads');
+      let inspection;
+      if (detail.detail.status === 'DECLARED' && detail.detail.body?.providerId) {
+        const inspected = await json(config.origin + '/api/circuit/v1/provider-inspection?' + query);
+        assert.equal(inspected.definitionDigest, provider.definitionDigest); assert.equal(inspected.snapshotDigest, scene.snapshotDigest);
+        inspection = { id: provider.id, status: 'retrieved', resultSets: inspected.resultSets.length };
+      } else {
+        // Catalog/executor authority can be a circuit provider without a provider
+        // entity. Preserve the explicit refusal; never pretend it was retrieved.
+        const refused = await fetchPublic('/api/circuit/v1/provider-inspection?' + query);
+        assert.equal(refused.status, 422); assert.equal((await refused.json()).error, 'DECLARED_PROVIDER_REQUIRED');
+        inspection = { id: provider.id, status: 'held', reason: 'DECLARED_PROVIDER_REQUIRED' };
+      }
+      query.set('expectedSnapshotDigest', '0'.repeat(64));
+      const stale = await fetchPublic('/api/circuit/v1/provider-inspection?' + query); await stale.body?.cancel(); assert.equal(stale.status, 409);
+      inspections.push(inspection); return inspection;
+    })();
+  }
+  await Promise.all([staticLane, readerLane()]);
+  const failures = records.filter(record => !record.ok);
+  if (scene && !inspections.some(i => i.status === 'retrieved'))
+    failures.push({ name: 'provider retrieval', error: 'Acceptance requires a real retrieved provider entity', classification: 'product' });
+  write('smoke.json', { checkedAt: new Date().toISOString(), staticConcurrency: READ_CONCURRENCY, readerConcurrency: 1, snapshotDigest: scene?.snapshotDigest ?? null, records, inspections, failures });
+  if (scene) write('snapshot.json', { capabilityId: scene.capabilityId, namespaceId: scene.namespaceId, snapshotDigest: scene.snapshotDigest });
+  if (failures.length) {
+    const first = failures[0];
+    throw Object.assign(new Error(`${failures.length} smoke read(s) failed; first: ${first.name}: ${first.error}`),
+      { classification: failures.every(f => f.classification === first.classification) ? first.classification : 'unclassified' });
+  }
+  console.log(`Deployment contract smoke passed: ${records.length} reads, ${inspections.length} provider inspections.`);
+}
+
+async function main() {
+  if (mode === 'smoke') return gate('smoke', smoke);
+  if (mode === 'browser') return gate('browser', async () => {
     const fixture = await privateFixture();
-    if (process.env.SFX_VERIFY_LOGS === '1') fixture.logs = await logAccess();
+    if (process.env.SFX_VERIFY_LOGS === '1') {
+      try { fixture.logs = await logAccess(); }
+      catch (error) { fixture.logsUnavailable = error.message.slice(0, 200); } // recorded as omitted scope by the browser gate
+    }
     fs.mkdirSync(evidence, {recursive:true});
     const request = path.join(evidence, 'observe-request.json'); fs.writeFileSync(request, JSON.stringify(config.observe));
+    const snapshot = fs.existsSync(path.join(evidence, 'snapshot.json')) ? JSON.parse(fs.readFileSync(path.join(evidence, 'snapshot.json'))) : null;
     try {
       await run(process.execPath, ['tools/live-circuit/verify-browser-session.mjs'], {
-        input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'), SFX_BROWSER_CAPTURES: path.join(evidence, 'browser-captures'), SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome, SFX_REQUIRE_DURABLE_RUNS: '1' }, timeout: 900000 });
+        input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'),
+          SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome, SFX_REQUIRE_DURABLE_RUNS: '1',
+          SFX_EXPECTED_SNAPSHOT_DIGEST: snapshot?.snapshotDigest ?? '' }, timeout: 900000 });
     } catch (error) {
-      console.error('Browser gate diagnostics: staging-release artifact, browser/failed.json (redacted assertion), browser/progress.json (last phase), browser/run.json (actual execution).');
-      throw error;
+      console.error('Browser gate diagnostics: staging-release artifact, browser/failed.json (stage, classification, redacted assertion), browser/progress.json (last phase), browser/run.json (actual execution).');
+      throw childFailure(error, path.join(evidence, 'browser/failed.json'));
     }
-    console.log('Real browser sign-in, live Observe, declared-home captures, sign-out and safety proof passed.');
-  } else if (mode === 'replay') {
-    await run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'prefix-process.json'});
-    const timing = await run(process.execPath, ['live-circuit/circuit/verify-timing.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'replay-timing-process.json'});
+    console.log('Real browser sign-in, live Observe, durable capture, sign-out and disclosure checks passed.');
+  });
+  if (mode === 'evidence') return gate('evidence', async () => {
+    // Pure processing of the fresh capture; the browser replay is qualified
+    // offline against the candidate (tools/live-circuit/verify-replay-candidate.mjs).
+    const scene = path.join(evidence, 'browser/scene.json'), capture = path.join(evidence, 'browser/capture.sse');
+    const [, timing] = await Promise.all([
+      run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', scene, capture], {publicDiagnostic:'prefix-process.json'}),
+      run(process.execPath, ['live-circuit/circuit/verify-timing.mjs', scene, capture], {publicDiagnostic:'replay-timing-process.json'})]);
     write('replay-timing.json', JSON.parse(timing));
-    await run(process.execPath, ['tools/sfx-api/verify-circuit-replay.mjs', config.origin, path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse'), path.join(evidence, 'replay')], {publicDiagnostic:'replay-process.json'});
-    console.log('Captured receipt prefixes, deterministic replay clocks at every declared rate, and 1x browser playback passed.');
-  } else if (mode === 'durable') {
+    console.log('Captured receipt prefixes and deterministic replay clocks at every declared rate passed.');
+  });
+  if (mode === 'durable') return gate('durable', async () => {
     const fixture = await privateFixture();
     await run(process.execPath, ['tools/live-circuit/verify-durable-restart.mjs'], {
       input: JSON.stringify(fixture), env: { SFX_BROWSER_EVIDENCE: evidence }, timeout: 600000,
       publicDiagnostic: 'durable-process.json', redactions: [fixture.password] });
     console.log('Durable run readback after container restart passed.');
-  } else if (mode === 'external') {
+  });
+  if (mode === 'external') return gate('external', async () => {
     await run(process.execPath, ['tools/live-circuit/verify-external-live.mjs', config.origin, config.observe.subject, config.expectedOutcome,
       path.join(evidence, 'external'), process.execPath, 'deploy/staging/accept.mjs', 'api-command'], {publicDiagnostic:'external-process.json'});
     console.log('External API CLI command and live provider/outcome visibility passed.');
-  } else if (mode === 'api-command') {
+  });
+  if (mode === 'api-command') {
     const machineToken = await token();
     const execution = await json(config.origin + '/api/circuit/v1/execution');
     assert.equal(execution.defaultNamespace, config.observe.namespace, 'Fixture must use the configured API default namespace');
@@ -44,118 +203,23 @@ try {
     assert(!output.includes(machineToken));
     const result = JSON.parse(output); assert.equal(result.disposition, config.expectedOutcome);
     write('api-command.json', { checkedAt: new Date().toISOString(), disposition: result.disposition });
-  } else if (mode === 'cli') {
+    return;
+  }
+  if (mode === 'cli') return gate('cli', async () => {
     const fixture = await privateFixture(); fixture.bin = path.resolve(process.env.SFX_CI_CLIENT_BIN);
     const output = await run(process.execPath, ['tools/sfx-api/live-auth-test.mjs'], {input:JSON.stringify(fixture)});
     assert(!output.includes(fixture.password)); write('cli.json', JSON.parse(output));
     console.log('Installed Windows CLI hidden login, DPAPI, whoami and logout passed.');
-  } else if (mode === 'public') {
-    const checks = [];
-    for (const [route, method, expected] of [
-      ['/', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/healthcare-solutions', 'GET', 200], ['/circuit/circuit-runtime.js', 'GET', 200], ['/circuit/app.js', 'GET', 404], ['/circuit/session-status.js', 'GET', 404], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200], ['/circuit/pane-layout.js', 'GET', 200], ['/circuit/objective-run.js', 'GET', 200], ['/circuit/provider-profile.js', 'GET', 404],
-      ['/circuit/page.html', 'GET', 200], ['/circuit/page.js', 'GET', 200], ['/circuit/page-runtime.js', 'GET', 200], ['/circuit/ui-components.js', 'GET', 200],
-      ['/circuit/view', 'GET', 404], ['/circuit/view.html', 'GET', 404], ['/circuit/view-runtime.js', 'GET', 200],
-      ['/circuit/region-runtime.js', 'GET', 200], ['/circuit/explorer-shell.js', 'GET', 200], ['/circuit/footer.js', 'GET', 200],
-      ['/healthz','GET',200], ['/readyz','GET',200], ['/v1/runs/ready','GET',401], ['/internal/deployment','GET',401],
-      ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/api/circuit/v1/crosswalk','POST',405], ['/procedure-extract/json','POST',401],
-      ['/robots.txt','GET',200], ['/favicon.ico','GET',200], ['/capabilities','GET',404], ['/about','GET',404], ['/sitemap.xml','GET',404]
-    ]) {
-      const response = await fetch(config.origin + route, {method, redirect:'error', signal:AbortSignal.timeout(90000)});
-      assert.equal(response.status, expected, route); assert(!response.headers.get('www-authenticate')?.includes('Basic'));
-      await response.body?.cancel(); checks.push({route,method,status:response.status});
-    }
-    // Declared region host: every region must be served AUTHORED from the pinned
-    // provider packages in the image; a missing package is UI_REGION_PROVIDER_UNREADABLE
-    // (ui-explorer-region-blueprint.md §3.2, §5.2).
-    for (const regionId of ['header', 'left-sidebar', 'middle', 'right-sidebar', 'footer']) {
-      const region = await json(config.origin + '/api/circuit/v1/region?' + new URLSearchParams({contractId:'ui-region-request.v1', regionId}));
-      assert.equal(region.disposition, 'AUTHORED', regionId); assert.equal(region.shapeConforms, true, regionId); assert(region.candidate, regionId);
-      checks.push({route:'/api/circuit/v1/region', regionId, disposition:region.disposition, provider:region.candidate.regionProviderId});
-    }
-    const unknownRegion = await fetch(config.origin + '/api/circuit/v1/region?' + new URLSearchParams({contractId:'ui-region-request.v1', regionId:'banner'}), {redirect:'error', signal:AbortSignal.timeout(90000)});
-    assert.equal(unknownRegion.status, 404); assert.equal((await unknownRegion.json()).findings?.[0]?.code, 'UI_REGION_UNKNOWN');
-    checks.push({route:'/api/circuit/v1/region', regionId:'banner', status:404});
-    // The former Live Circuit page is the Explorer: old links redirect with their selection intact.
-    for (const route of ['/circuit', '/circuit/']) {
-      const query = '?capability=' + encodeURIComponent(config.observe.subject) + '&page=scenario-1';
-      const moved = await fetch(config.origin + route + query, {redirect:'manual', signal:AbortSignal.timeout(90000)});
-      assert.equal(moved.status, 302, route); assert.equal(moved.headers.get('location'), '/circuit/explorer' + query, route + ' keeps its selection');
-      await moved.body?.cancel(); checks.push({route, method:'GET', status:302, location:moved.headers.get('location')});
-    }
-    // The Next.js website is retired: "/" is the platform home page and staging stays unindexed.
-    const home = await fetch(config.origin + '/', {redirect:'error', signal:AbortSignal.timeout(90000)});
-    assert((await home.text()).includes('<title>SFX Live Circuit Platform</title>'), 'The platform home page must be served at /');
-    const robots = await fetch(config.origin + '/robots.txt', {redirect:'error', signal:AbortSignal.timeout(90000)});
-    assert.equal(await robots.text(), 'User-agent: *\nDisallow: /\n', 'Staging must disallow indexing');
-    checks.push({route:'/',content:'platform home'},{route:'/robots.txt',content:'disallow all'});
-    const catalog = await json(config.origin + '/api/circuit/v1/capabilities'); assert(catalog.capabilities?.length > 0);
-    // The Explorer's capability details reading through the kernel: every set, navigation resolved; unknown refused.
-    const details = await json(config.origin + '/api/circuit/v1/capability-details?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace}));
-    assert.equal(details.contractId,'capability-details.v1'); assert.equal(details.status,'READ'); assert.equal(details.capabilityId,config.observe.subject);
-    const navigation = details.sets?.capability_navigation; assert(Array.isArray(navigation) && navigation.length, 'Navigation rows required');
-    assert.equal(navigation.find(r=>r.row_kind==='POLICY')?.state,'RESOLVED'); assert(!navigation.some(r=>r.row_kind==='COVERAGE'), 'No coverage violations');
-    const unknown = await fetch(config.origin + '/api/circuit/v1/capability-details?capabilityId=no-such-capability-for-details',{redirect:'error',signal:AbortSignal.timeout(90000)});
-    assert.equal(unknown.status,404); assert.equal((await unknown.json()).error,'CAPABILITY_NOT_FOUND');
-    checks.push({route:'/api/circuit/v1/capability-details',sets:Object.keys(details.sets).length,navigationRows:navigation.length,readingDefinitionSha256:details.readingDefinitionSha256},
-      {route:'/api/circuit/v1/capability-details',capabilityId:'no-such-capability-for-details',status:404});
-    // The declarative UI circuit: the deployed registry manifest, a declared
-    // page read, and the digest/refusal paths.
-    const registry = await json(config.origin + '/api/circuit/v1/ui-registry');
-    assert.equal(registry.contractId,'ui-registry.v1');
-    const declaredPage = await json(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home'));
-    assert.equal(declaredPage.contractId,'ui-page.v1'); assert.equal(declaredPage.status,'READ'); assert(declaredPage.pageDigest,'pageDigest required');
-    const missingPage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/does-not-exist'),{redirect:'error',signal:AbortSignal.timeout(90000)});
-    assert.equal(missingPage.status,404); assert.equal((await missingPage.json()).error,'PAGE_NOT_FOUND');
-    const stalePage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home') + '&expectedPageDigest=' + '0'.repeat(64),{redirect:'error',signal:AbortSignal.timeout(90000)});
-    assert.equal(stalePage.status,409); assert.equal((await stalePage.json()).error,'PAGE_SNAPSHOT_CHANGED');
-    const malformedPage = await fetch(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/home') + '&expectedPageDigest=xyz',{redirect:'error',signal:AbortSignal.timeout(90000)});
-    assert.equal(malformedPage.status,400); assert.equal((await malformedPage.json()).error,'INVALID_CIRCUIT_SELECTION');
-    // The second declared page (Phase 1) and its data-bound crosswalk section.
-    const secondPage = await json(config.origin + '/api/circuit/v1/page?path=' + encodeURIComponent('/circuit/healthcare-solutions'));
-    assert.equal(secondPage.contractId,'ui-page.v1'); assert.equal(secondPage.status,'READ'); assert(secondPage.pageDigest,'pageDigest required');
-    assert(secondPage.layout?.layoutId,'The second page must declare its layout');
-    const crosswalkBinding = (secondPage.sections ?? []).flatMap(section => Object.values(section.bindings ?? {}))
-      .find(binding => binding?.reader === 'crosswalk' || binding?.source === 'crosswalk');
-    const crosswalkId = crosswalkBinding?.input?.crosswalkId;
-    assert(crosswalkId,'The second page must bind the crosswalk reader with a crosswalkId');
-    const crosswalk = await json(config.origin + '/api/circuit/v1/crosswalk?' + new URLSearchParams({crosswalkId}));
-    assert.equal(crosswalk.contractId,'standards-crosswalk.v1');
-    const unknownCrosswalk = await fetch(config.origin + '/api/circuit/v1/crosswalk?' + new URLSearchParams({crosswalkId:'no-such-crosswalk.v1'}),{redirect:'error',signal:AbortSignal.timeout(90000)});
-    assert.equal(unknownCrosswalk.status,404);
-    checks.push({route:'/api/circuit/v1/ui-registry',contractId:registry.contractId,components:registry.components.length},
-      {route:'/api/circuit/v1/page',path:'/circuit/home',status:declaredPage.status,pageDigest:typeof declaredPage.pageDigest === 'string'},
-      {route:'/api/circuit/v1/page',path:'/circuit/does-not-exist',status:404},
-      {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'stale',status:409},
-      {route:'/api/circuit/v1/page',path:'/circuit/home',expectedPageDigest:'malformed',status:400},
-      {route:'/api/circuit/v1/page',path:'/circuit/healthcare-solutions',status:secondPage.status,pageDigest:typeof secondPage.pageDigest === 'string'},
-      {route:'/api/circuit/v1/crosswalk',crosswalkId,status:200,contractId:crosswalk.contractId},
-      {route:'/api/circuit/v1/crosswalk',crosswalkId:'no-such-crosswalk.v1',status:404});
-    const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
-    assert(scene.nodes.some(node => node.kind === 'variant' && node.id === `variant:${config.observe.subject}:${config.expectedOutcome}`),
-      `ACCEPTANCE_FIXTURE_OUTCOME_UNDECLARED: ${config.observe.subject} no longer declares ${config.expectedOutcome}; reconcile deploy/staging/config.json with the capability contract before live Observe`);
-    checks.push({route:'/api/circuit/v1/scenario', capabilityId:config.observe.subject, expectedOutcome:config.expectedOutcome, declared:true});
-    const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);
-    const inspections = [];
-    for (const provider of providers) {
-      const query = new URLSearchParams({capabilityId:scene.capabilityId,namespaceId:scene.namespaceId,scenarioId:scene.scenarioId,detailId:provider.id,expectedSnapshotDigest:scene.snapshotDigest});
-      const detail = await json(config.origin+'/api/circuit/v1/scenario?'+query);
-      assert.equal(detail.detail.id,provider.id); assert.equal(detail.snapshotDigest,scene.snapshotDigest);
-      if (detail.detail.status === 'DECLARED' && detail.detail.body?.providerId) {
-        const inspected = await json(config.origin+'/api/circuit/v1/provider-inspection?'+query);
-        assert.equal(inspected.definitionDigest,provider.definitionDigest); assert.equal(inspected.snapshotDigest,scene.snapshotDigest);
-        inspections.push({id:provider.id,status:'retrieved',resultSets:inspected.resultSets.length});
-      } else {
-        // Catalog/executor authority can be a circuit provider without a provider
-        // entity. Preserve the explicit refusal; never pretend it was retrieved.
-        const refused = await fetch(config.origin+'/api/circuit/v1/provider-inspection?'+query);
-        assert.equal(refused.status,422); assert.equal((await refused.json()).error,'DECLARED_PROVIDER_REQUIRED');
-        inspections.push({id:provider.id,status:'held',reason:'DECLARED_PROVIDER_REQUIRED'});
-      }
-      query.set('expectedSnapshotDigest','0'.repeat(64));
-      const stale = await fetch(config.origin+'/api/circuit/v1/provider-inspection?'+query); assert.equal(stale.status,409); await stale.body.cancel();
-    }
-    assert(inspections.some(i=>i.status==='retrieved'), 'Acceptance requires a real retrieved provider entity');
-    write('public.json',{checkedAt:new Date().toISOString(),checks,catalogCount:catalog.capabilities.length,providers:providers.length,inspections});
-    console.log('Public reads, provider drill-down and unauthenticated refusal passed.');
-  } else throw new Error('Unknown acceptance mode');
-} catch (error) { console.error('ACCEPTANCE_FAILED: ' + error.message); process.exitCode = 1; }
+  });
+  if (mode === 'presentation') return gate('presentation', async () => {
+    const fixture = await privateFixture();
+    try {
+      await run(process.execPath, ['tools/live-circuit/verify-presentation.mjs'], { input: JSON.stringify(fixture), timeout: 600000,
+        env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_CAPTURES: path.join(evidence, 'browser-captures') }, publicDiagnostic: 'presentation-process.json', redactions: [fixture.password] });
+    } catch (error) { throw childFailure(error, path.join(evidence, 'browser-captures/failed.json')); }
+    console.log('Declared-home presentation captures and DOM safety checks passed.');
+  });
+  throw new Error('Unknown acceptance mode');
+}
+try { await main(); }
+catch (error) { console.error('ACCEPTANCE_FAILED: ' + error.message + (error.classification ? ` [${error.classification}]` : '')); process.exitCode = 1; }

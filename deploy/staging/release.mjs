@@ -1,10 +1,15 @@
 // Automatic staging only. No production route, swap, credential rotation or DB migration.
+// Runs inside the release transaction (staging.yml), which holds the staging lock
+// from binding through acceptance or rollback. SFX_RELEASE_COMMIT is the commit
+// the Live Circuit checks run qualified; the identity publish arrives from that
+// run as an artifact and is verified against its manifest before packaging.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { azure, config, root, evidence, az, rest, run, read, write, token, json, sleep } from './common.mjs';
-import { exactImage, composite, identityUpdate, rollbackAllowed, releaseChanges, websiteRetired } from './policy.mjs';
+import { azure, config, root, evidence, az, rest, run, read, write, token, json, sleep, gate, classified } from './common.mjs';
+import { exactImage, composite, identityUpdate, rollbackAllowed, releaseChanges, websiteRetired, clientScope } from './policy.mjs';
+import { verifyIdentityPublish } from './identity-publish.mjs';
 import { desiredEvidenceSettings, evidenceSettings, applyEvidenceSettings } from './evidence-settings.mjs';
 const mode = process.argv[2];
 const binding = async () => (await rest('get', '/config/web')).properties.linuxFxVersion.replace(/^DOCKER\|/, '');
@@ -64,7 +69,9 @@ async function rollback() {
 async function deploy() {
   assert.equal(process.env.GITHUB_REF, 'refs/heads/main', 'Only main can bind staging');
   const commit = (await run('git', ['rev-parse', 'HEAD'])).trim();
-  assert.equal(commit, process.env.GITHUB_SHA);
+  assert.equal(commit, process.env.SFX_RELEASE_COMMIT || process.env.GITHUB_SHA, 'Checked-out commit must be the qualified release commit');
+  verifyIdentityPublish(path.join(root, 'artifacts/identity-publish'), JSON.parse(fs.readFileSync(path.join(root, 'artifacts/identity-publish.json'))),
+    JSON.parse(fs.readFileSync(path.join(root, 'deploy/staging/identity-sources.json'))));
   const previousImage = validate(await binding());
   console.log('Reading installed composite manifest from its exact image.');
   await az(['acr', 'login', '-n', azure.registryName]);
@@ -77,8 +84,16 @@ async function deploy() {
   console.log('Checking current readiness and release scope.');
   const baseline = await json(config.origin + '/healthz');
   assert.equal(baseline.release, previous.id); assert.equal(baseline.kernelDigest, previous.kernelDigest);
+  // Checks runs can finish out of order; never replace a release with an older commit.
+  try { await run('git', ['merge-base', '--is-ancestor', previous.circuit.sourceCommit, commit]); }
+  catch { throw classified('changed-input', 'RELEASE_OUT_OF_ORDER', `${commit} does not descend from the installed source ${previous.circuit.sourceCommit}`); }
   const changed = (await run('git', ['diff', '--name-only', previous.circuit.sourceCommit, commit])).trim().split(/\r?\n/).filter(Boolean);
   releaseChanges(changed);
+  // The live Windows client gate is required only when this release can change
+  // the installed CLI or the identity contract it authenticates against.
+  const client = clientScope(changed);
+  write('scope.json', { previousSource: previous.circuit.sourceCommit, changedFiles: changed.length, clientGateRequired: client.length > 0, clientChanges: client });
+  if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `client-gate=${client.length > 0}\n`);
   const bearer = await token();
   console.log('Fingerprinting existing encrypted vault.');
   const vault = baseline.bootId ? (await privateRead(bearer)).vault : await oldVault();
@@ -135,9 +150,9 @@ async function verifyRestart() {
   console.log('New process confirmed; vault fingerprint preserved.');
 }
 try {
-  if (mode === 'deploy') await deploy();
+  if (mode === 'deploy') await gate('deploy', deploy);
   else if (mode === 'rollback') await rollback();
-  else if (mode === 'restart-check') await verifyRestart();
+  else if (mode === 'restart-check') await gate('restart', verifyRestart);
   else throw new Error('Expected deploy, restart-check or rollback');
 } catch (error) {
   console.error(error.message + (error.cause?.code ? ` (${error.cause.code})` : '')); process.exitCode = 1;

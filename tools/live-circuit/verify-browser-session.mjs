@@ -1,13 +1,17 @@
 // Real-host acceptance with a caller-owned identity fixture (disposable or CI).
 // Credentials arrive over stdin and are never persisted or printed. The browser
-// uses the normal product UI and revokes the session in cleanup.
+// uses the normal product UI and revokes the session in cleanup. Declared-home
+// presentation captures are separate (verify-presentation.mjs).
+// SFX_EXPECTED_SNAPSHOT_DIGEST pins the scenario snapshot the release smoke read:
+// an estate edit during the release fails as changed input, not a product defect.
+// A live Azure log sample that cannot be obtained is recorded as omitted scope;
+// a secret found in any sample obtained fails the gate.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { durableSnapshot } from './durable-snapshot.mjs';
-import { captureDeclaredHome } from './browser-captures.mjs';
 
 let input = ''; for await (const chunk of process.stdin) input += chunk;
 const fixture = JSON.parse(input); input = '';
@@ -99,16 +103,13 @@ try {
   assert(!(await page.evaluate(() => document.cookie)).includes(session.value));
   record('Real browser sign-in; __Host-, HttpOnly, Secure, Strict cookie; no script bearer');
 
-  stage('Capturing the declared home and proving DOM rendering safety');
-  const capturesDirectory = process.env.SFX_BROWSER_CAPTURES || path.join(path.dirname(evidence), 'browser-captures');
-  const captures = await captureDeclaredHome({ browser, origin, outDir: capturesDirectory, signedInContext: context, requireSignedIn: true });
-  fs.writeFileSync(path.join(evidence, 'browser-captures.json'), JSON.stringify(captures, null, 2));
-  record(`Declared home captured signed-out and signed-in at ${captures.viewports.length} viewports; declaration markup stays text and refused URLs never navigate`);
-
   const query = new URLSearchParams({ capabilityId: request.subject, namespaceId: request.namespace || 'sidefx:capabilities', scenarioId: request.subject });
   const sceneResponse = await fetch(origin + '/api/circuit/v1/scenario?' + query);
   assert.equal(sceneResponse.status, 200); scene = await sceneResponse.json();
   fs.writeFileSync(path.join(evidence, 'scene.json'), JSON.stringify(scene));
+  const expectedSnapshot = process.env.SFX_EXPECTED_SNAPSHOT_DIGEST;
+  if (expectedSnapshot && scene.snapshotDigest !== expectedSnapshot) throw Object.assign(new Error(
+    `DECLARATION_SNAPSHOT_CHANGED: the scenario snapshot changed from ${expectedSnapshot} to ${scene.snapshotDigest} during the release`), { classification: 'changed-input' });
   await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: request.subject, namespace: query.get('namespaceId'), scenario: request.subject, page: 'scenario-1' }));
   await page.locator('.component-hit').first().waitFor({ timeout: 90000 });
   await page.waitForFunction(() => document.querySelector('#identity').textContent.includes('Signed in as'));
@@ -201,25 +202,30 @@ try {
   assert.equal(errors.length, 0, 'Browser JavaScript errors');
   for (const secret of secrets) assert(!(captured + consoleMessages.join('\n') + JSON.stringify(output)).includes(secret), 'Private value in observable material');
   record('No password or bearer in browser console, run output or observer testimony');
+  // Disclosure in any host output obtained is a failure. Whether a complete live
+  // sample could be obtained depends on SCM log transport, so an incomplete
+  // sample is recorded as omitted scope; the controlled redaction canaries in
+  // verify-identity-session.mjs are the required disclosure check.
+  let logOmitted = fixture.logsUnavailable ? `log access unavailable: ${fixture.logsUnavailable}` : logProcess ? null : 'not requested';
   if (logProcess) {
-    assert(!logTruncated && logText.length > 100, 'Azure log sample must be available and complete within its bound');
-    if (fixture.logs) { logStatus = Number(logText.match(/HTTP\/[\d.]+ (\d+)/)?.[1]); assert.equal(logStatus,200); assert(logExit===undefined || logExit===0); }
-    assert(logText.includes('STAGING_GATEWAY_READY'), 'Sample must contain real host output, not an Azure CLI diagnostic');
     for (const secret of secrets) assert(!logText.includes(secret), 'Private acceptance value in server logs');
     assert(!/Bearer\s+[A-Za-z0-9+/_=-]{24,}/.test(logText), 'Bearer-like credential in server logs');
-    record('Azure log sample contains no acceptance password/session bearer or bearer-like credential');
+    if (fixture.logs) logStatus = Number(logText.match(/HTTP\/[\d.]+ (\d+)/)?.[1]);
+    logOmitted = logTruncated ? 'sample exceeded its retention bound' : logText.length <= 100 ? 'no log sample received'
+      : fixture.logs && (logStatus !== 200 || (logExit !== undefined && logExit !== 0)) ? `log stream HTTP ${logStatus ?? 'unknown'}`
+      : !logText.includes('STAGING_GATEWAY_READY') ? 'sample lacks the host startup marker' : null;
+    if (!logOmitted) record('Azure log sample contains no acceptance password/session bearer or bearer-like credential');
   }
+  if (logOmitted) process.stderr.write(`OMITTED live Azure log disclosure scan: ${logOmitted}\n`);
   const receipt = { checkedAt: new Date().toISOString(), origin, runId, sceneDigest: scene.snapshotDigest,
     checks, errors, sampleCount: samples.length, visited: [...new Set(samples.flatMap(s => s.current.map(n => n.id)))],
-    captures: { directory: capturesDirectory, revision: captures.revision, pageDigest: captures.pageDigest,
-      signedIn: captures.signedIn, files: captures.captures.filter(capture => capture.file).map(capture => capture.file),
-      domSafety: captures.checks.filter(check => check.name.startsWith('dom-safety')).map(check => ({ name: check.name, ok: check.ok })) },
-    serverLogCheck: { performed: Boolean(logProcess), httpStatus:logStatus, actualHostOutput:logText.includes('STAGING_GATEWAY_READY'), sampledCharacters: logText.length, truncated: logTruncated, rawLogsRetained: false },
+    serverLogCheck: { performed: !logOmitted, omitted: logOmitted, httpStatus:logStatus, actualHostOutput:logText.includes('STAGING_GATEWAY_READY'), sampledCharacters: logText.length, truncated: logTruncated, rawLogsRetained: false },
     basis: 'Real identity session and fresh capability execution through product browser UI; no response mocks or replay overrides' };
   fs.writeFileSync(path.join(evidence, 'browser-receipt.json'), JSON.stringify(receipt, null, 2));
   process.stdout.write(JSON.stringify(receipt));
 } catch (error) {
-  fs.writeFileSync(path.join(evidence, 'failed.json'), JSON.stringify({ stage: currentStage, checks, runId, error: error.name, message: secrets.reduce((m,s) => m.replaceAll(s, '[private]'), error.message) }, null, 2));
+  const classification = error.classification ?? (error.code === 'ERR_ASSERTION' ? 'product' : 'unclassified');
+  fs.writeFileSync(path.join(evidence, 'failed.json'), JSON.stringify({ stage: currentStage, classification, checks, runId, error: error.name, message: secrets.reduce((m,s) => m.replaceAll(s, '[private]'), error.message) }, null, 2));
   process.stderr.write(`BROWSER_ACCEPTANCE_FAILED after ${checks.length} checks (${error.name}); private diagnostic retained\n`);
   process.exitCode = 1;
 } finally {

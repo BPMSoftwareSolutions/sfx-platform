@@ -2,22 +2,19 @@
 // Declarative-page acceptance checks against a running circuit host:
 //   node live-circuit/circuit/verify-pages.mjs <base-url> [--refusals] [--digests] [--safety]
 //   node live-circuit/circuit/verify-pages.mjs --fixtures
-// --fixtures spawns the observer on port 8897 over the file-backed page source
-// in fixtures/pages, runs every assertion group, then stops the child. Reads
-// only; the fixture observer and this script never touch ports 8788/8799.
+// --fixtures spawns the observer over the file-backed page source in
+// fixtures/pages on a spare port with an isolated environment
+// (fixture-observer.mjs), runs every assertion group, then stops the child.
 import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validatePage } from './page-runtime.js';
+import { startFixtureObserver as startObserver } from './fixture-observer.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..', '..');
 const fixtureDirectory = path.join(here, 'fixtures', 'pages');
-const observerModule = path.join(repoRoot, 'live-circuit', 'dispatch-pair', 'observe-server.mjs');
-const fixturePort = 8897;
-const fixtureBase = `http://localhost:${fixturePort}`;
 const expectedComponents = ['hero', 'section', 'text', 'heading', 'stat', 'card', 'card-list', 'list', 'media.figure', 'notice', 'table', 'field-list', 'disclosure', 'badge', 'status-chip',
   'tabs', 'timeline', 'form', 'media.gallery', 'code', 'chart'];
 const expectedSources = ['catalog', 'scenario', 'details', 'provider-inspection', 'session', 'release', 'crosswalk'];
@@ -41,8 +38,8 @@ const args = process.argv.slice(2);
 const flags = new Set(args.filter(arg => arg.startsWith('--')));
 const positional = args.filter(arg => !arg.startsWith('--'));
 const fixtures = flags.has('--fixtures');
-const base = positional[0] ?? (fixtures ? fixtureBase : null);
-if (!base) {
+let base = positional[0] ?? null;
+if (!base && !fixtures) {
   console.error('usage: node verify-pages.mjs <base-url> [--refusals] [--digests] [--safety] | --fixtures');
   process.exit(2);
 }
@@ -81,35 +78,17 @@ async function request(pathname, headers = {}) {
 }
 const pagePath = (slug, extra = '') => `/api/circuit/v1/page?path=${encodeURIComponent(`/circuit/${slug}`)}${extra}`;
 
-let child = null;
+let observer = null;
 async function startFixtureObserver() {
-  const env = {
-    ...process.env,
-    OBSERVER_PORT: String(fixturePort),
+  observer = await startObserver({
     SFX_PAGE_FIXTURE_DIR: fixtureDirectory,
     ...(process.env.SDA_ESTATE_DIR ? { SDA_ESTATE_DIR: process.env.SDA_ESTATE_DIR } : {}),
-  };
-  child = spawn(process.execPath, [observerModule], { env, cwd: repoRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-  child.stdout.resume();
-  child.stderr.resume();
-  child.on('error', () => {});
-  const deadline = Date.now() + 20000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`observe-server exited early with code ${child.exitCode}`);
-    try {
-      const response = await fetch(`${base}/health`, { signal: AbortSignal.timeout(2000) });
-      if (response.ok) return;
-    } catch {
-      /* the observer is not ready yet */
-    }
-    await new Promise(resolve => setTimeout(resolve, 250));
-  }
-  throw new Error('observe-server did not report /health within 20s');
+  });
+  base = observer.base;
 }
 function stopFixtureObserver() {
-  const running = child;
-  child = null;
-  if (running && running.exitCode === null) running.kill();
+  observer?.stop();
+  observer = null;
 }
 
 if (fixtures) {

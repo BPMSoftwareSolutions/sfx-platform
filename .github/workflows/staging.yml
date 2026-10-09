@@ -1,65 +1,50 @@
 name: Live Circuit staging
 
+# The release transaction. It starts only from a successful Live Circuit checks
+# run on main (staging-checks.yml) and releases exactly the commit and identity
+# publish that run qualified. To release or recover manually, run Live Circuit
+# checks on main with workflow_dispatch, or re-run this workflow's run.
 on:
-  push:
+  workflow_run:
+    workflows: ['Live Circuit checks']
+    types: [completed]
     branches: [main]
-    paths:
-      - 'live-circuit/**'
-      - 'deploy/sda-kernel/**'
-      - 'deploy/staging/**'
-      - 'tools/live-circuit/**'
-      - 'tools/sfx-api/**'
-      - 'infra/azure.json'
-      - 'infra/authorize-staging-release.ps1'
-      - '.github/workflows/staging.yml'
-  pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
 
-# Keep the complete release, including Windows acceptance and rollback, exclusive.
+# This group is the staging lock. Baseline recheck, binding, configuration,
+# restart, acceptance, the Windows client gate, the acceptance receipt or
+# rollback, and post-acceptance qualification all hold it, so no other release
+# can bind or restart the slot in between. Offline checks never wait for it.
+# Releases are never cancelled; a newer pending release replaces an older
+# pending one, and release.mjs refuses any commit older than the installed one.
 concurrency:
-  group: live-circuit-staging-${{ github.event_name == 'pull_request' && github.ref || 'release' }}
+  group: live-circuit-staging-release
   cancel-in-progress: false
 
-jobs:
-  checks:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '24.20.0'
-      - run: node --test deploy/staging/policy.test.mjs
-      - run: node deploy/sda-kernel/verify-composite-package.mjs
-      - run: node live-circuit/circuit/verify-identity-session.mjs
-      - name: Deterministic replay clocks on retained execution evidence
-        run: node live-circuit/circuit/verify-timing.mjs docs/replay-timing-fidelity/scene.json docs/replay-timing-fidelity/capture.sse
-      - run: node live-circuit/circuit/verify-run-api.mjs
-      - run: node live-circuit/circuit/verify-objective.mjs
-      - run: node live-circuit/circuit/verify-provider-profile.mjs
-      - run: node live-circuit/circuit/verify-view.mjs
-      - run: node live-circuit/circuit/verify-region.mjs
-      - run: node live-circuit/circuit/verify-pages.mjs --fixtures
-      - run: node live-circuit/circuit/verify-components.mjs
-      - run: node live-circuit/circuit/verify-claims.mjs --fixtures
-      - run: node tools/live-circuit/verify-kind-tooling.mjs
-      - run: node live-circuit/dispatch-pair/verify-run-scoped-sse.mjs
-      - run: node deploy/sda-kernel/verify-observer-bridge.mjs
+env:
+  SFX_RELEASE_COMMIT: ${{ github.event.workflow_run.head_sha }}
+  SFX_CHECKS_RUN: ${{ github.event.workflow_run.html_url }}
 
-  deploy:
-    needs: checks
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      contains(fromJSON('["push","workflow_dispatch"]'), github.event.workflow_run.event)
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    timeout-minutes: 50
     environment:
       name: staging
       url: https://sidefx-staging-fyfhb9gubneqbpaz.eastus2-01.azurewebsites.net/circuit/home
     permissions:
       contents: read
+      actions: read
       id-token: write
+    outputs:
+      client-gate: ${{ steps.deploy.outputs.client-gate }}
     env:
       SFX_BROWSER_TEST_MODULE: ${{ github.workspace }}/deploy/staging/test-tools/node_modules/playwright/index.mjs
       SFX_VERIFY_LOGS: '1'
@@ -69,10 +54,28 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.20.0'
+      - id: pins
+        name: Read pinned provider commit
+        run: node -e "console.log('providers='+require('./deploy/staging/identity-sources.json').providers)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: BPMSoftwareSolutions/sfx-providers
+          ref: ${{ steps.pins.outputs.providers }}
+          path: .release-sources/sfx-providers
+          sparse-checkout: providers
+      - name: Download the identity publish built by the qualifying checks run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: identity-publish
+          path: artifacts
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - run: tar -xzf artifacts/identity-publish.tar.gz -C artifacts
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
@@ -82,43 +85,15 @@ jobs:
         run: |
           npm ci --prefix deploy/staging/test-tools
           deploy/staging/test-tools/node_modules/.bin/playwright install --with-deps chromium
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          repository: BPMSoftwareSolutions/sfx-providers
-          ref: a33b4428ab74d5910f6ea69947bdda5122a7d33f
-          path: .release-sources/sfx-providers
-          sparse-checkout: providers
-      - name: Check missing-run and retry controls before deployment
-        env:
-          SFX_UI_PROVIDER_DIR: ${{ github.workspace }}/.release-sources/sfx-providers/providers
-        run: node live-circuit/circuit/verify-run-evidence-browser.mjs artifacts/staging/missing-run
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          repository: BPMSoftwareSolutions/sfx-dal
-          ref: bcaae40c2447bd9454b6eea9e3e001f0fc61b25b
-          path: .release-sources/sfx-dal
-          sparse-checkout: identity
-      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
-        with:
-          dotnet-version: '8.0.408'
-      - name: Publish the pinned identity evidence transport
-        run: node deploy/staging/build-identity.mjs
-      - name: Package, build, lock and deploy one composite image
+      - id: deploy
+        name: Recheck the baseline, then package, build, lock, bind and verify one composite image
         run: node deploy/staging/release.mjs deploy
-      - name: Public reads and authorization boundaries
-        run: node deploy/staging/accept.mjs public
-      - name: Real sign-in, live Observe, declared-home captures and sign-out
+      - name: Deployment contract smoke
+        run: node deploy/staging/accept.mjs smoke
+      - name: Real sign-in, live Observe, durable capture and sign-out
         run: node deploy/staging/accept.mjs browser
-      - name: Captured replay clocks and 1x browser rendering
-        run: node deploy/staging/accept.mjs replay
-      - name: Upload the declared-home browser captures
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: staging-browser-captures
-          path: artifacts/staging/browser-captures/
-          retention-days: 30
-          if-no-files-found: error
+      - name: Receipt prefixes and deterministic replay clocks on the fresh capture
+        run: node deploy/staging/accept.mjs evidence
       - name: Prove a new process and unchanged persistent vault
         run: node deploy/staging/release.mjs restart-check
       - name: Reopen the same retained run after the confirmed restart
@@ -134,8 +109,12 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
+  # Required only when the release can change the installed CLI, its login
+  # input, or the identity contract (policy.mjs clientScope); otherwise the
+  # acceptance receipt records this gate as omitted with its reason.
   windows-cli:
-    needs: deploy
+    needs: release
+    if: needs.release.outputs.client-gate == 'true'
     runs-on: windows-2022
     timeout-minutes: 20
     environment: staging
@@ -147,23 +126,29 @@ jobs:
       SFX_CI_CLIENT_BIN: ${{ github.workspace }}/.acceptance-cli/bin
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - id: pins
+        name: Read pinned input provider commit
+        shell: pwsh
+        run: node -e "console.log('input='+require('./deploy/staging/client-sources.json').cliInputProvider)" >> $env:GITHUB_OUTPUT
       # Input provider test build only; no server/kernel rebuild or checkout in the release image.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: BPMSoftwareSolutions/sfx-providers
-          ref: 86a30842f94c23f866e42eb312991c1c1f5efa88
+          ref: ${{ steps.pins.outputs.input }}
           path: .acceptance-providers
           sparse-checkout: |
             providers/cli-login-input-provider
             providers/cli-login/Contracts.cs
             providers/cli-login/IIdentityDal.cs
           sparse-checkout-cone-mode: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '24.20.0'
       - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.0.408'
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
@@ -197,8 +182,8 @@ jobs:
           if-no-files-found: ignore
 
   finish:
-    needs: [deploy, windows-cli]
-    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.deploy.result != 'skipped'
+    needs: [release, windows-cli]
+    if: always() && needs.release.result != 'skipped'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: staging
@@ -207,6 +192,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.20.0'
@@ -215,20 +202,28 @@ jobs:
         with:
           name: staging-release
           path: artifacts/staging
+      - if: needs.windows-cli.result != 'skipped'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        continue-on-error: true
+        with:
+          name: staging-windows-cli
+          path: artifacts/staging
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - name: Record accepted release
+      - name: Record accepted release from the gate ledger
         id: accepted
-        if: needs.deploy.result == 'success' && needs.windows-cli.result == 'success'
+        if: >-
+          needs.release.result == 'success' &&
+          (needs.windows-cli.result == 'success' || (needs.windows-cli.result == 'skipped' && needs.release.outputs.client-gate == 'false'))
         run: node deploy/staging/finish.mjs
-      - name: Restore prior digest when any release gate failed
-        if: always() && (needs.deploy.result != 'success' || needs.windows-cli.result != 'success' || steps.accepted.outcome == 'failure')
+      - name: Restore prior digest when any required gate failed
+        if: always() && steps.accepted.outcome != 'success'
         run: |
           if test -f artifacts/staging/state.json; then node deploy/staging/release.mjs rollback; fi
-          echo 'Release rejected; inspect acceptance and rollback receipts.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Release rejected; inspect the gate ledger (gates/*.json), acceptance and rollback receipts.' >> "$GITHUB_STEP_SUMMARY"
           exit 1
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -237,5 +232,47 @@ jobs:
           path: |
             artifacts/staging/accepted.json
             artifacts/staging/rollback.json
+            artifacts/staging/gates/
           if-no-files-found: ignore
           retention-days: 90
+
+  # Post-acceptance qualification: declared-home presentation captures with
+  # their own session. Holds the staging lock (same run) but never gates the
+  # release or triggers rollback; a failure is reported on this job only.
+  presentation:
+    needs: [release, finish]
+    if: needs.finish.result == 'success'
+    continue-on-error: true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SFX_BROWSER_TEST_MODULE: ${{ github.workspace }}/deploy/staging/test-tools/node_modules/playwright/index.mjs
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Install pinned acceptance browser
+        run: |
+          npm ci --prefix deploy/staging/test-tools
+          deploy/staging/test-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Declared-home presentation captures
+        run: node deploy/staging/accept.mjs presentation
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: staging-presentation
+          path: artifacts/staging/
+          retention-days: 30
+          if-no-files-found: ignore

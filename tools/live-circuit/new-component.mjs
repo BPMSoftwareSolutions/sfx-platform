@@ -290,7 +290,7 @@ full staging acceptance, not a data-only page publish.
 - [ ] Add the \`<kind>.parity.json\` section to a \`fixtures/pages\` page and run
       \`node live-circuit/circuit/verify-pages.mjs --fixtures\`.
 - [ ] Run the K1 conformance harness and the browser sign-in gate (WP0.7).
-- [ ] Pins: \`deploy/staging/accept.mjs:47-48\` route list and
+- [ ] Pins: \`deploy/staging/accept.mjs\` smoke static route list and
       \`live-circuit/circuit/verify-pages.mjs:127-136\` registry expectation.
 - [ ] \`CIRCUIT_FILES\` entry only if the adapter ships as a new client module
       (\`observe-server.mjs:14-49\`); then add the module pin.

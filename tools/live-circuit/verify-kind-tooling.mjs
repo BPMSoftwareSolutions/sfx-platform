@@ -86,7 +86,7 @@ try {
   const readersPatch = JSON.parse(await readFile(path.join(readerDir, 'platform/circuit-host.readers.patch.json'), 'utf8'));
   record('reader-host-patch', readersPatch.readers['standards-crosswalk']?.outputContractId === 'standards-crosswalk.v1', '');
   const pins = await readFile(path.join(readerDir, 'platform/accept.pins.patch.txt'), 'utf8');
-  record('reader-accept-pins', pins.includes("['/api/circuit/v1/standards-crosswalk', 'GET', 200]"), '');
+  record('reader-accept-pins', pins.includes("route('/api/circuit/v1/standards-crosswalk', 'GET', 200)"), '');
   const listing = run(['tools/live-circuit/new-reader.mjs', 'second-reader', '--list', '--out', path.join(scratch, 'second-reader')]);
   record('reader-list-dry-run', listing.status === 0 && !(await exists(path.join(scratch, 'second-reader'))), `exit=${listing.status}`);
   const refused = run(['tools/live-circuit/new-reader.mjs', 'third-reader', '--method', 'POST']);

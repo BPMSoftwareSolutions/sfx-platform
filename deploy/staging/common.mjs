@@ -66,3 +66,35 @@ export async function json(url, init = {}) {
   return response.json();
 }
 export async function sleep(ms) { await new Promise(resolve => setTimeout(resolve, ms)); }
+// An error whose cause is known: 'product' (deployed behavior contradicted its
+// contract), 'changed-input' (fixture or declaration drift), 'dependency-unavailable'
+// (Azure, SQL, model or log transport) or 'harness' (the test machinery itself).
+export function classified(classification, code, message = code) {
+  return Object.assign(new Error(`${code}: ${message}`), { classification, code });
+}
+// Gate ledger: one record per gate in gates/<id>.json with its duration and
+// result. Classification is reported only from explicit evidence; anything
+// else is 'unclassified', never guessed.
+export async function gate(id, work) {
+  const startedAt = new Date(), record = result => {
+    fs.mkdirSync(path.join(evidence, 'gates'), { recursive: true });
+    fs.writeFileSync(path.join(evidence, 'gates', id + '.json'), JSON.stringify({ id, startedAt: startedAt.toISOString(),
+      durationMilliseconds: Date.now() - startedAt.getTime(), ...result }, null, 2) + '\n');
+  };
+  try { const value = await work(); record({ result: 'passed' }); return value; }
+  catch (error) {
+    // An assertion may concern build inputs or the harness as well as product
+    // behavior. Only the owning check can establish that cause.
+    const classification = error.classification ?? 'unclassified';
+    record({ result: 'failed', classification, message: String(error.message).slice(0, 2000) });
+    throw error;
+  }
+}
+// Bounded concurrency for independent reads.
+export async function pool(items, limit, work) {
+  const queue = items.map((item, index) => [item, index]), results = new Array(items.length);
+  await Promise.all(Array.from({ length: Math.min(limit, queue.length) }, async () => {
+    for (let next = queue.shift(); next; next = queue.shift()) results[next[1]] = await work(next[0]);
+  }));
+  return results;
+}
