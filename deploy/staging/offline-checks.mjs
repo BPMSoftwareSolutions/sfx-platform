@@ -21,6 +21,8 @@ export const OFFLINE_CHECKS = [
     args: ['live-circuit/circuit/verify-identity-session.mjs'] },
   { id: 'replay-clock', prevents: 'Wrong receipt timing, rate scaling, pause/resume, sequencing or stalled-clock catch-up',
     args: ['live-circuit/circuit/verify-timing.mjs', 'docs/replay-timing-fidelity/scene.json', 'docs/replay-timing-fidelity/capture.sse'] },
+  { id: 'scenario-return', prevents: 'Composed scenario calls staying dark despite admitted return receipts, or lighting without matching evidence',
+    args: ['live-circuit/circuit/verify-scenario-return.mjs', 'docs/ui-landing-acceptance/scene.json', 'docs/ui-landing-acceptance/capture.sse'] },
   { id: 'run-api', prevents: 'Bad admission boundaries, credential forwarding, cursor routing or fragmented SSE handling',
     args: ['live-circuit/circuit/verify-run-api.mjs'] },
   { id: 'objective', prevents: 'Wrong objective admission or summary handling, or the module not being served',

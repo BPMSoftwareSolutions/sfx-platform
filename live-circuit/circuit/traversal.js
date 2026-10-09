@@ -10,7 +10,7 @@
 //            defect endpoint for unmatched, mismatched or missing testimony
 // The renderer draws this state and never reinterprets receipts.
 import { capturedTimestamp, joinFlow } from './deck-trace.js';
-import { executionCursors } from './execution-cursor.js';
+import { executionCursors, scenarioCaller } from './execution-cursor.js';
 
 const FLOW_CONTRACT = 'captured-operation-path.v1';
 const LOCATIONS = new Set(['input-payload', 'operation', 'provider-port', 'scenario-call', 'provider', 'called-scenario',
@@ -120,17 +120,28 @@ function selectedChild(lane, cell, run, deck) {
   addresses.push(...bindings.map(b => b.semanticAddress));
   // The captured scenario cell identity names the scenario even when authorityId
   // names its version. Never accept an arbitrary child under the owning call.
-  return run.graph.cells.find(c => c.altitude === 'scenario' && c.parentCellId === cell?.cellId &&
+  const children = run.graph.cells.filter(c => c.altitude === 'scenario' &&
+    (c.parentCellId === cell?.cellId || (c.parentCellId == null && scenarioCaller(run.graph, c)?.cellId === cell?.cellId)) &&
     (addresses.includes(c.semanticAddress) || (lane.calledScenarioId &&
       (c.authorityId === lane.calledScenarioId || c.cellId === `cell:scenario:${lane.calledScenarioId}`)) ||
       (declared?.semanticAddress && c.semanticAddress === declared.semanticAddress)));
+  return children.length === 1 ? children[0] : null;
 }
 function calleeEvidence(lane, interval, run, deck) {
   const cell = run.graph.cells.find(c => c.cellId === interval.fact.cellId);
   if (lane.calleeKind === 'scenario') {
     const child = selectedChild(lane, cell, run, deck);
     if (!child) return { ok: false, finding: { code: 'CALLED_SCENARIO_NOT_CAPTURED', nodeId: lane.nodeId, calledScenarioId: lane.calledScenarioId } };
-    const receipt = [...run.cells.values()].filter(f => f.cellId === child.cellId && f.cellAltitude === 'scenario').at(-1);
+    const receipt = [...run.cells.values()].filter(f => f.cellId === child.cellId && f.cellAltitude === 'scenario' &&
+      f.semanticAddress === child.semanticAddress && f.outcomeContractId === child.ports?.outcome?.contractId).at(-1);
+    if (!receipt) return { ok: false, finding: { code: 'CALLED_SCENARIO_RETURN_NOT_CAPTURED', nodeId: lane.nodeId } };
+    if (child.parentCellId !== cell?.cellId) {
+      const edge = run.graph.edges.find(e => e.kind === 'return' && e.from.cellId === child.cellId && e.to.cellId === cell?.cellId);
+      const returned = edge && [...run.edges.values()].some(f => f.edgeId === edge.edgeId &&
+        f.sourceCellExecutionId === receipt.cellExecutionId && f.destinationCellId === cell.cellId &&
+        f.semanticAddress === cell.semanticAddress && deck.observationMap.flowPolicy.admittedDispositions.includes(f.admissionDisposition));
+      if (!returned) return { ok: false, finding: { code: 'CALLED_SCENARIO_RETURN_NOT_CAPTURED', nodeId: lane.nodeId } };
+    }
     return { ok: true, child, receipt };
   }
   const providerId = lane.providerId ?? (lane.calleeKind === 'provider' ? lane.calleeNodeId : null);
@@ -297,7 +308,9 @@ function liveLocation(model, cursor) {
     // Admission identifies the dispatched operation, not a measured network
     // phase. Display its selected call only when the captured authority agrees.
     // Completion additionally verifies the executor actually reported back.
-    const matchedAuthority = lane.executorAuthorityId && lane.executorAuthorityId === cursor.cell.authorityId;
+    const matchedAuthority = lane.calleeKind === 'scenario'
+      ? cursor.cell.authorityId === 'operation:invoke-scenario'
+      : lane.executorAuthorityId && lane.executorAuthorityId === cursor.cell.authorityId;
     const returnedCall = complete && lane.requestPoints ? calleeEvidence(lane, { fact: cursor.fact }, model.run, model.deck) : null;
     const call = lane.requestPoints && (complete ? returnedCall.ok :
       matchedAuthority && (lane.calleeKind === 'provider' ? Boolean(lane.executorProfileId) :

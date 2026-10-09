@@ -1,5 +1,16 @@
 // Receipt-derived locations. Never derive progress from array position, time elapsed,
 // a successful process exit, or another operation's completion.
+// Composed graphs can keep scenario cells at the graph root and express their
+// caller through a return edge. That declared edge is a containment boundary
+// for observation; a shared or malformed return does not identify one caller.
+export function scenarioCaller(graph, scenario) {
+  if (scenario?.altitude !== 'scenario') return null;
+  const returns = graph.edges.filter(edge => edge.kind === 'return' && edge.from.cellId === scenario.cellId);
+  if (returns.length !== 1 || returns[0].from.portId !== scenario.ports?.outcome?.portId) return null;
+  const edge = returns[0];
+  return graph.cells.find(cell => cell.cellId === edge.to.cellId && cell.authorityId === 'operation:invoke-scenario' &&
+    edge.to.portId === cell.ports?.outcome?.portId) ?? null;
+}
 export function executionCursors(deck, run) {
   if (!run?.graph || run.ambiguous || !deck.observationMap ||
       run.graph.graphId !== `graph:${deck.capabilityId}` || deck.snapshotDigest !== deck.observationMap.snapshotDigest) return [];
@@ -56,7 +67,7 @@ export function executionCursors(deck, run) {
           milliseconds: run.ended ? 0 : Math.max(0, Number(fact.durationMilliseconds) || 0) });
         break;
       }
-      cell = cells.get(cell.parentCellId);
+      cell = cell.parentCellId == null ? scenarioCaller(run.graph, cell) : cells.get(cell.parentCellId);
     }
   }
   return cursors;
