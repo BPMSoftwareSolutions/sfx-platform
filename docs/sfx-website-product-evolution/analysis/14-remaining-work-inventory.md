@@ -1,12 +1,28 @@
 # 14 — Remaining-work inventory
 
-Prepared 2026-10-08 against the working tree. Read-only inventory: no code, declaration, estate,
-provider or workflow file was changed by this document. Every item names its status, the plan
-section it stems from with line cites, its change surface, the acceptance evidence it owes, and
-whether it can finish in one turn or is externally gated. Nothing is asserted that the cited file
-or a dated artifact does not show; unverifiable items are in §8.
+Prepared 2026-10-08 against the working tree; re-verified 2026-10-09 against `5eee1df`. Read-only
+inventory: no code, declaration, estate, provider or workflow file was changed by this document.
+Every item names its status, the plan section it stems from with line cites, its change surface,
+the acceptance evidence it owes, and whether it can finish in one turn or is externally gated.
+Nothing is asserted that the cited file or a dated artifact does not show; unverifiable items are
+in §8.
 
-**Abbreviations.** IS = [`implementation-strategy.md`](../implementation-strategy.md) Rev 4;
+**Originating plan.** The plan this inventory executes is
+[`sidefx-circuit-driven-ui-strategy.md`](../../sidefx-circuit-driven-ui-strategy.md) (SP; proposed
+2026-10-08, currently untracked — R8). Remaining items map to its lines:
+
+| SP line | Plan statement | Inventory items |
+| --- | --- | --- |
+| L9 | `sfx-platform` is a thin consumer/composer; UI/UX providers are owned in `sfx-providers` | B2, B3, B5, B7, R9, H18–H21 |
+| L22, L39, L128 | Four provider slots (region table at L19–L24) and the first post-login Explorer experience | P0-a, R1, R3, R4, B6 |
+| L48 | Each provider has its own circuit; provider drilldown recurses with the same template | B7, H11, H12, H20 |
+| L56, L58 | Ownership split: provider code/assets vs database-declared page/circuit meaning | B1, B2, B4, B6, R9 |
+| L78, L103 | One provider per slot; assets by declared manifest/digest; no provider-specific code in `sfx-platform` (also L60, L79) | R1, B1, B2, B3, R7, F3, F4 |
+| L118 | Unit B — provider seam extraction into `sfx-providers` | B3, R1, R9 |
+| L122 | Unit D — live flywheel from real testimony, not animation assumptions | P0-a, P0-b, T4, B7 |
+
+**Abbreviations.** SP = [`sidefx-circuit-driven-ui-strategy.md`](../../sidefx-circuit-driven-ui-strategy.md)
+(the originating plan; line cites above); IS = [`implementation-strategy.md`](../implementation-strategy.md) Rev 4;
 BS = [`ui-circuit-blueprint-strategy.md`](../ui-circuit-blueprint-strategy.md);
 LB = [`landing-blueprint.md`](../landing-blueprint.md);
 RB = [`ui-explorer-region-blueprint.md`](../ui-explorer-region-blueprint.md);
@@ -24,20 +40,20 @@ but not supported by an artifact read here.
 
 ---
 
-## 1. Local facts checked (2026-10-08/09)
+## 1. Local facts checked (2026-10-08; re-verified 2026-10-09 against `5eee1df`)
 
-**Git (`sfx-platform`).** `main` at `c4f67df` (up to date with origin). Uncommitted: 21 modified
-files, `view.html` deleted, and untracked `explorer-shell.js`, `footer.js`, `region-host.mjs`,
-`region-runtime.js`, `verify-region.mjs`, `tools/live-circuit/verify-region-header-browser.mjs`,
-`tools/live-circuit/verify-regions-browser.mjs`, `docs/canonical-scenario-blueprint.md`,
-`docs/sidefx-circuit-driven-ui-strategy.md`, `outputs/**` (large blueprint/deck artifacts, not in
-`.gitignore`). `git check-ignore` ignores `artifacts/`, not `outputs/`.
+**Git (`sfx-platform`).** `main` at `5eee1df`, four commits ahead of `origin/main` (`c4f67df`) and
+clean apart from untracked `docs/canonical-scenario-blueprint.md` and
+`docs/sidefx-circuit-driven-ui-strategy.md`. The declared-region wave is committed (not pushed):
+`62551f9` composite provider packaging, `6274d11` verification wiring, `5eee1df` region/footer
+mounts, on top of `7f39a5e` (this inventory and the runbook). `outputs/**` is ignored — `5eee1df`
+adds `outputs/` to `.gitignore` — so the landing deck remains a local-only check input (F3/R7).
 
-**Git (`sfx-providers`).** `main` is up to date with origin; commits `efad258` (ui-runtime-token-set),
-`9875017` (ui-explorer-region package), `8d23da2` (region blueprint conformance) and `4d45615` are
-present. Uncommitted: untracked `providers/ui-shell-footer/` (the declaration-wise footer provider
-plus `assets/footer.{css,html,svg}`), `tests/ui-shell-footer.test.mjs`, `docs/visual-assets/`;
-three `packages.lock.json` modifications.
+**Git (`sfx-providers`).** `main` is level with origin at `a33b442` ("Add the shared shell footer UI
+region provider", pushed); `efad258` (ui-runtime-token-set), `9875017` (ui-explorer-region
+package), `8d23da2` (region blueprint conformance) and `4d45615` precede it. Uncommitted:
+untracked `docs/visual-assets/` and three `providers/cli-login/**/packages.lock.json`
+modifications (unrelated churn).
 
 **Git (`sfx-embody`).** Three commits ahead of origin. Uncommitted:
 `docs/request-sda-cli-dispatch-preflight-parity.md` (its status line says the SDA working tree fix is
@@ -45,12 +61,13 @@ implemented but estate installation — commit twin, kernel selection, deck rege
 remaining turn) and untracked `docs/research/cli-login/07-node-preflight-parity.out.txt`,
 `08-node-preflight-uncommitted-child.{out.txt,sql}`.
 
-**CI.** Latest `Live Circuit staging` run `37818835706` is green for `c4f67df` (head of current
-branch) at 17m59s; the uncommitted region wave has no run. Watched paths include `live-circuit/**`,
-`tools/live-circuit/**`, `deploy/staging/**` and the workflow itself (`.github/workflows/staging.yml:6-14`),
-so committing the region wave triggers a full staging release.
+**CI.** Latest `Live Circuit staging` run `37818835706` is green for `c4f67df`. The four local
+commits (`7f39a5e`, `62551f9`, `6274d11`, `5eee1df`) have no run; `origin/main` is still `c4f67df`,
+so the single batch push will trigger a full staging release. Watched paths include
+`live-circuit/**`, `tools/live-circuit/**`, `deploy/staging/**` and the workflow itself
+(`.github/workflows/staging.yml:6-14`).
 
-**Captures (local, gitignored).** `artifacts/regions-local/capture.json` (2026-10-08T23:45:25Z, 41
+**Captures (local, gitignored).** `artifacts/regions-local/capture.json` (2026-10-09T02:05:59Z, 41
 checks, 0 failures) shows the Explorer's `header`, `left-sidebar`, `middle`, `right-sidebar` and
 `footer` all `source=declared`, slots filled, digests verified and named failures/tamper refusals
 proved. `artifacts/live-login-local/capture.json` (2026-10-09T00:36:09Z, signed-out) shows the same
@@ -65,12 +82,14 @@ the shared footer are wired in `explorer.js` and captured declared (see §8 F1).
 Explorer mounts all five; home, login and generic declared pages mount only the shared footer,
 their headers remaining hand-authored shell (`home.html:55-61`, `login.html:40-46`, `page.html:11-28`).
 
-**Staging reachability of the region wave (verified gap).** The deploy job sparse-checks
-`sfx-providers` at pinned ref `a020024c` (`.github/workflows/staging.yml` deploy job), which predates
-the `ui-explorer-region` and `ui-shell-footer` packages; `region-host.mjs:56-57` requires
-`SFX_UI_PROVIDER_DIR`, which appears nowhere in `deploy/` or `infra/` apart from the new files. A
-commit of the wave therefore needs a workflow pin bump plus provider-directory packaging/env, or the
-deployed Explorer renders five named `UI_REGION_PROVIDER_UNREADABLE` states.
+**Staging reachability of the region wave (closed in-repo, unproven until deploy).** The deploy job
+now sparse-checks `sfx-providers` at pinned ref `a33b442`
+(`.github/workflows/staging.yml:88`, commit `6274d11`), which carries the `ui-explorer-region` and
+`ui-shell-footer` packages; `prepare-composite.mjs` copies them under `estate/ui-providers/` and
+`Dockerfile.composite` sets `SFX_UI_PROVIDER_DIR=/opt/sfx/estate/ui-providers` (commit `62551f9`),
+with packaging refusals covered by `verify-composite-package.mjs`. `region-host.mjs:56-57` still
+requires `SFX_UI_PROVIDER_DIR`; that the deployed observer serves `AUTHORED` regions is not provable
+locally and remains the batch deploy's acceptance (F4).
 
 ---
 
@@ -87,19 +106,23 @@ deployed Explorer renders five named `UI_REGION_PROVIDER_UNREADABLE` states.
 
 ---
 
-## 3. Uncommitted declared-region wave (no plan revision owes these commits)
+## 3. Declared-region wave (committed 2026-10-09, unpushed)
+
+The wave was committed after the first issue of this inventory as `62551f9` (composite provider
+packaging), `6274d11` (verification wiring) and `5eee1df` (region/footer mounts); statuses below
+are updated by the 2026-10-09 verification pass.
 
 | ID | Item | Status | Source | Change surface | Acceptance evidence owed | Turn / gate |
 | --- | --- | --- | --- | --- | --- | --- |
-| R1 | Four Explorer regions + shared footer mounted from declared `ui-region-content.v1` provider content (`region-host.mjs`, `region-runtime.js`, `explorer-shell.js`, `footer.js`; `explorer.html` mounts only; `home/login/page` footer mounts) | uncommitted, locally green | BS §4-§5:121-193; LB §5-§6:289-358; RB §1-§3:32-351 | shell (a/b) + provider (ui-explorer-region committed; ui-shell-footer untracked); CI checks + acceptance pins | `verify-region.mjs` green; browser capture `artifacts/regions-local`; staging acceptance extension; provider dir present in the composite | One turn to commit + local checks; staging externally gated (~18 min, OIDC, pin bump) |
-| R2 | `view.html` deleted; provider drill-down folded into `declaration-detail` as primary view with collapsed raw authority; provider glyph click opens view | uncommitted | LB §6:327-358; RB §6:430-445 | shell (`circuit-runtime.js`, `view-runtime.js`, `verify-view.mjs`, `observe-server.mjs`, `accept.mjs`) | `verify-view.mjs` green; `artifacts/live-login-local` drill-down screenshots 05/06; staging acceptance pins for 404 `/circuit/view[.html]` | One turn locally; staging gated |
-| R3 | `circuit-host.json home.hero` changed to `ui-page-landing`/`sidefx:capabilities`; `verify-identity-session.mjs` pin updated | uncommitted, capture-verified | IS C1:204-208; A13c §2.3:49 | host config (class b) | updated pin + capture showing default selection reads `ui-page-landing` (`live-login-local` 03-04) | One turn; contradicting namespace cited in §8 F2 |
-| R4 | `login.js` default return target changed to `/circuit/explorer?capability=ui-page-landing&namespace=sidefx%3Acapabilities` | uncommitted, unverified (change is newer than the last capture) | LB §3:252-263; A13b §2.3:103-123 | shell (a) | browser re-capture of the post-login default landing; `verify-identity-session`/login fixture update if any | One turn locally; signed-in re-capture needs P0-a |
-| R5 | `verify-region.mjs` added to staging `checks`; acceptance pins for `region-runtime.js`/`explorer-shell.js`/`footer.js` and view 404s | uncommitted | IS §9.2:883-887 (module pin rule) | CI (`staging.yml`, `accept.mjs`) | green checks job; public acceptance for the pins | One turn to commit; CI wall clock applies |
-| R6 | `verify-regions-browser.mjs` (five regions, failure/tamper/blueprint diff) exists but is not wired into `staging.yml`; `verify-region-header-browser.mjs` is its superseded header-only predecessor | uncommitted | BS §6:208-220 (browser capture proof) | CI + tools | decide: wire into the browser job or keep local-only; remove or archive the header-only tool | One turn |
-| R7 | `outputs/**` (landing blueprint decks incl. `outputs/capability-estate/landing-circuit/circuit-blueprint.json`) is untracked; `verify-region.mjs:28,213-234` and both region browser tools depend on it | uncommitted | RB §3.1:329-333 (deck derived from `explorer.html`); RB §6:442-445 | repo hygiene/CI | commit a bounded deck or relocate the check input; in CI the check currently records a limitation | One turn |
-| R8 | Untracked design docs `docs/canonical-scenario-blueprint.md` and `docs/sidefx-circuit-driven-ui-strategy.md` | uncommitted | not in the four plans | docs | none; naming/strategy proposals only | One turn |
-| R9 | `sfx-providers` footer provider (`ui-shell-footer`) and its test are untracked; pinned release ref predates all region packages | uncommitted | RB §3.2:337-342; BS §5:173-177 | provider repo + CI pin/env | provider test green; new pin; `SFX_UI_PROVIDER_DIR` set | One turn in the provider repo; release gated |
+| R1 | Four Explorer regions + shared footer mounted from declared `ui-region-content.v1` provider content (`region-host.mjs`, `region-runtime.js`, `explorer-shell.js`, `footer.js`; `explorer.html` mounts only; `home/login/page` footer mounts) | committed (`5eee1df` mounts, `62551f9` packaging), locally green; unpushed | BS §4-§5:121-193; LB §5-§6:289-358; RB §1-§3:32-351 | shell (a/b) + provider (ui-explorer-region and ui-shell-footer committed); CI checks + acceptance pins | `verify-region.mjs` green (re-run 2026-10-09); browser capture `artifacts/regions-local` (02:05:59Z, 0 failures); staging acceptance extension; provider dir present in the composite | Local done; staging externally gated (push, ~18 min, OIDC) |
+| R2 | `view.html` deleted; provider drill-down folded into `declaration-detail` as primary view with collapsed raw authority; provider glyph click opens view | committed (`5eee1df`) | LB §6:327-358; RB §6:430-445 | shell (`circuit-runtime.js`, `view-runtime.js`, `verify-view.mjs`, `observe-server.mjs`, `accept.mjs`) | `verify-view.mjs` green; `artifacts/live-login-local` drill-down screenshots 05/06; staging acceptance pins for 404 `/circuit/view[.html]` (verified 404 locally) | Staging gated |
+| R3 | `circuit-host.json home.hero` changed to `ui-page-landing`/`sidefx:capabilities`; `verify-identity-session.mjs` pin updated | committed (`5eee1df`); live host confirms hero | IS C1:204-208; A13c §2.3:49 | host config (class b) | updated pin + capture showing default selection reads `ui-page-landing` (`live-login-local` 03-04) | Done locally; contradicting namespace cited in §8 F2 |
+| R4 | `login.js` default return target changed to `/circuit/explorer?capability=ui-page-landing&namespace=sidefx%3Acapabilities` | committed (`5eee1df`); target returns 200 on the live observer | LB §3:252-263; A13b §2.3:103-123 | shell (a) | browser re-capture of the post-login default landing; `verify-identity-session`/login fixture update if any | Signed-in re-capture needs P0-a |
+| R5 | `verify-region.mjs` added to staging `checks`; acceptance pins for `region-runtime.js`/`explorer-shell.js`/`footer.js` and view 404s | committed (`6274d11`) | IS §9.2:883-887 (module pin rule) | CI (`staging.yml`, `accept.mjs`) | green checks job; public acceptance for the pins | Push/CI outstanding |
+| R6 | `verify-regions-browser.mjs` (five regions, failure/tamper/blueprint diff) exists but is not wired into `staging.yml`; `verify-region-header-browser.mjs` is its superseded header-only predecessor | committed (`6274d11`); still not wired into `staging.yml` | BS §6:208-220 (browser capture proof) | CI + tools | decide: wire into the browser job or keep local-only; remove or archive the header-only tool | One turn |
+| R7 | `outputs/**` (landing blueprint decks incl. `outputs/capability-estate/landing-circuit/circuit-blueprint.json`) is a local-only check input; `verify-region.mjs:28,213-234` and both region browser tools depend on it | `outputs/` now ignored by `5eee1df`; deck not committed | RB §3.1:329-333 (deck derived from `explorer.html`); RB §6:442-445 | repo hygiene/CI | commit a bounded deck or relocate the check input; in CI the check currently records a limitation | One turn |
+| R8 | Untracked design docs `docs/canonical-scenario-blueprint.md` and `docs/sidefx-circuit-driven-ui-strategy.md` | still untracked (SP is the originating plan cited above) | not in the four plans | docs | none; naming/strategy proposals only | One turn |
+| R9 | `sfx-providers` footer provider (`ui-shell-footer`) and its test; pinned release ref | done: committed and pushed as `a33b442`; pins updated (`62551f9` identity-sources, `6274d11` workflow) | RB §3.2:337-342; BS §5:173-177 | provider repo + CI pin/env | provider test green (7/7 re-run); new pin; `SFX_UI_PROVIDER_DIR` set (composite packaging) | Staging deploy gated |
 
 ---
 
@@ -233,6 +256,6 @@ receipt, and the second-industry reuse proof has no artifact found here.
 **F6 (flagged).** BS §5 step 1 says "G2 lands in SDA" while BS §7 and IS Rev 4 withdraw the request;
 the sequencing table is stale relative to the withdrawal (see B8).
 
-**F7 (flagged).** `outputs/**` is untracked, large and not ignored; any commit of the region wave
-must consciously include, bound or exclude it, and the checks that read it must tolerate its
-absence.
+**F7 (resolved 2026-10-09).** `outputs/**` is ignored by `.gitignore` (added in `5eee1df`), so the
+region-wave commits exclude it; the deck remains a local-only check input, and the checks that read
+it must tolerate its absence in CI (F3/R7).

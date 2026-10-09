@@ -1,11 +1,18 @@
 # One-turn final-batch runbook — declared UI regions and shared chrome
 
-Prepared 2026-10-08. Status: **execution runbook, not started.** This document is the work order
-that lands the declarative-UI region batch in one turn: the four Explorer regions and the shared
-shell footer mounted from declared providers, the verification wiring, and the provider packaging
-that makes the batch servable on staging.
+Prepared 2026-10-08; executed 2026-10-09. Status: **lanes A–C committed (`62551f9`, `6274d11`,
+`5eee1df`), unpushed; the single push → watch → receipts (§3.7–§3.9) remains.** This document is
+the work order that lands the declarative-UI region batch in one turn: the four Explorer regions
+and the shared shell footer mounted from declared providers, the verification wiring, and the
+provider packaging that makes the batch servable on staging.
 
-Authority chain for the batch: [`implementation-strategy.md`](implementation-strategy.md) §4.6
+Authority chain for the batch:
+[`sidefx-circuit-driven-ui-strategy.md`](../sidefx-circuit-driven-ui-strategy.md) is the
+originating plan (L9 thin `sfx-platform` / providers-owned; L22/L39/L128 four post-login Explorer
+provider slots; L48 per-provider circuits and recursive drilldown; L56/L58 ownership split;
+L78/L103 one provider per slot, assets by manifest/digest, no provider code in `sfx-platform`;
+L118 provider seam extraction; L122 live flywheel from real testimony), then
+[`implementation-strategy.md`](implementation-strategy.md) §4.6
 (change classes and the data gate), §9 (acceptance and verification), §10 (staged rollout);
 [`ui-circuit-blueprint-strategy.md`](ui-circuit-blueprint-strategy.md) §1 (blueprint first), §4
 (UI/UX provider architecture), §5 (module-by-module migration), §6.3 (verification is click-path
@@ -29,36 +36,65 @@ release triggered by the single pushed commit range.
 
 ---
 
-## 0. Starting state (verified 2026-10-08, before execution)
+## 0. Execution and verification state (2026-10-09)
 
-The region work is present in the two working trees but uncommitted. Reproduce these checks before
-touching anything; a different state means stop and reconcile.
+The batch was executed after this runbook was prepared; the three lane commits exist locally and
+the working tree is clean apart from the two untracked planning docs. Verified in this pass:
 
-- `sfx-platform` working tree: lanes A and B are complete and green locally (file lists in §2).
-  New: `live-circuit/circuit/region-host.mjs`, `region-runtime.js`, `explorer-shell.js`,
-  `footer.js`, `live-circuit/circuit/verify-region.mjs`,
-  `tools/live-circuit/verify-regions-browser.mjs`, `verify-region-header-browser.mjs`.
-  Modified: the mount/verification files listed in §2.
-- `sfx-providers` working tree: `providers/ui-shell-footer/` and
-  `tests/ui-shell-footer.test.mjs` are new and uncommitted; `providers/ui-explorer-region` is
-  committed (`8d23da2`, "Conform ui-explorer-region to its declared blueprint"). The dirty
-  `providers/cli-login/**/packages.lock.json` files are unrelated local churn — never stage them.
-- The gap this batch closes (Lane C): the composite release stages only host files and
-  `estate/demo/**` (`deploy/sda-kernel/prepare-composite.mjs:32-35`,
-  `deploy/sda-kernel/verify-composite-package.mjs:38-40`), the image sets no
-  `SFX_UI_PROVIDER_DIR` (`deploy/sda-kernel/Dockerfile.composite:46`), and the workflow checks out
-  `sfx-providers` only for the identity publish
-  (`.github/workflows/staging.yml:85-90`). Without Lane C, the deployed observer answers
-  `UI_REGION_PROVIDER_UNREADABLE` for every region, the Explorer has no `#identity` element, and
-  `accept.mjs browser` fails at `verify-browser-session.mjs:108-111` (and again at `:168-170`),
-  rolling the release back.
-- Local gates already run at preparation time: `node --check` on every lane file — pass;
-  `node --test tests/ui-explorer-region.test.mjs tests/ui-shell-footer.test.mjs` — 7/7 pass;
-  `node live-circuit/circuit/verify-region.mjs` — all checks pass including the blueprint-deck
-  diff; `verify-pages.mjs --fixtures`, `verify-identity-session.mjs` (16/16),
-  `verify-objective.mjs`, `verify-view.mjs`, `verify-components.mjs`, `verify-claims.mjs
-  --fixtures`, `policy.test.mjs`, `verify-observer-bridge.mjs` — pass. These are reproduced by
-  §3.4–§3.5 and are the pre-push gate.
+- `sfx-platform`: `main` = `5eee1df`, four commits ahead of `origin/main` (`c4f67df`), unpushed —
+  `62551f9` (Lane C: provider packaging; pin `a33b442`), `6274d11` (Lane B: checks/public
+  acceptance; workflow pin `a33b442`), `5eee1df` (Lane A: region/footer mounts, `view.html`
+  deleted, `home.hero` = `ui-page-landing`, `login.js` default target, `.gitignore` gains
+  `outputs/`). `git status --porcelain` shows only `?? docs/canonical-scenario-blueprint.md` and
+  `?? docs/sidefx-circuit-driven-ui-strategy.md`.
+- `sfx-providers`: `main` = `a33b442` (footer provider) level with origin; the footer test re-runs
+  7/7. Only untracked `docs/visual-assets/` and `providers/cli-login/**/packages.lock.json` churn
+  remain.
+- `sfx-embody`: three commits ahead of origin with the modified SDA request doc and untracked
+  `docs/research/cli-login/0{7,8}-*` files (unchanged from the inventory).
+- Re-run gates: provider tests 7/7; `node deploy/sda-kernel/verify-composite-package.mjs` exit 0
+  (provider refusals covered); `SFX_UI_PROVIDER_DIR=… node live-circuit/circuit/verify-region.mjs`
+  all pass, including the four-region blueprint-deck diff.
+- Live observer `http://127.0.0.1:8788`: `header`, `left-sidebar`, `middle`, `right-sidebar` and
+  `footer` answer `AUTHORED`/`shapeConforms:true`; `banner` 404 `UI_REGION_UNKNOWN`;
+  `/api/circuit/v1/capability-details?capabilityId=ui-page-landing&namespaceId=sidefx%3Acapabilities`
+  is HTTP 200 `status=READ`; `/api/circuit/v1/home` hero = `ui-page-landing`; `/circuit/login` 200;
+  the new default target
+  `/circuit/explorer?capability=ui-page-landing&namespace=sidefx%3Acapabilities` is 200;
+  `/circuit/view` and `/circuit/view.html` are 404 (acceptance pins in `accept.mjs`).
+- Not verifiable locally: the batch deploy (no run for `5eee1df`; `origin/main` is `c4f67df`) and
+  the signed-in browser captures (credential gate, §2). No staging evidence is claimed.
+
+**Corrections to the runbook as first written.**
+
+1. The header said "not started" and the old §0 said the wave was uncommitted with untracked
+   `ui-shell-footer`; both are stale — see the table below. §3.1's commit/push commands are
+   already executed.
+2. The old §0 said `outputs/` was not ignored: `5eee1df` adds `outputs/` to `.gitignore`. The deck
+   itself remains a local-only check input (inventory R7/F7).
+3. The old §0 said the pinned `sfx-providers` ref `a020024c` predates the packages: both
+   `deploy/staging/identity-sources.json` and `.github/workflows/staging.yml:88` now pin `a33b442`.
+4. §3.6's cited regions capture timestamp is superseded: `artifacts/regions-local/capture.json`
+   is now 2026-10-09T02:05:59Z (41 checks, 0 failures); `live-login-local` is unchanged at
+   2026-10-09T00:36:09Z.
+5. §3.5 was not re-run in full in this pass; every file it names exists, and the §3.4 and
+   packaging gates were re-run and pass.
+
+**Done vs outstanding.**
+
+| Runbook step | State |
+| --- | --- |
+| §3.1 provider footer commit + push (`sfx-providers`) | done — `a33b442`, pushed |
+| §3.2 composite packaging + pins | done — `62551f9`; packaging conformance re-run exit 0 |
+| §3.3 checks/public acceptance wiring | done — `6274d11` |
+| §3.4 region mounts + `verify-region.mjs` | done — `5eee1df`; re-run green |
+| §3.5 local checks suite | not re-run in full this pass; files present |
+| §3.6 local browser captures | regions-local present (02:05:59Z, 0 failures); signed-in captures pending |
+| §3.7 three lane commits | done — `62551f9`, `6274d11`, `5eee1df` |
+| §3.7 single push | outstanding — `main` four ahead of `origin/main` |
+| §3.8 watch batch deploy | outstanding (external gate) |
+| §3.9 staging receipts | outstanding (external gate) |
+| §3.10 rollback | not needed (no deploy yet) |
 
 ---
 
@@ -108,7 +144,7 @@ watched paths and do not affect the deploy): `docs/canonical-scenario-blueprint.
 Every step states its source. Commands are PowerShell 5.1 from the repository root unless noted.
 Run everything from a state where `git status --porcelain` shows only the files owned by §1.
 
-### 3.1 Lane C — commit the provider package (`sfx-providers`)
+### 3.1 Lane C — commit the provider package (`sfx-providers`) — DONE (`a33b442`, pushed; commands kept as the record)
 
 Source: `ui-explorer-region-blueprint.md` §6 (package check; one package per deploy);
 `landing-blueprint.md` §5.4 (providers live in `sfx-providers`).
@@ -127,7 +163,7 @@ Set-Location C:\lab\repos\sfx-platform
 
 Do not stage `providers/cli-login/**/packages.lock.json`.
 
-### 3.2 Lane C — ship the provider packages in the composite release (`sfx-platform`)
+### 3.2 Lane C — ship the provider packages in the composite release (`sfx-platform`) — DONE (`62551f9`)
 
 Source: `ui-explorer-region-blueprint.md` §3.3, §4.4 (provider content read through the host; the
 browser never imports provider code); `implementation-strategy.md` §4.6 (class (a)/(b) deploy);
@@ -208,7 +244,7 @@ node deploy/sda-kernel/verify-composite-package.mjs
 node --test deploy/staging/policy.test.mjs
 ```
 
-### 3.3 Lane B — verification wiring
+### 3.3 Lane B — verification wiring — DONE (`6274d11`)
 
 Source: `implementation-strategy.md` §9.1 (checks and public refusals), §9.2 (`accept.mjs` public
 additions); `analysis/09` §1.3 (capture is the visual source of truth); `ui-explorer-region-blueprint.md`
@@ -259,7 +295,7 @@ node --check deploy/sda-kernel/prepare-composite.mjs
 node --check deploy/sda-kernel/verify-composite-package.mjs
 ```
 
-### 3.4 Lane A — mount verification
+### 3.4 Lane A — mount verification — DONE (`5eee1df`); re-run green 2026-10-09
 
 Source: `ui-explorer-region-blueprint.md` §1.2 (operation chain), §2.2/§2.4 (left/right region
 circuits, slots and failure terminals), §5.2–5.3; `live-circuit/circuit/README.md` "Declared region
@@ -285,7 +321,7 @@ run — `region-read-authored:{header,left-sidebar,middle,right-sidebar,footer}`
 present (`verify-region.mjs:157-243`). A missing provider checkout is a stop: the mount is not
 proven (`ui-explorer-region-blueprint.md:442-445`).
 
-### 3.5 Local checks suite — the `checks` job replicated
+### 3.5 Local checks suite — the `checks` job replicated — not re-run in full this pass
 
 Source: `implementation-strategy.md` §9.1; `.github/workflows/staging.yml:35-48`. Run in this
 order; any failure stops the batch before commit.
@@ -311,7 +347,7 @@ node deploy/sda-kernel/verify-observer-bridge.mjs
 records the provider checks as a limitation (`verify-region.mjs:240-242`), and that limitation is
 acceptable on CI only because §3.9 runs the real-browser acceptance on staging.
 
-### 3.6 Observer restart and local browser captures
+### 3.6 Observer restart and local browser captures — regions capture green (02:05:59Z); signed-in pending
 
 Source: `analysis/09` §1.3 (`capture_live_ui` is the visual source of truth; U1 deck from real
 captures), §2 T3 (publish→capture), §4 (credentials manual); `ui-circuit-blueprint-strategy.md`
@@ -352,7 +388,7 @@ Required results:
   `pending: true`, `reason: TEST_PRINCIPAL_CREDENTIALS_UNAVAILABLE` — the EXTERNAL GATE of §2,
   proven again on staging in §3.9.
 
-### 3.7 Commits (four commits) and the single push
+### 3.7 Commits (four commits) and the single push — three lane commits done; push outstanding
 
 Source: `implementation-strategy.md` §4.6 (change classes: exactly one class (a)/(b) release);
 `ui-circuit-blueprint-strategy.md` §5 (module by module, no big-bang);
