@@ -151,7 +151,8 @@ names result sets, synthesizes fields or picks SQL (`implementation-strategy.md:
 
 ### 2.1 Boundary panel
 
-Landing circuit `[proposal]`: capability `ui-page-landing`, namespace `sidefx:ui`, path
+Landing circuit `[proposal]`: capability `ui-page-landing`, namespace `sidefx:capabilities` (the
+published, readable circuit; an earlier draft said `sidefx:ui`), path
 `/circuit/explorer`, port `sda-ui-page-landing-port.v1` `[proposal]`, execution location
 `trusted-browser-shell`, `bindingState: UNBOUND`, readiness `REVIEWABLE`/`HELD`
 (`implementation-strategy.md:437-461`). The route is the deployed Explorer today
