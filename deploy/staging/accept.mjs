@@ -10,8 +10,13 @@ try {
     if (process.env.SFX_VERIFY_LOGS === '1') fixture.logs = await logAccess();
     fs.mkdirSync(evidence, {recursive:true});
     const request = path.join(evidence, 'observe-request.json'); fs.writeFileSync(request, JSON.stringify(config.observe));
-    await run(process.execPath, ['tools/live-circuit/verify-browser-session.mjs'], {
-      input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'), SFX_BROWSER_CAPTURES: path.join(evidence, 'browser-captures'), SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome, SFX_REQUIRE_DURABLE_RUNS: '1' }, timeout: 900000 });
+    try {
+      await run(process.execPath, ['tools/live-circuit/verify-browser-session.mjs'], {
+        input: JSON.stringify(fixture), env: { SFX_BROWSER_ORIGIN: config.origin, SFX_BROWSER_EVIDENCE: path.join(evidence, 'browser'), SFX_BROWSER_CAPTURES: path.join(evidence, 'browser-captures'), SFX_BROWSER_OBSERVE_REQUEST: request, SFX_EXPECTED_OUTCOME: config.expectedOutcome, SFX_REQUIRE_DURABLE_RUNS: '1' }, timeout: 900000 });
+    } catch (error) {
+      console.error('Browser gate diagnostics: staging-release artifact, browser/failed.json (redacted assertion), browser/progress.json (last phase), browser/run.json (actual execution).');
+      throw error;
+    }
     console.log('Real browser sign-in, live Observe, declared-home captures, sign-out and safety proof passed.');
     await run(process.execPath, ['live-circuit/circuit/verify-live-locations.mjs', path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse')], {publicDiagnostic:'prefix-process.json'});
     await run(process.execPath, ['tools/sfx-api/verify-circuit-replay.mjs', config.origin, path.join(evidence, 'browser/scene.json'), path.join(evidence, 'browser/capture.sse'), path.join(evidence, 'replay')], {publicDiagnostic:'replay-process.json'});
@@ -123,6 +128,9 @@ try {
       {route:'/api/circuit/v1/crosswalk',crosswalkId,status:200,contractId:crosswalk.contractId},
       {route:'/api/circuit/v1/crosswalk',crosswalkId:'no-such-crosswalk.v1',status:404});
     const scene = await json(config.origin + '/api/circuit/v1/scenario?' + new URLSearchParams({capabilityId:config.observe.subject,namespaceId:config.observe.namespace,scenarioId:config.observe.subject}));
+    assert(scene.nodes.some(node => node.kind === 'variant' && node.id === `variant:${config.observe.subject}:${config.expectedOutcome}`),
+      `ACCEPTANCE_FIXTURE_OUTCOME_UNDECLARED: ${config.observe.subject} no longer declares ${config.expectedOutcome}; reconcile deploy/staging/config.json with the capability contract before live Observe`);
+    checks.push({route:'/api/circuit/v1/scenario', capabilityId:config.observe.subject, expectedOutcome:config.expectedOutcome, declared:true});
     const providers = scene.navigation.items.filter(i=>i.kind==='provider'); assert(providers.length);
     const inspections = [];
     for (const provider of providers) {

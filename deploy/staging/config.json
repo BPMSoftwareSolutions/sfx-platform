@@ -14,5 +14,5 @@
     "namespace": "sidefx:capabilities",
     "input": {"contractId":"agent-objective-request.v1","payload":{"objective":"What is Broadcom's current market price?"}}
   },
-  "expectedOutcome": "ADMITTED"
+  "expectedOutcome": "RETURNED"
 }

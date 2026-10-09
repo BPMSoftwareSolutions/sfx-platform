@@ -143,6 +143,23 @@ The selected capability/input are release fixture data in
 selected end-to-end path and transport regressions, not every estate capability
 or complete formal observability.
 
+The fixture's expected outcome must track the declared capability contract.
+The public-read gate checks that its exact variant exists before live Observe.
+The objective-v3 discovery composition returns `RETURNED` for returned child
+evidence; the older `ADMITTED` expectation is no longer declared. `RETURNED`
+does not assert domain success or objective fulfillment. Release
+[37875553936](https://github.com/BPMSoftwareSolutions/sfx-platform/actions/runs/37875553936)
+completed its real Observe in 29 seconds with returned market-price evidence,
+then failed the stale `ADMITTED` assertion and rolled back. This was fixture
+drift, not a sign-in or model timeout. Historical receipts above retain their
+original outcomes.
+
+For a browser-gate failure, inspect `browser/failed.json` (phase and redacted
+assertion), `browser/progress.json` (last phase), and `browser/run.json` (actual
+execution, when available) in the `staging-release` artifact. The parent command
+withholds raw child output because authentication material can be present;
+`COMMAND_FAILED: node (1)` alone does not identify which assertion failed.
+
 Replay verification selects the completed capability run from the capture
 (which also contains real sign-in/sign-out runs), retaining its original receipt
 IDs, values and timestamps. Its browser consumes that retained run without new

@@ -48,7 +48,11 @@ if (fixture.logs) {
 }
 page.on('pageerror', error => errors.push(error.message));
 page.on('console', message => consoleMessages.push(message.text()));
-const stage = name => fs.writeFileSync(path.join(evidence, 'progress.json'), JSON.stringify({ at: new Date().toISOString(), stage: name, checks }));
+let currentStage;
+const stage = name => {
+  currentStage = name;
+  fs.writeFileSync(path.join(evidence, 'progress.json'), JSON.stringify({ at: new Date().toISOString(), stage: name, checks }));
+};
 const record = name => { checks.push(name); stage(name); process.stderr.write('PASS ' + name + '\n'); };
 const streamController = new AbortController(); let captured = '', streamFailure;
 const stream = await fetch(origin + '/events', { signal: streamController.signal });
@@ -121,11 +125,13 @@ try {
       window.acceptanceFrame = requestAnimationFrame(sample);
     }; window.acceptanceFrame = requestAnimationFrame(sample);
   });
+  stage('Starting signed-in live Observe');
   const admittedResponse = page.waitForResponse(r => r.url() === origin + '/api/circuit/v1/runs' && r.request().method() === 'POST', { timeout: 90000 });
   await page.locator('#observe').click();
   const admitted = await admittedResponse;
   assert.equal(admitted.status(), 202); runId = (await admitted.json()).runId;
   assert(runId);
+  stage('Waiting for live Observe completion');
   await page.waitForFunction(() => /API run .* · (completed|failed|cancelled|timed-out)/.test(document.querySelector('#observe-status').textContent), null, { timeout: 360000 });
   samples = await page.evaluate(() => { cancelAnimationFrame(window.acceptanceFrame); return window.acceptanceFrames; });
   const run = await (await fetch(origin + '/api/circuit/v1/runs/' + runId, { headers: { cookie } })).json();
@@ -133,9 +139,12 @@ try {
   fs.writeFileSync(path.join(evidence, 'run.json'), JSON.stringify({ run, output }, null, 2));
   fs.writeFileSync(path.join(evidence, 'frames.json'), JSON.stringify(samples));
   await page.screenshot({ path: path.join(evidence, 'observe.png'), fullPage: true });
+  stage('Checking completed Observe output against the release fixture');
   assert.equal(run.state, 'completed', 'Real Observe must complete successfully');
-  if (process.env.SFX_EXPECTED_OUTCOME) assert.equal(output.disposition, process.env.SFX_EXPECTED_OUTCOME);
+  if (process.env.SFX_EXPECTED_OUTCOME) assert.equal(output.disposition, process.env.SFX_EXPECTED_OUTCOME,
+    'Real Observe disposition must match the declared outcome selected in the release fixture');
   assert(!JSON.stringify(output).includes('CELL_EXECUTION_FAILED'), 'Technical failure is not successful Observe');
+  stage('Checking live operation, provider and outcome visibility');
   const current = samples.flatMap(s => s.current);
   assert(current.some(n => n.kind === 'provider'), 'A real provider must receive the dot while live');
   // A sub-frame operation need not be sampled under the dot. Its owning step
@@ -210,7 +219,7 @@ try {
   fs.writeFileSync(path.join(evidence, 'browser-receipt.json'), JSON.stringify(receipt, null, 2));
   process.stdout.write(JSON.stringify(receipt));
 } catch (error) {
-  fs.writeFileSync(path.join(evidence, 'failed.json'), JSON.stringify({ checks, runId, error: error.name, message: secrets.reduce((m,s) => m.replaceAll(s, '[private]'), error.message) }, null, 2));
+  fs.writeFileSync(path.join(evidence, 'failed.json'), JSON.stringify({ stage: currentStage, checks, runId, error: error.name, message: secrets.reduce((m,s) => m.replaceAll(s, '[private]'), error.message) }, null, 2));
   process.stderr.write(`BROWSER_ACCEPTANCE_FAILED after ${checks.length} checks (${error.name}); private diagnostic retained\n`);
   process.exitCode = 1;
 } finally {
