@@ -10,7 +10,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { newRun, applyRecord } from './deck-trace.js';
 import { evidenceModel, componentEvidence } from './run-evidence.mjs';
-import { readRegion, serveRegionApi, REGION_PROVIDERS } from './region-host.mjs';
+import { readRegion, serveRegionApi, REGION_PROVIDERS, REGION_ROUTE } from './region-host.mjs';
 
 const dir = path.dirname(fileURLToPath(import.meta.url)), root = path.resolve(dir, '../..');
 assert(process.env.SFX_UI_PROVIDER_DIR, 'SFX_UI_PROVIDER_DIR_REQUIRED: use the release-pinned UI providers');
@@ -40,6 +40,9 @@ let streamFailure = 0, admissions = 0, authenticated = true, externalCapture = n
 const sse = selected.records.map(r => 'data: ' + JSON.stringify(r) + '\n\n').join('');
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  // Region reads are asynchronous in the real host. Keep the fixture delayed
+  // so navigation checks cannot accidentally rely on immediate DOM mounting.
+  if (url.pathname === REGION_ROUTE) await new Promise(resolve => setTimeout(resolve, 25));
   if (await serveRegionApi(req, res, url)) return;
   const json = (body, status = 200) => { res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(body)); };
   if (url.pathname === '/events') { res.writeHead(200, { 'content-type': 'text/event-stream' }); return res.end(externalCapture ?? (url.searchParams.get('run') === 'current' ? sse : ': fixture observer\n\n')); }
@@ -74,10 +77,7 @@ const origin = `http://127.0.0.1:${server.address().port}`;
 const { chromium } = await import(pathToFileURL(process.env.SFX_BROWSER_TEST_MODULE).href);
 const browser = await chromium.launch({ executablePath: process.env.SFX_BROWSER_EXECUTABLE, headless: true });
 let page; const errors = [];
-try {
-  page = await browser.newPage({ viewport: { width: 1680, height: 1100 } });
-  page.on('pageerror', e => errors.push(e.message));
-  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
+async function waitForShell() {
   const mounts = ['region-header', 'tree', 'region-middle', 'context', 'region-footer'];
   await page.waitForFunction(ids => ids.every(id => {
     const node = document.getElementById(id);
@@ -86,13 +86,22 @@ try {
   assert.deepEqual(await page.locator('[data-region-failure]').evaluateAll(nodes => nodes.map(node => ({
     region: node.dataset.region, failure: node.dataset.regionFailure, detail: node.textContent
   }))), [], 'All declared shell regions must mount before run acceptance');
+}
+async function openPage(url) {
+  await page.goto(url);
+  await waitForShell();
+}
+try {
+  page = await browser.newPage({ viewport: { width: 1680, height: 1100 } });
+  page.on('pageerror', e => errors.push(e.message));
+  await openPage(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
   await page.waitForFunction(() => document.querySelector('#run-report')?.textContent.includes('Transport fixture output'));
   if (deck.slides.some(s => s.blueprint?.role === 'scenario-linear')) {
     assert.equal(await page.locator('#view-linear').getAttribute('aria-pressed'), 'true', 'Linear is the default');
     assert.equal(await page.locator('#slide').inputValue(), 'scenario-linear');
     await page.locator('#view-paged').click();
     assert.equal(new URL(page.url()).searchParams.get('view'), 'paged', 'Explicit Paged selection survives links');
-    await page.goBack();
+    await page.goBack(); await waitForShell();
     await page.waitForFunction(() => document.querySelector('#view-linear').getAttribute('aria-pressed') === 'true');
     assert.equal(await page.locator('#slide').inputValue(), 'scenario-linear');
   }
@@ -124,7 +133,7 @@ try {
   await page.setViewportSize({ width: 1680, height: 1100 });
   // An expired/missing session needs sign-in, not a repeated stream request.
   streamFailure = 503;
-  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
+  await openPage(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
   await page.waitForFunction(() => !document.querySelector('#observe-resume').hidden);
   assert((await page.locator('#identity').textContent()).includes('Signed in as'));
   streamFailure = 401; authenticated = false;
@@ -140,11 +149,11 @@ try {
   assert.equal(returnTo.searchParams.get('capability'), deck.capabilityId);
   assert.equal(admissions, 0, '401 must not resubmit');
   // Simulate the normal login return URL after the session has been renewed.
-  streamFailure = 0; authenticated = true; await page.goto(returnTo.href);
+  streamFailure = 0; authenticated = true; await openPage(returnTo.href);
   await page.waitForFunction(() => document.querySelector('#run-report').textContent.includes('Transport fixture output'));
   assert(await page.locator('#observe-sign-in').isHidden()); assert.equal(admissions, 0);
   authenticated = false;
-  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId }));
+  await openPage(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId }));
   await page.waitForFunction(() => !document.querySelector('#observe').disabled);
   await page.locator('#payload').fill('{}'); await page.locator('#observe').click();
   await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes('This request was not admitted'));
@@ -154,7 +163,7 @@ try {
   assert.equal(admissions, 0); authenticated = true;
   // A restart/eviction 404 is terminal for this observation; no implicit rerun.
   streamFailure = 404;
-  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
+  await openPage(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId, run: runId }));
   await page.waitForFunction(() => document.querySelector('#observe-status').textContent.includes('Resume cannot recover it'));
   assert(await page.locator('#observe-resume').isHidden());
   assert(await page.locator('#observe').isEnabled());
@@ -162,7 +171,7 @@ try {
   assert.equal(admissions, 0, '404 must never resubmit a capability');
   // Transient connection failures retain Resume and prevent duplicate Observe.
   streamFailure = 503;
-  await page.reload();
+  await page.reload(); await waitForShell();
   await page.waitForFunction(() => !document.querySelector('#observe-resume').hidden);
   assert(await page.locator('#observe').isDisabled());
   streamFailure = 0;
@@ -179,7 +188,7 @@ try {
     { kind: 'observation', payload: { observationType: 'execution-graph-captured.v1', graphId: 'graph:fixture-native-reader', cells: [], edges: [] } });
   interleaved.splice(Math.floor(interleaved.length * 2 / 3), 0, { kind: 'run-end', payload: { pid: 9001, exitCode: 0 } });
   externalCapture = interleaved.map((record, i) => 'data: ' + JSON.stringify({ ...record, seq: i + 1, observationKey: `fixture-observer:concurrent:${i + 1}` }) + '\n\n').join('');
-  await page.goto(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId }));
+  await openPage(origin + '/circuit/explorer?' + new URLSearchParams({ capability: deck.capabilityId, namespace: deck.namespaceId }));
   await page.waitForFunction(() => document.querySelector('.run-outcome')?.textContent === 'ADMITTED');
   await page.waitForFunction(() => [...document.querySelectorAll('.component-hit[data-current=true]')].some(node => node.dataset.nodeId.endsWith(':ADMITTED')));
   assert(!(await page.locator('#mode').textContent()).includes('REPLAY'), 'External follow must remain live mode');
