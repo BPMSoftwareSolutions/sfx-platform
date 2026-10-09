@@ -46,7 +46,8 @@ try {
     for (const [route, method, expected] of [
       ['/', 'GET', 200], ['/circuit/home', 'GET', 200], ['/circuit/healthcare-solutions', 'GET', 200], ['/circuit/circuit-runtime.js', 'GET', 200], ['/circuit/app.js', 'GET', 404], ['/circuit/session-status.js', 'GET', 404], ['/circuit/login', 'GET', 200], ['/circuit/explorer', 'GET', 200], ['/circuit/explorer-model.mjs', 'GET', 200], ['/circuit/pane-layout.js', 'GET', 200], ['/circuit/objective-run.js', 'GET', 200], ['/circuit/provider-profile.js', 'GET', 404],
       ['/circuit/page.html', 'GET', 200], ['/circuit/page.js', 'GET', 200], ['/circuit/page-runtime.js', 'GET', 200], ['/circuit/ui-components.js', 'GET', 200],
-      ['/circuit/view', 'GET', 200], ['/circuit/view.html', 'GET', 200], ['/circuit/view-runtime.js', 'GET', 200],
+      ['/circuit/view', 'GET', 404], ['/circuit/view.html', 'GET', 404], ['/circuit/view-runtime.js', 'GET', 200],
+      ['/circuit/region-runtime.js', 'GET', 200], ['/circuit/explorer-shell.js', 'GET', 200], ['/circuit/footer.js', 'GET', 200],
       ['/healthz','GET',200], ['/readyz','GET',200], ['/v1/runs/ready','GET',401], ['/internal/deployment','GET',401],
       ['/events','POST',405], ['/api/circuit/v1/scenario','POST',405], ['/api/circuit/v1/crosswalk','POST',405], ['/procedure-extract/json','POST',401],
       ['/robots.txt','GET',200], ['/favicon.ico','GET',200], ['/capabilities','GET',404], ['/about','GET',404], ['/sitemap.xml','GET',404]
@@ -55,6 +56,17 @@ try {
       assert.equal(response.status, expected, route); assert(!response.headers.get('www-authenticate')?.includes('Basic'));
       await response.body?.cancel(); checks.push({route,method,status:response.status});
     }
+    // Declared region host: every region must be served AUTHORED from the pinned
+    // provider packages in the image; a missing package is UI_REGION_PROVIDER_UNREADABLE
+    // (ui-explorer-region-blueprint.md §3.2, §5.2).
+    for (const regionId of ['header', 'left-sidebar', 'middle', 'right-sidebar', 'footer']) {
+      const region = await json(config.origin + '/api/circuit/v1/region?' + new URLSearchParams({contractId:'ui-region-request.v1', regionId}));
+      assert.equal(region.disposition, 'AUTHORED', regionId); assert.equal(region.shapeConforms, true, regionId); assert(region.candidate, regionId);
+      checks.push({route:'/api/circuit/v1/region', regionId, disposition:region.disposition, provider:region.candidate.regionProviderId});
+    }
+    const unknownRegion = await fetch(config.origin + '/api/circuit/v1/region?' + new URLSearchParams({contractId:'ui-region-request.v1', regionId:'banner'}), {redirect:'error', signal:AbortSignal.timeout(90000)});
+    assert.equal(unknownRegion.status, 404); assert.equal((await unknownRegion.json()).findings?.[0]?.code, 'UI_REGION_UNKNOWN');
+    checks.push({route:'/api/circuit/v1/region', regionId:'banner', status:404});
     // The former Live Circuit page is the Explorer: old links redirect with their selection intact.
     for (const route of ['/circuit', '/circuit/']) {
       const query = '?capability=' + encodeURIComponent(config.observe.subject) + '&page=scenario-1';

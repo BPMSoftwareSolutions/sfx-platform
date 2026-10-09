@@ -3,15 +3,20 @@
 //   node live-circuit/circuit/verify-view.mjs
 // Spawns the observer over the file-backed page fixtures and proves the
 // ui-view.v1 host end to end: the view document reads through the deployed page
-// reader, the URL selection binds into its declared sources (host selection
-// wins), the page validator admits it, and the host serves view.html /
-// view-runtime.js. Reads only; the fixture observer never touches ports 8788/8799.
+// reader, the selection binds into its declared sources (host selection wins),
+// the page validator admits it, and view-runtime.js is served to the Explorer
+// drill-down. Reads only; the fixture observer never touches ports 8788/8799.
+//
+// Click path: the Explorer's provider glyph click must open the declared view
+// (circuit-runtime.js selectComponent -> openDetail), reveal the Evidence pane,
+// and keep the generic authority browser as a collapsed disclosure below the
+// view. There is no standalone view page; the drill-down is its only host.
 //
 // Declared-only: the check also proves the bespoke provider-profile.js renderer
 // and every fallback path are gone. A provider drill-down that cannot read its
 // view is a named visible state, never a fallback render.
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,20 +41,32 @@ async function guard(name, work) {
   catch (error) { return record(name, false, `unavailable · ${error?.message ?? error}`); }
 }
 
-const [runtimeSource, htmlSource, serverSource, explorerSource, storeSource] = await Promise.all([
+const [runtimeSource, serverSource, explorerSource, storeSource, viewerSource] = await Promise.all([
   readFile(new URL('./view-runtime.js', import.meta.url), 'utf8'),
-  readFile(new URL('./view.html', import.meta.url), 'utf8'),
   readFile(new URL('../dispatch-pair/observe-server.mjs', import.meta.url), 'utf8'),
   readFile(new URL('./circuit-runtime.js', import.meta.url), 'utf8'),
   readFile(new URL('./live-store.mjs', import.meta.url), 'utf8'),
+  readFile(new URL('./circuit-viewer.js', import.meta.url), 'utf8'),
 ]);
 
 record('view-contract', runtimeSource.includes(`'${VIEW_CONTRACT}'`) && typeof createViewRuntime === 'function' && typeof readView === 'function',
   `contract=${VIEW_CONTRACT} projector=${/createPageRuntime/.test(runtimeSource)} validator=${/validatePage/.test(runtimeSource)}`);
-record('view-safety', !runtimeSource.includes('innerHTML') && htmlSource.includes('id="view-root"'),
-  `innerHTML=${runtimeSource.includes('innerHTML')} viewRoot=${htmlSource.includes('id="view-root"')}`);
-record('view-serving', serverSource.includes("['/circuit/view-runtime.js'") && serverSource.includes("['/circuit/view'") && serverSource.includes("'view-runtime.js'"),
-  'view.html, /circuit/view and view-runtime.js are CIRCUIT_FILES entries');
+record('view-safety', !runtimeSource.includes('innerHTML') && !runtimeSource.includes('document.write'),
+  `innerHTML=${runtimeSource.includes('innerHTML')}`);
+record('view-folded', serverSource.includes("['/circuit/view-runtime.js'")
+  && !serverSource.includes("['/circuit/view'") && !serverSource.includes("['/circuit/view.html'"),
+  `runtimeServed=${serverSource.includes("['/circuit/view-runtime.js'")} standalonePage=${serverSource.includes("['/circuit/view'")}`);
+record('view-standalone-removed', !(await access(new URL('./view.html', import.meta.url)).then(() => true, () => false)),
+  'view.html is deleted; the Explorer drill-down is the only mount point');
+record('view-click-path',
+  /function selectComponent\(id\)[\s\S]*?item\?\.kind === 'provider'[\s\S]*?openDetail\(id\)/.test(explorerSource)
+  && explorerSource.includes('selectNode: selectComponent')
+  && /addEventListener\('click', \(\) => selectNode\(/.test(viewerSource),
+  'the provider glyph click selects the component and opens its declared view');
+record('view-primary',
+  explorerSource.includes("context.tab('evidence')") && explorerSource.includes("'Declared authority (raw)'")
+  && /replaceChildren\(inspection, authority\)/.test(explorerSource),
+  'the declared view is the visible drill-down content; the generic authority browser is a collapsed disclosure below it');
 record('view-declared-only',
   explorerSource.includes('createViewRuntime(') && !explorerSource.includes('renderProviderProfile')
     && !explorerSource.includes('provider-profile.js') && !serverSource.includes("['/circuit/provider-profile.js'")
@@ -121,12 +138,10 @@ try {
       detail: `input={${Object.keys(input).join(',')}} binding=${Object.keys(readBinding?.input ?? {}).join(',')} hostWins=${hostWins} defaultKept=${defaultKept}` };
   });
 
-  await guard('view-host-serving', async () => {
-    const [page, runtime] = await Promise.all([fetch(`${fixtureBase}/circuit/view`), fetch(`${fixtureBase}/circuit/view-runtime.js`)]);
-    const html = await page.text();
-    const pass = page.status === 200 && html.includes('id="view-root"') && html.includes('/circuit/view-runtime.js')
-      && runtime.status === 200 && (await runtime.text()).includes('createViewRuntime');
-    return { pass, detail: `view.html=${page.status} view-runtime.js=${runtime.status}` };
+  await guard('view-host-folded', async () => {
+    const [gone, runtime] = await Promise.all([fetch(`${fixtureBase}/circuit/view`), fetch(`${fixtureBase}/circuit/view-runtime.js`)]);
+    const pass = gone.status === 404 && runtime.status === 200 && (await runtime.text()).includes('createViewRuntime');
+    return { pass, detail: `standaloneView=${gone.status} view-runtime.js=${runtime.status}` };
   });
 
   await guard('view-reader-reuse', async () => {
@@ -144,7 +159,7 @@ const summary = {
   failed: checks.filter(check => !check.pass).length,
   checks,
   limitations: [
-    'The fixture observer proves the read, binding and validator path; DOM execution of the projected view is the browser gate\'s capture bundle.',
+    'The fixture observer proves the read, binding, validator, fold and click-path wiring; the real browser click-to-screens proof is the browser gate\'s capture bundle.',
     'The estate publication of the ui-view declaration is proven by the declare-provider-profile-view migration and the live browser capture, not by the fixture host.',
   ],
 };

@@ -39,6 +39,7 @@ jobs:
       - run: node live-circuit/circuit/verify-objective.mjs
       - run: node live-circuit/circuit/verify-provider-profile.mjs
       - run: node live-circuit/circuit/verify-view.mjs
+      - run: node live-circuit/circuit/verify-region.mjs
       - run: node live-circuit/circuit/verify-pages.mjs --fixtures
       - run: node live-circuit/circuit/verify-components.mjs
       - run: node live-circuit/circuit/verify-claims.mjs --fixtures
@@ -84,7 +85,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: BPMSoftwareSolutions/sfx-providers
-          ref: a020024c513eee4f2a8f84939af284f84727d911
+          ref: a33b4428ab74d5910f6ea69947bdda5122a7d33f
           path: .release-sources/sfx-providers
           sparse-checkout: providers
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262

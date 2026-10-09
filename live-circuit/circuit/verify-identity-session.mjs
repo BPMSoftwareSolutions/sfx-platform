@@ -71,7 +71,7 @@ check('sign-in and home pages, scripts, styles and artwork are served', async ()
 });
 check('home configuration is host route data: hero and sign-in circuit only', async () => {
   const h = await (await get(o, '/api/circuit/v1/home')).json();
-  assert.equal(h.hero.capabilityId, 'authenticate-ide-user'); assert.equal(h.signInCircuit.capabilityId, 'authenticate-ide-user');
+  assert.equal(h.hero.capabilityId, 'ui-page-landing'); assert.equal(h.signInCircuit.capabilityId, 'authenticate-ide-user');
   assert.equal((h.featured ?? []).length, 0, 'featured is declaration authority, not host data (C1)');
 });
 check('no cookie: not authenticated, Observe requires session', async () => {

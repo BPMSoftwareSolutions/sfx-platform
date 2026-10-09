@@ -10,15 +10,19 @@ import { admissionBody, objectiveInput, spokenSummary, OBJECTIVE_CAPABILITY, OBJ
 const here = new URL('./', import.meta.url);
 const html = await readFile(new URL('explorer.html', here), 'utf8');
 const explorer = await readFile(new URL('explorer.js', here), 'utf8');
+const shell = await readFile(new URL('explorer-shell.js', here), 'utf8');
 const module_ = await readFile(new URL('objective-run.js', here), 'utf8');
 const server = await readFile(new URL('../dispatch-pair/observe-server.mjs', here), 'utf8');
-const client = [html, explorer, module_].join('\n');
+const client = [html, explorer, shell, module_].join('\n');
 
+// The declared middle region carries the composer; the shell builds its
+// behavior nodes into the declared slots, so the ids live in the shell module.
 for (const id of ['objective-form', 'objective-input', 'objective-voice-status', 'objective-mic', 'objective-run', 'objective-run-status', 'summary-strip', 'requested-capabilities'])
-  assert.match(html, new RegExp(`id="${id}"`), `Explorer declares ${id}`);
-assert.match(html, /<svg class="button-icon objective-mic-icon"[^>]*>[\s\S]*?M18\.585 13\.412[\s\S]*?<\/svg>/, 'The objective mic is the prompt-shell icon');
-assert.match(html, /id="objective-run"[^>]*>Run</, 'The objective action is Run');
-assert.match(html, /Voice ready/, 'The idle voice status is the shell copy');
+  assert.match(shell, new RegExp(`'${id}'`), `The shell slot content declares ${id}`);
+assert.match(shell, /M18\.585 13\.412/, 'The objective mic is the prompt-shell icon');
+assert.match(shell, /createElementNS\('http:\/\/www\.w3\.org\/2000\/svg', 'svg'\)/, 'The objective mic is an SVG icon');
+assert.match(shell, /id: 'objective-run'[\s\S]{0,220}text: 'Run'/, 'The objective action is Run');
+assert.match(shell, /Voice ready/, 'The idle voice status is the shell copy');
 assert.match(explorer, /createObjectiveRun\(/, 'The objective component is mounted in the Explorer');
 assert.match(module_, /Review or Run\./, 'The captured voice status is the shell copy');
 assert.ok(server.includes("['/circuit/objective-run.js'"), 'The circuit host serves objective-run.js');
