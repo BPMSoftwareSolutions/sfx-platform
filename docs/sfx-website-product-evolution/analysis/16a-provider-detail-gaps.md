@@ -1,6 +1,7 @@
 # 16a — Provider-detail surface gaps: what the drill-down reads today and what a per-provider UI contract must add
 
-Prepared 2026-10-09; updated 2026-10-10 with the model-provider trace (G13). Status: **research
+Prepared 2026-10-09; updated 2026-10-10 with the model-provider trace (G13) and the
+`SFX.Semantics` survey (G14). Status: **research
 and comparison only; not started.** Lane: provider-detail
 surface (companion to [`16b-provider-ui-contract.md`](16b-provider-ui-contract.md), which proposes
 the contract; this document records the surface that contract must fit and the exact deltas).
@@ -183,6 +184,9 @@ following are noise.
 No writer is applied from the browser; the retrieval service is read-only by policy
 (`docs/live-circuit-provider-details.md:120-126`; `live-circuit/circuit/README.md:187-191`).
 
+G14 adds the layer beneath all four intents: none of the read fields above has a typed semantic
+home today, so the contract's selections cannot yet resolve through `SFX.Semantics` (16b §11).
+
 ## 6. Efficiency: one broad read versus per-provider scoped reads
 
 **The broad read.** The details reader materialises the newest selected generation of *every*
@@ -273,6 +277,7 @@ Numbered deltas between the observed surface and the `provider-ui-contract.v1` d
 | G11 | The hosted UI provider API has no provider-detail operation; the drill-down provider is a pass-through over a prepared read, and its manifest references no contract | `sfx-ui-provider-drilldown.mjs:13-17`; `ui-provider-hosting.md:40-49` | manifest `uiContract` reference only; no new route (16b §8.5) |
 | G12 | Editor guard sourcing is manual: the staged document's `expectedDigest` values are literals from one capture, not read-selected row digests, so a stale page cannot be told from a fresh one | `provider-profile-P1.ui-view.json:847-853`; writer's guard semantics `PROVIDER_DETAILS_STALE_DIGEST` (`docs/live-circuit-provider-details.md:201-207`) | guards initialised from `provider_instructions.definition_digest`, `provider_engagements.generation_digest`, `provider_identity.definition_digest` (16b §4 guard rules) |
 | G13 | The drill-down displays neither the resolved model nor the three active instruction sources; the model-provider trace exists only outside it | `sfx-dal/.tmp/model-provider/model-resolution.json` (`model`, `stages`; ignored local trace, not committed); instruction texts at `prepare_objective_selection.sql:31`, `prepare_objective_capability_request.sql:31`, `prepare_objective_summary.sql:9`; the view's model/instruction material is captured literals (`provider-profile-P1.ui-view.json:716-737`) | a model section and instruction-source table over scoped read fields (16b §10.1-§10.4) |
+| G14 | Provider-detail reads have no semantic projection: `SFX.Semantics` generates a capability root only, with no `ProviderSnapshot`, typed instructions or typed model resolution, so model and instruction facts still come from ad-hoc extraction SQL | typed sections `sfx-dal/semantic/SFX.Semantics/Generated/CapabilityProjection.g.cs:36-85`; provider root planned and not started `sfx-dal/docs/semantic-object-projection-strategy.md:5,126`; trace's ad-hoc SQL `sfx-dal/.tmp/model-provider/read-composition.sql:1-18` | selections and guards resolve to a provider-root semantic contract instead of ad-hoc queries (16b §11, §11.3) |
 
 ## 9. What this document does not claim
 
@@ -299,3 +304,6 @@ Numbered deltas between the observed surface and the `provider-ui-contract.v1` d
 | `sfx-providers/providers/sfx-ui-*`, `sfx-providers/src/ui-providers/`, `sfx-providers/docs/ui-provider-hosting.md`, `ui-landing-provider-coverage.md` | hosted provider packages, versioned API, unfinished Stage B |
 | `sfx-dal/.tmp/model-provider/model-resolution.json` (captured 2026-10-10T00:02:42Z; ignored local trace, not committed) | the model-provider facts G13 and 16b §10 fold in: configured model, endpoint template, the three instruction sources |
 | `sfx-dal/.tmp/model-provider/prepare_objective_selection.sql:31`, `prepare_objective_capability_request.sql:31`, `prepare_objective_summary.sql:9` | the three declared instruction sources the trace resolves |
+| `sfx-dal/semantic/SFX.Semantics/`, `sfx-dal/semantic/contracts/capability-details.semantic-projection.v1.json` | the semantic read slice: generated `CapabilitySnapshot` types, snapshot-isolated read client, digest/provenance/refusal rules (16b §11.1) |
+| `sfx-dal/docs/semantic-object-projection-strategy.md` | `ProviderSnapshot` proposed mapping (`:126`); provider and graph roots not started (`:5`); declared read profiles (`:181`) |
+| `sfx-dal/.tmp/model-provider/Program.cs`, `read-composition.sql`, `read-definitions.sql`, `read-preparation-procedures.sql`, `read-provider.sql`, `Export-Resolution.ps1` | the trace read capability roots through `SemanticReadClient` and extracted the model/instruction facts with ad-hoc SQL (G14) |

@@ -1,11 +1,14 @@
 # 16b — Per-provider UI contract
 
-Prepared 2026-10-09; §10 updated 2026-10-10 with the model-provider trace. As a design
+Prepared 2026-10-09; §10 updated 2026-10-10 with the model-provider trace; §11 added 2026-10-10
+mapping the design onto the `SFX.Semantics` read slice. As a design
 specification only: no code, declaration, estate, provider or workflow file was changed by this
 document. Every normative statement is a **`[proposal]`** unless
 it cites a deployed artefact as **Observed**. The provider writer and reader are Observed
 (`../../live-circuit-provider-details.md`); the drill-down view and hosted provider API are Observed
-(`live-circuit/circuit/view-runtime.js`, `sfx-providers/docs/ui-provider-hosting.md`). Nothing here
+(`live-circuit/circuit/view-runtime.js`, `sfx-providers/docs/ui-provider-hosting.md`); the
+`SFX.Semantics` slice is Observed but its contract remains a non-authoritative draft (§11.1).
+Nothing here
 authorises SDA, `sfx-embody` or `sfx-dal` changes (`AGENTS.md`); SDA behaviour changes only by
 request to `scenario-driven-architecture`.
 
@@ -132,6 +135,12 @@ document"; it never means the render may apply — both presentations are reads 
 illustrative: the admitted contract must use the reader's declared column names exactly, and a
 mismatch refuses by name (§3, item 1).
 
+> **Semantic addressing `[proposal]`.** When a semantic projection covers the reader (§11),
+> `selection` addresses typed snapshot fields and digests instead of raw result-set columns; the
+> semantic contract's mapping is then the only place column names appear, and a selection naming an
+> absent entity, entity field or digest refuses by name like an absent column. Until the
+> provider-root projection lands, the reader-column rule above governs.
+
 > **Caveat (proposal).** The `editIntents` shown is one entry; the model kind's full set is the §4
 > table. `intentRefs` in a section is a list of `intentId`s the section's fields feed.
 
@@ -254,6 +263,9 @@ The contract's `readScope` is the query plan for the profile:
 5. **Read policy.** The scope parameter is validated server-side and can only narrow; a scope
    naming an undeclared set refuses (`PROVIDER_DETAILS_SCOPE_INVALID` `[proposal]`). Reads keep the
    existing queue, cache, timeout and size limits (`implementation-strategy.md:628-644`).
+6. **Semantic home.** The scope profile belongs on the provider-root semantic contract when it
+   lands (§11.3; `sfx-dal/docs/semantic-object-projection-strategy.md:126,181`); the reader
+   parameter and the compose-time fallback remain the transport until then.
 
 ---
 
@@ -289,6 +301,10 @@ free-for-all (`AGENTS.md`; `implementation-strategy.md:388-395`).
   the effective contract, the resolution marker and the candidate digests. It is registered as a
   reader (new `readers` entry / source, K5 pattern, `analysis/07-kind-and-reader-tooling.md:179-219`)
   so the shell fetches it like every other source; the browser still never runs SQL.
+- **Bound by a semantic contract.** The same reader is the source of a semantic projection
+  contract following `sfx.capability-details` (§11): the compose step then consumes a typed,
+  digest-addressed snapshot with provenance and named refusals instead of raw result sets, and the
+  contract's `contractDigest`/`resolution` members are projections of that snapshot.
 - **Publication** is a migration pair that appends a revision and moves the pointer; a contract
   change needs no shell deploy and no provider release, matching the data-only publication rule for
   class (c) (`implementation-strategy.md:388-395`). Digest-addressing makes the pair's no-op proof
@@ -380,6 +396,10 @@ intent's lived precedent is `route-objective-v3-summary-through-secondary-provid
 captured 2026-10-10T00:02:42Z) resolved the identity `request-capability-from-objective-v3` (estate
 model pk 34, capability definition pk 221960, execution authority version pk 113320) from stored
 definitions. `runtimeInvocationPerformed` and `expandedRuntimePromptsCaptured` are both `false`.
+The trace's capability reads ran through `SFX.Semantics`
+(`SemanticReadClient.ReadCapabilitySourceAsync`, `sfx-dal/.tmp/model-provider/Program.cs:11,20`);
+its model and instruction fields required ad-hoc extraction SQL — the gap and the opportunity §11
+records.
 
 - **The configured model** (`model`): resolved model `gemini-3.8-flash`
   (`configuredModel`/`endpointModel`; the conveyor member's `alias`/`resolvedModel`, §4), endpoint
@@ -496,7 +516,121 @@ without the request.
 
 ---
 
-## 11. Open questions `[proposal]`
+## 11. Handling provider details through `SFX.Semantics`
+
+**Why this section.** The scoped reads (§5), the field selections (§2-§3) and the guard rules (§4)
+name result sets and columns of `analysis.read_provider_details`. `SFX.Semantics` is the declared
+read slice above the estate: it projects installed readers into immutable, digest-addressed,
+refusal-aware snapshots (`sfx-dal/semantic/README.md:1-13`). This section maps every contract
+element to that layer, states what it provides today and what is missing, and names the flywheel
+the mapping sets in motion (§11.4). The design rule it adds: selections and guards resolve to
+typed semantic fields, never to ad-hoc SQL or unvalidated result-set columns.
+
+### 11.1 What `SFX.Semantics` provides today — and what is missing (Observed)
+
+The package is `sfx-dal/semantic/SFX.Semantics`, the first read slice of the semantic object
+projection strategy: contract `sfx.capability-details` revision `0.1.0-draft`, explicitly a
+non-authoritative draft whose estate-owned declaration is pending
+(`sfx-dal/semantic/SFX.Semantics/Generated/CapabilityProjection.g.cs:4-5,26-34`). The strategy
+records it as capabilities-only: "Provider and graph roots, S5-S9 and all mutation work are not
+started" (`sfx-dal/docs/semantic-object-projection-strategy.md:5`), and `ProviderSnapshot` over
+`provider_identity`, `provider_configuration`, `provider_mechanics`, `provider_bindings` and
+`provider_engagements` is a proposed mapping, not generated code (`:126`).
+
+| What this design needs | What the semantic layer provides today | Anchor |
+| --- | --- | --- |
+| A scoped read on one consistent basis | `SemanticReadClient.ReadCapabilityAsync(capabilityId, estateModelPk)`: one connection, one SNAPSHOT transaction, current-estate resolution when unpinned, reader-definition digest observed inside it, always rolled back; the projection binds the document SHA-256; the client has no write path | `SemanticReadClient.cs:70-75,107-158,160-185,187-197,30` |
+| Typed provider references | `Provider` records (`provider_id`, `reference_kinds`, `provider_role`, `role_evidence_status`, overlay counts, `authority_closure_satisfied`, opaque `operation_references`) — "a declared provider is not evidence of runtime use" | `CapabilityProjection.g.cs:430-486` |
+| Typed slots and bindings | `ProviderBinding` records (`slot_id`, `provider_id`, `provider_definition_pk`, `definition_digest`, `selection_policy`, `binding_role`, `binding_port_ids`) | `CapabilityProjection.g.cs:375-428` |
+| Typed ports | `Port` records (`port_id`, `port_version_pk`, `definition_digest`, `platform_capability_id`, `provider_overlay_id`, `linked_is_newest`/`linked_selected`, `invocation_count`) | `CapabilityProjection.g.cs:329-373` |
+| Exact joins without fetches | `ResolveProvider(ProviderBinding)`, `ResolvePort`, `ResolveScenario`: `Resolved`/`Dangling`/`NotApplicable` | `SemanticRuntime.g.cs:126-139`; `CapabilityProjection.g.cs:575-637` |
+| Identity and provenance | `SemanticIdentity` (namespace, kind, declared id, revision locator); `SemanticProvenance` (contract id/revision/digest, bound arguments, procedure, document SHA-256, capture) | `SemanticRuntime.g.cs:141-145,204-216` |
+| Named absence and refusal | `SemanticAvailability.Present`/`Absent`/`ContractMismatch`; declared refusals `CAPABILITY_NOT_FOUND`, `CAPABILITY_NOT_SELECTED`; availability "says nothing about admission, conformance or mutation eligibility" | `SemanticRuntime.g.cs:25-41`; `CapabilitySource.g.cs:75-96`; `CapabilityProjection.g.cs:533-552` |
+| Stale and mismatch control | canonical payload `ProjectionDigest` (RFC 8785 ordering, capture time and generator excluded) and source-text SHA-256 for opaque fragments | `CapabilityProjection.g.cs:551-552`; `SemanticRuntime.g.cs:674-705` |
+| Lossless reading | 7 typed sections, 38 retained verbatim of 45 expected; `ReconstructSourceDocument()`; bounded `ToInspectionJson()` | `CapabilityProjection.g.cs:36-85,1188-1251,1976` |
+| Verification | CLI `read`/`inspect`/`verify`; 14 live checks pass for the capability slice | `SFX.Semantics.Cli/Program.cs:31-39,70-89`; `sfx-dal/semantic/README.md:62-71` |
+
+**Missing, stated plainly.**
+
+- **No provider root.** The only generated snapshot is `CapabilitySnapshot`; there is no
+  `ProviderSnapshot`, no provider-details semantic contract, and no typing of
+  `provider_engagements`, `provider_mechanics` or `provider_instructions`. `ProviderSnapshot` is
+  planned (`sfx-dal/docs/semantic-object-projection-strategy.md:126`) and not started (`:5`).
+- **No typed provider identity digest.** `Provider` carries no `definition_digest`; digests exist
+  on `ProviderBinding`, `Port` and `ScenarioContract` only
+  (`CapabilityProjection.g.cs:430-486,402,347,203`). The contract's document guard
+  (`provider_identity.definition_digest`, §4) has no direct semantic field today.
+- **No typed instructions.** No instruction section or entity exists in `sfx.capability-details`;
+  `provider_overlays` is an expected-but-retained opaque section
+  (`CapabilityProjection.g.cs:36-85`). The §10.3 fields (direction, `instruction_kind`,
+  `json_path`, value, digest) have no semantic counterpart.
+- **No typed model resolution.** Nothing names a configured model, endpoint template, binding id
+  or source transformation; the trace's `model` block (`sfx-dal/.tmp/model-provider/model-resolution.json:9-19`)
+  required ad-hoc extraction SQL.
+- **No mutation surface, by design.** Semantic availability is not authority
+  (`SemanticRuntime.g.cs:22-24`). Edit intents cannot map to semantic services; they map to the
+  writer through read-selected guards, exactly as §4 states.
+
+### 11.2 The model-provider trace proves the pattern and the gap (Observed)
+
+The trace used the semantic client where it fits — `SemanticReadClient.ReadCapabilitySourceAsync`
+for the capability and helper roots (`sfx-dal/.tmp/model-provider/Program.cs:11,20`; the saved
+sources are serialized `SemanticRead` records) — and ad-hoc SQL where it does not: the
+transformation composition, preparation procedures and definitions came from
+`sfx-dal/.tmp/model-provider/read-composition.sql:1-18`, `read-preparation-procedures.sql:1-7` and
+`read-definitions.sql:1-10`, the provider rows from `read-provider.sql:1`, assembled by
+`Export-Resolution.ps1:4-45`. Its fields map one-to-one onto the contract's proposed sections: the
+`model` block (`model-resolution.json:9-19`) is §10.1's model section; the three `stages`
+(`:20-60`) are the instruction-source table; the resolved providers and `portVersionPk` 6089/6090
+are §10.1's engagement rows. It also exercised the semantic refusal path: the requested
+(misspelled) identity resolved `CAPABILITY_NOT_FOUND`, the corrected identity resolved (`:3-5`) —
+the same refuse-by-name behaviour §9.6 requires.
+
+### 11.3 Scoped reads and edit intents mapped to semantic types `[proposal]`
+
+The contract keeps its declared shape; what changes is where its selections point. The target is a
+provider-details semantic contract — the strategy's `ProviderSnapshot`
+(`sfx-dal/docs/semantic-object-projection-strategy.md:126`) — reading `analysis.read_provider_details`
+row-mode, pairing section labels with a pinned descriptor per the strategy's provider-transport rule
+(`:119`), with declared summary/detail profiles, a facility the strategy already requires because
+filtering after retrieval does not reduce SQL cost (`:181`). Until it lands, only the
+capability-root types above exist, and the trace's ad-hoc SQL is the honest description of
+model/instruction resolution.
+
+| Contract element | Semantic type or service it maps to | Status |
+| --- | --- | --- |
+| `readScope.sets` / `rowLimits` (§5) | declared read profile on the provider-root contract, generated `ProviderSource`/`ProviderSnapshot`, one SNAPSHOT basis, digest and capture as `CapabilitySnapshot` has | missing (planned root) |
+| identity section and document guard (§2, §4) | provider-root `SemanticIdentity` and provenance; a typed provider definition digest (today only bindings, ports and contracts carry digests) | partial |
+| model section (§10.1) | typed provider-root model entity carrying the trace's `model` fields (`configuredModel`, `endpointTemplate`, `endpointModel`, `bindingId`, source transformation pk/digest/expression) | missing |
+| instruction-source table (§10.1) | typed instruction entity preserving direction, kind, path, value and digest, excluding `FIXTURE`/`PROJECTED`/`MAPPING` copies (`live-circuit-provider-details.md:282-285`) | missing |
+| engagement rows (§10.3) | provider-root `provider_engagements` entity; capability-root `Provider`/`ProviderBinding`/`Port` are capability-scoped references, not the engagement read | missing |
+| `selection` pointers (§2-§3) | field paths on snapshot entities (`ProviderBinding.DefinitionDigest`, `Port.DefinitionDigest`, future provider-root fields) instead of raw result-set columns or literals | partial: types exist, provider-root fields do not |
+| edit intents and `expectedDigest` guards (§4, §10.2) | read-selected digest fields on the typed entities; the estate writer stays the only apply path; the semantic layer stages and applies nothing | by design |
+
+Every section selection therefore becomes a path into a snapshot — a typed field, its source row
+and its digest — and the compose step (§8.1) resolves the snapshot instead of issuing ad-hoc
+queries. An absent entity, field or digest refuses by name at the same boundary as an absent
+set/column (§3.1); a `ContractMismatch` propagates as a named read state, never a partial render.
+
+### 11.4 The flywheel
+
+**The flywheel.** The estate declares semantic objects; CodeLightly projects them into
+`SFX.Semantics` snapshot types (capability root today, provider root next); the provider UI
+contract is declared as estate data whose sections and intents select typed semantic fields and
+digests rather than ad-hoc queries (§7, §11.3); the platform composes that contract against a
+semantic read into the one generic `provider-profile` view; the hosted `sfx-ui-provider-drilldown`
+prepares it and the browser renders and stages it; the drill-down's gaps and the slice's acceptance
+evidence become the next semantic contract revision (provider root, then instruction and model
+entities), which sharpens the contract, the hosted provider and the drill-down in turn. The
+model-provider slice is the first turn of that wheel: it proves the capability-root round trip
+(one pinned read, typed providers/bindings/ports, digests, named refusal) and exposes exactly the
+provider-root fields the contract now declares — configured model, endpoint, binding and the three
+instruction sources — which the trace could resolve only with ad-hoc SQL
+(`sfx-dal/.tmp/model-provider/read-*.sql`).
+
+---
+
+## 12. Open questions `[proposal]`
 
 - **Kind taxonomy admission.** `model-overlay`/`http-overlay`/`platform-capability`/`slot-bound` is
   this document's vocabulary; it becomes authority only as admitted estate data, with detection
