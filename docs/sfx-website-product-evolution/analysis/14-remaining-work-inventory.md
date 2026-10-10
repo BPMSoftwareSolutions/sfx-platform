@@ -33,6 +33,8 @@ A09/A11/A12/A13a/A13b/A13c = [`analysis/09-iteration-loop-tooling.md`](09-iterat
 [`analysis/13b-shell-pages.md`](13b-shell-pages.md),
 [`analysis/13c-serving-and-readers.md`](13c-serving-and-readers.md);
 A15 = [`analysis/15-provider-deployment-boundary.md`](15-provider-deployment-boundary.md);
+A16a/A16b = [`analysis/16a-provider-detail-gaps.md`](16a-provider-detail-gaps.md),
+[`analysis/16b-provider-ui-contract.md`](16b-provider-ui-contract.md);
 REV = [`review.md`](../review.md).
 
 **Status legend.** *done* = landed and evidenced in-repo; *uncommitted* = present in the working
@@ -265,18 +267,23 @@ it must tolerate its absence in CI (F3/R7).
 
 ## 9. Provider deployment boundary — providers-first rollout
 
-Added 2026-10-08; rollout order corrected 2026-10-09. This is the post-batch companion to §3. The
-workstream and its P1–P4 specification are
+Added 2026-10-08; rollout order corrected 2026-10-09; P5 added 2026-10-10. This is the post-batch
+companion to §3. The workstream and its P1–P4 specification are
 [`analysis/15-provider-deployment-boundary.md`](15-provider-deployment-boundary.md) (A15), whose
 originating plan is
 [`sidefx-circuit-driven-ui-strategy.md`](../../sidefx-circuit-driven-ui-strategy.md) (SP) L54–L79
 with L9, L97 (L09), L103, L107, L118 and L130. A15 is design only — every statement there is
-`[proposal]`, and its status for all four items is **not started**.
+`[proposal]`, and its status for all four items is **not started**. P5 (the model-provider
+drill-down slice) is specified in A16b §10 against the model-provider trace, with its gap recorded
+as A16a G13; its provider half is Stage A work, its shell compose rides Stage B, and its estate
+contract rows ride the same externally gated estate half as P2.
 
-**Stage A — providers first (leads).** P1–P4 lead the rollout: every UI circuit provider
+**Stage A — providers first (leads).** P1–P5 lead the rollout: every UI circuit provider
 (`header`, `left-sidebar`, `middle`, `right-sidebar`, `footer`, drill-down) is completed,
 packaged, versioned and tested entirely in `sfx-providers`, then hosted and consumable through the
-provider API (P1) independently of `sfx-platform` (SP L9, L64–L70, L103, L118). IS §11.4 gate
+provider API (P1) independently of `sfx-platform` (SP L9, L64–L70, L103, L118). The drill-down
+provider's completion is concrete in P5: display the configured model and the three active
+instruction sources, and stage the three guarded intents (A16b §10; A16a G13). IS §11.4 gate
 relations are noted per row; no new gate is proposed, and G2 stays withdrawn (W9).
 
 | ID | Item | Status | Source | Change surface | Acceptance evidence owed | Turn / gate |
@@ -285,9 +292,10 @@ relations are noted per row; no new gate is proposed, and G2 stays withdrawn (W9
 | P2 | Admission and version selection, host-unchanged — a slot resolves through its admitted binding to `providerId` + selected version/generation digest, per slot, never global latest; rollback reselects the prior generation; an incompatible provider refuses and the prior selection stays in force, no silent fallback | not started | A15 §2; SP:9, 97 (L09), 107, 128; A14 B1 | estate: migration pair declaring identities, contracts, ports, bindings and generations (B1); shell: read the admitted selection/manifest; CI: two-version fixture, shell-digest comparison, conformance gate | the four-step L09 test (v1 digest baseline; v2 admitted with identical shell digests and conformance passing; v3 named contract refusal with v2 still selected; v1 rollback with no shell delta); pair preflight/commit + in-transaction proof; selection/capture receipts | Estate half externally gated (`sfx-embody` lifecycle, E3); G2 not an open gate (W9) |
 | P3 | Browser loading security mechanics and trust boundary — only if browser loading is admitted: fail-closed strict CSP, digest-verified asset fetch with named refusal, isolation with no ambient session/kernel/credential/network authority, content-addressed immutable assets pinned to the admitted generation; provider bytes and unverified manifest fields stay untrusted | not started; every element unproven (SP L130) | A15 §3; SP:62, 70, 128, 130 | shell: CSP/headers, integrity verification, isolation boundary, pin enforcement; provider: content surviving the allowlists, no executable authority; estate: admitted contracts selecting the mechanic; CI: negative security fixtures and a browser gate (F3) | named refusals for a tampered asset digest, a version/generation mismatch, a CSP-forbidden construct, an undeclared entrypoint and an attempted authority fetch; proof served assets carry no credential; browser-gate receipt under an admitted binding | One turn once a browser mechanic is admitted; no `browser-runtime` binding admitted (A12 §5, W9) |
 | P4 | Package boundaries, independent versioning and release independence — one package per independently versioned provider concern; package semver and admitted generation digest move together; a provider release changes only that package, a contract change is a declaration revision and admission, and each package stays testable with plain `node` without platform or estate | not started | A15 §4; SP:9, 56, 103, 118, 130; A14 B3 | provider: package layout, checks, release refs; shell: pins/packaging only, no code; estate: versions/digests as declaration data; CI: per-package checks, composite digest inventory, version-swap drill | release-independence test: vX and vX+1 pass their own checks and host conformance; version swap with empty host diff; incompatible contract version refused by name; per-version check output and composite inventory digests | Externally paced by provider deploys (B3: 1 of 6 packages done) |
-| SB | **Stage B — platform mount items.** §3's R1–R9 declared-region wave and the runbook's lanes, push, deploy and receipts: `sfx-platform` becomes the thin consumer (loader + mounts) in one batch | reference-only until Stage A is consumable; uncommitted platform region mounts are not the rollout | A15 Rollout sequence; SP:60, 79, 118, 128; §3 | shell: loader + mounts only (providers complete in Stage A) | Stage A consumption proof through P1, then the batch receipts | Dependent on Stage A (P1–P4) |
+| P5 | **Model-provider drill-down slice.** Display the configured model (resolved `gemini-3.8-flash` and the endpoint template `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`, from `compose-governed-model-invocation.v1`) and the three active instruction sources (`analysis.prepare_objective_selection`, `analysis.prepare_objective_capability_request`, `analysis.prepare_objective_summary`) with their declared ids and source paths; three staged edit intents — instruction text, model version, generic-LLM-connector provider switch — each mapped to the writer's `expectedDigest` guard; scoped read fields; no-apply | not started | A16b §10; A16a G13; `sfx-dal/.tmp/model-provider/model-resolution.json`; `prepare_objective_selection.sql:31`, `prepare_objective_capability_request.sql:31`, `prepare_objective_summary.sql:9` | provider: `sfx-ui-provider-drilldown` completion and manifest `uiContract` reference (Stage A); estate: `ui_provider_ui_contract` model-overlay default and gemini provider overrides (externally gated with P2); shell: `provider-ui-contract` source and compose step (Stage B) | before/after `definition_digest` and `generation_digest` pairing through `provider_details_change_summary`; the staged document matches the verified shape with read-initialised guards and no writer call; rollback-only probe: a mutated digest refuses `PROVIDER_DETAILS_STALE_DIGEST`, the unmutated re-apply is `already_set`; the served section shows configured, never runtime, model facts | One turn for the provider slice; shell compose after Stage A; estate half externally gated (P2/E3) |
+| SB | **Stage B — platform mount items.** §3's R1–R9 declared-region wave and the runbook's lanes, push, deploy and receipts: `sfx-platform` becomes the thin consumer (loader + mounts) in one batch | reference-only until Stage A is consumable; uncommitted platform region mounts are not the rollout | A15 Rollout sequence; SP:60, 79, 118, 128; §3 | shell: loader + mounts only (providers complete in Stage A) | Stage A consumption proof through P1, then the batch receipts | Dependent on Stage A (P1–P5) |
 
-**Stage B separation.** P1–P4 lead as Stage A and owe their own commit, deploy and receipts first;
+**Stage B separation.** P1–P5 lead as Stage A and owe their own commit, deploy and receipts first;
 §3's R1–R9 platform mounts are explicitly Stage B, dependent on Stage A. The uncommitted platform
 region mounts are reference-only, not the rollout; the runbook's §5 note points here, and §3's
 R1–R9 scope/status stand as written for the reference batch.
